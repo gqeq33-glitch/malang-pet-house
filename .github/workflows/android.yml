@@ -1,0 +1,67 @@
+# 안드로이드 앱 빌드 (클라우드). PC에 Android Studio 없이도 GitHub가 APK/AAB를 만들어 준다.
+# - 언제나: 테스트용 app-debug.apk (폰에 바로 설치 가능)
+# - 저장소 Secrets에 서명키 4개가 있으면: 구글 플레이 업로드용 app-release.aab
+#   ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD
+name: Android build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['www/**', 'assets/**', 'capacitor.config.json', 'package.json', '.github/workflows/android.yml']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Install Capacitor
+        run: npm install
+
+      - name: Create Android project
+        run: |
+          npx cap add android
+          npx @capacitor/assets generate --android --iconBackgroundColor "#DDF4EA" --splashBackgroundColor "#DDF4EA"
+          npx cap sync android
+          # 플레이 스토어는 업데이트마다 versionCode가 커져야 하므로 빌드 번호를 쓴다
+          sed -i "s/versionCode 1$/versionCode ${{ github.run_number }}/" android/app/build.gradle
+
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: malang-pet-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Build signed release AAB
+        if: env.HAS_KEYSTORE == 'true'
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/upload.jks"
+          npx cap build android \
+            --keystorepath "$RUNNER_TEMP/upload.jks" \
+            --keystorepass "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" \
+            --keystorealias "${{ secrets.ANDROID_KEY_ALIAS }}" \
+            --keystorealiaspass "${{ secrets.ANDROID_KEY_PASSWORD }}" \
+            --androidreleasetype AAB
+
+      - uses: actions/upload-artifact@v4
+        if: hashFiles('android/app/build/outputs/bundle/release/*.aab') != ''
+        with:
+          name: malang-pet-release-aab
+          path: android/app/build/outputs/bundle/release/*.aab

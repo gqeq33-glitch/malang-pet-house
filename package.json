@@ -1,0 +1,24 @@
+{
+  "name": "malang-pet-house",
+  "version": "1.0.0",
+  "private": true,
+  "description": "말랑 펫하우스 - 어린이 펫 키우기 게임 (PWA + Capacitor 네이티브 앱)",
+  "scripts": {
+    "serve": "npx http-server www -p 8080 -c-1",
+    "assets": "npx @capacitor/assets generate --iconBackgroundColor \"#DDF4EA\" --splashBackgroundColor \"#DDF4EA\"",
+    "android:add": "npx cap add android",
+    "ios:add": "npx cap add ios",
+    "sync": "npx cap sync",
+    "android:open": "npx cap open android",
+    "ios:open": "npx cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/ios": "^7.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^7.0.0"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "appId": "com.malangpet.house",
+  "appName": "말랑 펫하우스",
+  "webDir": "www",
+  "backgroundColor": "#DDF4EA",
+  "android": {
+    "allowMixedContent": false
+  },
+  "ios": {
+    "contentInset": "never"
+  }
+}
