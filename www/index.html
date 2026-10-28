@@ -109,6 +109,31 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
 .flash.go{animation:flash 1.6s ease-out}
 @keyframes flash{0%{opacity:0}35%{opacity:1}100%{opacity:0}}
 .tags{position:absolute;inset:0;pointer-events:none;z-index:4}
+.emote-btn{position:absolute;left:10px;bottom:10px;z-index:6;width:48px;height:48px;border-radius:50%;border:0;font-size:26px;background:var(--paper);box-shadow:0 0 0 2.5px var(--ink) inset,0 4px 0 rgba(91,69,80,.25)}
+.emote-tray{position:absolute;left:10px;bottom:66px;z-index:7;display:flex;gap:6px;background:var(--paper);border-radius:18px;padding:6px;box-shadow:0 0 0 2.5px var(--ink) inset,0 4px 0 rgba(91,69,80,.2)}
+.emote-tray button{border:0;background:var(--soft);border-radius:12px;width:52px;padding:6px 0 4px;font-size:22px;display:flex;flex-direction:column;align-items:center;gap:1px}
+.emote-tray small{font-family:var(--display);font-size:11px}
+.cook-btn{width:100%;margin-bottom:12px;background:#FFE0C7}
+.pantry{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.pan{font-family:var(--display);font-size:15px;background:var(--soft);border-radius:99px;padding:4px 10px;box-shadow:0 0 0 2px var(--line) inset;font-variant-numeric:tabular-nums}
+.item.off{opacity:.45}
+.pot{font-size:64px;line-height:1.1}
+.pot.stir{animation:wobble .35s ease}
+.obby-ui{position:absolute;inset:0;z-index:8;pointer-events:none}
+.ob-top{position:absolute;top:8px;left:8px;right:8px;display:flex;gap:6px;align-items:center;justify-content:flex-end;pointer-events:auto}
+.ob-top .pill{font-size:15px;padding:5px 10px;background:rgba(255,255,255,.92)}
+.ob-tip{position:absolute;top:60px;left:16px;right:16px;margin:0;text-align:center;font-family:var(--display);font-size:15px;color:#fff;text-shadow:0 2px 0 var(--ink)}
+.joy{position:absolute;left:18px;bottom:18px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.45);box-shadow:0 0 0 3px rgba(91,69,80,.55) inset;pointer-events:auto;touch-action:none;display:grid;place-items:center}
+.joy i{width:56px;height:56px;border-radius:50%;background:var(--paper);box-shadow:0 0 0 3px var(--ink) inset,0 4px 0 rgba(91,69,80,.3)}
+.jump-btn{position:absolute;right:18px;bottom:24px;width:110px;height:110px;border-radius:50%;border:0;background:var(--coral);color:#fff;font-family:var(--display);font-size:24px;box-shadow:0 6px 0 #B54A60,0 0 0 4px #fff inset;pointer-events:auto;touch-action:none}
+.jump-btn.on{transform:translateY(4px);box-shadow:0 2px 0 #B54A60,0 0 0 4px #fff inset}
+#obResult{z-index:9}
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px}
+.badge-card{display:flex;flex-direction:column;align-items:center;text-align:center;gap:3px;background:var(--soft);border-radius:18px;padding:10px 6px;box-shadow:0 0 0 2px var(--line) inset;opacity:.6}
+.badge-card.got{opacity:1;background:#FFF7D6;box-shadow:0 0 0 2.5px var(--ink) inset}
+.badge-card .be{font-size:32px}
+.badge-card b{font-family:var(--display);font-weight:400;font-size:14px}
+.badge-card small{font-size:11px;color:var(--muted);line-height:1.35}
 .mbtn{position:relative}
 .badge{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;border-radius:9px;background:#E8476A;color:#fff;font-size:11px;font-family:var(--display);display:grid;place-items:center;padding:0 4px;box-shadow:0 0 0 2px #fff}
 .msub{margin:0 0 10px;color:var(--muted);font-size:13px}
@@ -332,11 +357,13 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
         <button data-go="living">🛋️ 거실</button><button data-go="kitchen">🍳 부엌</button><button data-go="bedroom">🛏️ 침실</button><button data-go="bath">🛁 욕실</button><button data-go="door">🚪 밖으로</button>
       </div>
       <div class="room-tabs" id="villageTabs" hidden>
-        <button data-go="home">🏠 집으로</button><button data-go="plaza">⛲ 광장</button><button data-go="bakery">🍯 빵집</button><button data-go="library">📚 도서관</button><button data-go="flower">🌸 꽃집</button><button data-go="playground">🛝 놀이터</button><button data-go="camp">⛺ 캠핑장</button><button data-go="beach">🏖️ 해변</button><button data-go="meadow">🌼 꽃언덕</button>
+        <button data-go="home">🏠 집으로</button><button data-go="plaza">⛲ 광장</button><button data-go="bakery">🍯 빵집</button><button data-go="library">📚 도서관</button><button data-go="flower">🌸 꽃집</button><button data-go="playground">🛝 놀이터</button><button data-go="camp">⛺ 캠핑장</button><button data-go="beach">🏖️ 해변</button><button data-go="meadow">🌼 꽃언덕</button><button data-go="garden">🥕 텃밭</button><button data-go="portal">🌈 점프 코스</button>
       </div>
       <div class="bubble" id="bubble">안녕!</div>
       <div class="night"></div>
       <div class="flash" id="flash"></div>
+      <button class="emote-btn" id="emoteBtn" aria-label="감정 표현">😀</button>
+      <div class="emote-tray" id="emoteTray" hidden><button data-emote="wave">👋<small>인사</small></button><button data-emote="dance">💃<small>춤</small></button><button data-emote="spin">🌀<small>빙글</small></button><button data-emote="jump">🙌<small>점프</small></button><button data-emote="hop">🎵<small>신나!</small></button></div>
       <div class="fade" id="fade"></div>
       <div class="fx" id="fx"></div>
       <div class="sponge" id="sponge" hidden>🧽</div>
@@ -708,6 +735,7 @@ function addXP(n) {
   if (!up) return;
   const f = formOf(p.level);
   if (f !== formBefore) {
+    if (f >= 1) badge('form1'); if (f >= 2) badge('form2'); if (f >= 4) badge('form4');
     World.transform(formBefore, () => {
       confetti(110); sfx('hatch');
       toast(`✨ 변신! ${FORMS[f].name} ${p.name}`);
@@ -763,14 +791,16 @@ function renderHUD() {
   const egg = !p.hatched;
   document.querySelectorAll('.act').forEach(b => {
     const a = b.dataset.act;
-    b.disabled = (egg && !['shop', 'dex'].includes(a)) || (bathing && a !== 'bath') || (p.asleep && ['feed', 'play', 'bath'].includes(a));
+    b.disabled = (egg && !['shop', 'dex'].includes(a)) || (bathing && a !== 'bath') || (p.asleep && ['feed', 'play', 'bath'].includes(a)) || World.area() === 'obby';
   });
   $('#sleepIc').textContent = p.asleep ? '☀️' : '🌙';
   $('#sleepTxt').textContent = p.asleep ? '깨우기' : '잠';
   room.classList.toggle('sleeping', !!p.asleep);
   World.setTheme(ROOMS[S.room] || ROOMS.mint);
   const outside = World.area() === 'village';
-  $('#roomTabs').hidden = outside; $('#villageTabs').hidden = !outside;
+  const inObby = World.area() === 'obby';
+  $('#roomTabs').hidden = outside || inObby; $('#villageTabs').hidden = !outside;
+  $('#emoteBtn').hidden = egg || inObby; if (inObby || egg) $('#emoteTray').hidden = true;
   document.querySelectorAll('#roomTabs button').forEach(b => { b.disabled = egg || bathing || p.asleep; b.classList.toggle('on', b.dataset.go === World.roomNow()); });
 }
 function render() { renderHUD(); renderPet(); }
@@ -799,7 +829,8 @@ const World = (() => {
     arcade: { x: -1, z: 2.5, face: Math.PI, y: 0 },
     sofa: { x: -6.8, z: 4.6, face: Math.PI / 2, y: .45 },
     tv: { x: -6.8, z: 2.4, face: Math.PI, y: 0 },
-    door: { x: -7, z: 7, face: -Math.PI / 2, y: 0 }
+    door: { x: -7, z: 7, face: -Math.PI / 2, y: 0 },
+    stove: { x: 6.1, z: 4.4, face: Math.PI / 2, y: 0 }
   };
   const TRICK_LEN = { spin: .8, hop: .9, jump: .5, dance: 1.6, wave: 1.2, wobble: .5, transform: 1.8 };
   const FORM_SCALE = [1.1, 1.26, 1.4, 1.46, 1.52];
@@ -912,6 +943,7 @@ const World = (() => {
     mesh(BOX, '#B9C6D0', -.66, 1.6, 0, .02, .02, 1.2, fridge, { cast: false });
     tag(fridge, 'feed');
     mesh(BOX, '#FFE7B0', 7.25, .5, 4.4, 1.2, 1, 3.6); mesh(BOX, '#FFFFFF', 7.25, 1.03, 4.4, 1.3, .08, 3.7);
+    tag(mesh(BOX, '', 7.25, 1.2, 4.4, 1.5, 1.4, 3.8, null, { mat: new T.MeshBasicMaterial({ visible: false }), cast: false }), 'cook');   // 조리대 (보이지 않는 누르기 영역)
     mesh(CYL, '#5B4550', 7.25, 1.08, 3.6, .3, .03, .3); mesh(CYL, '#5B4550', 7.25, 1.08, 4.9, .3, .03, .3);
     mesh(CYL, '#7ED9C3', 7.25, 1.3, 4.9, .28, .4, .28);
     mesh(CYL, '#E9B98A', 3.8, 1, 4.2, 1.2, .12, 1.2); mesh(CYL, '#C98A5A', 3.8, .5, 4.2, .12, 1, .12);
@@ -1146,7 +1178,7 @@ const World = (() => {
     { id: 'library', x: 0, z: -11, w: 7, d: 4.5, wall: '#CDEFFF', roof: '#7C86E0', sign: '도서관' },
     { id: 'flower', x: 10, z: -10.5, w: 6, d: 4.5, wall: '#E3F5D3', roof: '#FF9EB0', sign: '포롱 꽃집' }
   ];
-  const VSPOTS = { gate: [-12.6, -.5], plaza: [0, 2.6], bakery: [-10, -6.9], library: [0, -7.6], flower: [10, -6.9], playground: [-8, 3.2], pond: [8.4, 2.4], camp: [-5.5, 12.4], beach: [6.5, 12.6], meadow: [18.5, 2.5] };
+  const VSPOTS = { gate: [-12.6, -.5], plaza: [0, 2.6], bakery: [-10, -6.9], library: [0, -7.6], flower: [10, -6.9], playground: [-8, 3.2], pond: [8.4, 2.4], camp: [-5.5, 12.4], beach: [6.5, 12.6], meadow: [18.5, 2.5], garden: [26.3, 12.2], portal: [12.4, 11.6] };
   const BEDS = [[6.8, -6.4], [13.2, -6.2], [12.6, -3.4]];
   const BUSHES = [[16.5, 4], [26.5, 3], [17, 10.5], [26, 11.5], [17.6, -2.2]];      // 숨바꼭질 덤불
   const SHELLS = [[2.6, 13], [12.6, 13.6], [2, 16.6], [14, 16.8], [6.2, 17.2], [10.4, 12.6], [3.6, 14.6], [12, 15.6]];
@@ -1396,6 +1428,7 @@ const World = (() => {
     }
     for (let i = 0; i < 50; i++) { const x = 15 + (i * 5.7) % 13.5, z = -2 + (i * 3.1) % 22; if (!inObs(x, z, .3) && (x < 19.4 || x > 24.6)) mesh(SPH, ['#FFB7C9', '#FFE27A', '#FFFFFF', '#CDBBFF'][i % 4], VX + x, .1, z, .13, .13, .13, null, { cast: false }); }
     post('꽃언덕', 15, 1.6);
+    buildGarden();
   }
 
   function animateVillage(dt) {
@@ -1524,6 +1557,145 @@ const World = (() => {
     }
   }
 
+  // ---------- 텃밭 (꽃언덕 앞) ----------
+  const GARDEN = [[25.4, 14], [27.2, 14], [25.4, 15.8], [27.2, 15.8], [25.4, 17.6], [27.2, 17.6]];
+  const plotObjs = [];
+  let portalCore = null;
+  function buildGarden() {
+    for (const z of [13, 18.6]) mesh(BOX, '#E9C79A', VX + 26.3, .45, z, 4.3, .08, .06);
+    for (const x of [24.2, 28.4]) mesh(BOX, '#E9C79A', VX + x, .45, 15.8, .06, .08, 5.6);
+    for (const [x, z] of [[24.2, 13], [28.4, 13], [24.2, 18.6], [28.4, 18.6], [26.3, 18.6]]) mesh(CYL, '#E9C79A', VX + x, .35, z, .06, .7, .06);
+    sign('우리 텃밭', VX + 26.3, 1.15, 12.94, 2);
+    GARDEN.forEach(([x, z], i) => {
+      const g = group(VX + x, 0, z, villageG);
+      mesh(BOX, '#8A5A3C', 0, .1, 0, 1.4, .2, 1.4, g, { outline: 1.03, receive: true });
+      for (let k = 0; k < 3; k++) mesh(BOX, '#7A4E33', 0, .21, -.45 + k * .45, 1.2, .03, .12, g, { cast: false });
+      const crop = group(0, .2, 0, g);
+      const wet = emojiSprite('💧', .55); wet.position.set(0, 1.3, 0); wet.visible = false; g.add(wet);
+      const ripe = emojiSprite('✨', .6); ripe.position.set(0, 1.5, 0); ripe.visible = false; g.add(ripe);
+      plotObjs.push({ g, crop, wet, ripe });
+      tag(g, 'plot:' + i);
+    });
+    // 점프 코스로 가는 무지개 포털
+    const pg = group(VX + 12.4, 0, 10, villageG);
+    ['#FF9DB5', '#FFE27A', '#7ED9C3', '#A9DDF7', '#CDBBFF'].forEach((c, i) => mesh(new T.TorusGeometry(1.3 - i * .14, .07, 8, 40), c, 0, 1.5, 0, 1, 1, 1, pg, { cast: false }));
+    portalCore = mesh(new T.CircleGeometry(1, 32), '', 0, 1.5, 0, 1, 1, 1, pg, { mat: new T.MeshBasicMaterial({ color: '#E9F7FF', transparent: true, opacity: .55, side: T.DoubleSide }), cast: false });
+    mesh(CYL, '#C9C2B8', 0, .1, 0, 1.2, .2, .5, pg, { outline: 1.03 });
+    sign('점프 코스', 0, 3.25, .05, 2.2, pg);
+    tag(pg, 'portal');
+    OBS.push({ x0: 11, x1: 13.8, z0: 9.6, z1: 10.4 });
+  }
+  function cropMesh(g, c, stage) {
+    if (stage === 0) { mesh(SPH, '#6B4430', 0, .03, 0, .12, .06, .12, g, { cast: false }); return; }
+    if (stage === 1) { for (const s of [-1, 1]) { const l = mesh(SPH, '#8FD694', s * .07, .12, 0, .08, .03, .05, g, { outline: 1.1 }); l.rotation.z = s * .5; } mesh(CYL, '#7FCB7A', 0, .06, 0, .015, .12, .015, g); return; }
+    if (stage === 2) { mesh(SPH, '#7FCB7A', 0, .25, 0, .3, .25, .3, g, { outline: 1.05 }); return; }
+    if (c === 'carrot') for (const [x, z] of [[-.3, -.25], [.3, 0], [-.1, .3]]) { mesh(CONE, '#FF8A3D', x, .1, z, .1, .22, .1, g, { outline: 1.08 }).rotation.x = Math.PI; for (const k of [-1, 0, 1]) mesh(SPH, '#7FCB7A', x + k * .05, .32, z, .04, .16, .04, g).rotation.z = k * .4; }
+    else if (c === 'strawberry') { mesh(SPH, '#7FCB7A', 0, .22, 0, .38, .22, .38, g, { outline: 1.05 }); for (const [x, z] of [[-.25, .25], [.28, .18], [0, -.3], [.3, -.2]]) mesh(CONE, '#FF4D6D', x, .3, z, .09, .13, .09, g, { outline: 1.1 }).rotation.x = Math.PI; }
+    else if (c === 'tomato') { mesh(CYL, '#C98A5A', .25, .45, -.25, .025, .9, .025, g); mesh(SPH, '#6FBE6A', 0, .45, 0, .32, .35, .32, g, { outline: 1.05 }); for (const [x, y, z] of [[-.2, .4, .25], [.22, .55, .2], [.05, .3, .3], [-.25, .6, -.1]]) mesh(SPH, '#FF5A4E', x, y, z, .1, .1, .1, g, { outline: 1.1 }); }
+    else if (c === 'corn') for (const x of [-.25, .25]) { mesh(CYL, '#7FCB7A', x, .45, 0, .04, .9, .04, g); mesh(CYL, '#FFD54F', x + .08, .55, .05, .07, .3, .07, g, { outline: 1.08 }); mesh(SPH, '#8FD694', x - .1, .7, 0, .04, .25, .08, g).rotation.z = .6; }
+    else if (c === 'pumpkin') { mesh(SPH, '#FF9A3D', 0, .22, 0, .45, .3, .42, g, { outline: 1.04 }); mesh(CYL, '#7FCB7A', 0, .55, 0, .05, .14, .05, g); mesh(SPH, '#7FCB7A', .3, .3, .3, .2, .05, .16, g); }
+  }
+  function setGarden(plots) {
+    if (!ok) return;
+    plots.forEach((pl, i) => {
+      const o = plotObjs[i]; if (!o) return;
+      while (o.crop.children.length) o.crop.remove(o.crop.children[0]);
+      if (pl) cropMesh(o.crop, pl.crop, pl.stage);
+      o.wet.visible = !!pl && pl.stage < 3 && !pl.wet;
+      o.ripe.visible = !!pl && pl.stage >= 3;
+    });
+  }
+
+  // ---------- 하늘 점프 코스 (오비): 발판·움직이는 발판·끈적 젤리·체크포인트 ----------
+  const OX = 240;
+  const PLATS = [
+    { x: 0, z: 0, w: 4, d: 4, y: 0, c: '#FFFFFF' },
+    { x: 0, z: -4, w: 2, d: 2, y: .5 },
+    { x: 2, z: -7, w: 2, d: 2, y: 1 },
+    { x: -1, z: -10, w: 2, d: 2, y: 1.5 },
+    { x: 0, z: -14, w: 4, d: 3, y: 1.5, c: '#E9F7FF' },
+    { x: 0, z: -18, w: 2.2, d: 2.2, y: 2, ax: 2.2, sp: 1.2 },
+    { x: 0, z: -22, w: 1.6, d: 1.6, y: 2.5 },
+    { x: 0, z: -26, w: 2, d: .8, y: 2.55, jelly: true },
+    { x: 0, z: -26, w: 2, d: 4, y: 2.5 },
+    { x: 0, z: -31.5, w: 4, d: 3, y: 3, c: '#E9F7FF' },
+    { x: 2, z: -35, w: 1.6, d: 1.6, y: 3.6 },
+    { x: 3.6, z: -37.4, w: 1.6, d: 1.6, y: 4.2 },
+    { x: 2, z: -39.8, w: 1.6, d: 1.6, y: 4.8 },
+    { x: 0, z: -42.2, w: 1.6, d: 1.6, y: 5.4 },
+    { x: 0, z: -46, w: 2.2, d: 2.2, y: 5.4, az: 1.4, sp: 1 },
+    { x: 0, z: -51, w: 4, d: 4, y: 5.4, c: '#FFF3A8' }
+  ];
+  const CPS = [{ x: 0, z: 0, y: 0 }, { x: 0, z: -14, y: 1.5 }, { x: 0, z: -31.5, y: 3 }];
+  const FIN = { x: 0, z: -51, y: 5.4 };
+  const obIn = { x: 0, z: 0, jump: false };
+  let obbyG = null, ob = null, flags = [], trophy = null;
+  function buildObby() {
+    obbyG = new T.Group(); obbyG.visible = false; scene.add(obbyG);
+    curParent = obbyG; curPick = [];
+    const cols = ['#FF9DB5', '#FFE27A', '#7ED9C3', '#A9DDF7', '#CDBBFF', '#FFB86B'];
+    PLATS.forEach((pl, i) => {
+      if (pl.jelly) pl.mesh = mesh(BOX, '', OX + pl.x, pl.y - .2, pl.z, pl.w + .02, .45, pl.d, null, { mat: new T.MeshToonMaterial({ color: '#FF5C9A', emissive: '#FF2E7E', emissiveIntensity: .35, gradientMap: grad, transparent: true, opacity: .92 }) });
+      else pl.mesh = mesh(BOX, pl.c || cols[i % cols.length], OX + pl.x, pl.y - .25, pl.z, pl.w, .5, pl.d, null, { outline: 1.02, receive: true });
+    });
+    CPS.slice(1).forEach(c => {
+      const g = group(OX + c.x + 1.5, c.y, c.z, obbyG);
+      mesh(CYL, '#FFFFFF', 0, .8, 0, .05, 1.6, .05, g);
+      const cloth = mesh(CONE, '#B9C6D0', .3, 1.35, 0, .2, .55, .05, g, { outline: 1.08 }); cloth.rotation.z = -Math.PI / 2; flags.push(cloth);
+    });
+    trophy = group(OX + FIN.x, FIN.y, FIN.z, obbyG);
+    mesh(CYL, '#FFD54F', 0, .2, 0, .4, .4, .4, trophy, { outline: 1.05 }); mesh(CYL, '#FFD54F', 0, .6, 0, .08, .5, .08, trophy);
+    mesh(new T.CylinderGeometry(1, .5, 1, 16), '#FFD54F', 0, 1.05, 0, .45, .55, .45, trophy, { outline: 1.05 }); mesh(STAR, '#FFFFFF', 0, 1.6, 0, .18, .18, .18, trophy);
+    for (let i = 0; i < 26; i++) {
+      const x = OX + (i * 7.3) % 24 - 12, z = 6 - (i * 4.1) % 64, y = -4 - (i % 3);
+      mesh(SPH, '#FFFFFF', x, y, z, 2.2, 1, 1.6, null, { cast: false }); mesh(SPH, '#FFFFFF', x + 1.4, y + .3, z, 1.5, .9, 1.2, null, { cast: false });
+    }
+    mesh(CYL, '#C98A5A', OX - 3.2, .5, -.6, .07, 2, .07); sign('점프 코스', OX - 3.2, 1.6, -.55, 2.2);
+    curParent = houseG; curPick = pickH;
+  }
+  function obReset() {
+    flags.forEach(f => { f.material = toon('#B9C6D0'); });
+    for (const pl of PLATS) { pl.cx = pl.cz = undefined; }
+    ob = { cp: 0, y: 0, vy: 0, ground: true, plat: null, time: 0, clock: 0, done: false, onEvent: ob ? ob.onEvent : null };
+    st.x = OX; st.z = .6; st.lift = 0; st.path = []; st.mode = 'idle'; st.face = st.faceGoal = Math.PI; st.camX = OX; st.camZ = 0; st.camY = 0;
+  }
+  function respawnOb(why) {
+    const c = CPS[ob.cp];
+    st.x = OX + c.x; st.z = c.z + .4; ob.y = c.y; ob.vy = 0; ob.ground = true; ob.plat = null; st.lift = c.y;
+    sfx('bad'); ob.onEvent && ob.onEvent(why);
+  }
+  function obbyStep(dt) {
+    const o = ob; if (o.done) return;
+    o.time += dt; o.clock += dt;
+    for (const pl of PLATS) if (pl.ax || pl.az) {
+      const k = Math.sin(o.clock * pl.sp), nx = pl.x + (pl.ax || 0) * k, nz = pl.z + (pl.az || 0) * k;
+      pl.dx = nx - (pl.cx ?? nx); pl.dz = nz - (pl.cz ?? nz); pl.cx = nx; pl.cz = nz;
+      pl.mesh.position.set(OX + nx, pl.y - .25, nz);
+    }
+    const len = Math.hypot(obIn.x, obIn.z);
+    let x = st.x - OX, z = st.z;
+    if (len > .15) { const k = 4.6 / Math.max(1, len); x += obIn.x * k * dt; z += obIn.z * k * dt; st.faceGoal = Math.atan2(obIn.x, obIn.z); }
+    if (o.ground && o.plat && o.plat.dx !== undefined) { x += o.plat.dx; z += o.plat.dz; }
+    st.obMove = len > .15 && o.ground;
+    if (obIn.jump && o.ground) { o.vy = 9; o.ground = false; sfx('tap'); }
+    obIn.jump = false;
+    const prevY = o.y; o.vy -= 22 * dt; o.y += o.vy * dt;
+    o.ground = false; o.plat = null;
+    if (o.vy <= 0) for (const pl of PLATS) {
+      const cx = pl.cx ?? pl.x, cz = pl.cz ?? pl.z;
+      if (Math.abs(x - cx) <= pl.w / 2 + .2 && Math.abs(z - cz) <= pl.d / 2 + .2 && prevY >= pl.y - .06 && o.y <= pl.y + .001) {
+        if (pl.jelly) return respawnOb('jelly');
+        o.y = pl.y; o.vy = 0; o.ground = true; o.plat = pl; break;
+      }
+    }
+    st.x = OX + x; st.z = z; st.lift = o.y;
+    CPS.forEach((c, i) => {
+      if (i > o.cp && o.ground && Math.abs(x - c.x) < 2 && Math.abs(z - c.z) < 1.6 && Math.abs(o.y - c.y) < .1) { o.cp = i; flags[i - 1].material = toon('#7ED9C3'); sfx('up'); o.onEvent && o.onEvent('cp', i); }
+    });
+    if (o.ground && Math.abs(x - FIN.x) < 2 && Math.abs(z - FIN.z) < 2 && Math.abs(o.y - FIN.y) < .1) { o.done = true; st.obMove = false; sfx('hatch'); o.onEvent && o.onEvent('finish', o.time); }
+    if (o.y < -7) respawnOb('fall');
+  }
+
   function stepRace(dt) {
     race.t += dt; if (race.t < 0) return;
     const L = 17.4;
@@ -1535,7 +1707,7 @@ const World = (() => {
   function setArea(a) {
     if (a !== 'village') for (const n of Object.values(npcs)) { n.follow = false; n.hidden = false; n.racing = false; }
     bushMarks.forEach(m => { m.visible = false; });
-    st.area = a; houseG.visible = a === 'house'; villageG.visible = a === 'village';
+    st.area = a; houseG.visible = a === 'house'; villageG.visible = a === 'village'; if (obbyG) obbyG.visible = a === 'obby';
     for (const n of Object.values(npcs)) n.tag.hidden = a !== 'village';
     renderHUD();
   }
@@ -1579,7 +1751,7 @@ const World = (() => {
 
   function animate(dt, p) {
     if (!pet) return;
-    const t = st.t, walking = (st.mode === 'walk' && st.path.length > 0) || !!(race && race.t >= 0), cyc = t * (st.run ? 16 : 10);
+    const t = st.t, walking = (st.mode === 'walk' && st.path.length > 0) || !!(race && race.t >= 0) || (st.area === 'obby' && st.obMove), cyc = t * (st.run ? 16 : 10);
     st.face = turn(st.face, st.faceGoal, dt * 9);
     let y = st.lift, rx = 0, ry = st.face, rz = 0, sx = 1, sy = 1;
     if (pet.isEgg) {
@@ -1630,7 +1802,8 @@ const World = (() => {
     const p = P(); if (!p) return;
     st.t += dt;
     if (race) stepRace(dt);
-    for (let left = dt; left > 1e-4; left -= .05) think(Math.min(.05, left), p);
+    if (st.area === 'obby' && ob) { for (let left = dt; left > 1e-4; left -= .02) obbyStep(Math.min(.02, left)); }
+    else for (let left = dt; left > 1e-4; left -= .05) think(Math.min(.05, left), p);
     animate(Math.min(dt, .1), p);
     // 공 굴리기
     if (ball) {
@@ -1650,15 +1823,20 @@ const World = (() => {
     hemi.intensity = .5 - .28 * st.night; sun.intensity = .55 - .47 * st.night; lamp.intensity = 1.3 * st.night;
     scene.background.setRGB(.75 - .55 * st.night, .91 - .66 * st.night, 1 - .45 * st.night); scene.fog.color.copy(scene.background);
     glassMat.color.set(st.night > .5 ? '#3A3F8F' : '#CFEFFF');
-    if (st.area === 'village') animateVillage(dt);
-    // 카메라: 펫을 부드럽게 따라간다
-    const vill = st.area === 'village';
-    st.camX += (clamp(st.x, vill ? VX - 12.5 : -4.4, vill ? VX + 26 : 4.4) - st.camX) * Math.min(1, dt * 2.5);
-    st.camZ += (clamp(st.z, vill ? -6.5 : -4.4, vill ? 15.5 : 5) - st.camZ) * Math.min(1, dt * 2.5);
-    sun.position.set(st.camX - 8, 16, st.camZ + 10); sun.target.position.set(st.camX, 0, st.camZ); sun.target.updateMatrixWorld();
-    const dist = (camera.aspect < .8 ? 8.8 : 8.6) * (vill ? 1.3 : 1);
-    camera.position.set(st.camX, dist * .72, st.camZ + dist * .98);
-    camera.lookAt(st.camX, .8, st.camZ - .6);
+    if (st.area === 'village') { animateVillage(dt); if (portalCore) portalCore.material.opacity = .45 + Math.sin(st.t * 3) * .15; }
+    if (st.area === 'obby') { if (trophy) trophy.rotation.y = st.t * 1.5; for (const pl of PLATS) if (pl.jelly) pl.mesh.scale.y = .45 * (1 + Math.sin(st.t * 8) * .12); }
+    // 카메라: 펫을 부드럽게 따라간다 (점프 코스에서는 높이도 따라간다)
+    const vill = st.area === 'village', inOb = st.area === 'obby';
+    if (inOb) { st.camX += (st.x - st.camX) * Math.min(1, dt * 4); st.camZ += (st.z - st.camZ) * Math.min(1, dt * 4); st.camY = (st.camY || 0) + (st.lift - (st.camY || 0)) * Math.min(1, dt * 3); }
+    else {
+      st.camX += (clamp(st.x, vill ? VX - 12.5 : -4.4, vill ? VX + 27.6 : 4.4) - st.camX) * Math.min(1, dt * 2.5);
+      st.camZ += (clamp(st.z, vill ? -6.5 : -4.4, vill ? 15.5 : 5) - st.camZ) * Math.min(1, dt * 2.5);
+      st.camY = 0;
+    }
+    sun.position.set(st.camX - 8, 16 + st.camY, st.camZ + 10); sun.target.position.set(st.camX, st.camY, st.camZ); sun.target.updateMatrixWorld();
+    const dist = (camera.aspect < .8 ? 8.8 : 8.6) * (vill ? 1.3 : inOb ? 1.15 : 1);
+    camera.position.set(st.camX, st.camY + dist * .72, st.camZ + dist * .98);
+    camera.lookAt(st.camX, st.camY + .8, st.camZ - .6);
     renderer.render(scene, camera);
     placeBubble();
   }
@@ -1763,6 +1941,7 @@ const World = (() => {
       buildHouse();
       buildVillage();
       decorG = new T.Group(); houseG.add(decorG);
+      buildObby();
       scene.add(sun.target);
       new ResizeObserver(resize).observe(room); resize();
       bindInput();
@@ -1814,6 +1993,30 @@ const World = (() => {
     },
     starsLeft() { return stars.length; },
     setDecor,
+    setGarden,
+    goToPlot(i, cb) { const [x, z] = GARDEN[i]; goTo(VX + x, z + 1, true, () => { st.faceGoal = Math.PI; cb && cb(); }); },
+    obbyInput: obIn,
+    obbyTime() { return ob ? ob.time : 0; },
+    enterObby(onEvent) {
+      if (!ok) return say('점프 코스는 3D를 켤 수 있는 기기에서 할 수 있어요', 3000);
+      fadeTo(() => { ob = { onEvent }; setArea('obby'); obReset(); for (const n of Object.values(npcs)) n.tag.hidden = true; });
+    },
+    obbyRestart() { if (ob) obReset(); },
+    exitObby() {
+      fadeTo(() => {
+        ob = null; obIn.x = obIn.z = 0; setArea('village');
+        const [x, z] = VSPOTS.portal; st.x = VX + x; st.z = z; st.lift = 0; st.path = []; st.mode = 'idle'; st.face = st.faceGoal = 0;
+        st.camX = clamp(st.x, VX - 12.5, VX + 27.6); st.camZ = clamp(st.z, -6.5, 15.5);
+      });
+    },
+    emote(kind) {
+      trick({ wave: 'wave', dance: 'dance', spin: 'spin', jump: 'jump', hop: 'hop' }[kind] || 'hop');
+      if (st.area !== 'village') return null;
+      let best = null, bd = 4.5;
+      for (const n of Object.values(npcs)) { if (n.hidden) continue; const d = Math.hypot(st.x - (VX + n.x), st.z - n.z); if (d < bd) { bd = d; best = n; } }
+      if (best) { best.jumpT = .6; return best.id; }
+      return null;
+    },
     clampRoom(x, z) { return clampToRoom(x, z); },
     goNear(x, z, cb) { goTo(x + .9, z + .8, true, () => { st.faceGoal = Math.atan2(x - st.x, z - st.z); cb && cb(); }); },
     spawnShells(n, cb) {
@@ -1865,7 +2068,7 @@ const World = (() => {
     leave(spot) { if (st.at) { st.at = null; st.lift = 0; } if (spot) goSpot(spot, false); },
     eat(sec, e) {
       st.eatT = sec;
-      if (ok && e) { food && scene.remove(food); food = emojiSprite(e, .55); food.position.set(2.3, .55, 6.6); scene.add(food); setTimeout(() => { scene.remove(food); food = null; }, sec * 1000); }
+      if (ok && e) { food && scene.remove(food); food = emojiSprite(e, .55); food.position.set(st.x + Math.sin(st.face) * .75, st.lift + .6, st.z + Math.cos(st.face) * .75); scene.add(food); setTimeout(() => { scene.remove(food); food = null; }, sec * 1000); }
     },
     transform(oldForm, cb) {
       if (!ok) { cb(); return; }
@@ -1900,6 +2103,8 @@ World.onTap = hit => {
   if (u.use === 'home') return World.goHome();
   if (u.use && u.use.startsWith('water:')) return waterBed(+u.use.slice(6));
   if (u.use && u.use.startsWith('bush:')) return hideGuess(+u.use.slice(5));
+  if (u.use && u.use.startsWith('plot:')) return tapPlot(+u.use.slice(5));
+  if (u.use === 'portal') return World.goVillage('portal', true, startObby);
   if (u.use && u.use.startsWith('bld:')) return World.goVillage(u.use.slice(4), true);
   if (u.use) return useThing(u.use);
   if (u.floor && !p.asleep) {
@@ -1910,6 +2115,7 @@ World.onTap = hit => {
 };
 function useThing(use) {
   if (use.startsWith('decor:')) return useDecor(use.slice(6));
+  if (use === 'cook') return openCook();
   const p = P();
   if (p.asleep && use !== 'sleep') return say('쿨쿨… (자고 있어요. 깨우려면 ☀️ 버튼!)', 3000);
   if (bathing && use !== 'bath') return;
@@ -1933,6 +2139,7 @@ $('#villageTabs').addEventListener('click', e => {
   const b = e.target.closest('[data-go]'); if (!b || b.disabled || talking) return;
   sfx('tap');
   if (b.dataset.go === 'home') return World.goHome();
+  if (b.dataset.go === 'portal') return World.goVillage('portal', true, startObby);
   World.goVillage(b.dataset.go, true);
 });
 $('#roomTabs').addEventListener('click', e => {
@@ -1965,7 +2172,7 @@ function tapEgg() {
   World.trick('wobble'); sfx('pop');
   if (p.taps >= HATCH_TAPS) {
     setTimeout(() => {
-      p.hatched = true; p.taps = 0;
+      p.hatched = true; p.taps = 0; badge('hatch');
       sfx('hatch'); confetti(100);
       setMood('happy', 2500);
       render(); World.trick('jump'); burst(['✨', '⭐', '💖'], 8, -.2);
@@ -2134,6 +2341,7 @@ const heartsOf = id => Math.min(5, Math.floor(fs(id).pts / 100));
 function addFriend(id, n) {
   const before = heartsOf(id); fs(id).pts += n;
   const after = heartsOf(id);
+  if (after >= 5) badge('bestie');
   if (after > before) { S.coins += 20; sfx('up'); confetti(50); toast(`${josa(FRIENDS[id].name, '과', '와')} 더 친해졌어요! ${'♥'.repeat(after)} +20코인`); }
   persist();
 }
@@ -2175,7 +2383,7 @@ function talkTo(id) {
     $('#talkName').textContent = f.name; $('#talkJob').textContent = f.job;
     $('#talk').hidden = false; pushBack(); sfx('pop');
     const s = fs(id);
-    if (!s.met) { s.met = true; s.day = today(); addFriend(id, 30); mission('talk'); return showNode(firstMeet(id)); }
+    if (!s.met) { s.met = true; s.day = today(); addFriend(id, 30); mission('talk'); if (Object.keys(FRIENDS).every(k => fs(k).met)) badge('friends8'); return showNode(firstMeet(id)); }
     if (s.day !== today()) { s.day = today(); addFriend(id, 30); mission('talk'); }
     showNode(menu(id, true));
   });
@@ -2437,7 +2645,7 @@ function startRace() {
   World.raceStart('banjjak', win => {
     ui.remove();
     change({ fun: win ? 15 : 10, energy: -8 }); mission('friend');
-    if (win) { const coins = playReward('banjjak', 20); addFriend('banjjak', 30); addXP(10); confetti(80); sfx('up'); say(`1등! 반짝: "우와, 너 엄청 빠르다!"${coins ? ` +${coins}코인` : ''}`, 5000); }
+    if (win) { badge('racer'); const coins = playReward('banjjak', 20); addFriend('banjjak', 30); addXP(10); confetti(80); sfx('up'); say(`1등! 반짝: "우와, 너 엄청 빠르다!"${coins ? ` +${coins}코인` : ''}`, 5000); }
     else { const coins = playReward('banjjak', 5); addFriend('banjjak', 15); addXP(5); sfx('coin'); say(`아깝다! 반짝: "다음엔 네가 이길 것 같아!"${coins ? ` +${coins}코인` : ''}`, 5000); }
     render();
   });
@@ -2469,7 +2677,7 @@ function waterBed(i) {
   });
 }
 function onEnterVillage() {
-  mission('outside');
+  mission('outside'); badge('village');
   if (fs('porong').q === 'active') World.showWater(watered);
   if (fs('banjjak').q === 'active' && !starsStarted) startStars();
   if (fs('neurit').q === 'active' && !shellsStarted) startShells();
@@ -2493,7 +2701,10 @@ const MISSIONS = {
   walk:    { text: '친구와 같이 산책하기', goal: 1, coin: 10, icon: '🚶' },
   quest:   { text: '친구 부탁 하나 들어주기', goal: 1, coin: 20, icon: '🎁' },
   decor:   { text: '집에 가구 놓아 보기', goal: 1, coin: 10, icon: '🛋️' },
-  sleepm:  { text: '졸릴 때 침대에서 재우기', goal: 1, coin: 10, icon: '🌙' }
+  sleepm:  { text: '졸릴 때 침대에서 재우기', goal: 1, coin: 10, icon: '🌙' },
+  harvest: { text: '텃밭에서 채소 수확하기', goal: 1, coin: 15, icon: '🥕' },
+  cook:    { text: '부엌에서 요리 한 번 하기', goal: 1, coin: 15, icon: '🍳' },
+  obby:    { text: '점프 코스 끝까지 가기', goal: 1, coin: 25, icon: '🏁' }
 };
 // 날짜로 정해지는 섞기: 같은 날에는 언제 열어도 같은 미션 3개
 function seeded(str) { let h = 2166136261; for (const c of str) h = Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0; return () => ((h = Math.imul(h ^ (h >>> 15), 2246822519) >>> 0) / 4294967296); }
@@ -2513,19 +2724,21 @@ function mission(id, n = 1) {
   if (it.prog >= M.goal) { toast(`📋 미션 완료! ${M.text}`); sfx('up'); }
   renderHUD(); persist();
 }
-function openMissions() {
+function openMissions(tab = 'm') {
+  if (tab === 'b') return openBadges();
   const m = todayMissions();
   const rows = m.list.map((it, i) => {
     const M = MISSIONS[it.id], done = it.prog >= M.goal;
     return `<div class="mission${done ? ' done' : ''}"><span class="mi">${M.icon}</span><span class="mt"><b>${M.text}</b><span class="mbar"><i style="width:${it.prog / M.goal * 100}%"></i></span><small>${it.prog} / ${M.goal}</small></span>${it.claimed ? '<span class="mclaimed">받음 ✓</span>' : `<button class="candy${done ? ' primary' : ''}" data-claim="${i}"${done ? '' : ' disabled'}><i class="coin"></i> ${M.coin}</button>`}</div>`;
   }).join('');
   const got = m.list.filter(x => x.claimed).length, all = got === 3;
-  openSheet('오늘의 미션', `<p class="msub">매일 새 미션 3개가 나와요. 모두 하면 보너스 선물!</p><div class="missions">${rows}</div>
+  openSheet('오늘의 미션', `${missionTabs('m')}<p class="msub">매일 새 미션 3개가 나와요. 모두 하면 보너스 선물!</p><div class="missions">${rows}</div>
     <div class="mission bonus${all ? ' done' : ''}"><span class="mi">🏆</span><span class="mt"><b>미션 3개 모두 완료</b><small>${got} / 3</small></span>${m.bonus ? '<span class="mclaimed">받음 ✓</span>' : `<button class="candy${all ? ' primary' : ''}" data-bonus${all ? '' : ' disabled'}><i class="coin"></i> 30</button>`}</div>`,
     body => body.addEventListener('click', e => {
+      const tb = e.target.closest('[data-mtab]'); if (tb) return openMissions(tb.dataset.mtab);
       const c = e.target.closest('[data-claim]');
       if (c) { const it = m.list[+c.dataset.claim]; if (it.claimed) return; it.claimed = true; S.coins += MISSIONS[it.id].coin; addXP(5); sfx('coin'); persist(); render(); return openMissions(); }
-      if (e.target.closest('[data-bonus]')) { m.bonus = true; S.coins += 30; addXP(20); confetti(90); sfx('hatch'); persist(); render(); toast('🏆 오늘의 미션 모두 완료! 최고예요!'); return openMissions(); }
+      if (e.target.closest('[data-bonus]')) { m.bonus = true; badge('mission'); S.coins += 30; addXP(20); confetti(90); sfx('hatch'); persist(); render(); toast('🏆 오늘의 미션 모두 완료! 최고예요!'); return openMissions(); }
     }));
 }
 
@@ -2558,7 +2771,7 @@ function endPlace() { placing = null; const bar = $('#placeBar'); bar && bar.rem
 function placeAt(x, z) {
   const ds = decorState(), [cx, cz] = World.clampRoom(x, z), old = ds.placed[placing];
   ds.placed[placing] = { x: cx, z: cz, r: old ? old.r : 0 };
-  World.setDecor(ds.placed); sfx('pop'); mission('decor'); persist();
+  World.setDecor(ds.placed); sfx('pop'); mission('decor'); if (Object.keys(ds.placed).length >= 5) badge('decor'); persist();
   startPlace(placing);
 }
 function playTune() {
@@ -2670,6 +2883,229 @@ function openParent() {
 }
 
 /* =========================================================
+   9-4. 텃밭 · 요리 · 점프 코스 · 감정 표현 · 배지
+   ========================================================= */
+const CROPS = {
+  carrot:     { name: '당근',  e: '🥕', seed: 5,  min: 3,  yield: [2, 3] },
+  strawberry: { name: '딸기',  e: '🍓', seed: 8,  min: 5,  yield: [3, 4] },
+  tomato:     { name: '토마토', e: '🍅', seed: 10, min: 8,  yield: [2, 3] },
+  corn:       { name: '옥수수', e: '🌽', seed: 12, min: 12, yield: [2, 3] },
+  pumpkin:    { name: '호박',  e: '🎃', seed: 15, min: 20, yield: [1, 2] }
+};
+const RECIPES = [
+  { id: 'juice',  name: '당근 주스',       e: '🥤', need: { carrot: 2 },                       eff: { hunger: 15, energy: 10 },          xp: 10 },
+  { id: 'milk',   name: '딸기 우유',       e: '🍓', need: { strawberry: 2 },                   eff: { hunger: 10, fun: 15 },             xp: 10 },
+  { id: 'pasta',  name: '토마토 스파게티',  e: '🍝', need: { tomato: 2 },                       eff: { hunger: 30 },                      xp: 12 },
+  { id: 'corn',   name: '버터 옥수수',     e: '🌽', need: { corn: 2 },                         eff: { hunger: 25, fun: 5 },              xp: 12 },
+  { id: 'soup',   name: '달콤 호박죽',     e: '🥣', need: { pumpkin: 1 },                      eff: { hunger: 35, energy: 10 },          xp: 15 },
+  { id: 'salad',  name: '무지개 샐러드',   e: '🥗', need: { carrot: 1, tomato: 1, corn: 1 },   eff: { hunger: 30, fun: 15 },             xp: 25 },
+  { id: 'tart',   name: '딸기 호박 타르트', e: '🥧', need: { strawberry: 2, pumpkin: 1 },       eff: { hunger: 30, fun: 20, energy: 10 }, xp: 30 }
+];
+// 한 단계 = 키우는 시간의 1/3. 물을 준 동안만 자라고, 단계가 오를 때마다 물을 다시 줘야 한다
+const stageMs = c => CROPS[c].min * 20000;
+const farm = () => S.farm || (S.farm = { plots: [null, null, null, null, null, null], pantry: {}, harvested: 0, cooked: 0 });
+function growFarm() {
+  if (!S.farm) return;
+  const now = Date.now(); let changed = false;
+  for (const pl of S.farm.plots) {
+    if (!pl || pl.stage >= 3 || !pl.wet) continue;
+    if (now - pl.start >= stageMs(pl.crop)) { pl.stage++; pl.wet = false; pl.start = now; changed = true; }
+  }
+  if (changed) { World.setGarden(S.farm.plots); persist(); }
+}
+function tapPlot(i) {
+  World.goToPlot(i, () => {
+    const f = farm(), pl = f.plots[i];
+    if (!pl) return openSeeds(i);
+    if (pl.stage >= 3) return harvest(i);
+    if (!pl.wet) {
+      pl.wet = true; pl.start = Date.now(); World.setGarden(f.plots); persist();
+      sfx('bub'); burst(['💧', '💧', '🌱'], 4, -.1);
+      return say(`촉촉~ ${josa(CROPS[pl.crop].name, '이', '가')} 쑥쑥 자랄 거예요!`, 3000);
+    }
+    const left = Math.max(0, stageMs(pl.crop) - (Date.now() - pl.start));
+    say(`${CROPS[pl.crop].name} 자라는 중! ${Math.max(1, Math.ceil(left / 60000))}분쯤 기다려요 🌱`, 3000);
+  });
+}
+function openSeeds(i) {
+  openSheet('어떤 씨앗을 심을까?', `<p class="msub">심고 물을 주면 자라요. 한 단계 자랄 때마다 물을 또 줘야 해요!</p><div class="grid">${Object.entries(CROPS).map(([k, c]) => `<button class="item" data-seed="${k}"><span class="em">${c.e}</span><span class="nm">${c.name}</span>${priceTag(c.seed)}<span class="eff">약 ${c.min}분</span></button>`).join('')}</div>`,
+    body => body.addEventListener('click', e => {
+      const b = e.target.closest('[data-seed]'); if (!b) return;
+      const c = CROPS[b.dataset.seed];
+      if (S.coins < c.seed) return toast(`코인이 ${c.seed - S.coins}개 모자라요`);
+      S.coins -= c.seed; farm().plots[i] = { crop: b.dataset.seed, stage: 0, wet: false, start: 0 };
+      World.setGarden(farm().plots); persist(); closeSheet(); render(); sfx('pop');
+      say(`${josa(c.name, '을', '를')} 심었어요! 밭을 한 번 더 눌러 물을 주세요 💧`, 4000);
+    }));
+}
+function harvest(i) {
+  const f = farm(), pl = f.plots[i], c = CROPS[pl.crop];
+  const n = c.yield[0] + Math.floor(Math.random() * (c.yield[1] - c.yield[0] + 1));
+  f.pantry[pl.crop] = (f.pantry[pl.crop] || 0) + n; f.harvested = (f.harvested || 0) + n; f.plots[i] = null;
+  World.setGarden(f.plots); sfx('coin'); confetti(30); burst([c.e, c.e, '✨'], 6, -.1); addXP(5);
+  badge('harvest'); if (f.harvested >= 20) badge('farmer'); mission('harvest');
+  say(`${c.e} ${c.name} ${n}개 수확! 부엌에서 요리해 봐요`, 4000); persist(); render();
+}
+function openCook() {
+  if (World.area() !== 'house') { say('부엌에서 요리할래요!', 2500); return World.goHome(openCook); }
+  const pan = farm().pantry, has = r => Object.entries(r.need).every(([k, n]) => (pan[k] || 0) >= n);
+  const cards = RECIPES.map(r => `<button class="item${has(r) ? '' : ' off'}" data-recipe="${r.id}"><span class="em">${r.e}</span><span class="nm">${r.name}</span><span class="eff">${Object.entries(r.need).map(([k, n]) => CROPS[k].e.repeat(n)).join(' + ')}</span></button>`).join('');
+  openSheet('요리하기', `<p class="msub">텃밭에서 키운 채소로 만들어요</p><div class="pantry">${Object.entries(CROPS).map(([k, c]) => `<span class="pan">${c.e} ${pan[k] || 0}</span>`).join('')}</div><div class="grid">${cards}</div>${Object.values(pan).some(n => n > 0) ? '' : '<p class="fine" style="margin-top:12px">아직 채소가 없어요. 마을 꽃언덕 앞 🥕 텃밭에서 씨앗을 심어 봐요!</p>'}`,
+    body => body.addEventListener('click', e => {
+      const b = e.target.closest('[data-recipe]'); if (!b) return;
+      const r = RECIPES.find(x => x.id === b.dataset.recipe);
+      if (!has(r)) return toast('재료가 모자라요. 텃밭에서 더 키워 봐요!');
+      for (const [k, n] of Object.entries(r.need)) pan[k] -= n;
+      persist(); closeSheet(); say(`${r.name} 만들러 가요!`, 2500);
+      World.goSpot('stove', true, () => cookGame(r));
+    }));
+}
+function cookGame(r) {
+  const wrap = document.createElement('div'); wrap.className = 'scrim mini';
+  wrap.innerHTML = `<div class="g-card cook"><h3>🍳 ${r.name}</h3><p id="ckHelp">버튼을 눌러 냄비를 휘휘 저어요!</p><div class="pot" id="ckPot">🍲</div><div class="heat"><i id="ckBar"></i></div><button class="candy primary" id="ckStir">휘휘 젓기!</button></div>`;
+  $('#app').appendChild(wrap);
+  let n = 0; const N = 12, pot = wrap.querySelector('#ckPot');
+  wrap.querySelector('#ckStir').addEventListener('click', () => {
+    if (n >= N) return;
+    n++; wrap.querySelector('#ckBar').style.width = n / N * 100 + '%'; retrigger(pot, 'stir'); sfx('bub');
+    if (n < N) return;
+    sfx('up'); pot.textContent = r.e; wrap.querySelector('#ckHelp').textContent = '완성! 맛있는 냄새~';
+    setTimeout(() => {
+      wrap.remove();
+      World.eat(1.6, r.e); setMood('eat', 1600); sfx('eat');
+      setTimeout(() => {
+        change(r.eff); addXP(r.xp);
+        const f = farm(); f.cooked = (f.cooked || 0) + 1; if (f.cooked >= 5) badge('chef'); mission('cook');
+        setMood('love', 1600); burst(['💖', '😋', '✨'], 5); say(`${r.name} 최고! 내가 키운 채소라 더 맛있어!`, 4000); render(); persist();
+      }, 1650);
+    }, 900);
+  });
+}
+
+/* ---------- 점프 코스 ---------- */
+let obbyUI = null, obTimer = 0;
+const obKeys = {};
+function dailyReward(key, coins, max = 3) {
+  if (!S.daily || S.daily.day !== today()) S.daily = { day: today() };
+  const n = S.daily[key] || 0; if (n >= max) return 0;
+  S.daily[key] = n + 1; S.coins += coins; renderHUD(); persist(); return coins;
+}
+function startObby() {
+  const p = P();
+  if (!p.hatched || obbyUI) return;
+  if (p.energy < 15) return say('너무 졸려서 점프를 못 하겠어요… 먼저 재워 주세요', 3000);
+  if (talking) closeTalk();
+  if (following) { following = null; World.setFollow(null); }
+  World.enterObby(obbyEvent);
+  setTimeout(buildObbyUI, 420);
+}
+function buildObbyUI() {
+  obbyUI = document.createElement('div'); obbyUI.className = 'obby-ui';
+  const best = S.best.obby;
+  obbyUI.innerHTML = `<div class="ob-top"><span class="pill">⏱ <b id="obTime">0.0</b>초</span><span class="pill">🚩 <b id="obCp">0/2</b></span>${best ? `<span class="pill">🏆 ${best.toFixed(1)}</span>` : ''}<button class="icon-btn" id="obExit" aria-label="나가기">✕</button></div>
+    <p class="ob-tip">왼쪽 동그라미로 움직이고, 점프 버튼으로 뛰어요! 분홍 젤리는 조심!</p>
+    <div class="joy" id="joy"><i id="joyKnob"></i></div><button class="jump-btn" id="obJump">점프!</button>`;
+  room.appendChild(obbyUI);
+  const joy = obbyUI.querySelector('#joy'), knob = obbyUI.querySelector('#joyKnob'), inp = World.obbyInput;
+  let jid = null;
+  const setJ = e => {
+    const r = joy.getBoundingClientRect(), R = r.width / 2;
+    let dx = (e.clientX - r.left - R) / R, dy = (e.clientY - r.top - R) / R; const l = Math.hypot(dx, dy);
+    if (l > 1) { dx /= l; dy /= l; }
+    inp.x = dx; inp.z = dy; knob.style.transform = `translate(${dx * R * .55}px, ${dy * R * .55}px)`;
+  };
+  joy.addEventListener('pointerdown', e => { e.preventDefault(); jid = e.pointerId; joy.setPointerCapture?.(jid); setJ(e); });
+  joy.addEventListener('pointermove', e => { if (e.pointerId === jid) setJ(e); });
+  const endJ = () => { jid = null; inp.x = 0; inp.z = 0; knob.style.transform = ''; };
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(t => joy.addEventListener(t, endJ));
+  const jb = obbyUI.querySelector('#obJump');
+  jb.addEventListener('pointerdown', e => { e.preventDefault(); inp.jump = true; jb.classList.add('on'); });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => jb.addEventListener(t, () => jb.classList.remove('on')));
+  obbyUI.querySelector('#obExit').addEventListener('click', exitObby);
+  window.addEventListener('keydown', obKey); window.addEventListener('keyup', obKey);
+  obTimer = setInterval(() => { const el = $('#obTime'); if (el) el.textContent = World.obbyTime().toFixed(1); }, 100);
+  setTimeout(() => { const t = obbyUI && obbyUI.querySelector('.ob-tip'); t && t.remove(); }, 6000);
+  renderHUD();
+}
+function obKey(e) {
+  const map = { ArrowLeft: 'l', a: 'l', ArrowRight: 'r', d: 'r', ArrowUp: 'u', w: 'u', ArrowDown: 'd', s: 'd', ' ': 'j' }, k = map[e.key];
+  if (!k) return;
+  e.preventDefault();
+  const inp = World.obbyInput, down = e.type === 'keydown';
+  if (k === 'j') { if (down) inp.jump = true; return; }
+  obKeys[k] = down;
+  inp.x = (obKeys.r ? 1 : 0) - (obKeys.l ? 1 : 0); inp.z = (obKeys.d ? 1 : 0) - (obKeys.u ? 1 : 0);
+}
+function closeObbyUI() {
+  clearInterval(obTimer); window.removeEventListener('keydown', obKey); window.removeEventListener('keyup', obKey);
+  obbyUI && obbyUI.remove(); obbyUI = null;
+  const r = $('#obResult'); r && r.remove();
+}
+function exitObby() { closeObbyUI(); World.exitObby(); setTimeout(renderHUD, 500); }
+function obbyEvent(kind, v) {
+  if (kind === 'cp') { const el = $('#obCp'); if (el) el.textContent = `${v}/2`; toast('🚩 체크포인트! 떨어져도 여기서 다시 시작해요'); }
+  else if (kind === 'jelly') say('앗, 끈적 젤리! 체크포인트로 돌아가요', 2500);
+  else if (kind === 'fall') say('으앗! 괜찮아, 다시 해 보자!', 2500);
+  else if (kind === 'finish') obbyFinish(v);
+}
+function obbyFinish(time) {
+  const prev = S.best.obby, isBest = !prev || time < prev;
+  if (isBest) S.best.obby = time;
+  const coins = dailyReward('obby', 25);
+  change({ fun: 20, energy: -10 }); addXP(15); mission('obby'); badge('obby'); if (time <= 60) badge('obbyFast');
+  confetti(100); persist(); render();
+  const card = document.createElement('div'); card.className = 'g-card'; card.id = 'obResult';
+  card.innerHTML = `<h3>🏁 완주했어요!</h3><div class="big-score">${time.toFixed(1)}초</div><p>${isBest ? '🏆 새 최고 기록!' : `최고 기록 ${prev.toFixed(1)}초`}</p><p>${coins ? `<i class="coin"></i> ${coins}코인 · ` : ''}경험치 15 · 행복 +20</p><div style="display:flex;gap:8px"><button class="candy" id="obAgain" style="flex:1">한 번 더</button><button class="candy primary" id="obHome" style="flex:1">마을로</button></div>`;
+  room.appendChild(card);
+  card.querySelector('#obAgain').addEventListener('click', () => { card.remove(); World.obbyRestart(); const el = $('#obCp'); if (el) el.textContent = '0/2'; });
+  card.querySelector('#obHome').addEventListener('click', exitObby);
+}
+
+/* ---------- 감정 표현 ---------- */
+const EMOTES = { wave: ['👋', '안녕~!'], dance: ['💃', '신나는 춤!'], spin: ['🌀', '빙글빙글~'], jump: ['🙌', '야호!'], hop: ['🎵', '랄랄라~'] };
+$('#emoteBtn').addEventListener('click', () => { sfx('tap'); $('#emoteTray').hidden = !$('#emoteTray').hidden; });
+$('#emoteTray').addEventListener('click', e => {
+  const b = e.target.closest('[data-emote]'); if (!b) return;
+  const k = b.dataset.emote, who = World.emote(k);
+  sfx('pop'); $('#emoteTray').hidden = true;
+  burst([EMOTES[k][0]], 2, -.2);
+  if (who) { addFriend(who, 2); say(`${EMOTES[k][1]} ${josa(FRIENDS[who].name, '이', '')}도 따라 했어요!`, 3000); }
+  else say(EMOTES[k][1], 2000);
+});
+
+/* ---------- 배지 ---------- */
+const BADGES = {
+  hatch:    ['🐣', '첫 부화', '알에서 친구가 태어났어요'],
+  form1:    ['🌱', '첫 변신', 'Lv.5 어린이로 변신'],
+  form2:    ['🌟', '어른 변신', 'Lv.10 어른으로 변신'],
+  form4:    ['🌈', '무지개 변신', 'Lv.20 무지개로 변신'],
+  village:  ['🌳', '마을 탐험가', '처음으로 마을에 나가기'],
+  friends8: ['🤝', '모두와 친구', '마을 친구 8명 모두 만나기'],
+  bestie:   ['💖', '단짝 친구', '친구 한 명과 하트 5개'],
+  obby:     ['🏁', '점프 코스 완주', '점프 코스 끝까지 가기'],
+  obbyFast: ['⚡', '번개 점프', '점프 코스 60초 안에 완주'],
+  harvest:  ['🥕', '첫 수확', '텃밭에서 처음 수확하기'],
+  farmer:   ['🧑‍🌾', '꼬마 농부', '채소 20개 수확하기'],
+  chef:     ['🍳', '꼬마 요리사', '요리 5번 하기'],
+  arcade:   ['🕹️', '오락실 고수', '오락실 게임에서 300점'],
+  racer:    ['🏃', '달리기 왕', '반짝과 달리기 시합에서 이기기'],
+  decor:    ['🛋️', '인테리어 장인', '집에 가구 5개 놓기'],
+  mission:  ['📋', '미션 성공', '오늘의 미션 모두 완료']
+};
+function badge(id) {
+  S.badges = S.badges || {};
+  if (S.badges[id] || !BADGES[id]) return;
+  S.badges[id] = today(); persist();
+  setTimeout(() => { toast(`🏅 배지 획득! ${BADGES[id][0]} ${BADGES[id][1]}`); sfx('hatch'); confetti(40); }, 900);
+}
+const missionTabs = t => `<div class="tabs" role="tablist"><button role="tab" data-mtab="m" aria-selected="${t === 'm'}">📋 오늘의 미션</button><button role="tab" data-mtab="b" aria-selected="${t === 'b'}">🏅 배지</button></div>`;
+function openBadges() {
+  const got = S.badges || {}, n = Object.keys(got).length;
+  openSheet('배지 수집첩', `${missionTabs('b')}<p class="msub">${n} / ${Object.keys(BADGES).length}개 모았어요</p><div class="badges">${Object.entries(BADGES).map(([k, [e, name, how]]) => `<div class="badge-card${got[k] ? ' got' : ''}"><span class="be">${got[k] ? e : '🔒'}</span><b>${name}</b><small>${how}</small></div>`).join('')}</div>`,
+    body => body.addEventListener('click', e => { const tb = e.target.closest('[data-mtab]'); if (tb) openMissions(tb.dataset.mtab); }));
+}
+
+/* =========================================================
    10. 바텀 시트 (밥 / 상점 / 친구들)
    ========================================================= */
 let scrim = null;
@@ -2698,10 +3134,11 @@ const priceTag = n => n ? `<span class="pr"><i class="coin"></i>${n}</span>` : '
 
 function openFeed() {
   const fav = SPECIES[P().sp].fav;
-  openSheet('뭘 먹을까?', `<div class="grid">${FOODS.map(f => {
+  openSheet('뭘 먹을까?', `<button class="candy cook-btn" id="goCook">🍳 텃밭 채소로 요리하기</button><div class="grid">${FOODS.map(f => {
     const eff = [`배부름+${f.hunger}`, f.fun ? `행복+${f.fun}` : '', f.energy ? `기운+${f.energy}` : ''].filter(Boolean).join(' ');
     return `<button class="item${f.id === fav ? ' fav' : ''}" data-food="${f.id}"><span class="em">${f.e}</span><span class="nm">${f.name}</span>${priceTag(f.price)}<span class="eff">${eff}</span></button>`;
   }).join('')}</div>`, body => body.addEventListener('click', e => {
+    if (e.target.closest('#goCook')) { closeSheet(); return openCook(); }
     const b = e.target.closest('[data-food]'); if (b) feed(FOODS.find(f => f.id === b.dataset.food));
   }));
 }
@@ -3385,7 +3822,7 @@ function openArcade(def) {
   function finish() {
     const coins = Math.floor(g.score / 10) + (g.win ? 10 : 0), xp = Math.ceil(g.score / 25) + 5;
     S.coins += coins; change({ fun: 25, energy: -15, hunger: -8 }); addXP(xp);
-    mission('play'); if (g.score >= 200) mission('score');
+    mission('play'); if (g.score >= 200) mission('score'); if (g.score >= 300) badge('arcade');
     const isBest = g.score > (S.best[def.id] || 0);
     if (isBest) S.best[def.id] = g.score;
     persist(); sfx(g.win ? 'up' : 'coin');
@@ -3473,7 +3910,7 @@ let worldReady = false;
 function showHome() {
   $('#start').hidden = true; $('#home').hidden = false;
   buildStats();
-  if (!worldReady) { World.init(); worldReady = true; World.setDecor(decorState().placed); }
+  if (!worldReady) { World.init(); worldReady = true; World.setDecor(decorState().placed); World.setGarden(farm().plots); }
   render();
 }
 
@@ -3485,6 +3922,7 @@ function tick() {
   const mins = (now - S.lastTick) / 60000;
   S.lastTick = now;
   if (mins > 0 && S.pets.length) decayAll(mins);
+  growFarm();
   if (P()) render();
 }
 let saveCount = 0;
