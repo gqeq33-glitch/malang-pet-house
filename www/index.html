@@ -108,6 +108,22 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
 .flash{position:absolute;inset:0;background:radial-gradient(circle,#fff 0 30%,rgba(255,246,200,.85) 60%,rgba(255,255,255,0) 100%);opacity:0;pointer-events:none;z-index:7}
 .flash.go{animation:flash 1.6s ease-out}
 @keyframes flash{0%{opacity:0}35%{opacity:1}100%{opacity:0}}
+.tags{position:absolute;inset:0;pointer-events:none;z-index:4}
+.ntag{position:absolute;transform:translate(-50%,-100%);font-family:var(--display);font-size:13px;background:rgba(255,255,255,.92);padding:2px 9px;border-radius:99px;box-shadow:0 0 0 2px var(--ink) inset;white-space:nowrap}
+.ntag i{font-style:normal;color:#E8476A}
+.fade{position:absolute;inset:0;background:#FFF6E9;opacity:0;pointer-events:none;z-index:8;transition:opacity .35s}
+.fade.on{opacity:1}
+.talk{position:absolute;left:0;right:0;bottom:0;z-index:25;background:var(--paper);border-radius:26px 26px 0 0;box-shadow:0 -2.5px 0 var(--ink),0 -10px 30px rgba(91,69,80,.15);padding-block:14px max(16px,env(safe-area-inset-bottom,0px));animation:slideup .25s cubic-bezier(.2,1.2,.4,1)}
+.talk-head{display:flex;align-items:center;gap:10px}
+.talk-face{width:60px;height:60px;flex:none;border-radius:18px;background:var(--soft);box-shadow:0 0 0 2px var(--ink) inset;padding:2px}
+.talk-face svg{width:100%;height:100%}
+.talk-who{display:flex;flex-direction:column;min-width:0}
+.talk-name{font-family:var(--display);font-weight:400;font-size:21px;line-height:1.1}
+.talk-job{font-size:12px;color:var(--muted)}
+.talk-hearts{margin-left:auto;color:#E8476A;font-size:16px;letter-spacing:1px;white-space:nowrap}
+.talk-text{font-size:17px;line-height:1.6;margin:10px 0 12px;min-height:3.3em;cursor:pointer;text-wrap:pretty}
+.talk-choices{display:grid;gap:8px}
+.talk-choices .candy{text-align:left;font-size:16px;padding:10px 14px}
 .form-chip{display:inline-block;margin-left:4px;font-size:11px;padding:1px 7px;border-radius:99px;background:var(--butter);box-shadow:0 0 0 1.5px var(--ink) inset;white-space:nowrap}
 .eyes{animation:blink 4.6s infinite;transform-box:fill-box;transform-origin:center}
 .chomp{animation:chomp .22s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:center}
@@ -257,12 +273,17 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
     <div class="stats gut" id="stats"></div>
     <div class="room" id="room">
       <canvas id="world" aria-label="말랑 친구의 집. 바닥을 누르면 그쪽으로 걸어가고, 친구를 누르면 쓰다듬어요."></canvas>
+      <div class="tags" id="tags"></div>
       <div class="room-tabs" id="roomTabs">
         <button data-go="living">🛋️ 거실</button><button data-go="kitchen">🍳 부엌</button><button data-go="bedroom">🛏️ 침실</button><button data-go="bath">🛁 욕실</button><button data-go="door">🚪 밖으로</button>
+      </div>
+      <div class="room-tabs" id="villageTabs" hidden>
+        <button data-go="home">🏠 집으로</button><button data-go="plaza">⛲ 광장</button><button data-go="bakery">🍯 빵집</button><button data-go="library">📚 도서관</button><button data-go="flower">🌸 꽃집</button><button data-go="playground">🛝 놀이터</button>
       </div>
       <div class="bubble" id="bubble">안녕!</div>
       <div class="night"></div>
       <div class="flash" id="flash"></div>
+      <div class="fade" id="fade"></div>
       <div class="fx" id="fx"></div>
       <div class="sponge" id="sponge" hidden>🧽</div>
       <div class="bath-bar" id="bathBar" hidden><span>스펀지로 문질러 주세요!</span><button class="candy" id="bathDone">다 씻었어</button></div>
@@ -277,6 +298,11 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
     </nav>
   </section>
 
+  <div class="talk gut" id="talk" hidden>
+    <div class="talk-head"><span class="talk-face" id="talkFace"></span><span class="talk-who"><b class="talk-name" id="talkName"></b><span class="talk-job" id="talkJob"></span></span><span class="talk-hearts" id="talkHearts" aria-label="친한 정도"></span></div>
+    <p class="talk-text" id="talkText"></p>
+    <div class="talk-choices" id="talkChoices"></div>
+  </div>
   <div class="toast" id="toast"></div>
   <div id="confetti"></div>
 </div>
@@ -688,6 +714,8 @@ function renderHUD() {
   $('#sleepTxt').textContent = p.asleep ? '깨우기' : '잠';
   room.classList.toggle('sleeping', !!p.asleep);
   World.setTheme(ROOMS[S.room] || ROOMS.mint);
+  const outside = World.area() === 'village';
+  $('#roomTabs').hidden = outside; $('#villageTabs').hidden = !outside;
   document.querySelectorAll('#roomTabs button').forEach(b => { b.disabled = egg || bathing || p.asleep; b.classList.toggle('on', b.dataset.go === World.roomNow()); });
 }
 function render() { renderHUD(); renderPet(); }
@@ -730,8 +758,9 @@ const World = (() => {
 
   let ok = false, renderer, scene, camera, grad, inkMat, dirtMat, hemi, sun, lamp, wallMat, rugMat, glassMat;
   let pet = null, petKey = '', ball = null, food = null, onTap = null;
-  const pickables = [];
-  const st = { x: -4, z: 4.6, face: 0, faceGoal: 0, path: [], run: false, mode: 'idle', idleT: 3, arrive: null, at: null, lift: 0,
+  const pickH = [], pickV = [];
+  let curPick = pickH, curParent = null;
+  const st = { area: 'house', x: -4, z: 4.6, face: 0, faceGoal: 0, path: [], run: false, mode: 'idle', idleT: 3, arrive: null, at: null, lift: 0,
     trick: null, trickT: 0, t: 0, blink: 3, camX: -4, camZ: 4.6, mood: 'normal', formHold: null, eatT: 0, flick: 0 };
   const cache = {};
   const toon = c => cache[c] || (cache[c] = new T.MeshToonMaterial({ color: c, gradientMap: grad }));
@@ -742,12 +771,12 @@ const World = (() => {
     m.position.set(x, y, z); m.scale.set(sx, sy, sz);
     m.castShadow = o.cast !== false; m.receiveShadow = !!o.receive;
     if (o.outline) { const ol = new T.Mesh(geo, inkMat); ol.scale.setScalar(o.outline); m.add(ol); }
-    (parent || scene).add(m);
+    (parent || curParent || scene).add(m);
     return m;
   }
   const basic = c => new T.MeshBasicMaterial({ color: c });
-  function tag(obj, use) { obj.userData.use = use; pickables.push(obj); return obj; }
-  function group(x, y, z, parent) { const g = new T.Group(); g.position.set(x, y, z); (parent || scene).add(g); return g; }
+  function tag(obj, use) { obj.userData.use = use; curPick.push(obj); return obj; }
+  function group(x, y, z, parent) { const g = new T.Group(); g.position.set(x, y, z); (parent || curParent || scene).add(g); return g; }
   function canvasTex(size, draw, repeat = 1) {
     const c = document.createElement('canvas'); c.width = c.height = size;
     draw(c.getContext('2d'), size);
@@ -763,6 +792,7 @@ const World = (() => {
 
   /* ---------- 집 짓기 ---------- */
   function buildHouse() {
+    houseG = new T.Group(); scene.add(houseG); curParent = houseG; curPick = pickH;
     // 마당과 나무
     mesh(BOX, '#A8E39A', 0, -.32, 0, 90, .4, 90, null, { receive: true, cast: false });
     for (const [x, z, s] of [[-12, 11, 1.1], [12, 10, 1], [-13, -5, 1.3], [13, -9, 1.2], [3, 13, .9], [-5, 14, 1], [11, 2, .8], [-12, 3, .8]]) {
@@ -781,7 +811,7 @@ const World = (() => {
     for (const [k, tex] of [['living', wood], ['kitchen', tile], ['bedroom', carpet], ['bath', bathT]]) {
       const r = ROOM3[k];
       const f = mesh(BOX, '#fff', (r.x0 + r.x1) / 2, -.1, (r.z0 + r.z1) / 2, 8, .2, 8, null, { receive: true, cast: false, mat: new T.MeshToonMaterial({ map: tex, gradientMap: grad }) });
-      f.userData.floor = true; pickables.push(f);
+      f.userData.floor = true; curPick.push(f);
     }
 
     // 벽: 바깥벽은 높게, 안쪽 벽은 낮게(위에서 방 안이 보이도록), 문 자리는 비운다
@@ -842,7 +872,7 @@ const World = (() => {
     tag(bed, 'sleep');
     mesh(BOX, '#E9B98A', -4.3, .4, -7.3, .8, .8, .8);
     mesh(CYL, '#FFFFFF', -4.3, .9, -7.3, .08, .2, .08); mesh(SPH, '', -4.3, 1.15, -7.3, .25, .2, .25, null, { mat: basic('#FFE7A0') });
-    lamp = new T.PointLight('#FFD58A', 0, 7); lamp.position.set(-4.3, 1.5, -7); scene.add(lamp);
+    lamp = new T.PointLight('#FFD58A', 0, 7); lamp.position.set(-4.3, 1.5, -7); houseG.add(lamp);
     glassMat = basic('#CFEFFF');
     mesh(BOX, '#FFFFFF', -2.6, 1.6, -7.98, 2.2, 1.5, .06, null, { cast: false }); mesh(BOX, '', -2.6, 1.6, -7.94, 1.9, 1.2, .04, null, { mat: glassMat, cast: false });
     mesh(CYL, '#FFF3A8', -3.4, .02, -3.4, 1.4, .04, 1.4, null, { receive: true, cast: false });
@@ -1020,8 +1050,9 @@ const World = (() => {
   const turn = (a, b, k) => { let d = ((b - a + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI; return a + d * Math.min(1, k); };
 
   function goTo(x, z, run, arrive) {
-    [x, z] = clampToRoom(x, z);
-    st.path = pathTo(x, z); st.run = !!run; st.arrive = arrive || null; st.mode = 'walk'; st.at = null; st.lift = 0;
+    if (st.area === 'village') { const [lx, lz] = clampVillage(x - VX, z); st.path = villagePath(st.x - VX, st.z, lx, lz).map(([a, b]) => [a + VX, b]); }
+    else { [x, z] = clampToRoom(x, z); st.path = pathTo(x, z); }
+    st.run = !!run; st.arrive = arrive || null; st.mode = 'walk'; st.at = null; st.lift = 0;
   }
   function goSpot(name, run, arrive) {
     const s = SPOTS[name];
@@ -1030,15 +1061,260 @@ const World = (() => {
     st.arrive = () => { st.faceGoal = s.face; st.lift = s.y; st.at = name; arrive && arrive(); };
   }
 
+  /* ---------- 마을: 집에서 멀리(x+120) 따로 짓고, 문을 지나면 화면이 하얗게 바뀌며 이동 ---------- */
+  const VX = 120;
+  const VB = { x0: -14, x1: 14, z0: -11.5, z1: 9.5 };          // 걸을 수 있는 범위 (마을 기준 좌표)
+  const BLD = [
+    { id: 'bakery', x: -10, z: -10.5, w: 6, d: 4.5, wall: '#FFE7B0', roof: '#E9A066', sign: '꿀빵 가게' },
+    { id: 'library', x: 0, z: -11, w: 7, d: 4.5, wall: '#CDEFFF', roof: '#7C86E0', sign: '도서관' },
+    { id: 'flower', x: 10, z: -10.5, w: 6, d: 4.5, wall: '#E3F5D3', roof: '#FF9EB0', sign: '포롱 꽃집' }
+  ];
+  const VSPOTS = { gate: [-12.6, -.5], plaza: [0, 2.6], bakery: [-10, -6.9], library: [0, -7.6], flower: [10, -6.9], playground: [-8, 3.2], pond: [8.4, 2.4] };
+  const BEDS = [[6.8, -6.4], [13.2, -6.2], [12.6, -3.4]];
+  const OBS = [
+    ...BLD.map(b => ({ x0: b.x - b.w / 2, x1: b.x + b.w / 2, z0: b.z - b.d / 2, z1: b.z + b.d / 2 })),
+    { x0: -2.3, x1: 2.3, z0: -3.8, z1: .8 },          // 분수대
+    { x0: -11.2, x1: -9.8, z0: 4.5, z1: 7.5 },        // 미끄럼틀
+    { x0: -7.6, x1: -4.4, z0: 6.5, z1: 7.5 },         // 그네
+    { x0: 6.6, x1: 11.4, z0: 3.4, z1: 7.8 },          // 연못
+    ...BEDS.map(([x, z]) => ({ x0: x - .8, x1: x + .8, z0: z - .5, z1: z + .5 }))
+  ];
+  const npcs = {};
+  let houseG, villageG, stars = [], onStar = null, waterMarks = [], drops = [], swings = [], flies = [];
+
+  const inObs = (x, z, m) => OBS.some(o => x > o.x0 - m && x < o.x1 + m && z > o.z0 - m && z < o.z1 + m);
+  function segClear(ax, az, bx, bz) {
+    const n = Math.ceil(Math.hypot(bx - ax, bz - az) / .25);
+    for (let i = 1; i < n; i++) { const t = i / n; if (inObs(ax + (bx - ax) * t, az + (bz - az) * t, .45)) return false; }
+    return true;
+  }
+  function clampVillage(x, z) {
+    x = clamp(x, VB.x0, VB.x1); z = clamp(z, VB.z0, VB.z1);
+    for (const o of OBS) {
+      const m = .65;
+      if (x > o.x0 - m && x < o.x1 + m && z > o.z0 - m && z < o.z1 + m) {
+        const opts = [[o.x0 - m, z], [o.x1 + m, z], [x, o.z0 - m], [x, o.z1 + m]];
+        [x, z] = opts.reduce((a, q) => Math.hypot(q[0] - x, q[1] - z) < Math.hypot(a[0] - x, a[1] - z) ? q : a);
+      }
+    }
+    return [x, z];
+  }
+  // 막히면 장애물 모서리를 하나(또는 둘) 거쳐 돌아간다
+  function villagePath(ax, az, bx, bz) {
+    if (segClear(ax, az, bx, bz)) return [[bx, bz]];
+    const corners = OBS.flatMap(o => [[o.x0 - 1, o.z0 - 1], [o.x1 + 1, o.z0 - 1], [o.x0 - 1, o.z1 + 1], [o.x1 + 1, o.z1 + 1]]).filter(([x, z]) => !inObs(x, z, .3));
+    let best = null, bl = Infinity;
+    for (const c of corners) if (segClear(ax, az, c[0], c[1]) && segClear(c[0], c[1], bx, bz)) {
+      const L = Math.hypot(c[0] - ax, c[1] - az) + Math.hypot(bx - c[0], bz - c[1]); if (L < bl) { bl = L; best = [c, [bx, bz]]; }
+    }
+    if (best) return best;
+    for (const c1 of corners) if (segClear(ax, az, c1[0], c1[1])) for (const c2 of corners) if (segClear(c1[0], c1[1], c2[0], c2[1]) && segClear(c2[0], c2[1], bx, bz)) {
+      const L = Math.hypot(c1[0] - ax, c1[1] - az) + Math.hypot(c2[0] - c1[0], c2[1] - c1[1]) + Math.hypot(bx - c2[0], bz - c2[1]);
+      if (L < bl) { bl = L; best = [c1, c2, [bx, bz]]; }
+    }
+    return best || [[bx, bz]];
+  }
+
+  function signTex(text) {
+    const c = document.createElement('canvas'); c.width = 320; c.height = 96;
+    const tex = new T.CanvasTexture(c);
+    const draw = () => {
+      const x = c.getContext('2d'); x.clearRect(0, 0, 320, 96);
+      x.fillStyle = '#FFFFFF'; x.strokeStyle = INK; x.lineWidth = 8;
+      x.beginPath(); x.moveTo(24, 6); x.arcTo(314, 6, 314, 90, 18); x.arcTo(314, 90, 6, 90, 18); x.arcTo(6, 90, 6, 6, 18); x.arcTo(6, 6, 314, 6, 18); x.fill(); x.stroke();
+      x.fillStyle = INK; x.font = '48px Jua, "Gowun Dodum", sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(text, 160, 52);
+      tex.needsUpdate = true;
+    };
+    draw(); document.fonts && document.fonts.load('48px Jua').then(draw).catch(() => {});
+    return tex;
+  }
+  function sign(text, x, y, z, w = 2.6, parent, rotY = 0) {
+    const m = new T.Mesh(new T.PlaneGeometry(w, w * .3), new T.MeshBasicMaterial({ map: signTex(text), transparent: true }));
+    m.position.set(x, y, z); m.rotation.y = rotY; (parent || curParent).add(m); return m;
+  }
+  function tree(x, z, s) {
+    mesh(CYL, '#B07A4F', x, .8 * s, z, .22 * s, 1.6 * s, .22 * s);
+    mesh(SPH, '#7FCB7A', x, 2.1 * s, z, 1.05 * s, .95 * s, 1.05 * s);
+    mesh(SPH, '#8FD694', x + .45 * s, 2.6 * s, z + .2, .7 * s, .65 * s, .7 * s);
+  }
+
+  function buildVillage() {
+    villageG = new T.Group(); villageG.visible = false; scene.add(villageG);
+    curParent = villageG; curPick = pickV;
+    // 바닥: 잔디 위에 광장과 길을 그린 그림 한 장
+    const W = 30, H = 23, Z0 = -12.5, PX = 1024, PY = Math.round(PX * H / W);
+    const cv = document.createElement('canvas'); cv.width = PX; cv.height = PY; const g = cv.getContext('2d');
+    const P2 = (x, z) => [(x + W / 2) / W * PX, (z - Z0) / H * PY], U = PX / W;
+    g.fillStyle = '#A8E39A'; g.fillRect(0, 0, PX, PY);
+    g.fillStyle = '#9ED98F'; for (let i = 0; i < 70; i++) { g.beginPath(); g.arc((i * 197) % PX, (i * 131) % PY, 10 + i % 14, 0, 7); g.fill(); }
+    g.fillStyle = '#F5E3B5'; { const [a, b] = P2(-12.5, 3); g.beginPath(); g.roundRect ? g.roundRect(a, b, 9 * U, 6.5 * U, 2 * U) : g.rect(a, b, 9 * U, 6.5 * U); g.fill(); }
+    g.strokeStyle = '#F2E6D0'; g.lineCap = 'round'; g.lineJoin = 'round'; g.lineWidth = 2 * U;
+    for (const line of [[[-15, -.5], [0, -.5]], [[0, -1.5], [-10, -5], [-10, -8.5]], [[0, -1.5], [0, -9]], [[0, -1.5], [10, -5], [10, -8.5]], [[0, -1.5], [-8, 4]], [[0, -1.5], [8.4, 2.6]]]) {
+      g.beginPath(); line.forEach(([x, z], i) => { const [a, b] = P2(x, z); i ? g.lineTo(a, b) : g.moveTo(a, b); }); g.stroke();
+    }
+    g.fillStyle = '#F2E6D0'; { const [a, b] = P2(0, -1.5); g.beginPath(); g.arc(a, b, 4.6 * U, 0, 7); g.fill(); }
+    g.strokeStyle = '#E6D5BA'; g.lineWidth = .12 * U; { const [a, b] = P2(0, -1.5); for (const r of [3.4, 4.4]) { g.beginPath(); g.arc(a, b, r * U, 0, 7); g.stroke(); } }
+    const tex = new T.CanvasTexture(cv);
+    const ground = new T.Mesh(new T.PlaneGeometry(W, H), new T.MeshToonMaterial({ map: tex, gradientMap: grad }));
+    ground.rotation.x = -Math.PI / 2; ground.position.set(VX, 0, Z0 + H / 2); ground.receiveShadow = true;
+    ground.userData.floor = true; villageG.add(ground); pickV.push(ground);
+    mesh(BOX, '#9ED98F', VX, -.15, 0, 150, .2, 150, null, { receive: true, cast: false });
+
+    // 가게 세 곳
+    const ROOF = new T.ConeGeometry(1, 1, 4);
+    for (const b of BLD) {
+      const gb = group(VX + b.x, 0, b.z);
+      mesh(BOX, b.wall, 0, 1.4, 0, b.w, 2.8, b.d, gb, { outline: 1.015, receive: true });
+      const roof = mesh(ROOF, b.roof, 0, 3.9, 0, b.w * .78, 2.2, b.d * .78, gb, { outline: 1.02 }); roof.rotation.y = Math.PI / 4;
+      mesh(BOX, '#C98A5A', 0, .95, b.d / 2 + .04, 1.1, 1.9, .08, gb);
+      mesh(SPH, '#FFD54F', .38, .95, b.d / 2 + .1, .06, .06, .06, gb);
+      for (const s of [-1, 1]) {
+        mesh(BOX, '#FFFFFF', s * b.w * .3, 1.55, b.d / 2 + .04, 1.05, .95, .06, gb, { cast: false });
+        mesh(BOX, '', s * b.w * .3, 1.55, b.d / 2 + .08, .85, .75, .02, gb, { mat: basic('#FFF6C8'), cast: false });
+      }
+      sign(b.sign, 0, 2.45, b.d / 2 + .1, 2.6, gb);
+      tag(gb, 'bld:' + b.id);
+    }
+    // 빵집 앞 진열대, 도서관 앞 벤치
+    mesh(BOX, '#C98A5A', VX - 12.6, .45, -7.4, 1.4, .9, .8);
+    for (let i = 0; i < 4; i++) mesh(SPH, '#D99A5B', VX - 13.1 + i * .33, .98, -7.4, .16, .1, .12);
+    mesh(BOX, '#FF9EB0', VX - 10, 2.25, -8, 2.2, .1, .8, null, { cast: false });
+    mesh(BOX, '#C98A5A', VX + 3.6, .45, -7.6, 1.8, .12, .6); mesh(BOX, '#C98A5A', VX + 3.6, .8, -7.85, 1.8, .6, .1);
+    for (const x of [-3.2, -2.6]) mesh(BOX, ['#A9DDF7', '#FFE27A'][x === -3.2 ? 0 : 1], VX + x, .2, -7.8, .45, .4, .32);
+
+    // 꽃밭 세 곳 (포롱의 부탁)
+    BEDS.forEach(([x, z], i) => {
+      const gb = group(VX + x, 0, z);
+      mesh(BOX, '#B07A4F', 0, .18, 0, 1.6, .36, 1, gb, { outline: 1.03 });
+      for (let k = 0; k < 5; k++) { mesh(CYL, '#7FCB7A', -.6 + k * .3, .5, (k % 2) * .2 - .1, .02, .3, .02, gb); mesh(SPH, ['#FF9DB5', '#FFE27A', '#FFFFFF', '#CDBBFF', '#FF6B7A'][k], -.6 + k * .3, .68, (k % 2) * .2 - .1, .12, .1, .12, gb); }
+      const mark = emojiSprite('💧', .6); mark.position.set(0, 1.4, 0); mark.visible = false; gb.add(mark); waterMarks.push(mark);
+      tag(gb, 'water:' + i);
+    });
+
+    // 분수대
+    const fx = VX, fz = -1.5;
+    mesh(CYL, '#E6DDD3', fx, .3, fz, 2.1, .6, 2.1, null, { outline: 1.02 });
+    mesh(CYL, '', fx, .6, fz, 1.85, .04, 1.85, null, { mat: new T.MeshToonMaterial({ color: '#9EDCF7', gradientMap: grad, transparent: true, opacity: .9 }), cast: false });
+    mesh(CYL, '#E6DDD3', fx, 1.1, fz, .3, 1.2, .3); mesh(CYL, '#E6DDD3', fx, 1.7, fz, .8, .18, .8, null, { outline: 1.04 });
+    for (let i = 0; i < 10; i++) drops.push({ m: mesh(SPH, '', fx, 1.8, fz, .07, .09, .07, null, { mat: basic('#CFF3FF'), cast: false }), ph: i / 10, a: i / 10 * Math.PI * 2 });
+
+    // 놀이터: 미끄럼틀 + 그네
+    const sl = group(VX - 10.5, 0, 6);
+    for (const s of [-1, 1]) mesh(CYL, '#7C86E0', s * .5, .9, -1.2, .06, 1.8, .06, sl);
+    mesh(BOX, '#FFE27A', 0, 1.8, -1.1, 1.2, .12, .8, sl);
+    const slide = mesh(BOX, '#FF8FA3', 0, .95, .45, .9, .1, 2.6, sl, { outline: 1.03 }); slide.rotation.x = .62;
+    const sw = group(VX - 6, 0, 7);
+    for (const s of [-1, 1]) { const a = mesh(CYL, '#7C86E0', s * 1.5, 1.2, 0, .07, 2.5, .07, sw); a.rotation.x = .2; const b2 = mesh(CYL, '#7C86E0', s * 1.5, 1.2, 0, .07, 2.5, .07, sw); b2.rotation.x = -.2; }
+    const bar = mesh(CYL, '#7C86E0', 0, 2.4, 0, .07, 3.1, .07, sw); bar.rotation.z = Math.PI / 2;
+    for (const s of [-1, 1]) { const piv = group(s * .7, 2.4, 0, sw); mesh(BOX, '#B9C6D0', -.25, -.9, 0, .02, 1.8, .02, piv); mesh(BOX, '#B9C6D0', .25, -.9, 0, .02, 1.8, .02, piv); mesh(BOX, '#FF9EB0', 0, -1.8, 0, .7, .08, .35, piv); swings.push({ piv, ph: s }); }
+
+    // 연못과 벤치
+    mesh(CYL, '', VX + 9, .03, 5.6, 2.3, .06, 2.1, null, { mat: new T.MeshToonMaterial({ color: '#9EDCF7', gradientMap: grad, transparent: true, opacity: .92 }), cast: false });
+    for (let i = 0; i < 14; i++) { const a = i / 14 * Math.PI * 2; mesh(SPH, '#D8D2C8', VX + 9 + Math.cos(a) * 2.35, .08, 5.6 + Math.sin(a) * 2.15, .28, .16, .24); }
+    for (const [x, z] of [[8.2, 5], [9.8, 6.3], [9.4, 4.7]]) mesh(CYL, '#7FCB7A', VX + x, .08, z, .32, .02, .32, null, { cast: false });
+    mesh(SPH, '#FFFFFF', VX + 8.8, .2, 6, .2, .16, .25); mesh(SPH, '#FFFFFF', VX + 8.8, .38, 6.18, .12, .12, .12); mesh(CONE, '#FFB35C', VX + 8.8, .37, 6.33, .04, .1, .04).rotation.x = Math.PI / 2;
+    mesh(BOX, '#C98A5A', VX + 5.4, .45, 7.4, 1.8, .12, .6); mesh(BOX, '#C98A5A', VX + 5.4, .8, 7.65, 1.8, .6, .1);
+
+    // 가로등, 나무, 꽃
+    for (const [x, z] of [[-4.5, 2.5], [4.5, 2.5], [-4.5, -5.5], [4.5, -5.5]]) { mesh(CYL, '#5B4550', VX + x, 1.2, z, .07, 2.4, .07); mesh(SPH, '', VX + x, 2.5, z, .22, .22, .22, null, { mat: basic('#FFF6C8') }); }
+    for (let x = -16; x <= 16; x += 3.2) tree(VX + x + (x % 2), -14 + (x % 3) * .3, 1 + (Math.abs(x) % 3) * .1);
+    for (let z = -11; z <= 10; z += 3) { if (z < -2 || z > 2) tree(VX - 16.5, z, 1); tree(VX + 16.5, z + 1, 1.05); }
+    for (let i = 0; i < 40; i++) { const x = (i * 7.3) % 28 - 14, z = 8.6 + (i % 3) * .5; if (!inObs(x, z, .3)) mesh(SPH, ['#FFB7C9', '#FFE27A', '#FFFFFF', '#CDBBFF'][i % 4], VX + x, .1, z, .13, .13, .13, null, { cast: false }); }
+
+    // 집으로 가는 문
+    const gate = group(VX - 14.6, 0, -.5);
+    for (const s of [-1, 1]) mesh(CYL, '#C98A5A', 0, 1.1, s * 1.1, .12, 2.2, .12, gate);
+    mesh(BOX, '#FF9EB0', 0, 2.3, 0, .3, .3, 2.6, gate, { outline: 1.04 });
+    mesh(BOX, '#FFE7B0', 0, .9, 0, .1, 1.6, 1.8, gate, { outline: 1.03 });
+    sign('우리 집', .2, 2.85, 0, 2, gate, Math.PI / 2);
+    tag(gate, 'home');
+
+    // 나비
+    for (let i = 0; i < 6; i++) {
+      const bf = group(VX, 1.5, 0); const col = ['#FFB7C9', '#FFE27A', '#CDBBFF'][i % 3];
+      const wl = mesh(BOX, col, -.1, 0, 0, .18, .02, .14, bf, { cast: false }), wr = mesh(BOX, col, .1, 0, 0, .18, .02, .14, bf, { cast: false });
+      flies.push({ bf, wl, wr, cx: rand(-10, 10), cz: rand(-5, 8), r: rand(1.2, 2.5), sp: rand(.4, .8), ph: rand(0, 6) });
+    }
+
+    // 동물 친구들
+    for (const [id, f] of Object.entries(FRIENDS)) {
+      const parts = buildPet(f.sp, f.hat, 2);
+      parts.root.traverse(o => { o.userData.pet = false; o.userData.npc = id; });
+      parts.root.userData.npc = id; parts.dirt.visible = false; parts.setFace('happy');
+      villageG.add(parts.root); pickV.push(parts.root);
+      const tagEl = document.createElement('span'); tagEl.className = 'ntag'; tagEl.hidden = true; tagEl.innerHTML = `${f.name}<i></i>`; $('#tags').appendChild(tagEl);
+      npcs[id] = { id, parts, tag: tagEl, hx: f.home[0], hz: f.home[1], x: f.home[0], z: f.home[1], face: 0, faceGoal: 0, t: rand(0, 9), wt: rand(1, 4), tx: f.home[0], tz: f.home[1], walk: false, talking: false, blink: rand(1, 4) };
+    }
+    curParent = houseG; curPick = pickH;
+  }
+
+  function animateVillage(dt) {
+    const t = st.t;
+    for (const n of Object.values(npcs)) {
+      const p = n.parts, dx = st.x - (VX + n.x), dz = st.z - n.z, near = Math.hypot(dx, dz) < 3.2;
+      n.t += dt;
+      if (n.talking || near) { n.walk = false; n.faceGoal = Math.atan2(dx, dz); }
+      else {
+        n.wt -= dt;
+        if (n.wt <= 0) { [n.tx, n.tz] = clampVillage(n.hx + rand(-1.3, 1.3), n.hz + rand(-1, 1)); n.wt = rand(3, 7); }
+        const ex = n.tx - n.x, ez = n.tz - n.z, d = Math.hypot(ex, ez);
+        if (d > .05) { const sp = Math.min(d, .9 * dt); n.x += ex / d * sp; n.z += ez / d * sp; n.faceGoal = Math.atan2(ex, ez); n.walk = true; } else { n.walk = false; n.faceGoal = 0; }
+      }
+      n.face = turn(n.face, n.faceGoal, dt * 6);
+      const cyc = n.t * 9, s = n.walk ? Math.cos(cyc * 2) * .04 : Math.sin(n.t * 2.2) * .02;
+      p.root.position.set(VX + n.x, n.walk ? Math.abs(Math.sin(cyc)) * .12 : (n.talking ? Math.abs(Math.sin(n.t * 5)) * .05 : 0), n.z);
+      p.root.rotation.set(0, n.face, n.walk ? Math.sin(cyc) * .06 : 0);
+      p.body.scale.set(1 + s, 1 - s, 1 + s);
+      if (p.footL) { p.footL.position.y = p.footBase + (n.walk ? Math.max(0, Math.sin(cyc)) * .1 : 0); p.footR.position.y = p.footBase + (n.walk ? Math.max(0, -Math.sin(cyc)) * .1 : 0); }
+      if (p.earL) { const sw = Math.sin(n.t * 2.5) * .06; p.earL.rotation.z = p.earBase + sw; p.earR.rotation.z = -p.earBase - sw; }
+      if (p.tail) p.tail.rotation.y = Math.sin(n.t * 5) * .35;
+      if (p.wingL) { const f = Math.sin(n.t * 5) * .3; p.wingL.rotation.y = p.wingBase + f; p.wingR.rotation.y = -p.wingBase - f; }
+      if (p.flL) { const f = Math.sin(n.t * 2) * .1; p.flL.rotation.z = -p.flBase - f - (n.talking ? Math.abs(Math.sin(n.t * 6)) * .6 : 0); p.flR.rotation.z = p.flBase - f; }
+      n.blink -= dt; if (n.blink < 0) n.blink = rand(2.5, 5);
+      if (p.eyesOpen) p.setFace(n.blink < .12 ? 'sleep' : (n.talking ? 'happy' : 'normal'));
+      // 이름표
+      const v = new T.Vector3(VX + n.x, 2.6, n.z).project(camera);
+      const on = v.z < 1 && Math.abs(v.x) < 1.1 && Math.abs(v.y) < 1.1;
+      n.tag.hidden = !on;
+      if (on) { n.tag.style.left = (v.x + 1) / 2 * room.clientWidth + 'px'; n.tag.style.top = (1 - v.y) / 2 * room.clientHeight + 'px'; n.tag.querySelector('i').textContent = friendAlert(n.id) ? ' ❗' : ''; }
+    }
+    for (const d of drops) { const k = (t * .7 + d.ph) % 1; d.m.position.set(VX + Math.cos(d.a) * k * 1.4, 1.85 + Math.sin(k * Math.PI) * .9 - k * .9, -1.5 + Math.sin(d.a) * k * 1.4); }
+    for (const s of swings) s.piv.rotation.x = Math.sin(t * 2 + s.ph) * .35;
+    for (const f of flies) { const a = t * f.sp + f.ph; f.bf.position.set(VX + f.cx + Math.cos(a) * f.r, 1.2 + Math.sin(a * 3) * .3, f.cz + Math.sin(a) * f.r); f.bf.rotation.y = -a; const w = Math.sin(t * 22 + f.ph) * .9; f.wl.rotation.z = w; f.wr.rotation.z = -w; }
+    for (let i = stars.length - 1; i >= 0; i--) {
+      const s = stars[i]; s.rotation.y = t * 2.5; s.position.y = .8 + Math.sin(t * 3 + i) * .15;
+      if (Math.hypot(s.position.x - st.x, s.position.z - st.z) < 1.2) { villageG.remove(s); stars.splice(i, 1); sfx('coin'); onStar && onStar(stars.length); }
+    }
+  }
+
+  function fadeTo(fn) {
+    const f = $('#fade'); f.classList.add('on');
+    setTimeout(() => { fn(); setTimeout(() => f.classList.remove('on'), 120); }, 380);
+  }
+  function setArea(a) {
+    st.area = a; houseG.visible = a === 'house'; villageG.visible = a === 'village';
+    for (const n of Object.values(npcs)) n.tag.hidden = a !== 'village';
+    renderHUD();
+  }
+
   /* ---------- 매 프레임 ---------- */
   function think(dt, p) {
-    const free = p.hatched && !p.asleep && !bathing && !gameOn && !scrim && st.mode === 'idle' && !st.trick && st.eatT <= 0;
+    const free = p.hatched && !p.asleep && !bathing && !gameOn && !scrim && !talking && st.mode === 'idle' && !st.trick && st.eatT <= 0;
     if (st.mode === 'walk' && st.path.length) {
       const [tx, tz] = st.path[0], dx = tx - st.x, dz = tz - st.z, d = Math.hypot(dx, dz), sp = (st.run ? 4.2 : 1.8) * dt;
       if (d <= sp) {
         st.x = tx; st.z = tz; st.path.shift();
         if (!st.path.length) { st.mode = 'idle'; st.idleT = rand(2.5, 5); st.faceGoal = 0; const cb = st.arrive; st.arrive = null; cb && cb(); }
       } else { st.x += dx / d * sp; st.z += dz / d * sp; st.faceGoal = Math.atan2(dx, dz); }
+    } else if (free && st.area === 'village') {
+      st.idleT -= dt;
+      if (st.idleT <= 0) {
+        const r = Math.random();
+        if (r < .55) goTo(VX + rand(-7, 7), rand(-4, 6), false);
+        else if (r < .8) trick(pick(['spin', 'hop', 'dance', 'wave']));
+        else { const n = pick(Object.keys(FRIENDS)); say(`${josa(FRIENDS[n].name, '이', '')}다! 안녕~`, 2500); }
+        st.idleT = rand(4, 7);
+      }
     } else if (free && !st.at) {
       st.idleT -= dt;
       if (st.idleT <= 0) {
@@ -1124,10 +1400,13 @@ const World = (() => {
     hemi.intensity = .5 - .28 * st.night; sun.intensity = .55 - .47 * st.night; lamp.intensity = 1.3 * st.night;
     scene.background.setRGB(.75 - .55 * st.night, .91 - .66 * st.night, 1 - .45 * st.night); scene.fog.color.copy(scene.background);
     glassMat.color.set(st.night > .5 ? '#3A3F8F' : '#CFEFFF');
+    if (st.area === 'village') animateVillage(dt);
     // 카메라: 펫을 부드럽게 따라간다
-    st.camX += (clamp(st.x, -4.4, 4.4) - st.camX) * Math.min(1, dt * 2.5);
-    st.camZ += (clamp(st.z, -4.4, 5) - st.camZ) * Math.min(1, dt * 2.5);
-    const dist = camera.aspect < .8 ? 8.8 : 8.6;
+    const vill = st.area === 'village';
+    st.camX += (clamp(st.x, vill ? VX - 12.5 : -4.4, vill ? VX + 12.5 : 4.4) - st.camX) * Math.min(1, dt * 2.5);
+    st.camZ += (clamp(st.z, vill ? -6.5 : -4.4, vill ? 8 : 5) - st.camZ) * Math.min(1, dt * 2.5);
+    sun.position.set(st.camX - 8, 16, st.camZ + 10); sun.target.position.set(st.camX, 0, st.camZ); sun.target.updateMatrixWorld();
+    const dist = (camera.aspect < .8 ? 8.8 : 8.6) * (vill ? 1.3 : 1);
     camera.position.set(st.camX, dist * .72, st.camZ + dist * .98);
     camera.lookAt(st.camX, .8, st.camZ - .6);
     renderer.render(scene, camera);
@@ -1159,9 +1438,10 @@ const World = (() => {
       const r = room.getBoundingClientRect();
       v2.set((cx - r.left) / r.width * 2 - 1, -(cy - r.top) / r.height * 2 + 1);
       ray.setFromCamera(v2, camera);
-      const h = ray.intersectObjects(pet ? [pet.root, ...pickables] : pickables, true)[0];
+      const list = st.area === 'village' ? pickV : pickH;
+      const h = ray.intersectObjects(pet ? [pet.root, ...list] : list, true)[0];
       if (!h) return null;
-      let o = h.object; while (o && !o.userData.pet && !o.userData.use && !o.userData.floor) o = o.parent;
+      let o = h.object; while (o && !o.userData.pet && !o.userData.use && !o.userData.floor && !o.userData.npc) o = o.parent;
       return o ? { o, point: h.point, sx: cx - r.left, sy: cy - r.top } : null;
     };
     const rub = e => {
@@ -1231,6 +1511,8 @@ const World = (() => {
       Object.assign(sun.shadow.camera, { left: -14, right: 14, top: 14, bottom: -14, near: 1, far: 50 });
       sun.shadow.bias = -.0008; scene.add(sun);
       buildHouse();
+      buildVillage();
+      scene.add(sun.target);
       new ResizeObserver(resize).observe(room); resize();
       bindInput();
       ok = true;
@@ -1245,7 +1527,41 @@ const World = (() => {
       if (key !== petKey) { if (pet) scene.remove(pet.root); pet = p.hatched ? buildPet(p.sp, p.hat, form) : buildEgg(p.sp, p.taps); scene.add(pet.root); petKey = key; }
       if (pet.setFace) { pet.setFace(mood); pet.setDirt(dirt); }
     },
-    place(x, z) { st.x = x; st.z = z; st.path = []; st.mode = 'idle'; st.at = null; st.lift = 0; st.camX = clamp(x, -4.4, 4.4); st.camZ = clamp(z, -4.4, 5); },
+    place(x, z) { if (ok && st.area !== 'house') setArea('house'); st.x = x; st.z = z; st.path = []; st.mode = 'idle'; st.at = null; st.lift = 0; st.camX = clamp(x, -4.4, 4.4); st.camZ = clamp(z, -4.4, 5); },
+    area() { return st.area; },
+    enterVillage() {
+      if (!ok) return say('마을은 3D를 켤 수 있는 기기에서 갈 수 있어요', 3000);
+      fadeTo(() => {
+        setArea('village'); st.x = VX + VSPOTS.gate[0]; st.z = VSPOTS.gate[1]; st.path = []; st.mode = 'idle'; st.at = null; st.lift = 0;
+        st.face = st.faceGoal = Math.PI / 2; st.camX = VX - 12.5; st.camZ = 0; st.idleT = 4; onEnterVillage();
+      });
+    },
+    goHome(cb) {
+      if (st.area !== 'village') { cb && cb(); return; }
+      goTo(VX + VSPOTS.gate[0], VSPOTS.gate[1], true, () => fadeTo(() => {
+        setArea('house'); st.x = SPOTS.door.x + .6; st.z = SPOTS.door.z - .3; st.path = []; st.mode = 'idle';
+        st.face = st.faceGoal = Math.PI / 2; st.camX = -4.4; st.camZ = 5;
+        say('집에 왔다! 역시 우리 집이 최고!', 3000); cb && setTimeout(cb, 500);
+      }));
+    },
+    goVillage(name, run, cb) { const [x, z] = VSPOTS[name]; goTo(VX + x, z, run, cb); },
+    goToBed(i, cb) { const [x, z] = BEDS[i]; goTo(VX + x, z + 1.1, true, () => { st.faceGoal = Math.PI; cb && cb(); }); },
+    walkToNpc(id, cb) {
+      const n = npcs[id]; if (!n) return;
+      const dx = st.x - (VX + n.x), dz = st.z - n.z, d = Math.hypot(dx, dz) || 1;
+      if (d < 2.2) { st.faceGoal = Math.atan2(-dx, -dz); cb(); return; }
+      goTo(VX + n.x + dx / d * 1.7, n.z + dz / d * 1.7, true, () => { st.faceGoal = Math.atan2(VX + n.x - st.x, n.z - st.z); cb(); });
+    },
+    setTalking(id, on) { if (npcs[id]) npcs[id].talking = on; },
+    showWater(flags) { waterMarks.forEach((m, i) => { m.visible = !flags[i]; }); },
+    spawnStars(n, cb) {
+      stars.forEach(s => villageG.remove(s)); stars = []; onStar = cb;
+      const mat = new T.MeshToonMaterial({ color: '#FFE27A', emissive: '#FFB300', emissiveIntensity: .5, gradientMap: grad });
+      for (const [x, z] of shuffle([[-12.5, 8.6], [13, 8.6], [-13, -5], [13.5, -1.2], [-4.5, 7.8], [4.8, -5.6], [-6.2, -3.4], [6.4, 8.6]]).slice(0, n)) {
+        stars.push(mesh(STAR, '', VX + x, .8, z, .3, .3, .3, villageG, { mat, outline: 1.1 }));
+      }
+    },
+    starsLeft() { return stars.length; },
     goTo, goSpot, trick, kickBall,
     goRoom(k) { const r = ROOM3[k]; goTo(r.cx, r.cz, true); },
     roomNow() { return roomAt(st.x, st.z); },
@@ -1281,7 +1597,12 @@ World.onTap = hit => {
   const p = P(); if (!p) return;
   const u = hit.o.userData;
   if (u.pet) return patPet();
-  if (!p.hatched) return u.use === 'door' ? goOutside() : say(idleLine(), 3000);
+  if (!p.hatched) return say(u.use === 'door' ? '알에서 깨어나면 같이 나가요!' : idleLine(), 3000);
+  if (talking) return;
+  if (u.npc) return talkTo(u.npc);
+  if (u.use === 'home') return World.goHome();
+  if (u.use && u.use.startsWith('water:')) return waterBed(+u.use.slice(6));
+  if (u.use && u.use.startsWith('bld:')) return World.goVillage(u.use.slice(4), true);
   if (u.use) return useThing(u.use);
   if (u.floor && !p.asleep) {
     const st = World.st, far = Math.hypot(hit.point.x - st.x, hit.point.z - st.z) > 4;
@@ -1303,8 +1624,18 @@ function useThing(use) {
   if (use === 'tv') return World.goSpot('tv', true, () => { change({ fun: 3 }); say(pick(['뽀로롱~ 만화 재밌다!', '와, 우주 탐험 만화다!']), 3500); render(); });
 }
 function goOutside() {
-  World.goSpot('door', true, () => say('밖에서 친구들 목소리가 들려요! 마을 산책은 곧 열려요 🌳', 5000));
+  const p = P();
+  if (!p.hatched) return say('알에서 깨어나면 같이 나가요!', 3000);
+  if (p.asleep) return say('쿨쿨… 아침이 되면 나가요', 3000);
+  say('밖에 나가 볼까? 친구들이 기다려요!', 2500);
+  World.goSpot('door', true, () => World.enterVillage());
 }
+$('#villageTabs').addEventListener('click', e => {
+  const b = e.target.closest('[data-go]'); if (!b || b.disabled || talking) return;
+  sfx('tap');
+  if (b.dataset.go === 'home') return World.goHome();
+  World.goVillage(b.dataset.go, true);
+});
 $('#roomTabs').addEventListener('click', e => {
   const b = e.target.closest('[data-go]'); if (!b || b.disabled) return;
   sfx('tap');
@@ -1351,10 +1682,11 @@ function feed(food) {
   if (S.coins < food.price) return toast('코인이 모자라요. 놀이에서 모아 봐요!');
   S.coins -= food.price;
   closeSheet(); renderHUD();
-  say(`${food.name} 먹으러 부엌으로 고고!`, 3000);
-  World.goSpot('bowl', true, () => {
+  const outside = World.area() === 'village';
+  say(outside ? `${food.name} 소풍 도시락이다!` : `${food.name} 먹으러 부엌으로 고고!`, 3000);
+  (outside ? (cb => setTimeout(cb, 300)) : (cb => World.goSpot('bowl', true, cb)))(() => {
     const isFav = SPECIES[p.sp].fav === food.id;
-    World.eat(1.4, food.e); setMood('eat', 1400); sfx('eat');
+    World.eat(1.4, outside ? null : food.e); setMood('eat', 1400); sfx('eat');
     const c = petCenter(.1);
     for (let i = 0; i < 5; i++) setTimeout(() => particle(food.e, c.x + rand(-14, 14), c.y + 6, 'crumb'), i * 140);
     change({ hunger: food.hunger, fun: (food.fun || 0) + (isFav ? 10 : 0), energy: food.energy || 0 });
@@ -1436,6 +1768,240 @@ setInterval(() => {
 }, 1500);
 
 /* =========================================================
+   9-2. 마을 친구들과 대화
+   어린이 안전을 위해 대화는 미리 써 둔 대사와 선택지로만 이루어진다 (자유 채팅·온라인 연결 없음).
+   ========================================================= */
+const FRIENDS = {
+  somsom:  { name: '솜솜', sp: 'bunny',    hat: 'ribbon',  job: '광장 수다쟁이',    home: [2.9, 1.6] },
+  tosil:   { name: '토실', sp: 'hamster',  hat: 'sprout',  job: '꿀빵 가게 사장님', home: [-10, -6.6] },
+  kokkal:  { name: '꼬깔', sp: 'squirrel', hat: 'glasses', job: '도서관 선생님',    home: [0, -7.2] },
+  porong:  { name: '포롱', sp: 'penguin',  hat: 'flower',  job: '꽃집 주인',       home: [10, -6.6] },
+  banjjak: { name: '반짝', sp: 'dragon',   hat: 'crown',   job: '놀이터 대장',     home: [-7.4, 4.6] }
+};
+// 받침에 맞는 조사: josa('토실', '과', '와') → '토실과'
+const batchim = s => { const c = s.charCodeAt(s.length - 1); return c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28 > 0; };
+const josa = (s, a, b) => s + (batchim(s) ? a : b);
+const shuffle = a => a.map(v => [Math.random(), v]).sort((x, y) => x[0] - y[0]).map(v => v[1]);
+
+const INTRO = {
+  somsom: p => `어머, 처음 보는 친구다! 나는 솜솜이야. 광장에서 수다 떠는 게 제일 좋아! 너는 이름이 뭐야?`,
+  tosil: p => `어서 와! 꿀빵 냄새 따라왔구나? 나는 토실, 이 가게 사장님이야. 이름이 뭐니?`,
+  kokkal: p => `안녕? 도서관에 온 걸 환영해. 나는 꼬깔 선생님이란다. 너는 누구니?`,
+  porong: p => `반가워! 나는 포롱, 꽃집 주인이야. 꽃 구경 왔니? 이름 알려 줄래?`,
+  banjjak: p => `야호! 새 친구다! 나는 놀이터 대장 반짝이야! 너 이름 뭐야?`
+};
+const GREET = {
+  somsom: p => [`${josa(p.name, '이', '')}다! 오늘은 무슨 이야기 할까?`, '안녕 안녕! 기다리고 있었어!', `${josa(p.name, '아', '야')}, 오늘 날씨 최고지?`],
+  tosil: p => ['어서 와! 오늘도 빵이 아주 잘 구워졌단다.', `${josa(p.name, '이', '')} 왔구나! 배는 안 고프니?`, '반죽 중이었는데 마침 잘 왔어!'],
+  kokkal: p => ['쉿, 도서관 앞에서는 조금 작게 말하자. 후후, 반갑구나!', `${josa(p.name, '이', '')} 왔구나. 오늘은 무엇이 궁금하니?`, '책 냄새 좋지? 어서 오렴.'],
+  porong: p => ['꽃들이 너를 보고 웃는 것 같아!', `${josa(p.name, '아', '야')}! 오늘 장미가 활짝 피었어.`, '어서 와~ 오늘도 향기로운 하루!'],
+  banjjak: p => ['왔다! 오늘은 뭐 하고 놀까?', `${josa(p.name, '아', '야')}! 미끄럼틀 같이 탈래?`, '놀이터 대장 반짝, 출동 준비 완료!']
+};
+const CHAT = {
+  somsom: p => ['오늘 하늘 진짜 예쁘지? 구름이 꼭 솜사탕 같아!', '분수대에 소원을 빌면 이루어진대! 나는 매일 빌어.', '나는 비 오는 날 웅덩이에서 첨벙첨벙 하는 게 제일 좋아!', '토실 아저씨 꿀빵 먹어 봤어? 진짜 진짜 맛있어!', `벌써 Lv.${p.level}이야? ${josa(p.name, '이', '')} 대단하다!`, '포롱이 꽃집에 새 꽃이 들어왔대. 나중에 같이 가 보자!'],
+  tosil: p => ['새벽부터 반죽했더니 팔이 뻐근하구나~ 그래도 빵 냄새는 최고지!', '꿀빵의 비밀은... 쉿! 꿀을 두 번 바르는 거란다.', '밥을 잘 먹어야 쑥쑥 크는 거 알지?', `${josa(p.name, '은', '는')} 무슨 빵을 제일 좋아하니? 나는 당연히 꿀빵!`, '반짝이는 하루에 빵을 세 개나 먹어. 그래서 그렇게 기운이 넘치나 봐.'],
+  kokkal: p => ['책 속에는 다른 세상이 있단다. 오늘은 우주 여행 책을 읽었어.', '모르는 걸 물어보는 건 하나도 부끄러운 게 아니란다.', '도토리를 숨겨 놓고 또 까먹었지 뭐니... 혹시 봤니?', '하루에 한 쪽씩만 읽어도 1년이면 365쪽이야!', '반짝이가 또 도서관 앞에서 뛰어다녀서 살짝 혼냈단다. 후후.'],
+  porong: p => ['해바라기는 물을 아주 좋아해. 그래서 키가 쑥쑥 크지!', '꽃 냄새를 맡으면 기분이 말랑말랑해져.', '나는 수영도 잘하고 꽃도 잘 키워! 헤헤.', '비 오는 날엔 꽃들이 신나서 춤을 춰.', '꽃마다 꽃말이 있어. 데이지 꽃말은 "희망"이야!'],
+  banjjak: p => ['어젯밤에 별똥별 떨어지는 거 봤어! 소원도 빌었지!', '놀이터 대장의 규칙! 순서는 꼭 지키기!', '그네를 높이 타면 하늘에 닿을 것 같아!', '나는 날개가 있는데 아직 높이는 못 날아. 언젠간 꼭 날 거야!', '나랑 달리기 시합할래? ...다음에! 지금은 숨차!']
+};
+
+function fs(id) {
+  S.friends = S.friends || {};
+  return S.friends[id] || (S.friends[id] = { pts: 0, met: false, day: '', q: 'none', qday: '', gday: '', rday: '', rcount: 0, rid: 0 });
+}
+const heartsOf = id => Math.min(5, Math.floor(fs(id).pts / 100));
+function addFriend(id, n) {
+  const before = heartsOf(id); fs(id).pts += n;
+  const after = heartsOf(id);
+  if (after > before) { S.coins += 20; sfx('up'); confetti(50); toast(`${josa(FRIENDS[id].name, '과', '와')} 더 친해졌어요! ${'♥'.repeat(after)} +20코인`); }
+  persist();
+}
+let watered = [false, false, false], starsStarted = false;
+function friendAlert(id) {
+  const f = fs(id);
+  if (!f.met || f.day !== today()) return true;
+  if (id === 'porong' && f.q === 'active' && watered.every(Boolean)) return true;
+  if (id === 'banjjak' && f.q === 'active' && starsStarted && World.starsLeft() === 0) return true;
+  return false;
+}
+
+/* ---------- 대화창 ---------- */
+let talking = null, typeTimer = 0, fullText = '';
+function typeText(t) {
+  const el = $('#talkText'); clearInterval(typeTimer); fullText = t; let i = 0; el.textContent = '';
+  typeTimer = setInterval(() => { i += 2; el.textContent = t.slice(0, i); if (i >= t.length) clearInterval(typeTimer); }, 28);
+}
+$('#talkText').addEventListener('click', () => { clearInterval(typeTimer); $('#talkText').textContent = fullText; });
+function showNode(node) {
+  if (!node || !talking) return closeTalk();
+  typeText(node.text);
+  const box = $('#talkChoices'); box.innerHTML = '';
+  for (const c of node.choices || [{ label: '👋 안녕!', fn: () => null }]) {
+    const b = document.createElement('button'); b.className = 'candy'; b.textContent = c.label;
+    b.addEventListener('click', () => { sfx('tap'); showNode(c.fn()); });
+    box.appendChild(b);
+  }
+  const h = heartsOf(talking);
+  $('#talkHearts').textContent = '♥'.repeat(h) + '♡'.repeat(5 - h);
+}
+function talkTo(id) {
+  if (talking) return;
+  const f = FRIENDS[id];
+  World.walkToNpc(id, () => {
+    talking = id; World.setTalking(id, true);
+    $('#talkFace').innerHTML = petSVG(f.sp, { mood: 'happy', stage: 'adult', hat: f.hat });
+    $('#talkName').textContent = f.name; $('#talkJob').textContent = f.job;
+    $('#talk').hidden = false; pushBack(); sfx('pop');
+    const s = fs(id);
+    if (!s.met) { s.met = true; s.day = today(); addFriend(id, 30); return showNode(firstMeet(id)); }
+    if (s.day !== today()) { s.day = today(); addFriend(id, 30); }
+    showNode(menu(id, true));
+  });
+}
+function closeTalk() {
+  clearInterval(typeTimer);
+  if (talking) World.setTalking(talking, false);
+  talking = null; $('#talk').hidden = true; renderHUD();
+}
+const bye = () => ({ text: pick(['또 놀러 와! 기다릴게~', '안녕! 오늘도 즐거운 하루 보내!', '다음에 또 이야기하자!']), choices: [{ label: '안녕! 👋', fn: () => null }] });
+const back = id => ({ label: '다른 이야기 할래요', fn: () => menu(id, false) });
+
+function firstMeet(id) {
+  const p = P();
+  return { text: INTRO[id](p), choices: [{ label: `나는 ${p.name}!`, fn: () => ({ text: `${p.name}! 이름 정말 예쁘다. 우리 이제 친구야! 자주 놀러 와~`, choices: [{ label: '응! 좋아 😊', fn: () => menu(id, false) }] }) }] };
+}
+function menu(id, greet) {
+  const p = P();
+  return {
+    text: greet ? pick(GREET[id](p)) : '또 무슨 이야기 할까?',
+    choices: [{ label: '💬 이야기하자', fn: () => chat(id) }, ...SPECIAL[id](), { label: '👋 안녕!', fn: bye }]
+  };
+}
+function chat(id) {
+  addFriend(id, 5);
+  return { text: pick(CHAT[id](P())), choices: [{ label: '우와, 그렇구나!', fn: () => menu(id, false) }, { label: '👋 안녕!', fn: bye }] };
+}
+
+/* ---------- 친구마다 할 수 있는 일 ---------- */
+const RIDDLES = [
+  ['다리는 넷인데 걷지 못하는 것은?', '의자', ['의자', '강아지', '거북이']],
+  ['세상에서 가장 큰 코는?', '멕시코', ['멕시코', '코끼리 코', '딸기코']],
+  ['먹으면 먹을수록 늘어나는 것은?', '나이', ['나이', '배', '밥']],
+  ['씻을수록 더러워지는 것은?', '물', ['물', '비누', '수건']],
+  ['밤하늘에서 반짝반짝 빛나는 것은?', '별', ['별', '해', '무지개']],
+  ['꿀벌이 꽃에서 모으는 것은?', '꿀', ['꿀', '우유', '소금']],
+  ['펭귄이 사는 곳은 어디일까?', '남극', ['남극', '사막', '정글']],
+  ['무지개는 몇 가지 색일까?', '일곱 가지', ['일곱 가지', '세 가지', '열 가지']],
+  ['겨울에 하늘에서 내리는 하얀 것은?', '눈', ['눈', '모래', '꽃잎']],
+  ['얼룩말의 줄무늬는 무슨 색일까?', '검정과 하양', ['검정과 하양', '빨강과 파랑', '노랑과 초록']]
+];
+function riddle() {
+  const s = fs('kokkal');
+  if (s.rday !== today()) { s.rday = today(); s.rcount = 0; }
+  const [q, a, opts] = RIDDLES[s.rid % RIDDLES.length];
+  const ask = txt => ({
+    text: txt,
+    choices: shuffle(opts).map(o => ({ label: o, fn: () => {
+      if (o !== a) { sfx('bad'); return ask(`땡! 다시 생각해 볼까? "${q}"`); }
+      s.rid++; let extra = '';
+      if (s.rcount < 3) { s.rcount++; S.coins += 10; addFriend('kokkal', 15); extra = ' 상으로 10코인을 줄게!'; }
+      sfx('coin'); renderHUD(); persist();
+      return { text: `딩동댕! 정답은 "${a}"! 정말 똑똑하구나.${extra}`, choices: [{ label: '하나 더! 🤔', fn: riddle }, back('kokkal')] };
+    } }))
+  });
+  return ask(`수수께끼 나갑니다~ ${q}`);
+}
+function bread() {
+  const s = fs('tosil'), p = P();
+  if (s.gday === today()) return { text: '오늘 꿀빵은 다 팔렸단다! 내일 아침에 또 구울게~', choices: [back('tosil')] };
+  s.gday = today();
+  change({ hunger: 20, fun: 5 }); addXP(5); addFriend('tosil', 10);
+  World.eat(1.2); setMood('eat', 1200); sfx('eat'); render();
+  return { text: `자, 갓 구운 꿀빵! ${josa(p.name, '아', '야')}, 따끈할 때 먹으렴~`, choices: [{ label: '냠냠! 고마워요 💛', fn: () => menu('tosil', false) }] };
+}
+function porongQuest() {
+  const s = fs('porong');
+  if (s.q === 'done' && s.qday !== today()) s.q = 'none';
+  if (s.q === 'none') return { text: '꽃밭 세 곳에 물을 줘야 하는데, 오늘은 손님이 많아서 바빠... 도와줄래?', choices: [
+    { label: '좋아요! 💧', fn: () => { s.q = 'active'; watered = [false, false, false]; World.showWater(watered); persist(); return { text: '고마워! 물방울 표시가 있는 꽃밭을 눌러 줘. 다 주면 나한테 꼭 알려 줘!', choices: [{ label: '다녀올게요!', fn: () => null }] }; } },
+    { label: '다음에 할게요', fn: () => menu('porong', false) }] };
+  if (s.q === 'active' && !watered.every(Boolean)) return { text: `아직 ${watered.filter(w => !w).length}곳 남았어! 물방울 표시를 찾아봐~`, choices: [{ label: '알겠어요!', fn: () => null }] };
+  if (s.q === 'active') {
+    s.q = 'done'; s.qday = today(); addFriend('porong', 40); addXP(15);
+    let gift;
+    if (!S.hats.includes('flower')) { S.hats.push('flower'); gift = '내가 아끼는 데이지 핀을 선물할게! 상점에서 써 볼 수 있어.'; }
+    else { S.coins += 25; gift = '고마운 마음으로 25코인을 줄게!'; }
+    confetti(60); sfx('up'); render(); persist();
+    return { text: `와, 꽃들이 신났어! 정말 고마워. ${gift}`, choices: [{ label: '헤헤, 천만에요 🌸', fn: () => menu('porong', false) }] };
+  }
+  return { text: '오늘 꽃밭은 반짝반짝해! 내일 또 도와줄래?', choices: [back('porong')] };
+}
+function starQuest() {
+  const s = fs('banjjak');
+  if (s.q === 'done' && s.qday !== today()) s.q = 'none';
+  if (s.q === 'none') return { text: '큰일이야! 어젯밤 별똥별 조각 세 개가 마을 어딘가에 떨어졌대. 같이 찾아 줄래?', choices: [
+    { label: '찾아볼게! ⭐', fn: () => { s.q = 'active'; startStars(); persist(); return { text: '고마워! 반짝반짝 빛나는 별 조각 가까이 가면 주울 수 있어. 다 모으면 나한테 와!', choices: [{ label: '출발!', fn: () => null }] }; } },
+    { label: '다음에 할게', fn: () => menu('banjjak', false) }] };
+  if (s.q === 'active' && !starsStarted) { startStars(); return { text: '별 조각이 다시 반짝이기 시작했어! 마을을 둘러봐!', choices: [{ label: '알았어!', fn: () => null }] }; }
+  if (s.q === 'active' && World.starsLeft() > 0) return { text: `아직 ${World.starsLeft()}개 남았어! 나무 근처랑 마을 구석을 잘 찾아봐!`, choices: [{ label: '알았어!', fn: () => null }] };
+  if (s.q === 'active') {
+    s.q = 'done'; s.qday = today(); S.coins += 30; addFriend('banjjak', 40); addXP(20);
+    confetti(70); sfx('up'); render(); persist();
+    return { text: '우와아! 별 조각을 다 찾았구나! 너 진짜 최고야! 상으로 30코인!', choices: [{ label: '야호! 🎉', fn: () => menu('banjjak', false) }] };
+  }
+  return { text: '오늘 별 조각은 다 찾았어! 내일 또 모험하자!', choices: [back('banjjak')] };
+}
+function startStars() {
+  starsStarted = true;
+  World.spawnStars(3, left => {
+    if (left > 0) toast(`⭐ 별 조각 ${3 - left}/3`);
+    else { say('별 조각을 다 찾았어요! 반짝에게 가져가자!', 5000); renderHUD(); }
+  });
+}
+function compliment() {
+  const p = P(), f = FORMS[formOf(p.level)].name;
+  const lines = [`${josa(p.name, '은', '는')} ${f} 모습이 정말 멋져!`, `${josa(p.name, '이', '')} 웃으면 나도 기분이 좋아져!`, `벌써 Lv.${p.level}! 진짜 열심히 크고 있구나!`];
+  if (p.hat) lines.push(`오늘 쓴 ${HATS[p.hat].name}, 완전 찰떡이야!`);
+  addFriend('somsom', 5);
+  return { text: pick(lines), choices: [{ label: '헤헤, 고마워 💖', fn: () => menu('somsom', false) }] };
+}
+function careTip() {
+  const p = P(), low = ['hunger', 'fun', 'clean', 'energy'].reduce((a, k) => p[k] < p[a] ? k : a, 'hunger');
+  const tips = {
+    hunger: '배가 고플 땐 토실 아저씨 꿀빵! 아니면 집 부엌에서 밥을 먹어.',
+    fun: '심심하면 집 거실 오락기에서 놀아 봐! 별빛 수비대 진짜 재밌어.',
+    clean: '목욕하면 기분이 상쾌해져. 욕조에서 스펀지로 쓱싹쓱싹!',
+    energy: '졸리면 일찍 자야 해. 침대에서 푹 자면 기운이 펑펑!'
+  };
+  return { text: p[low] > 70 ? '지금처럼만 하면 최고야! 매일 친구들한테 인사하는 것도 잊지 마~' : tips[low], choices: [{ label: '알려 줘서 고마워!', fn: () => menu('somsom', false) }] };
+}
+const SPECIAL = {
+  somsom: () => [{ label: '💖 나 어때?', fn: compliment }, { label: '🫧 돌보기 꿀팁', fn: careTip }],
+  tosil: () => [{ label: '🍯 꿀빵 주세요', fn: bread }],
+  kokkal: () => [{ label: '🤔 수수께끼 내 주세요', fn: riddle }],
+  porong: () => [{ label: fs('porong').q === 'active' ? '💧 꽃밭에 물 다 줬어요' : '🌸 도와줄 일 있어요?', fn: porongQuest }],
+  banjjak: () => [{ label: fs('banjjak').q === 'active' ? '⭐ 별 조각 가져왔어!' : '🌠 같이 모험하자!', fn: starQuest }]
+};
+
+function waterBed(i) {
+  const s = fs('porong');
+  World.goToBed(i, () => {
+    if (s.q !== 'active') return say(pick(['예쁜 꽃밭이다~', '꽃 냄새 좋다!']), 2500);
+    if (watered[i]) return say('여기는 벌써 물을 줬어요!', 2500);
+    watered[i] = true; World.showWater(watered); sfx('bub');
+    burst(['💧', '💧', '🌸'], 5, -.1);
+    const n = watered.filter(Boolean).length;
+    say(n < 3 ? `촉촉~ 꽃밭 ${n}/3` : '꽃밭에 물을 다 줬어요! 포롱에게 알려 주자!', 4000);
+    renderHUD();
+  });
+}
+function onEnterVillage() {
+  if (fs('porong').q === 'active') World.showWater(watered);
+  if (fs('banjjak').q === 'active' && !starsStarted) startStars();
+  say(pick(['와! 마을이다! 친구들한테 인사하자!', '바람 냄새 좋다~ 누구부터 만날까?']), 4000);
+}
+
+/* =========================================================
    10. 바텀 시트 (밥 / 상점 / 친구들)
    ========================================================= */
 let scrim = null;
@@ -1456,6 +2022,7 @@ window.addEventListener('popstate', () => {
   backDepth = 0;
   const gameClose = document.querySelector('#gClose, #gHome');
   if (gameClose) return gameClose.click();
+  if (talking) return closeTalk();
   if (scrim) closeSheet();
   else if (bathing) endBath();
 });
@@ -1519,7 +2086,11 @@ function openDex() {
     }
     return `<button class="dex-card" data-adopt="${sp}"><span class="art">${petSVG(sp, { sil: true, stage: 'kid' })}</span><span class="txt"><span class="t1">??? <small>(${s.kind})</small></span><br><span class="t2">${s.desc}</span></span><span class="go"><i class="coin"></i>${ADOPT_PRICE}</span></button>`;
   }).join('');
-  openSheet(`우리 친구들 ${S.pets.length}/5`, `<div class="dex">${cards}</div>`, body => body.addEventListener('click', e => {
+  const village = Object.entries(FRIENDS).map(([id, f]) => {
+    const met = fs(id).met, h = heartsOf(id);
+    return `<div class="dex-card"><span class="art">${petSVG(f.sp, { mood: 'happy', stage: 'adult', hat: f.hat, sil: !met })}</span><span class="txt"><span class="t1">${met ? f.name : '???'}</span><br><span class="t2">${met ? `${f.job} · ${'♥'.repeat(h)}${'♡'.repeat(5 - h)}` : '마을에서 만나 보세요'}</span></span></div>`;
+  }).join('');
+  openSheet(`우리 친구들 ${S.pets.length}/5`, `<div class="dex">${cards}<p class="arcade-head">마을 친구 <span class="arcade-tag">대화할수록 하트가 쌓여요</span></p>${village}</div>`, body => body.addEventListener('click', e => {
     const sw = e.target.closest('[data-switch]');
     if (sw) {
       if (bathing) endBath();
@@ -2161,6 +2732,12 @@ $('#actions').addEventListener('click', e => {
   const b = e.target.closest('.act'); if (!b || b.disabled) return;
   sfx('tap');
   const p = P();
+  if (World.area() === 'village' && (b.dataset.act === 'bath' || b.dataset.act === 'sleep')) {
+    if (talking) closeTalk();
+    say('집에 가서 할래요!', 2500);
+    return World.goHome(() => b.dataset.act === 'bath' ? startBath() : sleep());
+  }
+  if (talking) closeTalk();
   switch (b.dataset.act) {
     case 'feed': return openFeed();
     case 'play': return openPlayMenu();
