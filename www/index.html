@@ -88,7 +88,6 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
 .xp i{display:block;height:100%;background:var(--butter);width:0;transition:width .4s}
 .pill{display:flex;align-items:center;gap:6px;font-family:var(--display);font-size:17px;padding:6px 12px;border-radius:99px;background:var(--paper);box-shadow:0 0 0 2px var(--ink) inset;font-variant-numeric:tabular-nums}
 .icon-btn{border:0;width:40px;height:40px;border-radius:50%;background:var(--paper);box-shadow:0 0 0 2px var(--ink) inset;font-size:19px;display:grid;place-items:center;flex:none}
-#giftBtn{background:var(--butter);animation:wiggle 1.4s ease-in-out infinite}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;padding-block:4px 10px}
 .stat{display:flex;align-items:center;gap:6px;font-size:13px}
 .stat span{width:4.6em;white-space:nowrap}
@@ -344,8 +343,7 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
         <h1 id="petName">몽글이</h1>
         <div class="lv"><b id="lvChip">Lv.1</b><span id="stageTxt">아기</span><span class="xp" aria-hidden="true"><i id="xpBar"></i></span></div>
       </div>
-      <button class="icon-btn" id="giftBtn" aria-label="오늘의 선물 받기" hidden>🎁</button>
-      <button class="icon-btn mbtn" id="missionBtn" aria-label="오늘의 미션">📋<span class="badge" id="missionBadge" hidden></span></button>
+      <button class="icon-btn mbtn" id="missionBtn" aria-label="놀이 목표">📋<span class="badge" id="missionBadge" hidden></span></button>
       <div class="pill" aria-label="코인"><i class="coin"></i><span id="coinTxt">0</span></div>
       <button class="icon-btn" id="settingsBtn" aria-label="설정">⚙️</button>
     </header>
@@ -397,6 +395,7 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
    1. 기본 도구
    ========================================================= */
 const $ = s => document.querySelector(s);
+const escapeHTML = value => String(value).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const INK = '#5B4550';
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const pick = a => a[Math.floor(Math.random() * a.length)];
@@ -416,7 +415,6 @@ function star(cx, cy, R, r, n = 5) {
   }
   return `<polygon points="${pts.join(' ')}"/>`;
 }
-
 /* =========================================================
    2. 오리지널 캐릭터 5종
    - 공통 규칙: 몸통 = 머리(2등신 이하), 눈은 얼굴 중앙보다 아래, 점 눈 + 하이라이트,
@@ -608,7 +606,7 @@ const formOf = lv => FORMS.reduce((f, x, i) => lv >= x.lv ? i : f, 0);
    ========================================================= */
 let S = null;
 function freshSave() {
-  return { v: 1, coins: 30, sound: true, active: 0, pets: [], hats: [], rooms: ['mint'], room: 'mint', lastTick: Date.now(), lastGift: '' };
+  return { v: 1, coins: 30, sound: true, active: 0, pets: [], hats: [], rooms: ['mint'], room: 'mint', lastTick: Date.now() };
 }
 function newPet(sp, name) {
   return { sp, name, level: 1, xp: 0, hunger: 75, fun: 80, clean: 90, energy: 85, hat: null, asleep: false, hatched: false, taps: 0 };
@@ -721,7 +719,7 @@ function idleLine() {
   const fav = FOODS.find(f => f.id === SPECIES[p.sp].fav);
   return pick([
     `${p.name} 기분 최고!`, '쓰다듬어 주면 좋겠다~', '오늘은 뭐 하고 놀까?', '나랑 놀아 줘서 고마워!',
-    `${fav.name} 먹고 싶다…`, '새 모자 써 보고 싶어!', '빨리 쑥쑥 크고 싶어!'
+    `${fav.name} 먹고 싶다…`, '새 모자 써 보고 싶어!', '천천히 건강하게 크고 싶어!'
   ]);
 }
 function addXP(n) {
@@ -779,9 +777,8 @@ function renderHUD() {
   $('#stageTxt').innerHTML = p.hatched ? `${SPECIES[p.sp].kind} · ${FORMS[f].name}${f < FORMS.length - 1 ? `<span class="form-chip">Lv.${FORMS[f + 1].lv} 변신!</span>` : ''}` : '알';
   $('#xpBar').style.width = (p.xp / needXP(p.level) * 100) + '%';
   $('#coinTxt').textContent = S.coins;
-  const ms = todayMissions(), ready = ms.list.filter(x => !x.claimed && x.prog >= MISSIONS[x.id].goal).length + (!ms.bonus && ms.list.every(x => x.claimed) ? 1 : 0);
+  const ms = todayMissions(), ready = ms.list.filter(x => !x.claimed && x.prog >= MISSIONS[x.id].goal).length;
   $('#missionBadge').textContent = ready || ''; $('#missionBadge').hidden = !ready;
-  $('#giftBtn').hidden = S.lastGift === today();
   for (const s of STATS) {
     const el = $('#st-' + s.k), v = p.hatched ? p[s.k] : 100;
     el.querySelector('i').style.width = v + '%';
@@ -804,7 +801,6 @@ function renderHUD() {
   document.querySelectorAll('#roomTabs button').forEach(b => { b.disabled = egg || bathing || p.asleep; b.classList.toggle('on', b.dataset.go === World.roomNow()); });
 }
 function render() { renderHUD(); renderPet(); }
-
 /* =========================================================
    8-2. 3D 집 (Three.js r128)
    돌하우스처럼 앞이 트인 집: 거실·부엌·침실·욕실 4칸 + 마당.
@@ -2303,7 +2299,7 @@ const INTRO = {
   banjjak: p => `야호! 새 친구다! 나는 놀이터 대장 반짝이야! 너 이름 뭐야?`
 };
 const GREET = {
-  somsom: p => [`${josa(p.name, '이', '')}다! 오늘은 무슨 이야기 할까?`, '안녕 안녕! 기다리고 있었어!', `${josa(p.name, '아', '야')}, 오늘 날씨 최고지?`],
+  somsom: p => [`${josa(p.name, '이', '')}다! 오늘은 무슨 이야기 할까?`, '안녕 안녕! 반가워!' , `${josa(p.name, '아', '야')}, 오늘 날씨 최고지?`],
   tosil: p => ['어서 와! 오늘도 빵이 아주 잘 구워졌단다.', `${josa(p.name, '이', '')} 왔구나! 배는 안 고프니?`, '반죽 중이었는데 마침 잘 왔어!'],
   kokkal: p => ['쉿, 도서관 앞에서는 조금 작게 말하자. 후후, 반갑구나!', `${josa(p.name, '이', '')} 왔구나. 오늘은 무엇이 궁금하니?`, '책 냄새 좋지? 어서 오렴.'],
   porong: p => ['꽃들이 너를 보고 웃는 것 같아!', `${josa(p.name, '아', '야')}! 오늘 장미가 활짝 피었어.`, '어서 와~ 오늘도 향기로운 하루!'],
@@ -2348,7 +2344,7 @@ function addFriend(id, n) {
 let watered = [false, false, false], starsStarted = false;
 function friendAlert(id) {
   const f = fs(id);
-  if (!f.met || f.day !== today()) return true;
+  if (!f.met) return true;
   if (id === 'porong' && f.q === 'active' && watered.every(Boolean)) return true;
   if (id === 'banjjak' && f.q === 'active' && starsStarted && World.starsLeft() === 0) return true;
   if (id === 'neurit' && f.q === 'active' && shellsStarted && World.shellsLeft() === 0) return true;
@@ -2383,9 +2379,9 @@ function talkTo(id) {
     $('#talkName').textContent = f.name; $('#talkJob').textContent = f.job;
     $('#talk').hidden = false; pushBack(); sfx('pop');
     const s = fs(id);
-    if (!s.met) { s.met = true; s.day = today(); addFriend(id, 30); mission('talk'); if (Object.keys(FRIENDS).every(k => fs(k).met)) badge('friends8'); return showNode(firstMeet(id)); }
-    if (s.day !== today()) { s.day = today(); addFriend(id, 30); mission('talk'); }
-    showNode(menu(id, true));
+    if (!s.met) { s.met = true; s.day = 'met'; addFriend(id, 30); if (Object.keys(FRIENDS).every(k => fs(k).met)) badge('friends8'); showNode(firstMeet(id)); }
+    else showNode(menu(id, true));
+    mission('talk');
   });
 }
 function closeTalk() {
@@ -2393,12 +2389,12 @@ function closeTalk() {
   if (talking) World.setTalking(talking, false);
   talking = null; $('#talk').hidden = true; renderHUD();
 }
-const bye = () => ({ text: pick(['또 놀러 와! 기다릴게~', '안녕! 오늘도 즐거운 하루 보내!', '다음에 또 이야기하자!']), choices: [{ label: '안녕! 👋', fn: () => null }] });
+const bye = () => ({ text: pick(['다음에 또 만나자!', '안녕! 오늘도 즐거운 하루 보내!', '다음에 또 이야기하자!']), choices: [{ label: '안녕! 👋', fn: () => null }] });
 const back = id => ({ label: '다른 이야기 할래요', fn: () => menu(id, false) });
 
 function firstMeet(id) {
   const p = P();
-  return { text: INTRO[id](p), choices: [{ label: `나는 ${p.name}!`, fn: () => ({ text: `${p.name}! 이름 정말 예쁘다. 우리 이제 친구야! 자주 놀러 와~`, choices: [{ label: '응! 좋아 😊', fn: () => menu(id, false) }] }) }] };
+  return { text: INTRO[id](p), choices: [{ label: `나는 ${p.name}!`, fn: () => ({ text: `${p.name}! 이름 정말 예쁘다. 우리 이제 친구야! 다음에 또 이야기하자~`, choices: [{ label: '응! 좋아 😊', fn: () => menu(id, false) }] }) }] };
 }
 function menu(id, greet) {
   const p = P();
@@ -2427,14 +2423,13 @@ const RIDDLES = [
 ];
 function riddle() {
   const s = fs('kokkal');
-  if (s.rday !== today()) { s.rday = today(); s.rcount = 0; }
   const [q, a, opts] = RIDDLES[s.rid % RIDDLES.length];
   const ask = txt => ({
     text: txt,
     choices: shuffle(opts).map(o => ({ label: o, fn: () => {
       if (o !== a) { sfx('bad'); return ask(`땡! 다시 생각해 볼까? "${q}"`); }
       s.rid++; let extra = '';
-      if (s.rcount < 3) { s.rcount++; S.coins += 10; addFriend('kokkal', 15); extra = ' 상으로 10코인을 줄게!'; }
+      if ((s.rtotal || s.rcount || 0) < 3) { s.rtotal = (s.rtotal || s.rcount || 0) + 1; S.coins += 10; addFriend('kokkal', 15); extra = ' 상으로 10코인을 줄게!'; }
       sfx('coin'); renderHUD(); persist();
       return { text: `딩동댕! 정답은 "${a}"! 정말 똑똑하구나.${extra}`, choices: [{ label: '하나 더! 🤔', fn: riddle }, back('kokkal')] };
     } }))
@@ -2443,15 +2438,14 @@ function riddle() {
 }
 function bread() {
   const s = fs('tosil'), p = P();
-  if (s.gday === today()) return { text: '오늘 꿀빵은 다 팔렸단다! 내일 아침에 또 구울게~', choices: [back('tosil')] };
-  s.gday = today();
+  if (s.gday) return { text: '꿀빵은 다 나갔단다! 대신 집 부엌에서 다른 간식을 만들어 보렴.', choices: [back('tosil')] };
+  s.gday = 'claimed';
   change({ hunger: 20, fun: 5 }); addXP(5); addFriend('tosil', 10);
   World.eat(1.2); setMood('eat', 1200); sfx('eat'); render();
   return { text: `자, 갓 구운 꿀빵! ${josa(p.name, '아', '야')}, 따끈할 때 먹으렴~`, choices: [{ label: '냠냠! 고마워요 💛', fn: () => menu('tosil', false) }] };
 }
 function porongQuest() {
   const s = fs('porong');
-  if (s.q === 'done' && s.qday !== today()) s.q = 'none';
   if (s.q === 'none') return { text: '꽃밭 세 곳에 물을 줘야 하는데, 오늘은 손님이 많아서 바빠... 도와줄래?', choices: [
     { label: '좋아요! 💧', fn: () => { s.q = 'active'; watered = [false, false, false]; World.showWater(watered); persist(); return { text: '고마워! 물방울 표시가 있는 꽃밭을 눌러 줘. 다 주면 나한테 꼭 알려 줘!', choices: [{ label: '다녀올게요!', fn: () => null }] }; } },
     { label: '다음에 할게요', fn: () => menu('porong', false) }] };
@@ -2464,11 +2458,10 @@ function porongQuest() {
     confetti(60); sfx('up'); render(); persist();
     return { text: `와, 꽃들이 신났어! 정말 고마워. ${gift}`, choices: [{ label: '헤헤, 천만에요 🌸', fn: () => menu('porong', false) }] };
   }
-  return { text: '오늘 꽃밭은 반짝반짝해! 내일 또 도와줄래?', choices: [back('porong')] };
+  return { text: '꽃밭이 반짝반짝해! 도와줘서 고마워.', choices: [back('porong')] };
 }
 function starQuest() {
   const s = fs('banjjak');
-  if (s.q === 'done' && s.qday !== today()) s.q = 'none';
   if (s.q === 'none') return { text: '큰일이야! 어젯밤 별똥별 조각 세 개가 마을 어딘가에 떨어졌대. 같이 찾아 줄래?', choices: [
     { label: '찾아볼게! ⭐', fn: () => { s.q = 'active'; startStars(); persist(); return { text: '고마워! 반짝반짝 빛나는 별 조각 가까이 가면 주울 수 있어. 다 모으면 나한테 와!', choices: [{ label: '출발!', fn: () => null }] }; } },
     { label: '다음에 할게', fn: () => menu('banjjak', false) }] };
@@ -2479,7 +2472,7 @@ function starQuest() {
     confetti(70); sfx('up'); render(); persist();
     return { text: '우와아! 별 조각을 다 찾았구나! 너 진짜 최고야! 상으로 30코인!', choices: [{ label: '야호! 🎉', fn: () => menu('banjjak', false) }] };
   }
-  return { text: '오늘 별 조각은 다 찾았어! 내일 또 모험하자!', choices: [back('banjjak')] };
+  return { text: '별 조각을 다 찾았어! 같이 모험해서 즐거웠어.', choices: [back('banjjak')] };
 }
 function startStars() {
   starsStarted = true;
@@ -2503,7 +2496,7 @@ function careTip() {
     clean: '목욕하면 기분이 상쾌해져. 욕조에서 스펀지로 쓱싹쓱싹!',
     energy: '졸리면 일찍 자야 해. 침대에서 푹 자면 기운이 펑펑!'
   };
-  return { text: p[low] > 70 ? '지금처럼만 하면 최고야! 매일 친구들한테 인사하는 것도 잊지 마~' : tips[low], choices: [{ label: '알려 줘서 고마워!', fn: () => menu('somsom', false) }] };
+  return { text: p[low] > 70 ? '지금처럼만 하면 최고야! 친구들과 이야기하고 싶을 때 들러 줘~' : tips[low], choices: [{ label: '알려 줘서 고마워!', fn: () => menu('somsom', false) }] };
 }
 const SPECIAL = {
   somsom: () => [{ label: '💖 나 어때?', fn: compliment }, { label: '🫧 돌보기 꿀팁', fn: careTip }],
@@ -2520,12 +2513,11 @@ function followChoice(id) {
     ? { label: '👋 산책은 여기까지!', fn: () => { following = null; World.setFollow(null); addFriend(id, 5); return { text: '오늘 같이 걸어서 정말 즐거웠어! 또 산책하자~', choices: [back(id)] }; } }
     : { label: '🚶 같이 산책하자', fn: () => { following = id; World.setFollow(id); mission('walk'); addFriend(id, 10); return { text: '좋아! 어디든 따라갈게. 마을 구경시켜 줘!', choices: [{ label: '출발! 🚶', fn: () => null }] }; } };
 }
-// 같이 놀기 코인은 친구마다 하루 3번까지 (계속 반복해서 코인만 모으지 않도록)
+// 코인 보상은 친구마다 처음 세 번까지만 지급하고 날짜가 바뀌어도 초기화하지 않는다.
 function playReward(id, coins) {
-  const s = fs(id);
-  if (s.pday !== today()) { s.pday = today(); s.pcount = 0; }
-  if (s.pcount >= 3) return 0;
-  s.pcount++; S.coins += coins; renderHUD(); persist();
+  const s = fs(id), count = s.playCount ?? s.pcount ?? 0;
+  if (count >= 3) return 0;
+  s.playCount = count + 1; S.coins += coins; renderHUD(); persist();
   return coins;
 }
 
@@ -2561,7 +2553,7 @@ function roast() {
     addFriend('ruru', 10 + good * 5); change({ fun: 10 + good * 3 }); addXP(5 + good * 2); render();
     mission('friend');
     if (good === 3) confetti(60);
-    wrap.querySelector('.roast').innerHTML = `<h3>${good === 3 ? '마시멜로 박사님!' : good ? '맛있게 구웠어요!' : '다음엔 더 잘할 수 있어!'}</h3><div class="big-score">${'🍡'.repeat(good) || '🔥'}</div><p>${good}개 성공!${good ? (coins ? ` 상으로 ${coins}코인!` : ' 오늘 코인 선물은 다 받았어요.') : ''}</p><button class="candy primary" id="rDone">캠핑장으로 돌아가기</button>`;
+    wrap.querySelector('.roast').innerHTML = `<h3>${good === 3 ? '마시멜로 박사님!' : good ? '맛있게 구웠어요!' : '다음엔 더 잘할 수 있어!'}</h3><div class="big-score">${'🍡'.repeat(good) || '🔥'}</div><p>${good}개 성공!${good ? (coins ? ` 상으로 ${coins}코인!` : ' 코인 보상은 이미 받았어요.') : ''}</p><button class="candy primary" id="rDone">캠핑장으로 돌아가기</button>`;
     wrap.querySelector('#rDone').addEventListener('click', () => { wrap.remove(); say(pick(['루루: "냠냠, 같이 먹으니까 더 맛있다!"', '루루: "또 캠프파이어 하자!"']), 4000); });
   }
   btn.addEventListener('pointerdown', e => {
@@ -2577,7 +2569,6 @@ function roast() {
 // 조개 줍기 (느릿)
 function shellQuest() {
   const s = fs('neurit');
-  if (s.q === 'done' && s.qday !== today()) s.q = 'none';
   if (s.q === 'none') return { text: '어어... 파도가... 내 조개 다섯 개를... 해변에 흩어 놨어... 느릿느릿한 나 대신... 주워 줄래...?', choices: [
     { label: '내가 주워 올게! 🐚', fn: () => { s.q = 'active'; startShells(); persist(); return { text: '고마워어... 모래사장을... 잘 살펴봐...', choices: [{ label: '다녀올게!', fn: () => null }] }; } },
     { label: '다음에 할게', fn: () => menu('neurit', false) }] };
@@ -2588,7 +2579,7 @@ function shellQuest() {
     confetti(60); sfx('up'); render(); persist();
     return { text: '우와아... 다 찾았구나... 너는... 정말 빠르다... 고마운 마음으로... 30코인...', choices: [{ label: '천천히 말해도 괜찮아! 😊', fn: () => menu('neurit', false) }] };
   }
-  return { text: '오늘 조개는... 다 모았어... 내일... 또 와...', choices: [back('neurit')] };
+  return { text: '조개는... 다 모았어... 찾아줘서... 고마워...', choices: [back('neurit')] };
 }
 function startShells() {
   shellsStarted = true;
@@ -2684,7 +2675,6 @@ function onEnterVillage() {
   hide = null; following = null;
   say(pick(['와! 마을이다! 친구들한테 인사하자!', '바람 냄새 좋다~ 누구부터 만날까?']), 4000);
 }
-
 /* =========================================================
    9-3. 오늘의 미션 · 집 꾸미기 · 보호자 메뉴
    ========================================================= */
@@ -2709,10 +2699,10 @@ const MISSIONS = {
 // 날짜로 정해지는 섞기: 같은 날에는 언제 열어도 같은 미션 3개
 function seeded(str) { let h = 2166136261; for (const c of str) h = Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0; return () => ((h = Math.imul(h ^ (h >>> 15), 2246822519) >>> 0) / 4294967296); }
 function todayMissions() {
-  const d = today();
-  if (!S.missions || S.missions.day !== d) {
-    const r = seeded(d), ids = Object.keys(MISSIONS).map(id => [r(), id]).sort((a, b) => a[0] - b[0]).map(x => x[1]);
-    S.missions = { day: d, list: ids.slice(0, 3).map(id => ({ id, prog: 0, claimed: false })), bonus: false };
+  // Compatibility name retained. Goals do not expire when the date changes.
+  if (!S.missions || !Array.isArray(S.missions.list)) {
+    const r = seeded('malang-friendly-goals-v1'), ids = Object.keys(MISSIONS).map(id => [r(), id]).sort((a, b) => a[0] - b[0]).map(x => x[1]);
+    S.missions = { day: 'ongoing', list: ids.slice(0, 3).map(id => ({ id, prog: 0, claimed: false })) };
     persist();
   }
   return S.missions;
@@ -2731,14 +2721,11 @@ function openMissions(tab = 'm') {
     const M = MISSIONS[it.id], done = it.prog >= M.goal;
     return `<div class="mission${done ? ' done' : ''}"><span class="mi">${M.icon}</span><span class="mt"><b>${M.text}</b><span class="mbar"><i style="width:${it.prog / M.goal * 100}%"></i></span><small>${it.prog} / ${M.goal}</small></span>${it.claimed ? '<span class="mclaimed">받음 ✓</span>' : `<button class="candy${done ? ' primary' : ''}" data-claim="${i}"${done ? '' : ' disabled'}><i class="coin"></i> ${M.coin}</button>`}</div>`;
   }).join('');
-  const got = m.list.filter(x => x.claimed).length, all = got === 3;
-  openSheet('오늘의 미션', `${missionTabs('m')}<p class="msub">매일 새 미션 3개가 나와요. 모두 하면 보너스 선물!</p><div class="missions">${rows}</div>
-    <div class="mission bonus${all ? ' done' : ''}"><span class="mi">🏆</span><span class="mt"><b>미션 3개 모두 완료</b><small>${got} / 3</small></span>${m.bonus ? '<span class="mclaimed">받음 ✓</span>' : `<button class="candy${all ? ' primary' : ''}" data-bonus${all ? '' : ' disabled'}><i class="coin"></i> 30</button>`}</div>`,
+  openSheet('놀이 목표', `${missionTabs('m')}<p class="msub">원할 때 하나씩 해 보세요. 건너뛰어도 괜찮고 목표는 만료되지 않아요.</p><div class="missions">${rows}</div>`,
     body => body.addEventListener('click', e => {
       const tb = e.target.closest('[data-mtab]'); if (tb) return openMissions(tb.dataset.mtab);
       const c = e.target.closest('[data-claim]');
       if (c) { const it = m.list[+c.dataset.claim]; if (it.claimed) return; it.claimed = true; S.coins += MISSIONS[it.id].coin; addXP(5); sfx('coin'); persist(); render(); return openMissions(); }
-      if (e.target.closest('[data-bonus]')) { m.bonus = true; badge('mission'); S.coins += 30; addXP(20); confetti(90); sfx('hatch'); persist(); render(); toast('🏆 오늘의 미션 모두 완료! 최고예요!'); return openMissions(); }
     }));
 }
 
@@ -2822,16 +2809,16 @@ function showRest(kind) {
   if (restOpen) return;
   restOpen = true;
   const p = P(), msg = {
-    break: ['잠깐 쉬어 갈까요?', `${S.parent.breakEvery}분 동안 신나게 놀았어요! 눈을 감고 기지개를 쭉~ 물도 한 잔 마셔요 💧`],
+    break: ['잠깐 쉬어 갈까요?', `${S.parent.breakEvery}분 동안 놀았어요. 물을 마시고 기지개를 켜며 30초 쉬어 가요 💧`],
     limit: ['오늘 놀이 시간이 끝났어요', `${josa(p.name, '이', '')}도 이제 쉴 거예요. 내일 또 만나요! 🌙`],
     night: ['이제 잘 시간이에요', `밤에는 ${josa(p.name, '이', '')}도 코~ 자요. 내일 아침에 만나요! 🌙`]
   }[kind];
   const el = document.createElement('div'); el.className = 'rest';
-  el.innerHTML = `<div class="rest-card"><div class="rest-pet">${p.hatched ? petSVG(p.sp, { mood: 'sleep', stage: stageOf(p.level), hat: p.hat }) : eggSVG(p.sp, p.taps)}</div><h3>${msg[0]}</h3><p>${msg[1]}</p>${kind === 'break' ? '<button class="candy primary" id="restOk" disabled>10</button>' : '<button class="candy" id="restParent">🔒 보호자: 잠금 풀기</button>'}</div>`;
+  el.innerHTML = `<div class="rest-card"><div class="rest-pet">${p.hatched ? petSVG(p.sp, { mood: 'sleep', stage: stageOf(p.level), hat: p.hat }) : eggSVG(p.sp, p.taps)}</div><h3>${msg[0]}</h3><p>${msg[1]}</p>${kind === 'break' ? '<button class="candy primary" id="restOk" disabled>30</button>' : '<button class="candy" id="restParent">🔒 보호자: 잠금 풀기</button>'}</div>`;
   $('#app').appendChild(el); sfx('night');
   if (kind === 'break') {
-    let n = 10; const b = el.querySelector('#restOk');
-    const iv = setInterval(() => { n--; if (n > 0) b.textContent = n; else { clearInterval(iv); b.disabled = false; b.textContent = '다시 놀기!'; } }, 1000);
+    let n = 30; const b = el.querySelector('#restOk');
+    const iv = setInterval(() => { n--; if (n > 0) b.textContent = n; else { clearInterval(iv); b.disabled = false; b.textContent = '쉬고 돌아가기'; } }, 1000);
     b.addEventListener('click', () => { el.remove(); restOpen = false; });
   } else el.querySelector('#restParent').addEventListener('click', () => parentGate(() => {
     if (kind === 'limit') { S.play.extra = (S.play.extra || 0) + 15; toast('오늘만 15분 더 놀 수 있어요'); }
@@ -2839,11 +2826,11 @@ function showRest(kind) {
     persist(); el.remove(); restOpen = false;
   }));
 }
-// 어른 확인: 아이가 쉽게 풀기 어려운 곱셈 문제
+// 간단한 문제는 보호자 인증이 아니다. 실제 통제에는 기기 보호자 설정을 함께 사용해야 한다.
 function parentGate(onPass) {
   const a = 6 + Math.floor(Math.random() * 4), b = 3 + Math.floor(Math.random() * 7);
   const el = document.createElement('div'); el.className = 'gate-wrap';
-  el.innerHTML = `<div class="g-card"><h3>🔒 보호자 확인</h3><p>어른만 열 수 있어요.<br>문제를 풀어 주세요.</p><p class="gq">${a} × ${b} = ?</p><input id="gateIn" inputmode="numeric" maxlength="3" autocomplete="off" aria-label="답"><div style="display:flex;gap:8px"><button class="candy" id="gateNo" style="flex:1">취소</button><button class="candy primary" id="gateGo" style="flex:1">확인</button></div></div>`;
+  el.innerHTML = `<div class="g-card"><h3>🔒 보호자 확인</h3><p>보호자와 함께 확인해 주세요.<br>간단한 문제를 풀어 주세요.</p><p class="gq">${a} × ${b} = ?</p><input id="gateIn" inputmode="numeric" maxlength="3" autocomplete="off" aria-label="답"><div style="display:flex;gap:8px"><button class="candy" id="gateNo" style="flex:1">취소</button><button class="candy primary" id="gateGo" style="flex:1">확인</button></div></div>`;
   $('#app').appendChild(el);
   const inp = el.querySelector('#gateIn'); setTimeout(() => inp.focus(), 50);
   const go = () => { if (+inp.value === a * b) { el.remove(); onPass(); } else { toast('답이 달라요'); inp.value = ''; } };
@@ -2870,7 +2857,7 @@ function openParent() {
     <h4>쉬는 시간 알림</h4>${seg('brk', [0, 20, 30, 45], v => v ? `${v}분마다` : '끄기')}
     <h4>밤 9시 ~ 아침 7시에는 쉬기</h4>${seg('bed', [1, 0], v => v ? '켜기' : '끄기')}
     ${pa.limit ? '<button class="candy" id="plus15" style="margin-top:14px">오늘만 15분 더 주기</button>' : ''}
-    <p class="fine" style="margin-top:14px;text-align:left">이 앱에는 광고·결제·채팅이 없고, 놀이 기록은 이 기기에만 저장돼요. 시간이 다 되면 펫이 잠들고, 보호자 확인 후에만 다시 놀 수 있어요.</p>
+    <p class="fine" style="margin-top:14px;text-align:left">광고·결제·채팅은 없어요. 놀이 기록은 이 기기에만 저장돼요. 앱 안의 문제 풀이는 간단한 확인용이에요. 실제 시간 제한에는 기기의 보호자 설정도 함께 사용해 주세요.</p>
   </div>`, body => body.addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
     if (b.dataset.limit !== undefined) pa.limit = +b.dataset.limit;
@@ -2985,10 +2972,12 @@ function cookGame(r) {
 /* ---------- 점프 코스 ---------- */
 let obbyUI = null, obTimer = 0;
 const obKeys = {};
-function dailyReward(key, coins, max = 3) {
-  if (!S.daily || S.daily.day !== today()) S.daily = { day: today() };
-  const n = S.daily[key] || 0; if (n >= max) return 0;
-  S.daily[key] = n + 1; S.coins += coins; renderHUD(); persist(); return coins;
+function boundedReward(key, coins, max = 3) {
+  S.rewardClaims = S.rewardClaims || {};
+  // Migrate an already-earned count once; this cap never resets by calendar day.
+  if (!(key in S.rewardClaims)) S.rewardClaims[key] = S.daily?.[key] || 0;
+  const n = S.rewardClaims[key]; if (n >= max) return 0;
+  S.rewardClaims[key] = n + 1; S.coins += coins; renderHUD(); persist(); return coins;
 }
 function startObby() {
   const p = P();
@@ -3051,13 +3040,12 @@ function obbyEvent(kind, v) {
 function obbyFinish(time) {
   const prev = S.best.obby, isBest = !prev || time < prev;
   if (isBest) S.best.obby = time;
-  const coins = dailyReward('obby', 25);
+  const coins = boundedReward('obby', 25);
   change({ fun: 20, energy: -10 }); addXP(15); mission('obby'); badge('obby'); if (time <= 60) badge('obbyFast');
   confetti(100); persist(); render();
   const card = document.createElement('div'); card.className = 'g-card'; card.id = 'obResult';
-  card.innerHTML = `<h3>🏁 완주했어요!</h3><div class="big-score">${time.toFixed(1)}초</div><p>${isBest ? '🏆 새 최고 기록!' : `최고 기록 ${prev.toFixed(1)}초`}</p><p>${coins ? `<i class="coin"></i> ${coins}코인 · ` : ''}경험치 15 · 행복 +20</p><div style="display:flex;gap:8px"><button class="candy" id="obAgain" style="flex:1">한 번 더</button><button class="candy primary" id="obHome" style="flex:1">마을로</button></div>`;
+  card.innerHTML = `<h3>🏁 완주했어요!</h3><div class="big-score">${time.toFixed(1)}초</div><p>${isBest ? '🏆 새 최고 기록!' : `최고 기록 ${prev.toFixed(1)}초`}</p><p>${coins ? `<i class="coin"></i> ${coins}코인 · ` : ''}경험치 15 · 행복 +20</p><button class="candy primary" id="obHome">마을로 돌아가기</button>`;
   room.appendChild(card);
-  card.querySelector('#obAgain').addEventListener('click', () => { card.remove(); World.obbyRestart(); const el = $('#obCp'); if (el) el.textContent = '0/2'; });
   card.querySelector('#obHome').addEventListener('click', exitObby);
 }
 
@@ -3090,7 +3078,7 @@ const BADGES = {
   arcade:   ['🕹️', '오락실 고수', '오락실 게임에서 300점'],
   racer:    ['🏃', '달리기 왕', '반짝과 달리기 시합에서 이기기'],
   decor:    ['🛋️', '인테리어 장인', '집에 가구 5개 놓기'],
-  mission:  ['📋', '미션 성공', '오늘의 미션 모두 완료']
+  mission:  ['📋', '놀이 목표', '놀이 목표를 달성했어요']
 };
 function badge(id) {
   S.badges = S.badges || {};
@@ -3098,7 +3086,7 @@ function badge(id) {
   S.badges[id] = today(); persist();
   setTimeout(() => { toast(`🏅 배지 획득! ${BADGES[id][0]} ${BADGES[id][1]}`); sfx('hatch'); confetti(40); }, 900);
 }
-const missionTabs = t => `<div class="tabs" role="tablist"><button role="tab" data-mtab="m" aria-selected="${t === 'm'}">📋 오늘의 미션</button><button role="tab" data-mtab="b" aria-selected="${t === 'b'}">🏅 배지</button></div>`;
+const missionTabs = t => `<div class="tabs" role="tablist"><button role="tab" data-mtab="m" aria-selected="${t === 'm'}">📋 놀이 목표</button><button role="tab" data-mtab="b" aria-selected="${t === 'b'}">🏅 배지</button></div>`;
 function openBadges() {
   const got = S.badges || {}, n = Object.keys(got).length;
   openSheet('배지 수집첩', `${missionTabs('b')}<p class="msub">${n} / ${Object.keys(BADGES).length}개 모았어요</p><div class="badges">${Object.entries(BADGES).map(([k, [e, name, how]]) => `<div class="badge-card${got[k] ? ' got' : ''}"><span class="be">${got[k] ? e : '🔒'}</span><b>${name}</b><small>${how}</small></div>`).join('')}</div>`,
@@ -3202,7 +3190,7 @@ function openDex() {
     if (i >= 0) {
       const p = S.pets[i];
       const art = p.hatched ? petSVG(sp, { mood: 'happy', stage: stageOf(p.level), hat: p.hat }) : eggSVG(sp, p.taps);
-      return `<button class="dex-card${i === S.active ? ' cur' : ''}" data-switch="${i}"><span class="art">${art}</span><span class="txt"><span class="t1">${p.name}</span><br><span class="t2">${s.kind} · Lv.${p.level} ${p.hatched ? FORMS[formOf(p.level)].name : '알'}</span></span><span class="go">${i === S.active ? '함께 있어요' : '만나러 가기'}</span></button>`;
+      return `<button class="dex-card${i === S.active ? ' cur' : ''}" data-switch="${i}"><span class="art">${art}</span><span class="txt"><span class="t1">${escapeHTML(p.name)}</span><br><span class="t2">${s.kind} · Lv.${p.level} ${p.hatched ? FORMS[formOf(p.level)].name : '알'}</span></span><span class="go">${i === S.active ? '함께 있어요' : '만나러 가기'}</span></button>`;
     }
     return `<button class="dex-card" data-adopt="${sp}"><span class="art">${petSVG(sp, { sil: true, stage: 'kid' })}</span><span class="txt"><span class="t1">??? <small>(${s.kind})</small></span><br><span class="t2">${s.desc}</span></span><span class="go"><i class="coin"></i>${ADOPT_PRICE}</span></button>`;
   }).join('');
@@ -3215,7 +3203,7 @@ function openDex() {
     if (sw) {
       if (bathing) endBath();
       S.active = +sw.dataset.switch; tempMood = null; World.place(-4, 4.6); closeSheet(); render(); persist();
-      return say(P().hatched ? `${P().name} 왔어요! 보고 싶었어요!` : idleLine());
+      return say(P().hatched ? `${P().name} 왔어요! 반가워요!` : idleLine());
     }
     const ad = e.target.closest('[data-adopt]');
     if (ad) adoptSheet(ad.dataset.adopt);
@@ -3248,7 +3236,7 @@ function openGame() {
   gameOn = true;
   const wrap = document.createElement('div'); wrap.id = 'game';
   wrap.innerHTML = `<div class="g-top gut"><span class="ttl">별똥별 받기</span><span class="pill">⭐ <span id="gScore">0</span></span><span class="pill">⏱ <span id="gTime">30</span></span><button class="icon-btn" id="gClose" aria-label="그만하기">✕</button></div><canvas id="gCanvas"></canvas>
-    <div class="g-card" id="gCard"><h3>별똥별 받기</h3><p>손가락으로 ${p.name}를 움직여서<br>떨어지는 별을 받아요!</p><div class="legend"><span>⭐ +1</span><span>💖 +2</span><span>🍬 +3</span><span>🌧️ 앗, 어지러워!</span></div><button class="candy primary" id="gStart">시작!</button></div>`;
+    <div class="g-card" id="gCard"><h3>별똥별 받기</h3><p>손가락으로 ${escapeHTML(p.name)}를 움직여서<br>떨어지는 별을 받아요!</p><div class="legend"><span>⭐ +1</span><span>💖 +2</span><span>🍬 +3</span><span>🌧️ 앗, 어지러워!</span></div><button class="candy primary" id="gStart">시작!</button></div>`;
   $('#app').appendChild(wrap);
   pushBack();
   const cv = wrap.querySelector('#gCanvas'), ctx = cv.getContext('2d');
@@ -3315,26 +3303,21 @@ function openGame() {
     S.coins += coins; change({ fun: 20, energy: -12, hunger: -6 }); addXP(xp);
     mission('play');
     persist(); sfx('coin');
-    const msg = g.score >= 30 ? '별똥별 박사님이에요!' : g.score >= 15 ? '정말 잘했어요!' : '재밌었다! 또 하자!';
+    const msg = g.score >= 30 ? '별똥별 박사님이에요!' : g.score >= 15 ? '정말 잘했어요!' : '함께해서 즐거웠어요!';
     const card = document.createElement('div'); card.className = 'g-card';
-    card.innerHTML = `<h3>${msg}</h3><div class="big-score">⭐ ${g.score}</div><p><i class="coin"></i> ${coins}코인 · 경험치 ${xp} · 행복 +20</p><div style="display:flex;gap:8px"><button class="candy" id="gAgain" style="flex:1">한 번 더</button><button class="candy primary" id="gHome" style="flex:1">방으로</button></div>`;
+    card.innerHTML = `<h3>${msg}</h3><div class="big-score">⭐ ${g.score}</div><p><i class="coin"></i> ${coins}코인 · 경험치 ${xp} · 행복 +20</p><button class="candy primary" id="gHome">방으로 돌아가기</button>`;
     wrap.appendChild(card);
     card.querySelector('#gHome').addEventListener('click', closeGame);
-    card.querySelector('#gAgain').addEventListener('click', () => {
-      if (P().energy < 15) { closeGame(); return say('너무 졸려요… 이제 자고 싶어요'); }
-      card.remove(); Object.assign(g, { items: [], score: 0, time: 30, spawn: .3, stun: 0, run: true });
-    });
   }
   function closeGame() {
     gameOn = false;
     window.removeEventListener('resize', size); window.removeEventListener('keydown', kd); window.removeEventListener('keyup', kd);
-    wrap.remove(); setMood('happy', 1500); say(pick(['재밌었다!', '또 놀아요!', '헥헥, 신났어요!'])); render();
+    wrap.remove(); setMood('happy', 1500); say('함께 놀아 줘서 고마워요!'); render();
   }
   wrap.querySelector('#gStart').addEventListener('click', () => { wrap.querySelector('#gCard').remove(); g.run = true; g.spawn = .3; sfx('pop'); });
   wrap.querySelector('#gClose').addEventListener('click', () => { if (g.run && g.score > 0) finish(); else closeGame(); });
   requestAnimationFrame(loop);
 }
-
 /* =========================================================
    11-2. 추억의 오락실
    옛날 오락실 장르(방울 가두기 액션 · 사다리 오르기 · 우주 슈팅)를
@@ -3827,20 +3810,16 @@ function openArcade(def) {
     if (isBest) S.best[def.id] = g.score;
     persist(); sfx(g.win ? 'up' : 'coin');
     if (g.win) confetti(60);
-    const msg = g.win ? '끝판까지 해냈어요!' : g.score >= 400 ? '정말 잘했어요!' : '재밌었다! 또 하자!';
+    const msg = g.win ? '끝판까지 해냈어요!' : g.score >= 400 ? '정말 잘했어요!' : '함께해서 즐거웠어요!';
     const card = document.createElement('div'); card.className = 'g-card';
-    card.innerHTML = `<h3>${msg}</h3><div class="big-score">${g.score}</div><p>${isBest && g.score ? '🏆 새 최고 기록!' : `최고 기록 ${S.best[def.id] || 0}`}</p><p><i class="coin"></i> ${coins}코인 · 경험치 ${xp} · 행복 +25</p><div style="display:flex;gap:8px"><button class="candy" id="gAgain" style="flex:1">한 번 더</button><button class="candy primary" id="gHome" style="flex:1">방으로</button></div>`;
+    card.innerHTML = `<h3>${msg}</h3><div class="big-score">${g.score}</div><p>${isBest && g.score ? '🏆 새 최고 기록!' : `최고 기록 ${S.best[def.id] || 0}`}</p><p><i class="coin"></i> ${coins}코인 · 경험치 ${xp} · 행복 +25</p><button class="candy primary" id="gHome">방으로 돌아가기</button>`;
     wrap.appendChild(card);
     card.querySelector('#gHome').addEventListener('click', closeGame);
-    card.querySelector('#gAgain').addEventListener('click', () => {
-      if (P().energy < 15) { closeGame(); return say('너무 졸려요… 이제 자고 싶어요'); }
-      card.remove(); reset(); g.run = true; requestAnimationFrame(loop);
-    });
   }
   function closeGame() {
     gameOn = false;
     window.removeEventListener('resize', fit); window.removeEventListener('keydown', kd); window.removeEventListener('keyup', kd);
-    wrap.remove(); setMood('happy', 1500); say(pick(['오락실 최고!', '또 하고 싶어요!', '헥헥, 신났어요!'])); render();
+    wrap.remove(); setMood('happy', 1500); say('재미있게 놀았어요! 잠깐 쉬어도 좋아요.'); render();
   }
   wrap.querySelector('#gStart').addEventListener('click', () => { wrap.querySelector('#gCard').remove(); g.run = true; sfx('pop'); });
   wrap.querySelector('#gClose').addEventListener('click', () => { if (g.run && g.score > 0) { g.over = true; } else closeGame(); });
@@ -3871,13 +3850,6 @@ $('#actions').addEventListener('click', e => {
 });
 $('#settingsBtn').addEventListener('click', () => { sfx('tap'); openSettings(); });
 $('#missionBtn').addEventListener('click', () => { sfx('tap'); openMissions(); });
-$('#giftBtn').addEventListener('click', () => {
-  if (S.lastGift === today()) return;
-  S.lastGift = today(); S.coins += 25; sfx('coin'); confetti(50);
-  toast('오늘의 선물! 25코인을 받았어요');
-  if (P().hatched) addXP(10);
-  render(); persist();
-});
 
 /* =========================================================
    13. 시작(입양) 화면
@@ -3929,13 +3901,13 @@ let saveCount = 0;
 function start(hotData) {
   S = (hotData && hotData.v === 1 && Array.isArray(hotData.pets)) ? hotData : (load() || freshSave());
   S.best = S.best || {};
-  S.parent = Object.assign({ limit: 0, breakEvery: 30, bedtime: false }, S.parent);
+  S.parent = Object.assign({ limit: 60, breakEvery: 30, bedtime: true }, S.parent);
   if (!S.pets.length) { showStart(); }
   else {
     const away = (Date.now() - S.lastTick) / 60000;
     showHome(); tick();
     const p = P();
-    say(!p.hatched ? idleLine() : away > 60 ? `${p.name}가 기다리고 있었어요! 보고 싶었어요!` : idleLine(), 7000);
+    say(idleLine(), 7000);
   }
   setInterval(() => { if (!S.pets.length) return; tick(); playTick(); if (++saveCount % 10 === 0) persist(); }, 1000);
   document.addEventListener('visibilitychange', () => { if (S.pets.length) { tick(); persist(); } });
