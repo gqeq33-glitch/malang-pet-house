@@ -9,7 +9,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 game = (ROOT / "www" / "index.html").read_text(encoding="utf-8")
-single = game.replace('<script src="vendor/three.min.js"></script>',
+# 한 파일 실행용은 CDN의 3D 라이브러리·글꼴을 쓰므로 앱용 보안 설정(CSP)을 뺀다
+game_nocsp = re.sub(r'<meta http-equiv="Content-Security-Policy"[^>]*>\s*', "", game)
+single = game_nocsp.replace('<script src="vendor/three.min.js"></script>',
                       '<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>')
 single = re.sub(r'@font-face\{font-family:"(Jua|Gowun Dodum)";src:url\("fonts/[^)]*\) format\("woff2"\);font-display:swap\}\n', "", single)
 single = single.replace('<link rel="preload" href="fonts/Jua-Regular.woff2" as="font" type="font/woff2" crossorigin>\n',

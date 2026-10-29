@@ -2,7 +2,8 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; media-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <title>말랑 펫하우스</title>
 <meta name="description" content="오리지널 말랑 친구를 알에서 부화시켜 돌보는 어린이 펫 키우기 게임">
 <meta name="theme-color" content="#DDF4EA">
@@ -15,10 +16,6 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="preload" href="fonts/Jua-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <style>:root{color-scheme:light}body{margin:0}[hidden]{display:none!important}</style></head><body>
-<title>말랑 펫하우스</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
 <style>
 @font-face{font-family:"Jua";src:url("fonts/Jua-Regular.woff2") format("woff2");font-display:swap}
 @font-face{font-family:"Gowun Dodum";src:url("fonts/GowunDodum-Regular.woff2") format("woff2");font-display:swap}
@@ -95,7 +92,7 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
 .bar i{display:block;height:100%;width:50%;border-radius:9px;background:var(--c);transition:width .5s}
 .stat.low .bar{animation:blinkbar 1s steps(2) infinite}
 
-.room{position:relative;flex:1;min-height:240px;overflow:hidden;border-top:2.5px solid var(--ink);border-bottom:2.5px solid var(--ink);background:#BFE8FF;touch-action:none}
+.room{position:relative;flex:1;min-height:240px;overflow:hidden;border-top:2.5px solid var(--ink);border-bottom:2.5px solid var(--ink);background:#BFE8FF;touch-action:pinch-zoom}
 .room.bathing{cursor:none}
 #world{position:absolute;inset:0;width:100%;height:100%;display:block}
 .room-tabs{position:absolute;left:0;right:0;top:8px;display:flex;justify-content:center;gap:6px;z-index:6;padding-inline:8px;flex-wrap:wrap;pointer-events:none}
@@ -334,6 +331,26 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
 @media (max-width:370px){.act{font-size:12px}.act .ic{font-size:21px}.logo{font-size:36px}}
+/* 작은 화면: 방(무대)이 가려지지 않도록 위아래 여백과 버튼 높이를 줄인다 */
+@media (max-width:360px){.room-tabs button{padding:4px 8px;font-size:13px}.quest{left:62px;padding:6px 6px 6px 10px}.q-tx b{font-size:14px}.pill{font-size:15px;padding:5px 10px}.icon-btn{width:36px;height:36px;font-size:17px}}
+@media (max-height:640px){.top{padding-block:8px 4px}.who h1{font-size:21px}.stats{padding-block:2px 6px;gap:4px 12px}.act{min-height:54px;padding:5px 0 4px}.act .ic{font-size:21px}.room{min-height:190px}.joy{width:112px;height:112px}.jump-btn{width:96px;height:96px;font-size:21px}.race-btn{width:124px;height:124px}.race-tip{bottom:150px}}
+/* 키보드로 3D 방을 고를 때 보이는 테두리 */
+#world:focus-visible{outline:3px solid #4BB8A0;outline-offset:-4px}
+.g-card button:focus-visible,.talk button:focus-visible,.sheet button:focus-visible{outline:3px solid #4BB8A0;outline-offset:2px}
+.mini-quit{border:0;background:none;font-family:var(--display);font-size:14px;color:var(--muted);padding:4px;align-self:center}
+.photo-btn{position:absolute;left:10px;bottom:66px;z-index:6;width:48px;height:48px;border-radius:50%;border:0;font-size:24px;background:var(--paper);box-shadow:0 0 0 2.5px var(--ink) inset,0 4px 0 rgba(91,69,80,.25)}
+.album{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.album button{border:0;padding:0;border-radius:12px;overflow:hidden;background:var(--soft);box-shadow:0 0 0 2px var(--line) inset;aspect-ratio:4/5}
+.album img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-view{display:flex;flex-direction:column;gap:10px;align-items:center}
+.photo-view img{width:100%;max-width:360px;border-radius:14px;box-shadow:0 0 0 2.5px var(--ink)}
+.photo-view .row{display:flex;gap:8px;width:100%;max-width:360px}
+.photo-view .row .candy{flex:1}
+.backup textarea{width:100%;min-height:96px;font:12px/1.4 ui-monospace,Consolas,monospace;border:0;border-radius:12px;padding:10px;box-shadow:0 0 0 2px var(--line) inset;background:var(--soft);color:var(--ink);user-select:text;-webkit-user-select:text;word-break:break-all;resize:vertical}
+.backup .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.backup .row .candy{flex:1;min-width:120px;font-size:15px}
+.warn{background:#FFF1D6;border-radius:12px;padding:10px 12px;font-size:13.5px;line-height:1.5;margin-top:8px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
 
 <div id="app">
@@ -367,7 +384,7 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
     </header>
     <div class="stats gut" id="stats"></div>
     <div class="room" id="room">
-      <canvas id="world" aria-label="말랑 친구의 집. 바닥을 누르면 그쪽으로 걸어가고, 친구를 누르면 쓰다듬어요."></canvas>
+      <canvas id="world" tabindex="0" role="application"aria-label="말랑 친구의 집. 바닥을 누르면 그쪽으로 걸어가고, 친구를 누르면 쓰다듬어요. 키보드: 방향키로 걷고, Enter나 스페이스바로 쓰다듬어요." aria-describedby="bubble"></canvas>
       <div class="tags" id="tags"></div>
       <div class="room-tabs" id="roomTabs">
         <button data-go="living">🛋️ 거실</button><button data-go="kitchen">🍳 부엌</button><button data-go="bedroom">🛏️ 침실</button><button data-go="bath">🛁 욕실</button><button data-go="door">🚪 밖으로</button>
@@ -378,9 +395,10 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
       <div class="bubble" id="bubble">안녕!</div>
       <div class="night"></div>
       <div class="flash" id="flash"></div>
-      <button class="quest" id="questBtn" aria-label="다음 모험" hidden></button>
-      <button class="emote-btn" id="emoteBtn" aria-label="감정 표현">😀</button>
-      <div class="emote-tray" id="emoteTray" hidden><button data-emote="wave">👋<small>인사</small></button><button data-emote="dance">💃<small>춤</small></button><button data-emote="spin">🌀<small>빙글</small></button><button data-emote="jump">🙌<small>점프</small></button><button data-emote="hop">🎵<small>신나!</small></button></div>
+      <button class="quest" id="questBtn" hidden></button>
+      <button class="photo-btn" id="photoBtn" aria-label="사진 찍기">📷</button>
+      <button class="emote-btn" id="emoteBtn" aria-label="감정 표현" aria-expanded="false" aria-controls="emoteTray">😀</button>
+      <div class="emote-tray" id="emoteTray" role="group" aria-label="감정 표현 고르기" hidden><button data-emote="wave">👋<small>인사</small></button><button data-emote="dance">💃<small>춤</small></button><button data-emote="spin">🌀<small>빙글</small></button><button data-emote="jump">🙌<small>점프</small></button><button data-emote="hop">🎵<small>신나!</small></button></div>
       <div class="fade" id="fade"></div>
       <div class="fx" id="fx"></div>
       <div class="sponge" id="sponge" hidden>🧽</div>
@@ -396,13 +414,13 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
     </nav>
   </section>
 
-  <div class="talk gut" id="talk" hidden>
-    <div class="talk-head"><span class="talk-face" id="talkFace"></span><span class="talk-who"><b class="talk-name" id="talkName"></b><span class="talk-job" id="talkJob"></span></span><span class="talk-hearts" id="talkHearts" aria-label="친한 정도"></span></div>
-    <p class="talk-text" id="talkText"></p>
-    <div class="talk-choices" id="talkChoices"></div>
+  <div class="talk gut" id="talk" role="dialog" aria-labelledby="talkName" aria-describedby="talkText" hidden>
+    <div class="talk-head"><span class="talk-face" id="talkFace"></span><span class="talk-who"><b class="talk-name" id="talkName"></b><span class="talk-job" id="talkJob"></span></span><span class="talk-hearts" id="talkHearts" role="img" aria-label="친한 정도"></span></div>
+    <p class="talk-text" id="talkText" aria-live="polite"></p>
+    <div class="talk-choices" id="talkChoices" role="group" aria-label="대답 고르기"></div>
   </div>
-  <div class="toast" id="toast"></div>
-  <div id="confetti"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div id="confetti" aria-hidden="true"></div>
 </div>
 
 <script src="vendor/three.min.js"></script>
@@ -414,7 +432,9 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
    1. 기본 도구
    ========================================================= */
 const $ = s => document.querySelector(s);
-const escapeHTML = value => String(value).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// 아이가 지은 이름: 보이지 않는 제어 문자와 꺾쇠를 빼고 8글자까지. 화면에 넣을 때는 늘 textContent나 escapeHTML을 거친다
+const cleanName = (value, fallback) => String(value ?? '').replace(/[\u0000-\u001F\u007F<>]/g, '').trim().slice(0, 8) || fallback;
 const INK = '#5B4550';
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const pick = a => a[Math.floor(Math.random() * a.length)];
@@ -636,7 +656,8 @@ function load() {
   try { const raw = localStorage.getItem(SAVE_KEY); if (raw) { const d = JSON.parse(raw); if (d && d.v === 1 && Array.isArray(d.pets)) return d; } } catch (e) {}
   return null;
 }
-function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) {} }
+let restoring = false;
+function persist() { if (restoring) return; try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) {} }
 const P = () => S.pets[S.active];
 
 /* =========================================================
@@ -819,7 +840,8 @@ function renderHUD() {
   const outside = World.area() === 'village';
   const inObby = World.area() === 'obby';
   $('#roomTabs').hidden = outside || inObby; $('#villageTabs').hidden = !outside;
-  $('#emoteBtn').hidden = egg || inObby; if (inObby || egg) $('#emoteTray').hidden = true;
+  $('#photoBtn').hidden = egg || inObby || bathing || !!placing;
+  $('#emoteBtn').hidden = egg || inObby; if (inObby || egg) { $('#emoteTray').hidden = true; $('#emoteBtn').setAttribute('aria-expanded', 'false'); }
   renderQuest(inObby);
   document.querySelectorAll('#roomTabs button').forEach(b => { b.disabled = egg || bathing || p.asleep; b.classList.toggle('on', b.dataset.go === World.roomNow()); });
 }
@@ -2180,6 +2202,8 @@ const World = (() => {
       });
     },
     raceTap() { if (race && race.t >= 0) race.boost = Math.min(5, race.boost + .7); },
+    snapshot() { if (!ok || !renderer) return null; placeBubble(); renderer.render(scene, camera); return renderer.domElement; },
+    raceCancel() { if (race) { race.n.racing = false; st.run = false; race = null; } },
     portrait(id) {
       if (portraits[id]) return portraits[id];
       if (!ok) return '';
@@ -2251,6 +2275,17 @@ World.onTap = hit => {
     particle('✨', hit.sx, hit.sy, 'plus');
   }
 };
+// 키보드로 3D 방 조작: 방향키 = 그쪽으로 몇 걸음, Enter·스페이스 = 쓰다듬기(알이면 톡톡). 점프 코스는 따로 키를 받는다
+$('#world').addEventListener('keydown', e => {
+  const p = P(); if (!p || talking || bathing || placing || World.area() === 'obby' || $('#home').hidden) return;
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (!e.repeat) patPet(); return; }
+  const dir = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
+  if (!dir) return;
+  e.preventDefault();
+  if (!p.hatched) return say('알에서 깨어나면 같이 걸어요! Enter로 톡톡 깨워 주세요', 2500);
+  if (p.asleep) return say('쿨쿨… (자고 있어요. 깨우려면 ☀️ 버튼!)', 2500);
+  const st = World.st; World.goTo(st.x + dir[0] * 1.8, st.z + dir[1] * 1.8, false);
+});
 function useThing(use) {
   if (use.startsWith('decor:')) return useDecor(use.slice(6));
   if (use === 'cook') return openCook();
@@ -2265,6 +2300,11 @@ function useThing(use) {
   if (use === 'door') return goOutside();
   if (use === 'sofa') return World.goSpot('sofa', true, () => { change({ fun: 2 }); say(pick(['폭신폭신 소파 최고!', '여기서 쉬어야지~']), 3000); render(); });
   if (use === 'tv') return World.goSpot('tv', true, () => { change({ fun: 3 }); say(pick(['뽀로롱~ 만화 재밌다!', '와, 우주 탐험 만화다!']), 3500); render(); });
+}
+// 걸어가는 도중 아이가 바닥을 눌러 길이 바뀌면 도착 신호가 오지 않는다. 이미 코인·재료를 썼으면 잠시 뒤 그 자리에서라도 마무리한다
+function goSpotThen(name, cb, ms = 6000) {
+  let done = false; const run = () => { if (!done) { done = true; cb(); } };
+  World.goSpot(name, true, run); setTimeout(run, ms);
 }
 function goOutside() {
   const p = P();
@@ -2305,11 +2345,15 @@ function patPet() {
   render();
 }
 
+let hatchPending = false;
 function tapEgg() {
+  if (hatchPending) return;
   const p = P(); p.taps++;
   World.trick('wobble'); sfx('pop');
   if (p.taps >= HATCH_TAPS) {
+    hatchPending = true;
     setTimeout(() => {
+      hatchPending = false;
       p.hatched = true; p.taps = 0; badge('hatch'); setTimeout(() => story('hatch'), 300);
       sfx('hatch'); confetti(100);
       setMood('happy', 2500);
@@ -2329,7 +2373,7 @@ function feed(food) {
   closeSheet(); renderHUD();
   const outside = World.area() === 'village';
   say(outside ? `${food.name} 소풍 도시락이다!` : `${food.name} 먹으러 부엌으로 고고!`, 3000);
-  (outside ? (cb => setTimeout(cb, 300)) : (cb => World.goSpot('bowl', true, cb)))(() => {
+  (outside ? (cb => setTimeout(cb, 300)) : (cb => goSpotThen('bowl', cb)))(() => {
     const isFav = SPECIES[p.sp].fav === food.id;
     World.eat(1.4, outside ? null : food.e); setMood('eat', 1400); sfx('eat');
     const c = petCenter(.1);
@@ -2386,15 +2430,15 @@ function rubPet(x, y) {
 }
 $('#bathDone').addEventListener('click', endBath);
 
-let goingToBed = false;
+let goingToBed = 0;
 function sleep() {
   const p = P();
   if (p.energy >= 92) return say('아직 하나도 안 졸려요!');
-  if (goingToBed) return;
-  goingToBed = true;
+  if (goingToBed && Date.now() - goingToBed < 8000) return;
+  goingToBed = Date.now();
   say('하암… 침대로 갈래요', 3000);
   World.goSpot('bed', false, () => {
-    goingToBed = false;
+    goingToBed = 0;
     p.asleep = true; sfx('night'); mission('sleepm');
     say('잘 자요… 쿨쿨', 4000);
     render(); persist();
@@ -2494,7 +2538,7 @@ function friendAlert(id) {
 }
 
 /* ---------- 대화창 ---------- */
-let talking = null, typeTimer = 0, fullText = '';
+let talking = null, typeTimer = 0, fullText = '', talkReturnFocus = null;
 function typeText(t) {
   const el = $('#talkText'); clearInterval(typeTimer); fullText = t; let i = 0; el.textContent = '';
   typeTimer = setInterval(() => { i += 2; el.textContent = t.slice(0, i); if (i >= t.length) clearInterval(typeTimer); }, 28);
@@ -2511,12 +2555,16 @@ function showNode(node) {
   }
   const h = heartsOf(talking);
   $('#talkHearts').textContent = '♥'.repeat(h) + '♡'.repeat(5 - h);
+  $('#talkHearts').setAttribute('aria-label', `친한 정도 하트 5개 중 ${h}개`);
+  box.querySelector('button')?.focus({ preventScroll: true });
 }
 function talkTo(id) {
   if (talking || World.hidden(id)) return;
   const f = FRIENDS[id];
+  const back = document.activeElement instanceof HTMLElement && document.activeElement !== document.body ? document.activeElement : $('#world');
   World.walkToNpc(id, () => {
-    talking = id; World.setTalking(id, true);
+    if (talking) return;
+    talking = id; talkReturnFocus = back; World.setTalking(id, true);
     $('#talkFace').innerHTML = `<img src="${World.portrait(id)}" alt="${f.name}">`;
     $('#talkName').textContent = f.name; $('#talkJob').textContent = f.job;
     $('#talk').hidden = false; pushBack(); sfx('pop');
@@ -2528,8 +2576,12 @@ function talkTo(id) {
 }
 function closeTalk() {
   clearInterval(typeTimer);
+  // 대화창 안에 초점이 있었을 때만 원래 자리로 돌려준다 (다른 창이 열리며 닫힌 경우는 그 창이 초점을 가져간다)
+  const hadFocus = $('#talk').contains(document.activeElement);
   if (talking) World.setTalking(talking, false);
   talking = null; $('#talk').hidden = true; renderHUD();
+  if (hadFocus && talkReturnFocus?.isConnected) talkReturnFocus.focus({ preventScroll: true });
+  talkReturnFocus = null;
 }
 const bye = () => ({ text: pick(['다음에 또 만나자!', '안녕! 오늘도 즐거운 하루 보내!', '다음에 또 이야기하자!']), choices: [{ label: '안녕! 👋', fn: () => null }] });
 const back = id => ({ label: '다른 이야기 할래요', fn: () => menu(id, false) });
@@ -2669,8 +2721,10 @@ function roast() {
   const wrap = document.createElement('div'); wrap.className = 'scrim mini';
   wrap.innerHTML = `<div class="g-card roast"><h3>🔥 마시멜로 굽기</h3><p id="rHelp">버튼을 <b>꾹</b> 누르고 있다가<br>노릇노릇할 때 손을 떼요!</p>
     <div class="mallow" id="mallow"></div><div class="heat"><i id="heatBar"></i><span class="gold"></span></div>
-    <p id="rCount">1번째 마시멜로 · 성공 0개</p><button class="candy primary" id="rHold">꾹 눌러서 굽기</button></div>`;
-  $('#app').appendChild(wrap);
+    <p id="rCount">1번째 마시멜로 · 성공 0개</p><button class="candy primary" id="rHold">꾹 눌러서 굽기</button><p class="fine">키보드: 스페이스바를 꾹 눌렀다 떼요</p><button class="mini-quit" id="rQuit">그만하기</button></div>`;
+  wrap.querySelector('.roast').setAttribute('role', 'dialog'); wrap.querySelector('.roast').setAttribute('aria-label', '마시멜로 굽기');
+  const backFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  $('#app').appendChild(wrap); pushBack();
   let heat = 0, holding = false, round = 1, good = 0, timer = 0, done = false, waiting = false;
   const bar = wrap.querySelector('#heatBar'), mal = wrap.querySelector('#mallow'), btn = wrap.querySelector('#rHold');
   const color = h => h < 35 ? '#FFFFFF' : h < 60 ? '#FFF1C9' : h <= 85 ? '#E9A55A' : h < 95 ? '#9A5B2E' : '#3A2A22';
@@ -2696,15 +2750,26 @@ function roast() {
     mission('friend');
     if (good === 3) confetti(60);
     wrap.querySelector('.roast').innerHTML = `<h3>${good === 3 ? '마시멜로 박사님!' : good ? '맛있게 구웠어요!' : '다음엔 더 잘할 수 있어!'}</h3><div class="big-score">${'🍡'.repeat(good) || '🔥'}</div><p>${good}개 성공!${good ? (coins ? ` 상으로 ${coins}코인!` : ' 코인 보상은 이미 받았어요.') : ''}</p><button class="candy primary" id="rDone">캠핑장으로 돌아가기</button>`;
-    wrap.querySelector('#rDone').addEventListener('click', () => { wrap.remove(); say(pick(['루루: "냠냠, 같이 먹으니까 더 맛있다!"', '루루: "또 캠프파이어 하자!"']), 4000); });
+    const leave = () => { closeMini(); say(pick(['루루: "냠냠, 같이 먹으니까 더 맛있다!"', '루루: "또 캠프파이어 하자!"']), 4000); };
+    wrap.querySelector('#rDone').addEventListener('click', leave); wrap._close = leave;
+    wrap.querySelector('#rDone').focus({ preventScroll: true });
   }
-  btn.addEventListener('pointerdown', e => {
-    e.preventDefault(); if (done || holding || waiting) return;
+  // 중간에 그만두면 보상 없이 닫고, 언제든 다시 할 수 있다고 알려 준다
+  function closeMini() { clearInterval(timer); done = true; wrap.remove(); if (backFocus?.isConnected) backFocus.focus(); else $('#world').focus({ preventScroll: true }); }
+  wrap._close = () => { closeMini(); say('루루: "괜찮아! 굽고 싶을 때 또 와~"', 3000); };
+  wrap.querySelector('#rQuit').addEventListener('click', () => wrap._close());
+  function hold() {
+    if (done || holding || waiting) return;
     holding = true; btn.classList.add('on');
     const t0 = performance.now();
     timer = setInterval(() => { heat = Math.min(100, (performance.now() - t0) / 30); draw(); if (heat >= 100) release(); }, 30);
-  });
+  }
+  btn.addEventListener('pointerdown', e => { e.preventDefault(); hold(); });
   ['pointerup', 'pointerleave', 'pointercancel'].forEach(t => btn.addEventListener(t, release));
+  btn.addEventListener('keydown', e => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); hold(); } });
+  btn.addEventListener('keyup', e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); release(); } });
+  wrap.addEventListener('keydown', trapTab);
+  btn.focus({ preventScroll: true });
   draw();
 }
 
@@ -2771,11 +2836,16 @@ function startRace() {
   if (following === 'banjjak') following = null;
   closeTalk();
   const ui = document.createElement('div'); ui.className = 'race-ui';
-  ui.innerHTML = '<div class="race-count" id="rcCount"></div><p class="race-tip">신호가 울리면 버튼을 빠르게 연타!</p><button class="race-btn" id="rcBtn" disabled>달려!<br>🏃</button>';
+  ui.innerHTML = '<div class="race-count" id="rcCount"></div><p class="race-tip">신호가 울리면 버튼을 빠르게 연타! (키보드: 스페이스바)</p><button class="race-btn" id="rcBtn" disabled>달려!<br>🏃</button>';
   room.appendChild(ui);
   const cnt = ui.querySelector('#rcCount'), btn = ui.querySelector('#rcBtn');
-  btn.addEventListener('pointerdown', e => { e.preventDefault(); World.raceTap(); sfx('tap'); btn.classList.add('on'); setTimeout(() => btn.classList.remove('on'), 70); });
+  const tap = () => { World.raceTap(); sfx('tap'); btn.classList.add('on'); setTimeout(() => btn.classList.remove('on'), 70); };
+  btn.addEventListener('pointerdown', e => { e.preventDefault(); tap(); });
+  btn.addEventListener('keydown', e => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); tap(); } });
+  let cancelled = false;
+  ui._close = () => { cancelled = true; World.raceCancel(); ui.remove(); say('반짝: "괜찮아! 달리고 싶을 때 또 말해 줘!"', 3500); renderHUD(); };
   World.raceStart('banjjak', win => {
+    if (cancelled) return;
     ui.remove();
     change({ fun: win ? 15 : 10, energy: -8 }); mission('friend');
     if (win) { badge('racer'); const coins = playReward('banjjak', 20); addFriend('banjjak', 30); addXP(10); confetti(80); sfx('up'); say(`1등! 반짝: "우와, 너 엄청 빠르다!"${coins ? ` +${coins}코인` : ''}`, 5000); }
@@ -2784,8 +2854,9 @@ function startRace() {
   });
   let k = 3;
   const tick = () => {
+    if (cancelled) return;
     if (k > 0) { cnt.textContent = k; sfx('pop'); k--; setTimeout(tick, 1000); }
-    else { cnt.textContent = '출발!'; sfx('up'); btn.disabled = false; setTimeout(() => { cnt.textContent = ''; }, 800); }
+    else if (!cancelled) { cnt.textContent = '출발!'; sfx('up'); btn.disabled = false; btn.focus({ preventScroll: true }); setTimeout(() => { cnt.textContent = ''; }, 800); }
   };
   setTimeout(tick, 420);
 }
@@ -2958,15 +3029,17 @@ function showRest(kind) {
   restOpen = true;
   const p = P(), msg = {
     break: ['잠깐 쉬어 갈까요?', `${S.parent.breakEvery}분 동안 놀았어요. 물을 마시고 기지개를 켜며 30초 쉬어 가요 💧`],
-    limit: ['오늘 놀이 시간이 끝났어요', `${josa(p.name, '이', '')}도 이제 쉴 거예요. 내일 또 만나요! 🌙`],
-    night: ['이제 잘 시간이에요', `밤에는 ${josa(p.name, '이', '')}도 코~ 자요. 내일 아침에 만나요! 🌙`]
+    limit: ['오늘 놀이 시간이 끝났어요', `${josa(p.name, '이', '')}도 이제 쉴 거예요. 푹 쉬고 다음에 또 만나요! 🌙`],
+    night: ['이제 잘 시간이에요', `밤에는 ${josa(p.name, '이', '')}도 코~ 자요. 우리도 푹 자고 다음에 만나요! 🌙`]
   }[kind];
   const el = document.createElement('div'); el.className = 'rest';
-  el.innerHTML = `<div class="rest-card"><div class="rest-pet">${p.hatched ? petSVG(p.sp, { mood: 'sleep', stage: stageOf(p.level), hat: p.hat }) : eggSVG(p.sp, p.taps)}</div><h3>${msg[0]}</h3><p>${msg[1]}</p>${kind === 'break' ? '<button class="candy primary" id="restOk" disabled>30</button>' : '<button class="candy" id="restParent">🔒 보호자: 잠금 풀기</button>'}</div>`;
+  el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-labelledby', 'restTitle');
+  el.innerHTML = `<div class="rest-card"><div class="rest-pet" aria-hidden="true">${p.hatched ? petSVG(p.sp, { mood: 'sleep', stage: stageOf(p.level), hat: p.hat }) : eggSVG(p.sp, p.taps)}</div><h3 id="restTitle">${escapeHTML(msg[0])}</h3><p>${escapeHTML(msg[1])}</p>${kind === 'break' ? '<button class="candy primary" id="restOk" disabled>30</button>' : '<button class="candy" id="restParent">🔒 보호자: 잠금 풀기</button>'}</div>`;
   $('#app').appendChild(el); sfx('night');
+  el.querySelector('button')?.focus();
   if (kind === 'break') {
     let n = 30; const b = el.querySelector('#restOk');
-    const iv = setInterval(() => { n--; if (n > 0) b.textContent = n; else { clearInterval(iv); b.disabled = false; b.textContent = '쉬고 돌아가기'; } }, 1000);
+    const iv = setInterval(() => { n--; if (n > 0) b.textContent = n; else { clearInterval(iv); b.disabled = false; b.textContent = '쉬고 돌아가기'; b.focus(); } }, 1000);
     b.addEventListener('click', () => { el.remove(); restOpen = false; });
   } else el.querySelector('#restParent').addEventListener('click', () => parentGate(() => {
     if (kind === 'limit') { S.play.extra = (S.play.extra || 0) + 15; toast('오늘만 15분 더 놀 수 있어요'); }
@@ -2977,22 +3050,29 @@ function showRest(kind) {
 // 간단한 문제는 보호자 인증이 아니다. 실제 통제에는 기기 보호자 설정을 함께 사용해야 한다.
 function parentGate(onPass) {
   const a = 6 + Math.floor(Math.random() * 4), b = 3 + Math.floor(Math.random() * 7);
+  const back = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   const el = document.createElement('div'); el.className = 'gate-wrap';
-  el.innerHTML = `<div class="g-card"><h3>🔒 보호자 확인</h3><p>보호자와 함께 확인해 주세요.<br>간단한 문제를 풀어 주세요.</p><p class="gq">${a} × ${b} = ?</p><input id="gateIn" inputmode="numeric" maxlength="3" autocomplete="off" aria-label="답"><div style="display:flex;gap:8px"><button class="candy" id="gateNo" style="flex:1">취소</button><button class="candy primary" id="gateGo" style="flex:1">확인</button></div></div>`;
+  el.innerHTML = `<div class="g-card" role="dialog" aria-modal="true" aria-labelledby="gateTitle" aria-describedby="gateNote"><h3 id="gateTitle">🔒 보호자 확인</h3><p id="gateNote">어른이 함께 풀어 주세요.<br><small>아이가 실수로 설정을 바꾸지 않게 하는 간단한 확인이에요. 비밀번호 같은 보안 잠금은 아니에요.</small></p><p class="gq" id="gateQ">${a} × ${b} = ?</p><input id="gateIn" inputmode="numeric" maxlength="3" autocomplete="off" aria-labelledby="gateQ"><div style="display:flex;gap:8px"><button class="candy" id="gateNo" style="flex:1">취소</button><button class="candy primary" id="gateGo" style="flex:1">확인</button></div></div>`;
   $('#app').appendChild(el);
+  const close = () => { el.remove(); if (back?.isConnected) back.focus(); };
+  el._close = close;
   const inp = el.querySelector('#gateIn'); setTimeout(() => inp.focus(), 50);
-  const go = () => { if (+inp.value === a * b) { el.remove(); onPass(); } else { toast('답이 달라요'); inp.value = ''; } };
+  const go = () => { if (+inp.value === a * b) { el.remove(); onPass(); } else { toast('답이 달라요'); inp.value = ''; inp.focus(); } };
   el.querySelector('#gateGo').addEventListener('click', go);
   inp.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
-  el.querySelector('#gateNo').addEventListener('click', () => el.remove());
+  el.querySelector('#gateNo').addEventListener('click', close);
 }
 function openSettings() {
   openSheet('설정', `<div class="set-list">
-    <button class="set-row" id="setSound"><span>${S.sound ? '🔊' : '🔈'} 소리</span><b>${S.sound ? '켜짐' : '꺼짐'}</b></button>
+    <button class="set-row" id="setSound"><span>${S.sound ? '🔊' : '🔈'} 효과음</span><b>${S.sound ? '켜짐' : '꺼짐'}</b></button>
+    <button class="set-row" id="setMusic"><span>${S.music !== false ? '🎵' : '🔇'} 배경음악</span><b>${S.music !== false ? '켜짐' : '꺼짐'}</b></button>
+    <button class="set-row" id="setAlbum"><span>📷 사진 앨범</span><b>${loadPhotos().length} / ${PHOTO_MAX}장 ›</b></button>
     <div class="set-row"><span>⏱️ 오늘 논 시간</span><b>${Math.floor(playSec() / 60)}분</b></div>
     <button class="set-row" id="setParent"><span>🔒 보호자 메뉴</span><b>열기 ›</b></button>
   </div>`, body => {
     body.querySelector('#setSound').addEventListener('click', () => { S.sound = !S.sound; persist(); sfx('pop'); openSettings(); });
+    body.querySelector('#setMusic').addEventListener('click', () => { S.music = S.music === false; persist(); Music.sync(); openSettings(); });
+    body.querySelector('#setAlbum').addEventListener('click', () => openAlbum());
     body.querySelector('#setParent').addEventListener('click', () => { closeSheet(); parentGate(openParent); });
   });
 }
@@ -3005,17 +3085,203 @@ function openParent() {
     <h4>쉬는 시간 알림</h4>${seg('brk', [0, 20, 30, 45], v => v ? `${v}분마다` : '끄기')}
     <h4>밤 9시 ~ 아침 7시에는 쉬기</h4>${seg('bed', [1, 0], v => v ? '켜기' : '끄기')}
     ${pa.limit ? '<button class="candy" id="plus15" style="margin-top:14px">오늘만 15분 더 주기</button>' : ''}
-    <p class="fine" style="margin-top:14px;text-align:left">광고·결제·채팅은 없어요. 놀이 기록은 이 기기에만 저장돼요. 앱 안의 문제 풀이는 간단한 확인용이에요. 실제 시간 제한에는 기기의 보호자 설정도 함께 사용해 주세요.</p>
+    <h4>기록 백업</h4>
+    <p class="msub" style="margin:0">기록은 이 기기에만 있어요. 앱을 지우거나 폰을 바꾸기 전에 백업 코드를 만들어 메모장·메일 등에 보관해 주세요.</p>
+    <div class="backup"><div class="row"><button class="candy" id="bkOut">💾 백업 코드 만들기</button><button class="candy" id="bkIn">📥 백업 코드로 되살리기</button></div></div>
+    <p class="fine" style="margin-top:14px;text-align:left">광고·결제·채팅은 없어요. 놀이 기록은 이 기기에만 저장돼요.<br>이 메뉴를 열 때 푸는 곱셈 문제는 아이가 실수로 설정을 바꾸지 않게 돕는 장치일 뿐, 보안 인증이 아니에요. 아이가 답을 알면 열 수 있어요. 확실한 시간 관리는 기기의 보호자 기능(안드로이드 패밀리 링크, 아이폰 스크린 타임)을 함께 사용해 주세요.</p>
   </div>`, body => body.addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
     if (b.dataset.limit !== undefined) pa.limit = +b.dataset.limit;
     else if (b.dataset.brk !== undefined) { pa.breakEvery = +b.dataset.brk; contSec = 0; }
     else if (b.dataset.bed !== undefined) pa.bedtime = b.dataset.bed === '1';
     else if (b.id === 'plus15') { S.play.extra = (S.play.extra || 0) + 15; toast('오늘만 15분 더 놀 수 있어요'); }
+    else if (b.id === 'bkOut') return openBackupOut();
+    else if (b.id === 'bkIn') return openBackupIn();
     else return;
     sfx('tap'); persist(); openParent();
   }));
 }
+
+/* ---------- 기록 백업: 서버 없이 '백업 코드' 글자로 옮긴다 ----------
+   코드 = 'MALANG1.' + 저장 데이터(JSON)를 base64로 + '.' + 확인용 숫자. 저장 형식(S)은 바꾸지 않는다 */
+const BACKUP_PREFIX = 'MALANG1.';
+const hashStr = str => { let h = 2166136261; for (let i = 0; i < str.length; i++) h = Math.imul(h ^ str.charCodeAt(i), 16777619) >>> 0; return h.toString(36); };
+const toB64 = str => { const b = new TextEncoder().encode(str); let bin = ''; for (let i = 0; i < b.length; i += 8192) bin += String.fromCharCode.apply(null, b.subarray(i, i + 8192)); return btoa(bin); };
+const fromB64 = b64 => new TextDecoder().decode(Uint8Array.from(atob(b64), c => c.charCodeAt(0)));
+function makeBackup() { persist(); const json = JSON.stringify(S); return BACKUP_PREFIX + toB64(json) + '.' + hashStr(json); }
+// 코드가 맞는지 확인만 하고, 실제로 덮어쓰기 전에는 아무것도 바꾸지 않는다
+function readBackup(code) {
+  const c = String(code || '').replace(/\s+/g, '');
+  if (!c.startsWith(BACKUP_PREFIX)) return { err: '말랑 펫하우스 백업 코드가 아니에요. MALANG1. 로 시작하는 글자 전체를 붙여 넣어 주세요.' };
+  const [b64, sum] = c.slice(BACKUP_PREFIX.length).split('.');
+  let json, d;
+  try { json = fromB64(b64); d = JSON.parse(json); } catch (e) { return { err: '코드 일부가 빠진 것 같아요. 처음부터 끝까지 다시 복사해 주세요.' }; }
+  if (hashStr(json) !== sum) return { err: '코드 일부가 바뀌었거나 빠졌어요. 다시 복사해 주세요.' };
+  if (!d || d.v !== 1 || !Array.isArray(d.pets) || !d.pets.length || !d.pets.every(q => q && SPECIES[q.sp])) return { err: '이 코드에는 펫 기록이 없어요.' };
+  return { data: d };
+}
+function openBackupOut() {
+  const code = makeBackup();
+  openSheet('💾 백업 코드', `<div class="backup"><p class="msub" style="margin:0 0 8px">아래 글자 전체가 백업 코드예요. 복사해서 메모장·메일·메신저 내게 쓰기에 보관하세요. 다른 사람에게 보내지 않아도 돼요.</p>
+    <textarea id="bkCode" readonly aria-label="백업 코드">${escapeHTML(code)}</textarea>
+    <div class="row"><button class="candy primary" id="bkCopy">📋 복사하기</button><button class="candy" id="bkFile">📄 파일로 저장</button></div>
+    <p class="fine" style="text-align:left;margin-top:8px">펫 ${S.pets.length}마리 · 코인 ${S.coins} · 만든 때 ${new Date().toLocaleString('ko-KR')}</p></div>`, body => {
+    const ta = body.querySelector('#bkCode');
+    body.querySelector('#bkCopy').addEventListener('click', () => {
+      const fallback = () => { ta.focus(); ta.select(); toast('글자가 선택됐어요. 길게 눌러 복사해 주세요'); };
+      try { navigator.clipboard.writeText(code).then(() => toast('백업 코드를 복사했어요'), fallback); } catch (e) { fallback(); }
+    });
+    body.querySelector('#bkFile').addEventListener('click', () => {
+      try {
+        const a = document.createElement('a'), d = new Date();
+        a.href = URL.createObjectURL(new Blob([code], { type: 'text/plain' }));
+        a.download = `malang-backup-${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}.txt`;
+        document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+        toast('파일 저장을 시작했어요. 안 되면 복사하기를 써 주세요');
+      } catch (e) { toast('이 기기에서는 파일 저장이 안 돼요. 복사하기를 써 주세요'); }
+    });
+  });
+}
+function openBackupIn() {
+  openSheet('📥 백업 코드로 되살리기', `<div class="backup"><p class="msub" style="margin:0 0 8px">보관해 둔 백업 코드를 붙여 넣거나, 백업 파일을 골라 주세요.</p>
+    <textarea id="bkPaste" aria-label="백업 코드 붙여 넣기" placeholder="MALANG1. 로 시작하는 글자"></textarea>
+    <div class="row"><button class="candy" id="bkPick">📄 파일 고르기</button><button class="candy primary" id="bkCheck">확인하기</button></div>
+    <input type="file" id="bkFileIn" accept=".txt,text/plain" hidden>
+    <div id="bkResult" role="status"></div></div>`, body => {
+    const ta = body.querySelector('#bkPaste'), out = body.querySelector('#bkResult'), fileIn = body.querySelector('#bkFileIn');
+    body.querySelector('#bkPick').addEventListener('click', () => fileIn.click());
+    fileIn.addEventListener('change', () => { const f = fileIn.files[0]; if (!f) return; f.text().then(t => { ta.value = t.trim(); check(); }); });
+    const check = () => {
+      const r = readBackup(ta.value);
+      if (r.err) { out.innerHTML = `<p class="warn">${escapeHTML(r.err)}</p>`; return; }
+      const d = r.data, names = d.pets.map(q => cleanName(q.name, SPECIES[q.sp].name)).join(', ');
+      // 덮어쓰기는 되돌리기 어려우니 페이지 안에서 한 번 더 묻는다
+      out.innerHTML = `<p class="warn">이 기록으로 바꿀까요?<br><b>펫 ${d.pets.length}마리</b>: ${escapeHTML(names)} · 코인 ${+d.coins || 0}<br>지금 이 기기의 기록은 이 백업으로 바뀌어요. (바로 전 기록은 기기 안에 한 번 더 보관해 둬요)</p>
+        <div class="row" style="display:flex;gap:8px;margin-top:8px"><button class="candy" id="bkNo" style="flex:1">그만두기</button><button class="candy primary" id="bkYes" style="flex:1">이 기록으로 바꾸기</button></div>`;
+      out.querySelector('#bkNo').addEventListener('click', () => { out.innerHTML = ''; ta.focus(); });
+      out.querySelector('#bkYes').addEventListener('click', () => {
+        try {
+          localStorage.setItem(SAVE_KEY + '-before-restore', JSON.stringify(S));
+          d.lastTick = Date.now();
+          localStorage.setItem(SAVE_KEY, JSON.stringify(d));
+        } catch (e) { out.innerHTML = '<p class="warn">기기 저장 공간이 모자라 바꾸지 못했어요. 사진 앨범의 사진을 몇 장 지우고 다시 해 주세요.</p>'; return; }
+        restoring = true; toast('기록을 되살렸어요! 다시 시작할게요'); setTimeout(() => location.reload(), 900);
+      });
+      out.querySelector('#bkYes').focus();
+    };
+    body.querySelector('#bkCheck').addEventListener('click', check);
+  });
+}
+
+/* ---------- 사진 찍기와 앨범: 저장 데이터와 따로, 기기 안에만 최대 12장 ---------- */
+const PHOTO_KEY = 'malang-pet-house-photos', PHOTO_MAX = 12;
+function loadPhotos() { try { const a = JSON.parse(localStorage.getItem(PHOTO_KEY) || '[]'); return Array.isArray(a) ? a.filter(x => x && typeof x.d === 'string' && x.d.startsWith('data:image/')) : []; } catch (e) { return []; } }
+function savePhotos(list) { try { localStorage.setItem(PHOTO_KEY, JSON.stringify(list)); return true; } catch (e) { return false; } }
+// 무대 그림을 폴라로이드처럼 테두리와 이름·날짜를 붙여 한 장으로 만든다
+function framePhoto(src, sw, sh, bg) {
+  const W = 480, ih = Math.round(W * Math.min(1.1, sh / sw)), pad = 16, foot = 58;
+  const c = document.createElement('canvas'); c.width = W + pad * 2; c.height = ih + pad + foot;
+  const x = c.getContext('2d');
+  x.fillStyle = '#FFFFFF'; x.fillRect(0, 0, c.width, c.height);
+  x.fillStyle = bg || '#BFE8FF'; x.fillRect(pad, pad, W, ih);
+  const scale = Math.max(W / sw, ih / sh), dw = sw * scale, dh = sh * scale;
+  x.drawImage(src, pad + (W - dw) / 2, pad + (ih - dh) / 2, dw, dh);
+  const p = P(), d = new Date();
+  x.fillStyle = INK; x.font = `24px ${getComputedStyle(document.body).getPropertyValue('--display') || 'sans-serif'}`; x.textBaseline = 'middle';
+  x.fillText(`${p.name} · Lv.${p.level}`, pad + 4, ih + pad + foot / 2);
+  x.font = '15px sans-serif'; x.textAlign = 'right'; x.fillStyle = '#8E7A85';
+  x.fillText(`${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()}`, c.width - pad - 4, ih + pad + foot / 2);
+  return c.toDataURL('image/jpeg', .82);
+}
+function takePhoto() {
+  const p = P(); if (!p || !p.hatched) return;
+  const list = loadPhotos();
+  if (list.length >= PHOTO_MAX) { toast(`앨범이 가득 찼어요 (${PHOTO_MAX}장). 지울 사진을 골라 주세요`); return openAlbum(); }
+  const keep = dataUrl => {
+    if (!dataUrl) return toast('이 기기에서는 사진을 찍을 수 없어요');
+    list.push({ d: dataUrl, t: Date.now() });
+    if (!savePhotos(list)) return toast('저장 공간이 모자라요. 앨범에서 사진을 지워 주세요');
+    retrigger($('#flash'), 'go'); sfx('pop'); setMood('happy', 1500); World.trick('hop');
+    say(pick(['찰칵! 예쁘게 나왔어요?', '브이~ ✌️ 잘 찍었다!', '앨범에 넣어 줘서 고마워!']), 3000);
+    toast(`📷 찰칵! 앨범에 저장했어요 (${list.length}/${PHOTO_MAX})`);
+  };
+  const shot = World.snapshot();
+  if (shot) { try { return keep(framePhoto(shot, shot.width, shot.height, '#BFE8FF')); } catch (e) { return keep(null); } }
+  // 3D를 못 쓰는 기기: 2D 그림으로 찍는다
+  const img = new Image();
+  img.onload = () => { try { keep(framePhoto(img, 200, 200, (SPECIES[p.sp] || {}).bg)); } catch (e) { keep(null); } };
+  img.onerror = () => keep(null);
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(petSVG(p.sp, { mood: 'happy', stage: stageOf(p.level), hat: p.hat }));
+}
+function openAlbum() {
+  const list = loadPhotos();
+  openSheet(`📷 사진 앨범 ${list.length}/${PHOTO_MAX}`, list.length
+    ? `<p class="msub">사진은 이 기기에만 있어요. 사진을 누르면 크게 보고, 저장하거나 지울 수 있어요.</p><div class="album">${list.map((ph, i) => `<button data-photo="${i}" aria-label="${i + 1}번째 사진 크게 보기"><img src="${ph.d}" alt=""></button>`).join('')}</div>`
+    : `<p class="msub">아직 사진이 없어요. 방 왼쪽의 📷 버튼을 누르면 펫 사진을 찍을 수 있어요!</p>`,
+    body => body.addEventListener('click', e => { const b = e.target.closest('[data-photo]'); if (b) openPhoto(+b.dataset.photo); }));
+}
+function openPhoto(i) {
+  const list = loadPhotos(), ph = list[i]; if (!ph) return openAlbum();
+  openSheet(`📷 ${new Date(ph.t).toLocaleDateString('ko-KR')}`, `<div class="photo-view"><img src="${ph.d}" alt="${i + 1}번째 펫 사진">
+    <div class="row"><button class="candy" id="phBack">‹ 앨범</button><button class="candy primary" id="phSave">💾 저장</button><button class="candy" id="phDel">🗑️ 지우기</button></div>
+    <p class="fine">저장이 안 되면 사진을 길게 눌러 저장해 보세요.</p></div>`, body => {
+    body.querySelector('#phBack').addEventListener('click', () => openAlbum());
+    body.querySelector('#phSave').addEventListener('click', () => {
+      try { const a = document.createElement('a'); a.href = ph.d; a.download = `malang-photo-${ph.t}.jpg`; document.body.appendChild(a); a.click(); a.remove(); toast('사진 저장을 시작했어요'); }
+      catch (e) { toast('사진을 길게 눌러 저장해 주세요'); }
+    });
+    const del = body.querySelector('#phDel');
+    del.addEventListener('click', () => {
+      // 지우기는 되돌릴 수 없어서 한 번 더 누르게 한다
+      if (!del.dataset.armed) { del.dataset.armed = '1'; del.textContent = '한 번 더 누르면 지워져요'; setTimeout(() => { if (del.isConnected) { delete del.dataset.armed; del.textContent = '🗑️ 지우기'; } }, 3000); return; }
+      const now = loadPhotos(); now.splice(i, 1); savePhotos(now); toast('사진을 지웠어요'); openAlbum();
+    });
+  });
+}
+
+/* ---------- 배경음악: 파일 없이 WebAudio로 짓는 짧은 노래. 집·마을·점프 코스마다 곡이 다르다 ----------
+   음 = C5 기준 반음 수, null = 쉼. 첫 터치 뒤에만 소리를 낼 수 있어서 그때 시작한다 */
+const Music = (() => {
+  const TUNES = {
+    house:   { bpm: 84,  chords: [0, -3, -7, -5], mel: [0, null, 4, null, 7, null, 4, 2, 0, null, 2, 4, 2, null, null, null, 9, null, 7, null, 4, null, 2, 4, 0, null, null, null, null, null, null, null] },
+    village: { bpm: 104, chords: [0, -5, -3, -7], mel: [7, 9, 7, 4, 2, 4, 7, null, 12, null, 9, 7, 4, null, null, null, 7, 9, 12, 9, 7, 4, 2, 4, 0, null, 4, null, 0, null, null, null] },
+    obby:    { bpm: 126, chords: [0, 2, 4, -5],  mel: [0, 4, 7, 12, 7, 4, 0, 4, 2, 5, 9, 14, 9, 5, 2, 5, 4, 7, 11, 16, 11, 7, 4, 7, 12, null, 12, null, 7, null, null, null] }
+  };
+  let gain = null, timer = 0, step = 0, next = 0, tuneKey = '', started = false;
+  const freq = n => 523.25 * Math.pow(2, n / 12);
+  function note(f, t, d, type, vol) {
+    const o = AC.createOscillator(), g = AC.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .02); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    o.connect(g).connect(gain); o.start(t); o.stop(t + d + .05);
+  }
+  const quiet = () => !S || S.music === false || document.hidden || restOpen || gameOn || $('#home').hidden;
+  function schedule() {
+    if (!AC || quiet()) { next = 0; return; }
+    const key = World.area() === 'obby' ? 'obby' : World.area() === 'village' ? 'village' : 'house';
+    if (key !== tuneKey) { tuneKey = key; step = 0; next = 0; }
+    const tune = TUNES[key], dur = 60 / tune.bpm / 2;
+    if (!next || next < AC.currentTime) next = AC.currentTime + .05;
+    while (next < AC.currentTime + .3) {
+      const m = tune.mel[step % tune.mel.length];
+      if (m !== null) note(freq(m), next, dur * 1.8, 'triangle', .5);
+      if (step % 8 === 0) { const c = tune.chords[(step / 8) % tune.chords.length]; note(freq(c - 24), next, dur * 7, 'sine', .45); note(freq(c - 12 + 4), next, dur * 7, 'sine', .14); }
+      step++; next += dur;
+    }
+  }
+  function start() {
+    if (started) return;
+    try {
+      AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+      if (AC.state === 'suspended') AC.resume();
+      gain = AC.createGain(); gain.gain.value = .07; gain.connect(AC.destination);
+      started = true; timer = setInterval(schedule, 100);
+    } catch (e) {}
+  }
+  return { start, sync() { if (S && S.music !== false) start(); else next = 0; } };
+})();
+['pointerdown', 'keydown'].forEach(t => document.addEventListener(t, () => { if (S && S.music !== false) Music.start(); }, { capture: true }));
+$('#photoBtn').addEventListener('click', () => { sfx('tap'); takePhoto(); });
 
 /* =========================================================
    9-4. 텃밭 · 요리 · 점프 코스 · 감정 표현 · 배지
@@ -3098,19 +3364,28 @@ function openCook() {
       if (!has(r)) return toast('재료가 모자라요. 텃밭에서 더 키워 봐요!');
       for (const [k, n] of Object.entries(r.need)) pan[k] -= n;
       persist(); closeSheet(); say(`${r.name} 만들러 가요!`, 2500);
-      World.goSpot('stove', true, () => cookGame(r));
+      goSpotThen('stove', () => cookGame(r));
     }));
 }
 function cookGame(r) {
   const wrap = document.createElement('div'); wrap.className = 'scrim mini';
-  wrap.innerHTML = `<div class="g-card cook"><h3>🍳 ${r.name}</h3><p id="ckHelp">버튼을 눌러 냄비를 휘휘 저어요!</p><div class="pot" id="ckPot">🍲</div><div class="heat"><i id="ckBar"></i></div><button class="candy primary" id="ckStir">휘휘 젓기!</button></div>`;
-  $('#app').appendChild(wrap);
+  wrap.innerHTML = `<div class="g-card cook"><h3>🍳 ${r.name}</h3><p id="ckHelp">버튼을 눌러 냄비를 휘휘 저어요!</p><div class="pot" id="ckPot">🍲</div><div class="heat"><i id="ckBar"></i></div><button class="candy primary" id="ckStir">휘휘 젓기!</button><button class="mini-quit" id="ckQuit">그만하기 (재료는 돌려받아요)</button></div>`;
+  wrap.querySelector('.cook').setAttribute('role', 'dialog'); wrap.querySelector('.cook').setAttribute('aria-label', r.name + ' 요리');
+  $('#app').appendChild(wrap); pushBack();
   let n = 0; const N = 12, pot = wrap.querySelector('#ckPot');
+  wrap._close = () => {
+    if (n >= N) return;
+    const pan = farm().pantry; for (const [k, c] of Object.entries(r.need)) pan[k] = (pan[k] || 0) + c;
+    persist(); wrap.remove(); toast('요리를 멈췄어요. 재료는 그대로 있어요'); $('#world').focus({ preventScroll: true });
+  };
+  wrap.querySelector('#ckQuit').addEventListener('click', () => wrap._close());
+  wrap.addEventListener('keydown', trapTab);
+  wrap.querySelector('#ckStir').focus({ preventScroll: true });
   wrap.querySelector('#ckStir').addEventListener('click', () => {
     if (n >= N) return;
     n++; wrap.querySelector('#ckBar').style.width = n / N * 100 + '%'; retrigger(pot, 'stir'); sfx('bub');
     if (n < N) return;
-    sfx('up'); pot.textContent = r.e; wrap.querySelector('#ckHelp').textContent = '완성! 맛있는 냄새~';
+    sfx('up'); pot.textContent = r.e; wrap.querySelector('#ckHelp').textContent = '완성! 맛있는 냄새~'; wrap.querySelector('#ckQuit').remove();
     setTimeout(() => {
       wrap.remove();
       World.eat(1.6, r.e); setMood('eat', 1600); sfx('eat');
@@ -3205,11 +3480,15 @@ function obbyFinish(time) {
 
 /* ---------- 감정 표현 ---------- */
 const EMOTES = { wave: ['👋', '안녕~!'], dance: ['💃', '신나는 춤!'], spin: ['🌀', '빙글빙글~'], jump: ['🙌', '야호!'], hop: ['🎵', '랄랄라~'] };
-$('#emoteBtn').addEventListener('click', () => { sfx('tap'); $('#emoteTray').hidden = !$('#emoteTray').hidden; });
+function toggleEmotes(open) {
+  $('#emoteTray').hidden = !open; $('#emoteBtn').setAttribute('aria-expanded', String(open));
+  if (open) $('#emoteTray button')?.focus({ preventScroll: true });
+}
+$('#emoteBtn').addEventListener('click', () => { sfx('tap'); toggleEmotes($('#emoteTray').hidden); });
 $('#emoteTray').addEventListener('click', e => {
   const b = e.target.closest('[data-emote]'); if (!b) return;
   const k = b.dataset.emote, who = World.emote(k);
-  sfx('pop'); $('#emoteTray').hidden = true;
+  sfx('pop'); toggleEmotes(false); $('#emoteBtn').focus({ preventScroll: true });
   burst([EMOTES[k][0]], 2, -.2);
   if (who) { addFriend(who, 2); say(`${EMOTES[k][1]} ${josa(FRIENDS[who].name, '이', '')}도 따라 했어요!`, 3000); }
   else say(EMOTES[k][1], 2000);
@@ -3245,7 +3524,7 @@ function badge(id) {
   S.badges[id] = today(); persist();
   setTimeout(() => { toast(`🏅 배지 획득! ${BADGES[id][0]} ${BADGES[id][1]}`); sfx('hatch'); confetti(40); }, 900);
 }
-const missionTabs = t => `<div class="tabs" role="tablist"><button role="tab" data-mtab="m" aria-selected="${t === 'm'}">📋 놀이 목표</button><button role="tab" data-mtab="b" aria-selected="${t === 'b'}">🏅 배지</button>${SEASON ? `<button role="tab" data-mtab="e" aria-selected="${t === 'e'}">🎃 축제</button>` : ''}<button role="tab" data-mtab="n" aria-selected="${t === 'n'}">📰 소식</button></div>`;
+const missionTabs = t => `<div class="tabs" role="tablist"><button role="tab" data-mtab="m" aria-selected="${t === 'm'}">📋 놀이 목표</button><button role="tab" data-mtab="b" aria-selected="${t === 'b'}">🏅 배지</button>${seasonState() ? `<button role="tab" data-mtab="e" aria-selected="${t === 'e'}">${SEASON ? '🎃 축제' : '🍬 사탕'}</button>` : ''}<button role="tab" data-mtab="n" aria-selected="${t === 'n'}">📰 소식</button></div>`;
 function openBadges() {
   const got = S.badges || {}, n = Object.keys(got).length;
   openSheet('배지 수집첩', `${missionTabs('b')}<p class="msub">${n} / ${Object.keys(BADGES).length}개 모았어요</p><div class="badges">${Object.entries(BADGES).map(([k, [e, name, how]]) => `<div class="badge-card${got[k] ? ' got' : ''}"><span class="be">${got[k] ? e : '🔒'}</span><b>${name}</b><small>${how}</small></div>`).join('')}</div>`,
@@ -3368,17 +3647,25 @@ $('#questBtn').addEventListener('click', () => {
 /* ---------- 계절 축제 (지금은 할로윈): 기간 안에 아무 때나 사탕을 찾고, 선물은 상점에서도 살 수 있다 ---------- */
 const SEASON = (() => {
   const d = new Date(), m = d.getMonth() + 1, day = d.getDate();
-  return (m === 10 && day >= 15) || (m === 11 && day <= 7) ? { id: 'halloween' + d.getFullYear(), name: '할로윈 축제' } : null;
+  return (m === 10 && day >= 15) || (m === 11 && day <= 7) ? { id: 'halloween', year: d.getFullYear(), name: '할로윈 축제' } : null;
 })();
 const CANDY_SPOTS = [[-3, 4.2], [4.6, -4.8], [-11.6, -2.6], [5.6, 9.2], [-5.5, 10.5], [9.5, 12], [18, -.6], [23, 8.5], [14.5, 4], [-9, -4.5], [1.5, 7], [11, -1.6]];
 const SEASON_SHOP = [{ kind: 'decor', id: 'jack', name: '호박 등불', e: '🎃', cost: 6 }, { kind: 'hat', id: 'witch', name: '마녀 모자', e: '🧙', cost: 12 }];
+// 모은 사탕(candy)은 날짜·연도·축제가 바뀌어도 그대로 남는다. 새 축제에서 새로 생기는 건 '사탕이 숨은 자리'뿐이다.
+// 저장 형식은 예전 그대로 S.season = { id, candy, found } 이고 year만 더한다.
 function seasonState() {
-  if (!SEASON) return null;
-  if (!S.season || S.season.id !== SEASON.id) S.season = { id: SEASON.id, candy: 0, found: [] };
-  return S.season;
+  const old = S.season;
+  if (!SEASON) return old && old.candy > 0 ? old : null;            // 축제 기간이 아니어도 남은 사탕은 언제든 쓸 수 있다
+  if (!old) return (S.season = { id: SEASON.id, year: SEASON.year, candy: 0, found: [] });
+  // 예전 저장본은 id가 'halloween2026'처럼 연도를 품고 있다. 올해 것이면 찾은 자리를 그대로 지킨다
+  const oldYear = old.year ?? (+(String(old.id || '').match(/\d{4}$/) || [])[0] || null);
+  const sameRound = String(old.id || '').startsWith(SEASON.id) && oldYear === SEASON.year;
+  if (!sameRound || !Array.isArray(old.found)) old.found = [];
+  old.id = SEASON.id; old.year = SEASON.year; old.candy = Math.max(0, +old.candy || 0);
+  return old;
 }
 function spawnCandies() {
-  const ev = seasonState(); if (!ev) return;
+  const ev = SEASON && seasonState(); if (!ev) return;
   World.spawnCandies(CANDY_SPOTS.map((c, i) => [i, c[0], c[1]]).filter(c => !ev.found.includes(c[0])), i => {
     if (ev.found.includes(i)) return;
     ev.found.push(i); ev.candy++; sfx('coin');
@@ -3391,13 +3678,16 @@ function openSeason() {
   const ev = seasonState(); if (!ev) return openMissions('m');
   const owned = it => it.kind === 'hat' ? S.hats.includes(it.id) : decorState().owned.includes(it.id);
   const cards = SEASON_SHOP.map((it, i) => `<button class="item${owned(it) ? ' on' : ''}" data-sz="${i}"${owned(it) ? ' disabled' : ''}><span class="em">${it.e}</span><span class="nm">${it.name}</span><span class="pr">${owned(it) ? '받음 ✓' : `🍬 ${it.cost}개`}</span></button>`).join('');
-  openSheet('🎃 할로윈 축제', `${missionTabs('e')}<p class="msub">마을 곳곳에 숨은 사탕을 찾아 선물로 바꿔요. 서두르지 않아도 돼요. 선물은 상점에서 코인으로도 살 수 있어요.</p><div class="ev-head"><span class="pill">🍬 ${ev.candy}</span><span>찾은 사탕 ${ev.found.length} / ${CANDY_SPOTS.length}</span></div><div class="grid">${cards}</div>`,
+  const intro = SEASON
+    ? '마을 곳곳에 숨은 사탕을 찾아 선물로 바꿔요. 다 못 찾아도 괜찮아요. 모은 사탕은 축제가 끝나도 없어지지 않고, 선물은 상점에서 코인으로도 살 수 있어요.'
+    : '축제는 쉬는 중이에요. 모아 둔 사탕은 그대로 있으니 언제든 선물로 바꿔요. 선물은 상점에서 코인으로도 살 수 있어요.';
+  openSheet(SEASON ? '🎃 할로윈 축제' : '🍬 모아 둔 사탕', `${missionTabs('e')}<p class="msub">${intro}</p><div class="ev-head"><span class="pill">🍬 ${ev.candy}</span>${SEASON ? `<span>올해 찾은 사탕 ${ev.found.length} / ${CANDY_SPOTS.length}</span>` : ''}</div><div class="grid">${cards}</div>`,
     body => body.addEventListener('click', e => {
       const tb = e.target.closest('[data-mtab]'); if (tb) return openMissions(tb.dataset.mtab);
       const b = e.target.closest('[data-sz]'); if (!b) return;
       const it = SEASON_SHOP[+b.dataset.sz];
       if (owned(it)) return;
-      if (ev.candy < it.cost) return toast(`사탕이 ${it.cost - ev.candy}개 더 필요해요. 마을을 둘러봐요!`);
+      if (ev.candy < it.cost) return toast(SEASON ? `사탕이 ${it.cost - ev.candy}개 더 필요해요. 마을을 둘러봐요!` : `사탕이 ${it.cost - ev.candy}개 모자라요. 상점에서 코인으로도 살 수 있어요`);
       ev.candy -= it.cost;
       if (it.kind === 'hat') S.hats.push(it.id); else decorState().owned.push(it.id);
       sfx('buy'); confetti(50); toast(`${it.e} ${josa(it.name, '을', '를')} 받았어요! 상점에서 쓰거나 놓을 수 있어요`);
@@ -3463,6 +3753,7 @@ function openStand() {
 function goStand() { World.area() === 'village' ? World.goVillage('garden', true, openStand) : openStand(); }
 
 const NEWS = [
+  { v: '1.9', date: '10월 29일', items: ['📷 방 왼쪽 📷 버튼으로 펫 사진을 찍고 설정 > 사진 앨범에서 볼 수 있어요', '🎵 집·마을·점프 코스마다 다른 배경음악 (설정에서 끌 수 있어요)', '💾 보호자 메뉴에서 기록 백업 코드를 만들고 되살릴 수 있어요', '⌨️ 키보드와 Esc 키로도 놀 수 있어요'] },
   { v: '1.8', date: '10월 29일', items: ['👫 기른 펫들이 졸졸 따라다녀요! 따라오는 펫을 누르면 그 친구와 놀아요', '🌧️ 마을에 가끔 단비가 와요. 텃밭에 물이 저절로 뿌려져요', '✨ 수확할 때 가끔 황금·무지개 채소가 나와요 (비 올 때 더 잘 나와요)', '🧺 텃밭 옆 채소 가게에서 채소를 팔 수 있어요'] },
   { v: '1.7', date: '10월 29일', items: ['📜 말랑 모험 4장이 열렸어요. 화면 아래 "가기"를 눌러 보세요', '🎃 할로윈 축제: 마을에 숨은 사탕 12개를 찾아요', '🎨 상점에서 펫 염색 6색'] },
   { v: '1.6', date: '10월 28일', items: ['🥕 텃밭과 요리', '🌈 무지개 점프 코스', '😀 감정 표현, 🏅 배지 수집첩'] }
@@ -3476,27 +3767,60 @@ function openNews() {
 /* =========================================================
    10. 바텀 시트 (밥 / 상점 / 친구들)
    ========================================================= */
-let scrim = null;
+let scrim = null, sheetReturnFocus = null;
 function openSheet(title, inner, mount) {
   closeSheet();
+  sheetReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   scrim = document.createElement('div'); scrim.className = 'scrim';
-  scrim.innerHTML = `<div class="sheet gut" role="dialog" aria-label="${title}"><div class="sheet-head"><h2>${title}</h2><button class="icon-btn" data-close aria-label="닫기">✕</button></div><div class="sheet-body">${inner}</div></div>`;
+  scrim.innerHTML = `<div class="sheet gut" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" tabindex="-1"><div class="sheet-head"><h2 id="sheetTitle">${title}</h2><button class="icon-btn" data-close aria-label="닫기">✕</button></div><div class="sheet-body">${inner}</div></div>`;
   scrim.addEventListener('click', e => { if (e.target === scrim || e.target.closest('[data-close]')) closeSheet(); });
+  scrim.addEventListener('keydown', trapTab);
   $('#app').appendChild(scrim);
   pushBack();
   mount && mount(scrim.querySelector('.sheet-body'));
+  // 같은 시트를 다시 그릴 때(탭 바꾸기·구매 후)는 누른 버튼 대신 시트 첫 버튼에 초점을 둔다
+  (scrim.querySelector('.sheet-body [aria-selected="true"], .sheet-body button:not(:disabled), .sheet-body input') || scrim.querySelector('[data-close]'))?.focus({ preventScroll: true });
 }
-function closeSheet() { if (scrim) { scrim.remove(); scrim = null; } }
+function closeSheet() {
+  if (!scrim) return;
+  scrim.remove(); scrim = null;
+  const target = sheetReturnFocus; sheetReturnFocus = null;
+  if (target?.isConnected) target.focus();
+}
+// 열린 창 안에서만 Tab 초점이 돌게 한다 (창 뒤의 버튼으로 빠져나가지 않게)
+function trapTab(e) {
+  if (e.key !== 'Tab') return;
+  const items = [...e.currentTarget.querySelectorAll('button:not(:disabled), input:not(:disabled), [tabindex="0"]')].filter(el => el.offsetParent !== null);
+  if (!items.length) return;
+  const first = items[0], last = items[items.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+}
 // 시트·게임을 열 때 기록을 하나 쌓아 두고, 뒤로가기가 오면 앱을 끄지 않고 그 창만 닫는다
 let backDepth = 0;
 function pushBack() { if (!backDepth) { try { history.pushState({ malang: 1 }, ''); backDepth = 1; } catch (e) {} } }
-window.addEventListener('popstate', () => {
-  backDepth = 0;
-  const gameClose = document.querySelector('#gClose, #gHome');
-  if (gameClose) return gameClose.click();
-  if (talking) return closeTalk();
-  if (scrim) closeSheet();
-  else if (bathing) endBath();
+// 맨 위에 떠 있는 창 하나를 닫는다 (Escape 키와 휴대폰 뒤로가기가 같이 쓴다). 닫은 게 있으면 true
+// 휴식·잠금 화면은 보호자 설정이라 여기서 닫지 않는다
+function closeTopLayer() {
+  const gate = document.querySelector('.gate-wrap');
+  if (gate) { gate._close ? gate._close() : gate.remove(); return true; }
+  if (document.querySelector('.rest')) return false;
+  const mini = document.querySelector('.scrim.mini');
+  if (mini) { mini._close ? mini._close() : mini.remove(); return true; }
+  const race = document.querySelector('.race-ui');
+  if (race) { race._close && race._close(); return true; }
+  const game = document.querySelector('#gHome, #obHome') || document.querySelector('#gClose, #obExit');
+  if (game) { game.click(); return true; }
+  if (scrim) { closeSheet(); return true; }
+  if (talking) { closeTalk(); return true; }
+  if (!$('#emoteTray').hidden) { toggleEmotes(false); $('#emoteBtn').focus(); return true; }
+  if (placing) { endPlace(); return true; }
+  if (bathing) { endBath(); return true; }
+  return false;
+}
+window.addEventListener('popstate', () => { backDepth = 0; closeTopLayer(); });
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !e.repeat && closeTopLayer()) e.preventDefault();
 });
 const priceTag = n => n ? `<span class="pr"><i class="coin"></i>${n}</span>` : '<span class="pr">무료</span>';
 
@@ -3612,7 +3936,7 @@ function adoptSheet(sp) {
     <button class="candy primary" id="adoptGo" style="width:100%;font-size:19px"><i class="coin"></i> ${ADOPT_PRICE}코인으로 알 받기</button>`, body => {
     body.querySelector('#adoptGo').addEventListener('click', () => {
       if (S.coins < ADOPT_PRICE) return toast(`코인이 ${ADOPT_PRICE - S.coins}개 모자라요. 놀이로 모아 봐요!`);
-      const name = body.querySelector('#adoptName').value.trim() || s.name;
+      const name = cleanName(body.querySelector('#adoptName').value, s.name);
       S.coins -= ADOPT_PRICE; S.pets.push(newPet(sp, name)); S.active = S.pets.length - 1;
       if (bathing) endBath();
       tempMood = null; World.place(-4, 4.6); sfx('buy'); closeSheet(); render(); persist();
@@ -3630,9 +3954,11 @@ function openGame() {
   if (p.energy < 15) return say('너무 졸려서 못 놀겠어요… 먼저 재워 주세요');
   if (p.hunger < 12) return say('배가 고파서 힘이 없어요…');
   gameOn = true;
+  const backFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   const wrap = document.createElement('div'); wrap.id = 'game';
+  wrap.setAttribute('role', 'dialog'); wrap.setAttribute('aria-modal', 'true'); wrap.setAttribute('aria-label', '별똥별 받기');
   wrap.innerHTML = `<div class="g-top gut"><span class="ttl">별똥별 받기</span><span class="pill">⭐ <span id="gScore">0</span></span><span class="pill">⏱ <span id="gTime">30</span></span><button class="icon-btn" id="gClose" aria-label="그만하기">✕</button></div><canvas id="gCanvas"></canvas>
-    <div class="g-card" id="gCard"><h3>별똥별 받기</h3><p>손가락으로 ${escapeHTML(p.name)}를 움직여서<br>떨어지는 별을 받아요!</p><div class="legend"><span>⭐ +1</span><span>💖 +2</span><span>🍬 +3</span><span>🌧️ 앗, 어지러워!</span></div><button class="candy primary" id="gStart">시작!</button></div>`;
+    <div class="g-card" id="gCard"><h3>별똥별 받기</h3><p>손가락으로 ${escapeHTML(josa(p.name, '을', '를'))} 움직여서<br>떨어지는 별을 받아요!</p><p class="fine">키보드: ← → 방향키</p><div class="legend"><span>⭐ +1</span><span>💖 +2</span><span>🍬 +3</span><span>🌧️ 앗, 어지러워!</span></div><button class="candy primary" id="gStart">시작!</button></div>`;
   $('#app').appendChild(wrap);
   pushBack();
   const cv = wrap.querySelector('#gCanvas'), ctx = cv.getContext('2d');
@@ -3704,14 +4030,18 @@ function openGame() {
     card.innerHTML = `<h3>${msg}</h3><div class="big-score">⭐ ${g.score}</div><p><i class="coin"></i> ${coins}코인 · 경험치 ${xp} · 행복 +20</p><button class="candy primary" id="gHome">방으로 돌아가기</button>`;
     wrap.appendChild(card);
     card.querySelector('#gHome').addEventListener('click', closeGame);
+    card.querySelector('#gHome').focus({ preventScroll: true });
   }
   function closeGame() {
     gameOn = false;
     window.removeEventListener('resize', size); window.removeEventListener('keydown', kd); window.removeEventListener('keyup', kd);
     wrap.remove(); setMood('happy', 1500); say('함께 놀아 줘서 고마워요!'); render();
+    if (backFocus?.isConnected) backFocus.focus(); else $('#world').focus({ preventScroll: true });
   }
-  wrap.querySelector('#gStart').addEventListener('click', () => { wrap.querySelector('#gCard').remove(); g.run = true; g.spawn = .3; sfx('pop'); });
+  wrap.querySelector('#gStart').addEventListener('click', () => { wrap.querySelector('#gCard').remove(); g.run = true; g.spawn = .3; sfx('pop'); wrap.querySelector('#gClose').focus({ preventScroll: true }); });
   wrap.querySelector('#gClose').addEventListener('click', () => { if (g.run && g.score > 0) finish(); else closeGame(); });
+  wrap.addEventListener('keydown', trapTab);
+  wrap.querySelector('#gStart').focus({ preventScroll: true });
   requestAnimationFrame(loop);
 }
 /* =========================================================
@@ -4138,8 +4468,10 @@ function openArcade(def) {
   if (p.energy < 15) return say('너무 졸려서 못 놀겠어요… 먼저 재워 주세요');
   if (p.hunger < 12) return say('배가 고파서 힘이 없어요…');
   gameOn = true;
+  const backFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   const img = petImages(p);
   const wrap = document.createElement('div'); wrap.id = 'game'; wrap.className = 'arcade';
+  wrap.setAttribute('role', 'dialog'); wrap.setAttribute('aria-modal', 'true'); wrap.setAttribute('aria-label', def.title);
   const padBtn = (k, label, area) => def.pads.includes(k) ? `<button class="pbtn" data-k="${k}" style="grid-area:${area}" aria-label="${label}">${label}</button>` : '';
   wrap.innerHTML = `<div class="g-top gut"><span class="ttl">${def.emo} ${def.title}</span><span class="pill">점수 <span id="aScore">0</span></span><span class="pill" id="aLives">♥♥♥</span><button class="icon-btn" id="gClose" aria-label="그만하기">✕</button></div>
     <div class="a-stage"><canvas id="aCanvas"></canvas></div>
@@ -4211,14 +4543,18 @@ function openArcade(def) {
     card.innerHTML = `<h3>${msg}</h3><div class="big-score">${g.score}</div><p>${isBest && g.score ? '🏆 새 최고 기록!' : `최고 기록 ${S.best[def.id] || 0}`}</p><p><i class="coin"></i> ${coins}코인 · 경험치 ${xp} · 행복 +25</p><button class="candy primary" id="gHome">방으로 돌아가기</button>`;
     wrap.appendChild(card);
     card.querySelector('#gHome').addEventListener('click', closeGame);
+    card.querySelector('#gHome').focus({ preventScroll: true });
   }
   function closeGame() {
     gameOn = false;
     window.removeEventListener('resize', fit); window.removeEventListener('keydown', kd); window.removeEventListener('keyup', kd);
     wrap.remove(); setMood('happy', 1500); say('재미있게 놀았어요! 잠깐 쉬어도 좋아요.'); render();
+    if (backFocus?.isConnected) backFocus.focus(); else $('#world').focus({ preventScroll: true });
   }
-  wrap.querySelector('#gStart').addEventListener('click', () => { wrap.querySelector('#gCard').remove(); g.run = true; sfx('pop'); });
+  wrap.querySelector('#gStart').addEventListener('click', () => { wrap.querySelector('#gCard').remove(); g.run = true; sfx('pop'); wrap.querySelector('#gClose').focus({ preventScroll: true }); });
   wrap.querySelector('#gClose').addEventListener('click', () => { if (g.run && g.score > 0) { g.over = true; } else closeGame(); });
+  wrap.addEventListener('keydown', trapTab);
+  wrap.querySelector('#gStart').focus({ preventScroll: true });
   requestAnimationFrame(loop);
 }
 
@@ -4268,7 +4604,7 @@ function showStart() {
   renderPick();
 }
 $('#startBtn').addEventListener('click', () => {
-  const name = $('#nameInput').value.trim() || SPECIES[chosen].name;
+  const name = cleanName($('#nameInput').value, SPECIES[chosen].name);
   S.pets.push(newPet(chosen, name)); S.active = 0; S.lastTick = Date.now();
   persist(); sfx('hatch'); showHome();
   setTimeout(() => chapterBanner(CHAPTERS[1], CH_SUB[1]), 700);
