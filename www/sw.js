@@ -1,6 +1,6 @@
 // 말랑 펫하우스 오프라인 캐시.
 // 게임 파일을 바꿔 다시 올릴 때는 VERSION 숫자를 올려야 기존 설치본도 새 파일을 받는다.
-const VERSION = 'malang-v6';
+const VERSION = 'malang-v7';
 const FILES = [
   './',
   'index.html',
