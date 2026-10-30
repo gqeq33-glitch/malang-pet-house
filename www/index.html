@@ -364,6 +364,14 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
 .no3d{position:absolute;left:10px;right:10px;top:52px;z-index:6;display:flex;flex-direction:column;gap:4px;background:rgba(255,255,255,.95);border-radius:16px;padding:10px 14px;box-shadow:0 0 0 2.5px var(--ink) inset;font-size:13px;line-height:1.5}
 .no3d b{font-family:var(--display);font-weight:400;font-size:16px}
 .no3d em{font-style:normal;color:#E8476A}
+.ptitle{display:inline-block;margin-top:2px;font-family:var(--display);font-size:11.5px;padding:1px 8px;border-radius:99px;background:var(--butter);box-shadow:0 0 0 1.5px var(--ink) inset;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.wear-h{font-family:var(--display);font-size:16px;margin:14px 0 8px}
+.wear-h:first-child{margin-top:0}
+.titles{display:flex;flex-wrap:wrap;gap:6px}
+.titles button{border:0;border-radius:99px;padding:6px 11px;font-family:var(--display);font-size:13.5px;background:var(--soft);box-shadow:0 0 0 2px var(--line) inset}
+.titles button.on{background:var(--butter);box-shadow:0 0 0 2.5px var(--ink) inset}
+.titles button:disabled{opacity:.5}
+.titles small{display:block;font-family:var(--body);font-size:10.5px;color:var(--muted)}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
 
@@ -390,6 +398,7 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
     <header class="top gut">
       <div class="who">
         <h1 id="petName">몽글이</h1>
+        <span class="ptitle" id="petTitle" hidden></span>
         <div class="lv"><b id="lvChip">Lv.1</b><span id="stageTxt">아기</span><span class="xp" aria-hidden="true"><i id="xpBar"></i></span></div>
       </div>
       <button class="icon-btn mbtn" id="missionBtn" aria-label="놀이 목표">📋<span class="badge" id="missionBadge" hidden></span></button>
@@ -831,6 +840,7 @@ function buildStats() {
 function renderHUD() {
   const p = P(); if (!p) return;
   $('#petName').textContent = p.name;
+  const tName = p.title ? titleName(p.title) : ''; $('#petTitle').textContent = tName ? '🏷️ ' + tName : ''; $('#petTitle').hidden = !tName;
   $('#lvChip').textContent = 'Lv.' + p.level;
   const f = formOf(p.level);
   $('#stageTxt').innerHTML = p.hatched ? `${SPECIES[p.sp].kind} · ${FORMS[f].name}${f < FORMS.length - 1 ? `<span class="form-chip">Lv.${FORMS[f + 1].lv} 변신!</span>` : ''}` : '알';
@@ -1043,7 +1053,7 @@ const World = (() => {
   }
 
   /* ---------- 펫 만들기 ---------- */
-  function buildPet(spId, hatId, form, tint) {
+  function buildPet(spId, hatId, form, tint, back, neck) {
     const c = PET3[spId], R = c.R, cy = c.cy;
     const root = new T.Group(), body = new T.Group(); root.add(body);
     const pt = { root, body, isEgg: false };
@@ -1150,7 +1160,7 @@ const World = (() => {
     pt.setDirt = v => { pt.dirt.visible = v > 0; dirtMat.opacity = v; };
 
     // 변신 장식: 어린이(목도리·나비넥타이) → 어른(이마 별) → 반짝(별 궤도) → 무지개(무지개 날개·후광)
-    if (form >= 1) {
+    if (form >= 1 && !neck) {
       if (spId === 'penguin') { for (const s of [-1, 1]) { const b = add(c.accent, s * .09, cy - R * .62, zAt(0, cy - R * .62) - .02, .07, .12, .07, body, 1.1, CONE); b.rotation.z = s * Math.PI / 2; } add(c.accent, 0, cy - R * .62, zAt(0, cy - R * .62), .04, .04, .04, body, 1.1); }
       else { const sc = add(c.accent, 0, cy - R * .6, 0, R * .78, R * .78, R * .78, body, 1.03, new T.TorusGeometry(1, .1, 10, 32)); sc.rotation.x = Math.PI / 2; }
     }
@@ -1178,6 +1188,46 @@ const World = (() => {
       else if (hatId === 'witch') { add('#4E3780', 0, 0, 0, .4, .03, .4, h, o, CYL); const cn = add('#6B4FA0', 0, .3, 0, .24, .58, .24, h, o, CONE); cn.rotation.z = .2; add('#FF9A3D', 0, .07, 0, .25, .06, .25, h, 0, CYL); }
       else if (hatId === 'wizard') { add('#6570CF', 0, 0, 0, .36, .03, .36, h, o, CYL); const cn = add('#7C86E0', 0, .27, 0, .24, .52, .24, h, o, CONE); cn.rotation.z = -.15; add('#FFE27A', .02, .3, .18, .06, .06, .06, h, 0, STAR); }
       else if (hatId === 'glasses') { h.position.set(0, 0, 0); for (const s of [-1, 1]) mesh(new T.TorusGeometry(.085, .018, 8, 20), '#FF7FA6', s * ex, ey, zAt(ex, ey) + .05, 1, 1, 1, h, { cast: false }); mesh(CYL, '#FF7FA6', 0, ey + .02, zAt(0, ey) + .05, .015, .1, .015, h, { cast: false }).rotation.z = Math.PI / 2; }
+    }
+    // 등 장식 (날개는 걸을 때 퍼덕이도록 날개 자리 wingL/wingR에 붙인다)
+    if (back) {
+      const bz = -R * .92;
+      if (back === 'angel' || back === 'bat') {
+        const col = back === 'angel' ? '#FFF1B8' : '#8A6CC8';
+        pt.wingL = pivot(-.22, cy + .2, bz + .1); pt.wingR = pivot(.22, cy + .2, bz + .1); pt.wingBase = .45;
+        for (const [w, sx] of [[pt.wingL, -1], [pt.wingR, 1]]) {
+          add(col, sx * .42, .2, 0, .46, .32, .05, w, 1.1); add(col, sx * .76, .04, 0, .28, .2, .045, w, 1.1);
+          if (back === 'bat') for (const k of [0, 1, 2]) { const tip = add('#6B4FA0', sx * (.34 + k * .22), -.14, 0, .06, .12, .04, w, 1.1, CONE); tip.rotation.z = Math.PI; }
+        }
+      } else if (back === 'cape') {
+        const cp = add('#E8476A', 0, cy - .12, bz - .02, R * .95, R * 1.05, .05, body, 1.05, BOX); cp.rotation.x = .18;
+        add('#FFD54F', 0, cy + R * .45, bz + .12, .1, .1, .06, body, 1.1, STAR);
+      } else if (back === 'backpack') {
+        add('#FF9A3D', 0, cy - .02, bz - .06, .38, .42, .22, body, 1.06, BOX);
+        add('#FFC07A', 0, cy + .16, bz - .17, .4, .12, .06, body, 1.06, BOX);
+        add('#FFE27A', 0, cy - .08, bz - .2, .06, .06, .04, body, 0);
+      } else if (back === 'jetpack') {
+        for (const sx of [-1, 1]) {
+          add('#D9DEE8', sx * .13, cy, bz - .08, .1, .38, .1, body, 1.06, CYL);
+          const cap = add('#E8476A', sx * .13, cy + .24, bz - .08, .1, .12, .1, body, 1.08, CONE); cap.rotation.x = 0;
+        }
+        pt.flame = group(0, cy - .26, bz - .08, body);
+        for (const sx of [-1, 1]) { const fl = mesh(CONE, '', sx * .13, -.1, 0, .07, .18, .07, pt.flame, { mat: basic('#FF8A3D'), cast: false }); fl.rotation.x = Math.PI; }
+      } else if (back === 'balloon') {
+        pt.balloon = group(.34, cy - .1, -.05, body);
+        mesh(CYL, '#8E7A85', 0, .6, 0, .008, 1.2, .008, pt.balloon, { cast: false });
+        add('#FF6B7A', 0, 1.35, 0, .26, .3, .26, pt.balloon, 1.06);
+        add('#FFFFFF', -.08, 1.45, .2, .05, .07, .02, pt.balloon, 0);
+      }
+    }
+    // 목 장식 (있으면 변신 목도리 대신 이걸 둔다)
+    if (neck) {
+      const ny = cy - R * .62, nz = zAt(0, ny);
+      const ring = col => { const t = add(col, 0, ny, 0, R * .78, R * .78, R * .78, body, 1.03, new T.TorusGeometry(1, .07, 10, 32)); t.rotation.x = Math.PI / 2; };
+      if (neck === 'bowtie') { for (const sx of [-1, 1]) { const b = add('#E8476A', sx * .09, ny, nz - .02, .07, .12, .07, body, 1.1, CONE); b.rotation.z = sx * Math.PI / 2; } add('#FF8FA3', 0, ny, nz, .04, .04, .04, body, 1.1); }
+      else if (neck === 'scarf') { ring('#7ED9C3'); const tl = add('#7ED9C3', -.16, ny - .14, nz - .02, .08, .18, .04, body, 1.08, BOX); tl.rotation.z = .2; add('#FFFFFF', -.16, ny - .14, nz + .01, .085, .03, .02, body, 0, BOX); }
+      else if (neck === 'medal') { ring('#4E7BD9'); add('#FFD54F', 0, ny - .13, nz + .01, .1, .1, .03, body, 1.1, CYL).rotation.x = Math.PI / 2; add('#FFF3A8', 0, ny - .13, nz + .04, .05, .05, .02, body, 0, STAR); }
+      else if (neck === 'bell') { ring('#E8476A'); add('#FFD54F', 0, ny - .08, nz + .02, .08, .08, .08, body, 1.1); }
     }
     root.scale.setScalar(FORM_SCALE[form]);
     root.traverse(o => { if (o.isMesh) o.userData.pet = true; });
@@ -1883,7 +1933,7 @@ const World = (() => {
     compKey = key;
     comps.forEach(c => scene.remove(c.parts.root)); comps = [];
     list.forEach((d, k) => {
-      const parts = buildPet(d.sp, d.hat, d.form, d.tint);
+      const parts = buildPet(d.sp, d.hat, d.form, d.tint, d.back, d.neck);
       parts.root.scale.multiplyScalar(.82); parts.dirt.visible = false; parts.setFace('happy');
       parts.root.traverse(o => { o.userData.pet = false; o.userData.comp = d.idx; });
       scene.add(parts.root);
@@ -2037,6 +2087,8 @@ const World = (() => {
       if (pet.flL) { const f = walking ? Math.sin(cyc) * .5 : Math.sin(t * 2) * .1; pet.flL.rotation.z = -pet.flBase - f - wave * 1.6; pet.flR.rotation.z = pet.flBase - f; }
       if (pet.handL) { pet.handL.position.y = PET3.hamster.cy - .3 + wave * .2; }
       if (pet.tuft) pet.tuft.rotation.z = Math.sin(t * 3) * .2;
+      if (pet.flame) pet.flame.scale.set(1, .7 + Math.abs(Math.sin(t * 22)) * .6, 1);
+      if (pet.balloon) { pet.balloon.rotation.z = Math.sin(t * 1.3) * .12; pet.balloon.rotation.x = Math.sin(t * .9) * .08; }
       if (pet.orbit) { pet.orbit.rotation.y = t * 1.6; pet.orbit.children.forEach(s => { s.rotation.y = t * 3; }); }
       if (pet.rainbow) pet.rainbow.rotation.x = Math.sin(t * 4) * .12;
       st.blink -= dt; if (st.blink < 0) st.blink = rand(2.5, 5);
@@ -2249,8 +2301,8 @@ const World = (() => {
       st.mood = mood;
       if (!ok) { if (flat) flat.innerHTML = p.hatched ? petSVG(p.sp, { mood, stage: stageOf(p.level), hat: p.hat, dirt: Math.round(dirt * 10) / 10 }) : eggSVG(p.sp, p.taps); return; }
       const form = st.formHold !== null ? st.formHold : formOf(p.level);
-      const tint = p.hatched ? dyeColor(p) : null, key = p.hatched ? `${p.sp}|${p.hat}|${form}|${tint}` : `egg|${p.sp}|${p.taps}`;
-      if (key !== petKey) { if (pet) scene.remove(pet.root); pet = p.hatched ? buildPet(p.sp, p.hat, form, tint) : buildEgg(p.sp, p.taps); scene.add(pet.root); petKey = key; }
+      const tint = p.hatched ? dyeColor(p) : null, key = p.hatched ? `${p.sp}|${p.hat}|${form}|${tint}|${p.back || ''}|${p.neck || ''}` : `egg|${p.sp}|${p.taps}`;
+      if (key !== petKey) { if (pet) scene.remove(pet.root); pet = p.hatched ? buildPet(p.sp, p.hat, form, tint, p.back, p.neck) : buildEgg(p.sp, p.taps); scene.add(pet.root); petKey = key; }
       if (pet.setFace) { pet.setFace(mood); pet.setDirt(dirt); }
     },
     place(x, z) { trail = []; if (ok && st.area !== 'house') setArea('house'); st.x = x; st.z = z; st.path = []; st.mode = 'idle'; st.at = null; st.lift = 0; st.camX = clamp(x, -4.4, 4.4); st.camZ = clamp(z, -4.4, 5); },
@@ -2773,7 +2825,8 @@ function firstMeet(id) {
 function menu(id, greet) {
   const p = P();
   return {
-    text: greet ? (SEASON && Math.random() < .35 ? pick(['해피 할로윈! 🎃 마을에 사탕이 숨어 있대!', '호박 등불 봤어? 밤이 되면 더 예뻐!', '나는 할로윈에 유령 분장을 할 거야! 우우~']) : pick(GREET[id](p))) : '또 무슨 이야기 할까?',
+    text: greet && (p.back || p.neck) && Math.random() < .3 ? pick([`우와, ${WEAR[p.back || p.neck].name}! 정말 멋지다!`, `${josa(p.name, '이', '')} 오늘 멋 좀 냈네? ${WEAR[p.back || p.neck].e}`, `나도 ${WEAR[p.back || p.neck].name} 갖고 싶다~`])
+      : greet ? (SEASON && Math.random() < .35 ? pick(['해피 할로윈! 🎃 마을에 사탕이 숨어 있대!', '호박 등불 봤어? 밤이 되면 더 예뻐!', '나는 할로윈에 유령 분장을 할 거야! 우우~']) : pick(GREET[id](p))) : '또 무슨 이야기 할까?',
     choices: [{ label: '💬 이야기하자', fn: () => chat(id) }, ...SPECIAL[id](), followChoice(id), { label: '👋 안녕!', fn: bye }]
   };
 }
@@ -3369,7 +3422,7 @@ function framePhoto(src, sw, sh, bg) {
   x.drawImage(src, pad + (W - dw) / 2, pad + (ih - dh) / 2, dw, dh);
   const p = P(), d = new Date();
   x.fillStyle = INK; x.font = `24px ${getComputedStyle(document.body).getPropertyValue('--display') || 'sans-serif'}`; x.textBaseline = 'middle';
-  x.fillText(`${p.name} · Lv.${p.level}`, pad + 4, ih + pad + foot / 2);
+  x.fillText(`${p.name} · Lv.${p.level}${p.title ? ' · ' + titleName(p.title) : ''}`, pad + 4, ih + pad + foot / 2);
   x.font = '15px sans-serif'; x.textAlign = 'right'; x.fillStyle = '#8E7A85';
   x.fillText(`${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()}`, c.width - pad - 4, ih + pad + foot / 2);
   return c.toDataURL('image/jpeg', .82);
@@ -3960,6 +4013,33 @@ function openStickers() {
     body => body.addEventListener('click', e => { const tb = e.target.closest('[data-mtab]'); if (tb) openMissions(tb.dataset.mtab); }));
 }
 
+/* ---------- 아바타 꾸미기: 등 장식·목 장식(코인으로 사서 모든 펫이 같이 씀)과 칭호(배지를 따면 열림) ----------
+   저장: S.wear = 가진 장식 id 목록, 펫마다 p.back · p.neck · p.title (없으면 예전 모습 그대로) */
+const WEAR = {
+  angel:    { slot: 'back', e: '🕊️', name: '천사 날개',  price: 90 },
+  bat:      { slot: 'back', e: '🦇', name: '박쥐 날개',  price: 90 },
+  cape:     { slot: 'back', e: '🦸', name: '영웅 망토',  price: 70 },
+  backpack: { slot: 'back', e: '🎒', name: '탐험 가방',  price: 60 },
+  jetpack:  { slot: 'back', e: '🚀', name: '로켓 가방',  price: 130 },
+  balloon:  { slot: 'back', e: '🎈', name: '빨간 풍선',  price: 40 },
+  bowtie:   { slot: 'neck', e: '🎀', name: '나비넥타이', price: 30 },
+  scarf:    { slot: 'neck', e: '🧣', name: '민트 목도리', price: 40 },
+  medal:    { slot: 'neck', e: '🥇', name: '금메달',    price: 60 },
+  bell:     { slot: 'neck', e: '🔔', name: '방울 목걸이', price: 35 }
+};
+// 칭호: 처음부터 쓸 수 있는 것 하나 + 배지를 따면 열리는 것들 (돈으로는 못 산다)
+const TITLES = [
+  { id: 'newbie', name: '새내기 집사' },
+  { id: 'village', name: '마을 탐험가', badge: 'village' }, { id: 'obby', name: '점프왕', badge: 'obby' },
+  { id: 'obbyFast', name: '번개 점프', badge: 'obbyFast' }, { id: 'obbyAll', name: '코스 정복자', badge: 'obbyAll' },
+  { id: 'explorer', name: '꼬마 탐험가', badge: 'explorer' }, { id: 'racer', name: '달리기 왕', badge: 'racer' },
+  { id: 'chef', name: '꼬마 요리사', badge: 'chef' }, { id: 'farmer', name: '꼬마 농부', badge: 'farmer' },
+  { id: 'bestie', name: '인기쟁이', badge: 'bestie' }, { id: 'merchant', name: '꼬마 사장님', badge: 'merchant' },
+  { id: 'decor', name: '인테리어 장인', badge: 'decor' }, { id: 'form4', name: '무지개 전설', badge: 'form4' }
+];
+const titleOpen = t => !t.badge || !!(S.badges && S.badges[t.badge]);
+const titleName = id => (TITLES.find(t => t.id === id) || {}).name || '';
+
 /* ---------- 펫 염색 (내 펫만의 색) ---------- */
 const DYES = { base: ['원래 색', null, 0], pink: ['딸기우유', '#FFC9DA', 40], mint: ['민트', '#BFF0E0', 40], sky: ['하늘', '#CDE8FF', 40], lemon: ['레몬', '#FFF1A8', 40], lavender: ['라벤더', '#DCD0FF', 40], choco: ['초코', '#D9B08C', 40] };
 const dyeColor = p => (DYES[p.dye] || DYES.base)[1];
@@ -3972,7 +4052,7 @@ const SELL = { carrot: 4, strawberry: 5, tomato: 9, corn: 12, pumpkin: 25 };
 let rainUntil = 0;
 function companionList() {
   return S.pets.map((q, i) => ({ q, i })).filter(o => o.i !== S.active && o.q.hatched).slice(0, 2)
-    .map(({ q, i }) => ({ sp: q.sp, hat: q.hat, form: formOf(q.level), tint: dyeColor(q), idx: i }));
+    .map(({ q, i }) => ({ sp: q.sp, hat: q.hat, form: formOf(q.level), tint: dyeColor(q), back: q.back, neck: q.neck, idx: i }));
 }
 function switchPet(idx) {
   if (bathing || gameOn || talking || idx === S.active || !S.pets[idx]) return;
@@ -4018,6 +4098,7 @@ function openStand() {
 function goStand() { World.area() === 'village' ? World.goVillage('garden', true, openStand) : openStand(); }
 
 const NEWS = [
+  { v: '2.2', date: '10월 30일', items: ['🦸 상점 > 꾸미기: 천사·박쥐 날개, 영웅 망토, 로켓 가방, 풍선, 목도리, 금메달…', '🏷️ 배지를 따면 칭호가 열려요. 이름 아래에 보여요', '💬 마을 친구들이 새 모습을 알아봐 줘요'] },
   { v: '2.1', date: '10월 30일', items: ['🌈 점프 코스가 5단계로! 구름 징검다리 · 사라지는 발판 · 빙글빙글 막대 · 무지개 탑', '🟡 점프대를 밟으면 하늘 높이 슈웅!', '🏆 단계마다 최고 기록, 다 깨면 코스 정복자 배지'] },
   { v: '2.0', date: '10월 30일', items: ['🕹️ 화면을 끌거나 WASD·방향키로 펫을 직접 조종해요. 점프 버튼(스페이스바)도 생겼어요', '🔎 집과 마을에 숨은 스티커 30개! 5개마다 선물, 높이 뜬 스티커는 점프로 잡아요', '🥚 알은 세 번만 톡톡, 걷는 속도도 빨라졌어요'] },
   { v: '1.9', date: '10월 29일', items: ['📷 방 왼쪽 📷 버튼으로 펫 사진을 찍고 설정 > 사진 앨범에서 볼 수 있어요', '🎵 집·마을·점프 코스마다 다른 배경음악 (설정에서 끌 수 있어요)', '💾 보호자 메뉴에서 기록 백업 코드를 만들고 되살릴 수 있어요', '⌨️ 키보드와 Esc 키로도 놀 수 있어요'] },
@@ -4118,13 +4199,35 @@ function openShop(tab = 'hat') {
     const own = ds.owned.includes(id), on = !!ds.placed[id];
     return `<div class="item decor${on ? ' on' : ''}"><span class="em">${DECOR[id].e}</span><span class="nm">${DECOR[id].name}</span>${own ? `<span class="dbtns"><button class="mini-btn" data-place="${id}">${on ? '옮기기' : '놓기'}</button>${on ? `<button class="mini-btn" data-store="${id}">넣기</button>` : ''}</span>` : `<button class="mini-btn buy" data-buyd="${id}">${priceTag(DECOR[id].price)}</button>`}</div>`;
   }).join('');
+  const wearOwned = S.wear || [];
+  const wearGrid = slot => Object.entries(WEAR).filter(([, w]) => w.slot === slot).map(([id, w]) => {
+    const own = wearOwned.includes(id), on = p[slot] === id;
+    return `<button class="item${on ? ' on' : ''}" data-wear="${id}"><span class="em">${w.e}</span><span class="nm">${w.name}</span>${own ? `<span class="pr">${on ? '하는 중 · 빼기' : '가지고 있어요'}</span>` : priceTag(w.price)}</button>`;
+  }).join('');
+  const titleHTML = TITLES.map(t => {
+    const open = titleOpen(t), on = p.title === t.id;
+    return `<button data-title="${t.id}" class="${on ? 'on' : ''}"${open ? '' : ' disabled'}>${open ? '' : '🔒 '}${t.name}${open ? '' : `<small>${BADGES[t.badge] ? BADGES[t.badge][2] : ''}</small>`}</button>`;
+  }).join('');
+  const wearHTML = `<p class="msub">한 번 사면 모든 펫이 같이 쓸 수 있어요. 칭호는 배지를 따면 열려요.</p><h3 class="wear-h">🪽 등 장식</h3><div class="grid">${wearGrid('back')}</div><h3 class="wear-h">🎀 목 장식</h3><div class="grid">${wearGrid('neck')}</div><h3 class="wear-h">🏷️ 칭호</h3><div class="titles">${titleHTML}</div>`;
   const dyes = S.dyes || [];
   const dyeHTML = Object.entries(DYES).map(([k, [name, col, price]]) => {
     const own = k === 'base' || dyes.includes(k), on = (p.dye || 'base') === k;
     return `<button class="item${on ? ' on' : ''}" data-dye="${k}"><span class="swatch dye" style="background:${col || 'linear-gradient(135deg,#FFFFFF 50%,#EADDE3 50%)'}"></span><span class="nm">${name}</span>${own ? `<span class="pr">${on ? '지금 색' : '가지고 있어요'}</span>` : priceTag(price)}</button>`;
   }).join('');
-  openSheet('반짝 상점', `<div class="tabs" role="tablist"><button role="tab" aria-selected="${tab === 'hat'}" data-tab="hat">모자</button><button role="tab" aria-selected="${tab === 'dye'}" data-tab="dye">염색</button><button role="tab" aria-selected="${tab === 'decor'}" data-tab="decor">가구</button><button role="tab" aria-selected="${tab === 'room'}" data-tab="room">벽지</button></div><div class="grid">${tab === 'hat' ? hatHTML : tab === 'dye' ? dyeHTML : tab === 'decor' ? decorHTML : roomHTML}</div>`,
+  openSheet('반짝 상점', `<div class="tabs" role="tablist"><button role="tab" aria-selected="${tab === 'hat'}" data-tab="hat">모자</button><button role="tab" aria-selected="${tab === 'wear'}" data-tab="wear">꾸미기</button><button role="tab" aria-selected="${tab === 'dye'}" data-tab="dye">염색</button><button role="tab" aria-selected="${tab === 'decor'}" data-tab="decor">가구</button><button role="tab" aria-selected="${tab === 'room'}" data-tab="room">벽지</button></div>${tab === 'wear' ? wearHTML : `<div class="grid">${tab === 'hat' ? hatHTML : tab === 'dye' ? dyeHTML : tab === 'decor' ? decorHTML : roomHTML}</div>`}`,
     body => body.addEventListener('click', e => {
+      const wr = e.target.closest('[data-wear]');
+      if (wr) {
+        const id = wr.dataset.wear, w = WEAR[id]; S.wear = S.wear || [];
+        if (!S.wear.includes(id)) {
+          if (S.coins < w.price) return toast(`코인이 ${w.price - S.coins}개 모자라요`);
+          S.coins -= w.price; S.wear.push(id); sfx('buy'); toast(`${w.e} ${josa(w.name, '을', '를')} 샀어요!`); p[w.slot] = id;
+        } else p[w.slot] = p[w.slot] === id ? null : id;
+        if (p.hatched && p[w.slot]) { setMood('love', 1400); World.trick('spin'); say(pick(['어때요? 멋지죠?', '짜잔! 새 모습이에요!', `${w.name} 너무 좋아!`])); }
+        render(); persist(); return openShop('wear');
+      }
+      const ti = e.target.closest('[data-title]');
+      if (ti && !ti.disabled) { p.title = p.title === ti.dataset.title ? null : ti.dataset.title; sfx('pop'); if (p.title) toast(`🏷️ 칭호: ${titleName(p.title)}`); render(); persist(); return openShop('wear'); }
       const dy = e.target.closest('[data-dye]');
       if (dy) {
         const k = dy.dataset.dye, [name, , price] = DYES[k]; S.dyes = S.dyes || [];
