@@ -350,6 +350,17 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
 .backup .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .backup .row .candy{flex:1;min-width:120px;font-size:15px}
 .warn{background:#FFF1D6;border-radius:12px;padding:10px 12px;font-size:13.5px;line-height:1.5;margin-top:8px}
+.jump-mini{position:absolute;right:10px;bottom:66px;z-index:6;width:58px;height:58px;border-radius:50%;border:0;background:var(--coral);color:#fff;font-family:var(--display);font-size:16px;box-shadow:0 5px 0 #B54A60,0 0 0 3px #fff inset;touch-action:manipulation}
+.jump-mini:active{transform:translateY(3px);box-shadow:0 2px 0 #B54A60,0 0 0 3px #fff inset}
+.drag-ring{position:absolute;width:96px;height:96px;margin:-48px 0 0 -48px;border-radius:50%;background:rgba(255,255,255,.35);box-shadow:0 0 0 3px rgba(91,69,80,.45) inset;pointer-events:none;z-index:6;display:grid;place-items:center}
+.drag-ring i{width:42px;height:42px;border-radius:50%;background:var(--paper);box-shadow:0 0 0 3px var(--ink) inset}
+.stk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:8px}
+.stk{display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--soft);border-radius:14px;padding:8px 2px 6px;box-shadow:0 0 0 2px var(--line) inset;font-size:11px;color:var(--muted)}
+.stk b{font-size:28px;line-height:1.1;font-weight:400}
+.stk.got{background:#FFF7D6;box-shadow:0 0 0 2.5px var(--ink) inset;color:var(--ink)}
+.gift-row{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 12px}
+.gift-row span{font-size:12.5px;padding:4px 9px;border-radius:99px;background:var(--soft);box-shadow:0 0 0 1.5px var(--line) inset}
+.gift-row span.got{background:var(--butter);box-shadow:0 0 0 2px var(--ink) inset}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
 
@@ -384,7 +395,7 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
     </header>
     <div class="stats gut" id="stats"></div>
     <div class="room" id="room">
-      <canvas id="world" tabindex="0" role="application"aria-label="말랑 친구의 집. 바닥을 누르면 그쪽으로 걸어가고, 친구를 누르면 쓰다듬어요. 키보드: 방향키로 걷고, Enter나 스페이스바로 쓰다듬어요." aria-describedby="bubble"></canvas>
+      <canvas id="world" tabindex="0" role="application" aria-label="말랑 친구의 집. 화면을 끌면 그쪽으로 직접 달리고, 바닥을 누르면 걸어가고, 친구를 누르면 쓰다듬어요. 키보드: 방향키나 WASD로 달리고, 스페이스바로 점프, Enter로 쓰다듬어요." aria-describedby="bubble"></canvas>
       <div class="tags" id="tags"></div>
       <div class="room-tabs" id="roomTabs">
         <button data-go="living">🛋️ 거실</button><button data-go="kitchen">🍳 부엌</button><button data-go="bedroom">🛏️ 침실</button><button data-go="bath">🛁 욕실</button><button data-go="door">🚪 밖으로</button>
@@ -397,6 +408,7 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
       <div class="flash" id="flash"></div>
       <button class="quest" id="questBtn" hidden></button>
       <button class="photo-btn" id="photoBtn" aria-label="사진 찍기">📷</button>
+      <button class="jump-mini" id="jumpBtn" aria-label="점프">점프</button>
       <button class="emote-btn" id="emoteBtn" aria-label="감정 표현" aria-expanded="false" aria-controls="emoteTray">😀</button>
       <div class="emote-tray" id="emoteTray" role="group" aria-label="감정 표현 고르기" hidden><button data-emote="wave">👋<small>인사</small></button><button data-emote="dance">💃<small>춤</small></button><button data-emote="spin">🌀<small>빙글</small></button><button data-emote="jump">🙌<small>점프</small></button><button data-emote="hop">🎵<small>신나!</small></button></div>
       <div class="fade" id="fade"></div>
@@ -632,7 +644,7 @@ const STATS = [
 // 분당 변화량. 아이 게임이라 절대 0이 되지 않고(최저 8), 오래 비워 둬도 펫이 아프거나 떠나지 않는다.
 const DECAY_AWAKE  = { hunger: -1.0, fun: -0.8, clean: -0.5, energy: -0.5 };
 const DECAY_ASLEEP = { hunger: -0.4, fun: 0,    clean: -0.2, energy: 3.5 };
-const FLOOR = 8, HATCH_TAPS = 5, ADOPT_PRICE = 100;
+const FLOOR = 8, HATCH_TAPS = 3, ADOPT_PRICE = 100;
 const needXP = lv => 30 + lv * 15;
 const stageOf = lv => lv < 5 ? 'baby' : lv < 10 ? 'kid' : 'adult';
 const STAGE_KO = { baby: '아기', kid: '어린이', adult: '어른' };
@@ -761,7 +773,8 @@ function idleLine() {
   const fav = FOODS.find(f => f.id === SPECIES[p.sp].fav);
   return pick([
     `${p.name} 기분 최고!`, '쓰다듬어 주면 좋겠다~', '오늘은 뭐 하고 놀까?', '나랑 놀아 줘서 고마워!',
-    `${fav.name} 먹고 싶다…`, '새 모자 써 보고 싶어!', '천천히 건강하게 크고 싶어!'
+    `${fav.name} 먹고 싶다…`, '새 모자 써 보고 싶어!', '천천히 건강하게 크고 싶어!',
+    ...(S.stickers && S.stickers.found.length >= STICKERS.length ? [] : ['어딘가 스티커가 반짝이는 것 같아! 화면을 끌어서 찾아볼까?', '점프 버튼으로 높이 뛰어 볼래?'])
   ]);
 }
 function addXP(n) {
@@ -841,6 +854,7 @@ function renderHUD() {
   const inObby = World.area() === 'obby';
   $('#roomTabs').hidden = outside || inObby; $('#villageTabs').hidden = !outside;
   $('#photoBtn').hidden = egg || inObby || bathing || !!placing;
+  $('#jumpBtn').hidden = egg || inObby || bathing || !!placing || !!p.asleep;
   $('#emoteBtn').hidden = egg || inObby; if (inObby || egg) { $('#emoteTray').hidden = true; $('#emoteBtn').setAttribute('aria-expanded', 'false'); }
   renderQuest(inObby);
   document.querySelectorAll('#roomTabs button').forEach(b => { b.disabled = egg || bathing || p.asleep; b.classList.toggle('on', b.dataset.go === World.roomNow()); });
@@ -891,7 +905,10 @@ const World = (() => {
   const pickH = [], pickV = [];
   let curPick = pickH, curParent = null;
   const st = { area: 'house', x: -4, z: 4.6, face: 0, faceGoal: 0, path: [], run: false, mode: 'idle', idleT: 3, arrive: null, at: null, lift: 0,
-    trick: null, trickT: 0, t: 0, blink: 3, camX: -4, camZ: 4.6, mood: 'normal', formHold: null, eatT: 0, flick: 0 };
+    trick: null, trickT: 0, t: 0, blink: 3, camX: -4, camZ: 4.6, mood: 'normal', formHold: null, eatT: 0, flick: 0, driving: false };
+  // 직접 조종 입력 (화면 끌기·WASD). 길: x = 오른쪽, z = 화면 아래쪽. 크기 0~1
+  const drive = { x: 0, z: 0 };
+  let stickers = [], onSticker = null;
   const cache = {};
   const toon = c => cache[c] || (cache[c] = new T.MeshToonMaterial({ color: c, gradientMap: grad }));
   let SPH, BOX, CYL, CONE, STAR, HALF;
@@ -1855,11 +1872,32 @@ const World = (() => {
   }
 
   /* ---------- 매 프레임 ---------- */
+  // 집 안 직접 이동: 바깥벽 안쪽에서만, 가운데 십자 벽(x=0, z=0)은 문(±4) 자리로만 지나간다
+  function houseMove(x, z, nx, nz) {
+    const L = 7.3, W = .45, door = v => Math.abs(v - 4) < .9 || Math.abs(v + 4) < .9;
+    nx = clamp(nx, -L, L); nz = clamp(nz, -L, L);
+    if (Math.abs(nx) < W && !door(z)) nx = x;
+    if (Math.abs(nz) < W && !door(nx)) nz = z;
+    if (Math.abs(nx) < W && !door(nz)) nz = z;
+    return [nx, nz];
+  }
   function think(dt, p) {
     if (race) return;
+    if ((drive.x || drive.z) && p.hatched && !p.asleep && !bathing && !talking && st.area !== 'obby') {
+      // 아이가 직접 조종하면 자동 걷기·가구 자리는 바로 풀고 그쪽으로 달린다
+      const l = Math.min(1, Math.hypot(drive.x, drive.z)), a = Math.atan2(drive.x, drive.z), sp = (2.2 + 3.4 * l) * dt;
+      st.path = []; st.mode = 'idle'; st.arrive = null; st.at = null; st.lift = 0; st.idleT = 6; st.driving = true; st.run = l > .55;
+      let nx = st.x + Math.sin(a) * sp, nz = st.z + Math.cos(a) * sp;
+      if (st.area === 'village') { [nx, nz] = clampVillage(nx - VX, nz); nx += VX; }
+      else [nx, nz] = houseMove(st.x, st.z, nx, nz);
+      st.x = nx; st.z = nz; st.faceGoal = a;
+      if (st.eatT > 0) st.eatT -= dt;
+      return;
+    }
+    st.driving = false;
     const free = p.hatched && !p.asleep && !bathing && !gameOn && !scrim && !talking && !document.querySelector('.mini, .race-ui') && !hide && st.mode === 'idle' && !st.trick && st.eatT <= 0;
     if (st.mode === 'walk' && st.path.length) {
-      const [tx, tz] = st.path[0], dx = tx - st.x, dz = tz - st.z, d = Math.hypot(dx, dz), sp = (st.run ? 4.2 : 1.8) * dt;
+      const [tx, tz] = st.path[0], dx = tx - st.x, dz = tz - st.z, d = Math.hypot(dx, dz), sp = (st.run ? 5 : 2.4) * dt;
       if (d <= sp) {
         st.x = tx; st.z = tz; st.path.shift();
         if (!st.path.length) { st.mode = 'idle'; st.idleT = rand(2.5, 5); st.faceGoal = 0; const cb = st.arrive; st.arrive = null; cb && cb(); }
@@ -1893,7 +1931,7 @@ const World = (() => {
 
   function animate(dt, p) {
     if (!pet) return;
-    const t = st.t, walking = (st.mode === 'walk' && st.path.length > 0) || !!(race && race.t >= 0) || (st.area === 'obby' && st.obMove), cyc = t * (st.run ? 16 : 10);
+    const t = st.t, walking = (st.mode === 'walk' && st.path.length > 0) || st.driving || !!(race && race.t >= 0) || (st.area === 'obby' && st.obMove), cyc = t * (st.run ? 16 : 10);
     st.face = turn(st.face, st.faceGoal, dt * 9);
     let y = st.lift, rx = 0, ry = st.face, rz = 0, sx = 1, sy = 1;
     if (pet.isEgg) {
@@ -1948,6 +1986,14 @@ const World = (() => {
     else for (let left = dt; left > 1e-4; left -= .05) think(Math.min(.05, left), p);
     animate(Math.min(dt, .1), p);
     moveCompanions(Math.min(dt, .1));
+    for (let i = stickers.length - 1; i >= 0; i--) {
+      const sk = stickers[i], u = sk.userData; if (u.area !== st.area) continue;
+      sk.position.y = u.y + Math.sin(st.t * 3 + i) * .1; sk.material.rotation = Math.sin(st.t * 2 + i) * .25;
+      const near = Math.hypot(sk.position.x - st.x, sk.position.z - st.z) < 1.15;
+      const reach = !u.high || (st.trick === 'jump' && st.trickT > .1 && st.trickT < .45);
+      if (near && reach) { sk.parent && sk.parent.remove(sk); stickers.splice(i, 1); onSticker && onSticker(u.idx); }
+      else if (near && u.high && !u.told) { u.told = true; say('위에 스티커가 떠 있어요! 점프해서 잡아요 ⬆️', 2500); }
+    }
     // 공 굴리기
     if (ball) {
       const b = ball; b.m.position.x += b.vx * dt; b.m.position.z += b.vz * dt; b.vx *= 1 - 1.4 * dt; b.vz *= 1 - 1.4 * dt;
@@ -2027,12 +2073,30 @@ const World = (() => {
       const h = hitAt(e.clientX, e.clientY);
       if (h && h.o.userData.pet) rubPet(x, y);
     };
-    cv.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY }; if (bathing) { cv.setPointerCapture?.(e.pointerId); rub(e); } });
-    cv.addEventListener('pointermove', e => { if (bathing) rub(e); });
+    let ring = null, dragging = false;
+    const canDrive = () => !bathing && !placing && st.area !== 'obby' && !talking && P() && P().hatched && !P().asleep;
+    const stopDrive = () => { drive.x = 0; drive.z = 0; dragging = false; ring && ring.remove(); ring = null; };
+    cv.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY, id: e.pointerId }; try { cv.setPointerCapture(e.pointerId); } catch (err) {} if (bathing) rub(e); });
+    cv.addEventListener('pointermove', e => {
+      if (bathing) return rub(e);
+      if (!down || e.pointerId !== down.id || !canDrive()) return;
+      const dx = e.clientX - down.x, dy = e.clientY - down.y, d = Math.hypot(dx, dy);
+      if (!dragging && d > 14) {
+        dragging = true; const r = room.getBoundingClientRect();
+        ring = document.createElement('div'); ring.className = 'drag-ring'; ring.innerHTML = '<i></i>';
+        ring.style.left = (down.x - r.left) + 'px'; ring.style.top = (down.y - r.top) + 'px'; room.appendChild(ring);
+      }
+      if (!dragging) return;
+      const k = Math.min(1, d / 60), nx = dx / (d || 1), ny = dy / (d || 1);
+      drive.x = nx * k; drive.z = ny * k;
+      ring.firstChild.style.transform = `translate(${nx * k * 28}px, ${ny * k * 28}px)`;
+    });
+    cv.addEventListener('pointercancel', () => { down = null; stopDrive(); });
     cv.addEventListener('pointerup', e => {
       if (!down) return;
+      const wasDrag = dragging; stopDrive();
       const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y); down = null;
-      if (moved > 12 || bathing) return;
+      if (wasDrag || moved > 12 || bathing) return;
       const h = hitAt(e.clientX, e.clientY);
       if (h && onTap) onTap(h);
     });
@@ -2202,6 +2266,18 @@ const World = (() => {
       });
     },
     raceTap() { if (race && race.t >= 0) race.boost = Math.min(5, race.boost + .7); },
+    drive,
+    spawnStickers(list, cb) {
+      stickers.forEach(sk => sk.parent && sk.parent.remove(sk)); stickers = []; onSticker = cb;
+      if (!ok) return;
+      for (const it of list) {
+        const sp = emojiSprite(it.e, it.high ? .62 : .55), y = it.high ? 1.75 : .6;
+        let x = it.x, z = it.z;
+        if (it.area === 'village') { [x, z] = clampVillage(x, z); x += VX; }
+        sp.position.set(x, y, z); Object.assign(sp.userData, { idx: it.i, area: it.area, y, high: !!it.high });
+        (it.area === 'village' ? villageG : houseG).add(sp); stickers.push(sp);
+      }
+    },
     snapshot() { if (!ok || !renderer) return null; placeBubble(); renderer.render(scene, camera); return renderer.domElement; },
     raceCancel() { if (race) { race.n.racing = false; st.run = false; race = null; } },
     portrait(id) {
@@ -2278,14 +2354,32 @@ World.onTap = hit => {
 // 키보드로 3D 방 조작: 방향키 = 그쪽으로 몇 걸음, Enter·스페이스 = 쓰다듬기(알이면 톡톡). 점프 코스는 따로 키를 받는다
 $('#world').addEventListener('keydown', e => {
   const p = P(); if (!p || talking || bathing || placing || World.area() === 'obby' || $('#home').hidden) return;
-  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (!e.repeat) patPet(); return; }
-  const dir = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
-  if (!dir) return;
-  e.preventDefault();
-  if (!p.hatched) return say('알에서 깨어나면 같이 걸어요! Enter로 톡톡 깨워 주세요', 2500);
-  if (p.asleep) return say('쿨쿨… (자고 있어요. 깨우려면 ☀️ 버튼!)', 2500);
-  const st = World.st; World.goTo(st.x + dir[0] * 1.8, st.z + dir[1] * 1.8, false);
+  if (e.key === 'Enter') { e.preventDefault(); if (!e.repeat) patPet(); }
 });
+// 방향키·WASD = 직접 달리기, 스페이스 = 점프. 창이 떠 있거나 글자를 쓰는 중이면 받지 않는다 (점프 코스는 따로 받는다)
+const driveKeys = {};
+const DRIVE_MAP = { ArrowLeft: 'l', a: 'l', A: 'l', ArrowRight: 'r', d: 'r', D: 'r', ArrowUp: 'u', w: 'u', W: 'u', ArrowDown: 'd', s: 'd', S: 'd' };
+function driveBlocked() {
+  const a = document.activeElement, typing = a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA');
+  return typing || $('#home').hidden || World.area() === 'obby' || !!scrim || !!talking || gameOn || !!document.querySelector('.mini, .race-ui, .gate-wrap, .rest');
+}
+function applyDriveKeys() {
+  const d = World.drive; d.x = (driveKeys.r ? 1 : 0) - (driveKeys.l ? 1 : 0); d.z = (driveKeys.d ? 1 : 0) - (driveKeys.u ? 1 : 0);
+  const l = Math.hypot(d.x, d.z); if (l > 1) { d.x /= l; d.z /= l; }
+}
+window.addEventListener('keydown', e => {
+  if (driveBlocked()) return;
+  const k = DRIVE_MAP[e.key];
+  if (k) { e.preventDefault(); driveKeys[k] = true; return applyDriveKeys(); }
+  if (e.key === ' ' && (document.activeElement === document.body || document.activeElement === $('#world'))) { e.preventDefault(); if (!e.repeat) doJump(); }
+});
+window.addEventListener('keyup', e => { const k = DRIVE_MAP[e.key]; if (k && driveKeys[k]) { driveKeys[k] = false; applyDriveKeys(); } });
+window.addEventListener('blur', () => { for (const k in driveKeys) driveKeys[k] = false; applyDriveKeys(); });
+function doJump() {
+  const p = P(); if (!p || !p.hatched || p.asleep || bathing || World.area() === 'obby') return;
+  World.trick('jump'); sfx('pop');
+}
+$('#jumpBtn').addEventListener('click', () => doJump());
 function useThing(use) {
   if (use.startsWith('decor:')) return useDecor(use.slice(6));
   if (use === 'cook') return openCook();
@@ -2358,7 +2452,7 @@ function tapEgg() {
       sfx('hatch'); confetti(100);
       setMood('happy', 2500);
       render(); World.trick('jump'); burst(['✨', '⭐', '💖'], 8, -.2);
-      say(`안녕! 나는 ${p.name}! 잘 부탁해!`, 6000);
+      say(`안녕! 나는 ${p.name}! 화면을 끌면 나를 직접 움직일 수 있어! 숨은 스티커도 찾아 줘!`, 7000);
       persist();
     }, 260);
   } else say(['톡! 알이 살짝 흔들려요', '안에서 꼼지락거려요!', '눈이 보여요! 조금만 더!', '거의 다 됐어요!'][p.taps - 1] + ` (${p.taps}/${HATCH_TAPS})`, 4000);
@@ -2934,6 +3028,7 @@ function openMissions(tab = 'm') {
   if (tab === 'b') return openBadges();
   if (tab === 'e') return openSeason();
   if (tab === 'n') return openNews();
+  if (tab === 's') return openStickers();
   const m = todayMissions();
   const rows = m.list.map((it, i) => {
     const M = MISSIONS[it.id], done = it.prog >= M.goal;
@@ -3496,6 +3591,7 @@ $('#emoteTray').addEventListener('click', e => {
 
 /* ---------- 배지 ---------- */
 const BADGES = {
+  explorer: ['🔎', '꼬마 탐험가', '숨은 스티커 30개 모두 찾기'],
   hatch:    ['🐣', '첫 부화', '알에서 친구가 태어났어요'],
   form1:    ['🌱', '첫 변신', 'Lv.5 어린이로 변신'],
   form2:    ['🌟', '어른 변신', 'Lv.10 어른으로 변신'],
@@ -3524,7 +3620,7 @@ function badge(id) {
   S.badges[id] = today(); persist();
   setTimeout(() => { toast(`🏅 배지 획득! ${BADGES[id][0]} ${BADGES[id][1]}`); sfx('hatch'); confetti(40); }, 900);
 }
-const missionTabs = t => `<div class="tabs" role="tablist"><button role="tab" data-mtab="m" aria-selected="${t === 'm'}">📋 놀이 목표</button><button role="tab" data-mtab="b" aria-selected="${t === 'b'}">🏅 배지</button>${seasonState() ? `<button role="tab" data-mtab="e" aria-selected="${t === 'e'}">${SEASON ? '🎃 축제' : '🍬 사탕'}</button>` : ''}<button role="tab" data-mtab="n" aria-selected="${t === 'n'}">📰 소식</button></div>`;
+const missionTabs = t => `<div class="tabs" role="tablist"><button role="tab" data-mtab="m" aria-selected="${t === 'm'}">📋 목표</button><button role="tab" data-mtab="b" aria-selected="${t === 'b'}">🏅 배지</button>${seasonState() ? `<button role="tab" data-mtab="e" aria-selected="${t === 'e'}">${SEASON ? '🎃 축제' : '🍬 사탕'}</button>` : ''}<button role="tab" data-mtab="s" aria-selected="${t === 's'}">🔎 탐험</button><button role="tab" data-mtab="n" aria-selected="${t === 'n'}">📰 소식</button></div>`;
 function openBadges() {
   const got = S.badges || {}, n = Object.keys(got).length;
   openSheet('배지 수집첩', `${missionTabs('b')}<p class="msub">${n} / ${Object.keys(BADGES).length}개 모았어요</p><div class="badges">${Object.entries(BADGES).map(([k, [e, name, how]]) => `<div class="badge-card${got[k] ? ' got' : ''}"><span class="be">${got[k] ? e : '🔒'}</span><b>${name}</b><small>${how}</small></div>`).join('')}</div>`,
@@ -3538,7 +3634,7 @@ function openBadges() {
 const CHAPTERS = ['', '1장 · 우리 집', '2장 · 말랑 마을', '3장 · 꼬마 농부', '4장 · 마을의 모험가'];
 const CH_SUB = ['', '새 친구를 돌봐 주세요', '마을 친구들을 만나러 가요', '텃밭에서 채소를 키워요', '마을 최고의 모험가에 도전!'];
 const STORY = [
-  { id: 'hatch',   ch: 1, text: '알을 톡톡 깨우기',            goal: 1,  reward: 20, hint: '알을 다섯 번 톡톡 눌러 봐요!' },
+  { id: 'hatch',   ch: 1, text: '알을 톡톡 깨우기',            goal: 1,  reward: 20, hint: '알을 세 번 톡톡 눌러 봐요!' },
   { id: 'pat',     ch: 1, text: '친구를 3번 쓰다듬기',         goal: 3,  reward: 15, go: 'pet' },
   { id: 'feed',    ch: 1, text: '부엌에서 밥 먹이기',          goal: 1,  reward: 15, go: 'feed' },
   { id: 'bath',    ch: 1, text: '욕실에서 반짝반짝 목욕하기',   goal: 1,  reward: 20, go: 'bath' },
@@ -3695,6 +3791,57 @@ function openSeason() {
     }));
 }
 
+/* ---------- 숨은 스티커 찾기: 집 10개 + 마을 20개. 직접 달려가서 줍고, 위에 뜬 건 점프로 잡는다 ----------
+   날짜와 상관없이 한 번 찾은 건 계속 내 것. 다섯 개마다 선물이 한 번씩 (모두 정해진 개수라 끝없이 늘지 않는다) */
+const STICKERS = [
+  { e: '🐞', area: 'house', x: -7, z: 7.1 }, { e: '🦋', area: 'house', x: 6.9, z: 7.1 }, { e: '🐝', area: 'house', x: -7, z: -7 },
+  { e: '🐌', area: 'house', x: 7, z: -7.1 }, { e: '🍀', area: 'house', x: -1.3, z: 6.9 }, { e: '🌷', area: 'house', x: 1.4, z: 1.3 },
+  { e: '🌻', area: 'house', x: -6.8, z: -1.3, high: true }, { e: '🍄', area: 'house', x: 6.8, z: -1.4, high: true },
+  { e: '🐚', area: 'house', x: -4, z: 2.2, high: true }, { e: '⭐', area: 'house', x: 4, z: -6.4, high: true },
+  { e: '🌈', area: 'village', x: -13.2, z: -10.6 }, { e: '🍓', area: 'village', x: 27.6, z: -10.8 }, { e: '🍩', area: 'village', x: 27.8, z: 19.2 },
+  { e: '🧁', area: 'village', x: -13.4, z: 19 }, { e: '🎈', area: 'village', x: -12.5, z: 6 }, { e: '🎁', area: 'village', x: 21, z: -9 },
+  { e: '🎯', area: 'village', x: 15, z: -1, high: true }, { e: '🎨', area: 'village', x: 4, z: -3 }, { e: '🧩', area: 'village', x: -4, z: -3 },
+  { e: '🎲', area: 'village', x: -9.5, z: 8.5 }, { e: '🚀', area: 'village', x: 1.5, z: 18.8 }, { e: '🛸', area: 'village', x: 10.5, z: 18.8 },
+  { e: '🦄', area: 'village', x: 22, z: 15.5 }, { e: '🐳', area: 'village', x: 24, z: 5.5 }, { e: '🦕', area: 'village', x: 13.5, z: 8, high: true },
+  { e: '🐙', area: 'village', x: -2, z: 10, high: true }, { e: '🦊', area: 'village', x: 6, z: 7 }, { e: '🐼', area: 'village', x: 18, z: 13 },
+  { e: '🐧', area: 'village', x: -6.5, z: -9.8 }, { e: '👑', area: 'village', x: 4.8, z: -10.2 }
+];
+const STICKER_GIFTS = [
+  { n: 5, coins: 20 }, { n: 10, decor: 'plant', coins: 30 }, { n: 15, coins: 40 },
+  { n: 20, decor: 'piano', coins: 60 }, { n: 25, coins: 60 }, { n: 30, hat: 'wizard', coins: 100 }
+];
+const stickerState = () => { const st = S.stickers || (S.stickers = { found: [], gifts: 0 }); if (!Array.isArray(st.found)) st.found = []; return st; };
+function spawnStickers() {
+  const st = stickerState();
+  World.spawnStickers(STICKERS.map((it, i) => Object.assign({ i }, it)).filter(it => !st.found.includes(it.i)), gotSticker);
+}
+function gotSticker(i) {
+  const st = stickerState(); if (st.found.includes(i)) return;
+  st.found.push(i); sfx('coin'); burst([STICKERS[i].e, '✨'], 4, -.2);
+  const n = st.found.length, next = STICKER_GIFTS.find(g => g.n > n);
+  toast(`${STICKERS[i].e} 스티커 ${n}/${STICKERS.length}${next ? ` · 선물까지 ${next.n - n}개` : ''}`);
+  while (st.gifts < STICKER_GIFTS.length && n >= STICKER_GIFTS[st.gifts].n) giveStickerGift(STICKER_GIFTS[st.gifts++]);
+  if (n >= STICKERS.length) badge('explorer');
+  addXP(3); renderHUD(); persist();
+}
+function giveStickerGift(g) {
+  let what = '';
+  if (g.decor && !decorState().owned.includes(g.decor)) { decorState().owned.push(g.decor); what = `${DECOR[g.decor].e} ${DECOR[g.decor].name}`; }
+  else if (g.hat && !S.hats.includes(g.hat)) { S.hats.push(g.hat); what = HATS[g.hat].name; }
+  S.coins += g.coins;
+  confetti(70); sfx('up');
+  setTimeout(() => toast(`🎁 스티커 ${g.n}개 선물! ${what ? what + ' + ' : ''}${g.coins}코인`), 1300);
+}
+function openStickers() {
+  const st = stickerState(), n = st.found.length;
+  const cards = STICKERS.map((it, i) => st.found.includes(i)
+    ? `<div class="stk got"><b>${it.e}</b>찾음</div>`
+    : `<div class="stk"><b>❔</b>${it.area === 'house' ? '집' : '마을'}${it.high ? ' ⬆️' : ''}</div>`).join('');
+  const gifts = STICKER_GIFTS.map(g => `<span class="${n >= g.n ? 'got' : ''}">${g.n}개: ${g.decor ? DECOR[g.decor].e + ' ' : g.hat ? '🎩 ' : ''}${g.coins}코인</span>`).join('');
+  openSheet('🔎 숨은 스티커', `${missionTabs('s')}<p class="msub">${n} / ${STICKERS.length}개 찾았어요. 화면을 끌거나 WASD로 직접 달려가서 주워요. ⬆️ 표시는 높이 떠 있어서 점프로 잡아요.</p><div class="gift-row">${gifts}</div><div class="stk-grid">${cards}</div>`,
+    body => body.addEventListener('click', e => { const tb = e.target.closest('[data-mtab]'); if (tb) openMissions(tb.dataset.mtab); }));
+}
+
 /* ---------- 펫 염색 (내 펫만의 색) ---------- */
 const DYES = { base: ['원래 색', null, 0], pink: ['딸기우유', '#FFC9DA', 40], mint: ['민트', '#BFF0E0', 40], sky: ['하늘', '#CDE8FF', 40], lemon: ['레몬', '#FFF1A8', 40], lavender: ['라벤더', '#DCD0FF', 40], choco: ['초코', '#D9B08C', 40] };
 const dyeColor = p => (DYES[p.dye] || DYES.base)[1];
@@ -3753,6 +3900,7 @@ function openStand() {
 function goStand() { World.area() === 'village' ? World.goVillage('garden', true, openStand) : openStand(); }
 
 const NEWS = [
+  { v: '2.0', date: '10월 30일', items: ['🕹️ 화면을 끌거나 WASD·방향키로 펫을 직접 조종해요. 점프 버튼(스페이스바)도 생겼어요', '🔎 집과 마을에 숨은 스티커 30개! 5개마다 선물, 높이 뜬 스티커는 점프로 잡아요', '🥚 알은 세 번만 톡톡, 걷는 속도도 빨라졌어요'] },
   { v: '1.9', date: '10월 29일', items: ['📷 방 왼쪽 📷 버튼으로 펫 사진을 찍고 설정 > 사진 앨범에서 볼 수 있어요', '🎵 집·마을·점프 코스마다 다른 배경음악 (설정에서 끌 수 있어요)', '💾 보호자 메뉴에서 기록 백업 코드를 만들고 되살릴 수 있어요', '⌨️ 키보드와 Esc 키로도 놀 수 있어요'] },
   { v: '1.8', date: '10월 29일', items: ['👫 기른 펫들이 졸졸 따라다녀요! 따라오는 펫을 누르면 그 친구와 놀아요', '🌧️ 마을에 가끔 단비가 와요. 텃밭에 물이 저절로 뿌려져요', '✨ 수확할 때 가끔 황금·무지개 채소가 나와요 (비 올 때 더 잘 나와요)', '🧺 텃밭 옆 채소 가게에서 채소를 팔 수 있어요'] },
   { v: '1.7', date: '10월 29일', items: ['📜 말랑 모험 4장이 열렸어요. 화면 아래 "가기"를 눌러 보세요', '🎃 할로윈 축제: 마을에 숨은 사탕 12개를 찾아요', '🎨 상점에서 펫 염색 6색'] },
@@ -4615,7 +4763,7 @@ let worldReady = false;
 function showHome() {
   $('#start').hidden = true; $('#home').hidden = false;
   buildStats();
-  if (!worldReady) { World.init(); worldReady = true; World.setDecor(decorState().placed); World.setGarden(farm().plots); World.setEvent(!!SEASON); }
+  if (!worldReady) { World.init(); worldReady = true; World.setDecor(decorState().placed); World.setGarden(farm().plots); World.setEvent(!!SEASON); spawnStickers(); }
   render();
 }
 
