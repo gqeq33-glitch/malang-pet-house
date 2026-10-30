@@ -361,6 +361,9 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
 .gift-row{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 12px}
 .gift-row span{font-size:12.5px;padding:4px 9px;border-radius:99px;background:var(--soft);box-shadow:0 0 0 1.5px var(--line) inset}
 .gift-row span.got{background:var(--butter);box-shadow:0 0 0 2px var(--ink) inset}
+.no3d{position:absolute;left:10px;right:10px;top:52px;z-index:6;display:flex;flex-direction:column;gap:4px;background:rgba(255,255,255,.95);border-radius:16px;padding:10px 14px;box-shadow:0 0 0 2.5px var(--ink) inset;font-size:13px;line-height:1.5}
+.no3d b{font-family:var(--display);font-weight:400;font-size:16px}
+.no3d em{font-style:normal;color:#E8476A}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
 
@@ -1679,56 +1682,106 @@ const World = (() => {
     });
   }
 
-  // ---------- 하늘 점프 코스 (오비): 발판·움직이는 발판·끈적 젤리·체크포인트 ----------
+  // ---------- 하늘 점프 코스 (오비) 5단계 ----------
+  // 발판 종류: 기본 · 움직이는(ax/az) · 끈적 젤리(jelly, 닿으면 체크포인트로) · 사라지는(vanish) · 점프대(pad) · 빙글 막대(spin)
+  // 점프 높이 약 1.8, 같은 높이에서 약 3.5칸까지 건너뛸 수 있게 간격을 맞췄다
   const OX = 240;
-  const PLATS = [
-    { x: 0, z: 0, w: 4, d: 4, y: 0, c: '#FFFFFF' },
-    { x: 0, z: -4, w: 2, d: 2, y: .5 },
-    { x: 2, z: -7, w: 2, d: 2, y: 1 },
-    { x: -1, z: -10, w: 2, d: 2, y: 1.5 },
-    { x: 0, z: -14, w: 4, d: 3, y: 1.5, c: '#E9F7FF' },
-    { x: 0, z: -18, w: 2.2, d: 2.2, y: 2, ax: 2.2, sp: 1.2 },
-    { x: 0, z: -22, w: 1.6, d: 1.6, y: 2.5 },
-    { x: 0, z: -26, w: 2, d: .8, y: 2.55, jelly: true },
-    { x: 0, z: -26, w: 2, d: 4, y: 2.5 },
-    { x: 0, z: -31.5, w: 4, d: 3, y: 3, c: '#E9F7FF' },
-    { x: 2, z: -35, w: 1.6, d: 1.6, y: 3.6 },
-    { x: 3.6, z: -37.4, w: 1.6, d: 1.6, y: 4.2 },
-    { x: 2, z: -39.8, w: 1.6, d: 1.6, y: 4.8 },
-    { x: 0, z: -42.2, w: 1.6, d: 1.6, y: 5.4 },
-    { x: 0, z: -46, w: 2.2, d: 2.2, y: 5.4, az: 1.4, sp: 1 },
-    { x: 0, z: -51, w: 4, d: 4, y: 5.4, c: '#FFF3A8' }
+  const COURSES = [
+    { name: '무지개 첫걸음', tip: '왼쪽 동그라미로 움직이고, 점프 버튼으로 뛰어요! 분홍 젤리는 조심!', plats: [
+      { x: 0, z: 0, w: 4, d: 4, y: 0, c: '#FFFFFF' }, { x: 0, z: -4, w: 2, d: 2, y: .5 }, { x: 2, z: -7, w: 2, d: 2, y: 1 }, { x: -1, z: -10, w: 2, d: 2, y: 1.5 },
+      { x: 0, z: -14, w: 4, d: 3, y: 1.5, c: '#E9F7FF' }, { x: 0, z: -18, w: 2.2, d: 2.2, y: 2, ax: 2.2, sp: 1.2 }, { x: 0, z: -22, w: 1.6, d: 1.6, y: 2.5 },
+      { x: 0, z: -26, w: 2, d: .8, y: 2.55, jelly: true }, { x: 0, z: -26, w: 2, d: 4, y: 2.5 }, { x: 0, z: -31.5, w: 4, d: 3, y: 3, c: '#E9F7FF' },
+      { x: 2, z: -35, w: 1.6, d: 1.6, y: 3.6 }, { x: 3.6, z: -37.4, w: 1.6, d: 1.6, y: 4.2 }, { x: 2, z: -39.8, w: 1.6, d: 1.6, y: 4.8 }, { x: 0, z: -42.2, w: 1.6, d: 1.6, y: 5.4 },
+      { x: 0, z: -46, w: 2.2, d: 2.2, y: 5.4, az: 1.4, sp: 1 }, { x: 0, z: -51, w: 4, d: 4, y: 5.4, c: '#FFF3A8' }],
+      cps: [{ x: 0, z: 0, y: 0 }, { x: 0, z: -14, y: 1.5 }, { x: 0, z: -31.5, y: 3 }], fin: { x: 0, z: -51, y: 5.4 } },
+    { name: '구름 징검다리', tip: '움직이는 발판에 올라타요! 노란 점프대를 밟으면 하늘 높이 튀어 올라요!', plats: [
+      { x: 0, z: 0, w: 4, d: 4, y: 0, c: '#FFFFFF' }, { x: 0, z: -4.5, w: 2, d: 2, y: .4 }, { x: -2.5, z: -7.5, w: 2, d: 2, y: .8 }, { x: 0, z: -10.5, w: 2, d: 2, y: 1.2, ax: 1.8, sp: 1.4 },
+      { x: 2.5, z: -13.5, w: 2, d: 2, y: 1.2 }, { x: 0, z: -17, w: 4, d: 3, y: 1.2, c: '#E9F7FF' }, { x: 0, z: -21, w: 2, d: 2, y: 1.2, az: 1.2, sp: 1.6 },
+      { x: 0, z: -25.5, w: 2, d: 2, y: 1.6 }, { x: 0, z: -28.5, w: 2, d: 2, y: 1.6, pad: true }, { x: 0, z: -32.5, w: 3, d: 3, y: 4.6 },
+      { x: 0, z: -36.5, w: 4, d: 3, y: 4.6, c: '#E9F7FF' }, { x: -2, z: -40, w: 1.6, d: 1.6, y: 5 }, { x: -4, z: -43, w: 1.6, d: 1.6, y: 5.4, ax: 1.5, sp: 1.8 },
+      { x: -1, z: -46, w: 1.6, d: 1.6, y: 5.8 }, { x: 1.5, z: -49, w: 1.6, d: 1.6, y: 6.2, az: 1, sp: 2 }, { x: 0, z: -53, w: 4, d: 4, y: 6.2, c: '#FFF3A8' }],
+      cps: [{ x: 0, z: 0, y: 0 }, { x: 0, z: -17, y: 1.2 }, { x: 0, z: -36.5, y: 4.6 }], fin: { x: 0, z: -53, y: 6.2 } },
+    { name: '사라지는 발판', tip: '깜빡이는 발판은 곧 사라져요! 보이는 동안 재빨리 건너요!', plats: [
+      { x: 0, z: 0, w: 4, d: 4, y: 0, c: '#FFFFFF' }, { x: 0, z: -4.5, w: 2.2, d: 2.2, y: .3, vanish: true, ph: 0 }, { x: 0, z: -8.5, w: 2.2, d: 2.2, y: .6, vanish: true, ph: 1 },
+      { x: 0, z: -12.5, w: 2.2, d: 2.2, y: .9, vanish: true, ph: 2 }, { x: 0, z: -16.5, w: 4, d: 3, y: .9, c: '#E9F7FF' },
+      { x: 0, z: -20.5, w: 2, d: .8, y: .95, jelly: true }, { x: 0, z: -20.5, w: 2, d: 4, y: .9 },
+      { x: -2.5, z: -24.5, w: 1.8, d: 1.8, y: 1.3, vanish: true, ph: .5 }, { x: 0, z: -27.5, w: 1.8, d: 1.8, y: 1.7, vanish: true, ph: 1.5 },
+      { x: 2.5, z: -30.5, w: 1.8, d: 1.8, y: 2.1, vanish: true, ph: 2.5 }, { x: 0, z: -34.5, w: 4, d: 3, y: 2.1, c: '#E9F7FF' },
+      { x: 0, z: -38.5, w: 2, d: 2, y: 2.5, ax: 2, sp: 1.5 }, { x: 0, z: -42.5, w: 2, d: 2, y: 2.9, vanish: true, ph: 0 },
+      { x: 0, z: -46.5, w: 2, d: 2, y: 3.3, vanish: true, ph: 1.3 }, { x: 0, z: -50.5, w: 4, d: 4, y: 3.3, c: '#FFF3A8' }],
+      cps: [{ x: 0, z: 0, y: 0 }, { x: 0, z: -16.5, y: .9 }, { x: 0, z: -34.5, y: 2.1 }], fin: { x: 0, z: -50.5, y: 3.3 } },
+    { name: '빙글빙글 막대', tip: '빨간 막대가 빙글빙글 돌아요! 막대가 오면 점프해서 넘어요!', plats: [
+      { x: 0, z: 0, w: 4, d: 4, y: 0, c: '#FFFFFF' }, { x: 0, z: -5, w: 5, d: 5, y: 0, spin: { len: 2.3, sp: 1.6 } }, { x: 0, z: -10, w: 2, d: 2, y: .5 },
+      { x: 0, z: -15, w: 5, d: 5, y: .5, spin: { len: 2.3, sp: -2 } }, { x: 0, z: -20, w: 4, d: 3, y: .8, c: '#E9F7FF' },
+      { x: -2, z: -24, w: 2, d: 2, y: 1.2, ax: 1.5, sp: 2 }, { x: 0, z: -29, w: 5, d: 5, y: 1.4, spin: { len: 2.3, sp: 2.4 } },
+      { x: 2, z: -34, w: 2, d: 2, y: 1.8, az: 1.2, sp: 1.8 }, { x: 0, z: -38.5, w: 4, d: 3, y: 2.2, c: '#E9F7FF' },
+      { x: 0, z: -43.5, w: 5, d: 5, y: 2.2, spin: { len: 2.3, sp: -2.6 } }, { x: 0, z: -48.5, w: 2, d: 2, y: 2.6 }, { x: 0, z: -52.5, w: 4, d: 4, y: 2.6, c: '#FFF3A8' }],
+      cps: [{ x: 0, z: 0, y: 0 }, { x: 0, z: -20, y: .8 }, { x: 0, z: -38.5, y: 2.2 }], fin: { x: 0, z: -52.5, y: 2.6 } },
+    { name: '무지개 탑', tip: '마지막 도전! 지금까지 나온 함정이 모두 나와요. 체크포인트를 꼭 밟아요!', plats: [
+      { x: 0, z: 0, w: 4, d: 4, y: 0, c: '#FFFFFF' }, { x: 0, z: -4, w: 1.4, d: 1.4, y: .6 }, { x: 1.8, z: -6.8, w: 1.4, d: 1.4, y: 1.2 },
+      { x: 0, z: -9.6, w: 1.4, d: 1.4, y: 1.8, vanish: true, ph: 0 }, { x: -1.8, z: -12.4, w: 1.4, d: 1.4, y: 2.4 },
+      { x: 0, z: -15.2, w: 1.8, d: 1.8, y: 2.4, pad: true }, { x: 0, z: -18.8, w: 3, d: 3, y: 5.6 }, { x: 0, z: -22.5, w: 4, d: 3, y: 5.6, c: '#E9F7FF' },
+      { x: 0, z: -27, w: 5, d: 5, y: 5.6, spin: { len: 2.3, sp: 2.8 } }, { x: -2, z: -31.5, w: 1.6, d: 1.6, y: 6, ax: 1.6, sp: 2.2 },
+      { x: 0, z: -34.5, w: 1.6, d: 1.6, y: 6.4, vanish: true, ph: .7 }, { x: 2, z: -37.5, w: 1.6, d: 1.6, y: 6.8, az: .9, sp: 2.4 },
+      { x: 0, z: -41.5, w: 4, d: 3, y: 7.2, c: '#E9F7FF' }, { x: 0, z: -45.5, w: 2, d: .8, y: 7.25, jelly: true }, { x: 0, z: -45.5, w: 2, d: 4, y: 7.2 },
+      { x: 0, z: -50, w: 5, d: 5, y: 7.2, spin: { len: 2.3, sp: -3 } }, { x: 0, z: -55, w: 1.4, d: 1.4, y: 7.6, vanish: true, ph: 1.2 },
+      { x: 0, z: -58.5, w: 1.4, d: 1.4, y: 8, ax: 1.4, sp: 2.6 }, { x: 0, z: -62.5, w: 4, d: 4, y: 8, c: '#FFF3A8' }],
+      cps: [{ x: 0, z: 0, y: 0 }, { x: 0, z: -22.5, y: 5.6 }, { x: 0, z: -41.5, y: 7.2 }], fin: { x: 0, z: -62.5, y: 8 } }
   ];
-  const CPS = [{ x: 0, z: 0, y: 0 }, { x: 0, z: -14, y: 1.5 }, { x: 0, z: -31.5, y: 3 }];
-  const FIN = { x: 0, z: -51, y: 5.4 };
+  const VANISH_T = 3, VANISH_ON = 1.8;
+  let course = 0, PLATS = COURSES[0].plats, CPS = COURSES[0].cps, FIN = COURSES[0].fin;
   const obIn = { x: 0, z: 0, jump: false };
   let obbyG = null, ob = null, flags = [], trophy = null;
   function buildObby() {
     obbyG = new T.Group(); obbyG.visible = false; scene.add(obbyG);
     curParent = obbyG; curPick = [];
-    const cols = ['#FF9DB5', '#FFE27A', '#7ED9C3', '#A9DDF7', '#CDBBFF', '#FFB86B'];
-    PLATS.forEach((pl, i) => {
-      if (pl.jelly) pl.mesh = mesh(BOX, '', OX + pl.x, pl.y - .2, pl.z, pl.w + .02, .45, pl.d, null, { mat: new T.MeshToonMaterial({ color: '#FF5C9A', emissive: '#FF2E7E', emissiveIntensity: .35, gradientMap: grad, transparent: true, opacity: .92 }) });
-      else pl.mesh = mesh(BOX, pl.c || cols[i % cols.length], OX + pl.x, pl.y - .25, pl.z, pl.w, .5, pl.d, null, { outline: 1.02, receive: true });
-    });
-    CPS.slice(1).forEach(c => {
-      const g = group(OX + c.x + 1.5, c.y, c.z, obbyG);
-      mesh(CYL, '#FFFFFF', 0, .8, 0, .05, 1.6, .05, g);
-      const cloth = mesh(CONE, '#B9C6D0', .3, 1.35, 0, .2, .55, .05, g, { outline: 1.08 }); cloth.rotation.z = -Math.PI / 2; flags.push(cloth);
-    });
-    trophy = group(OX + FIN.x, FIN.y, FIN.z, obbyG);
-    mesh(CYL, '#FFD54F', 0, .2, 0, .4, .4, .4, trophy, { outline: 1.05 }); mesh(CYL, '#FFD54F', 0, .6, 0, .08, .5, .08, trophy);
-    mesh(new T.CylinderGeometry(1, .5, 1, 16), '#FFD54F', 0, 1.05, 0, .45, .55, .45, trophy, { outline: 1.05 }); mesh(STAR, '#FFFFFF', 0, 1.6, 0, .18, .18, .18, trophy);
-    for (let i = 0; i < 26; i++) {
-      const x = OX + (i * 7.3) % 24 - 12, z = 6 - (i * 4.1) % 64, y = -4 - (i % 3);
+    for (let i = 0; i < 30; i++) {
+      const x = OX + (i * 7.3) % 24 - 12, z = 6 - (i * 4.1) % 72, y = -4 - (i % 3);
       mesh(SPH, '#FFFFFF', x, y, z, 2.2, 1, 1.6, null, { cast: false }); mesh(SPH, '#FFFFFF', x + 1.4, y + .3, z, 1.5, .9, 1.2, null, { cast: false });
     }
     mesh(CYL, '#C98A5A', OX - 3.2, .5, -.6, .07, 2, .07); sign('점프 코스', OX - 3.2, 1.6, -.55, 2.2);
     curParent = houseG; curPick = pickH;
   }
+  // 코스마다 처음 들어갈 때 한 번만 짓고, 다른 코스는 숨긴다
+  function buildCourse(i) {
+    const C = COURSES[i]; if (C.g) return;
+    C.g = new T.Group(); obbyG.add(C.g); curParent = C.g;
+    const cols = ['#FF9DB5', '#FFE27A', '#7ED9C3', '#A9DDF7', '#CDBBFF', '#FFB86B'];
+    C.plats.forEach((pl, k) => {
+      if (pl.jelly) pl.mesh = mesh(BOX, '', OX + pl.x, pl.y - .2, pl.z, pl.w + .02, .45, pl.d, null, { mat: new T.MeshToonMaterial({ color: '#FF5C9A', emissive: '#FF2E7E', emissiveIntensity: .35, gradientMap: grad, transparent: true, opacity: .92 }) });
+      else if (pl.vanish) pl.mesh = mesh(BOX, '', OX + pl.x, pl.y - .25, pl.z, pl.w, .5, pl.d, null, { mat: new T.MeshToonMaterial({ color: '#B9E6FF', gradientMap: grad, transparent: true, opacity: 1 }) });
+      else if (pl.pad) {
+        pl.mesh = mesh(BOX, '#FFD54F', OX + pl.x, pl.y - .25, pl.z, pl.w, .5, pl.d, null, { outline: 1.02, receive: true });
+        const ar = mesh(CONE, '#FF8A3D', OX + pl.x, pl.y + .35, pl.z, .35, .5, .35, null, { outline: 1.08 }); pl.arrow = ar;
+      } else pl.mesh = mesh(BOX, pl.c || cols[k % cols.length], OX + pl.x, pl.y - .25, pl.z, pl.w, .5, pl.d, null, { outline: 1.02, receive: true });
+      if (pl.spin) {
+        const g = group(OX + pl.x, pl.y, pl.z, C.g);
+        mesh(CYL, '#FFFFFF', 0, .3, 0, .28, .6, .28, g, { outline: 1.06 });
+        mesh(BOX, '#FF5C5C', 0, .45, 0, pl.spin.len * 2, .26, .26, g, { outline: 1.08 });
+        pl.spinG = g;
+      }
+    });
+    C.flags = [];
+    C.cps.slice(1).forEach(c => {
+      const g = group(OX + c.x + 1.5, c.y, c.z, C.g);
+      mesh(CYL, '#FFFFFF', 0, .8, 0, .05, 1.6, .05, g);
+      const cloth = mesh(CONE, '#B9C6D0', .3, 1.35, 0, .2, .55, .05, g, { outline: 1.08 }); cloth.rotation.z = -Math.PI / 2; C.flags.push(cloth);
+    });
+    const F = C.fin; C.trophy = group(OX + F.x, F.y, F.z, C.g);
+    mesh(CYL, '#FFD54F', 0, .2, 0, .4, .4, .4, C.trophy, { outline: 1.05 }); mesh(CYL, '#FFD54F', 0, .6, 0, .08, .5, .08, C.trophy);
+    mesh(new T.CylinderGeometry(1, .5, 1, 16), '#FFD54F', 0, 1.05, 0, .45, .55, .45, C.trophy, { outline: 1.05 }); mesh(STAR, '#FFFFFF', 0, 1.6, 0, .18, .18, .18, C.trophy);
+    sign(`${i + 1}단계 · ${C.name}`, OX + 3.4, 1.6, -.55, 3.4);
+    mesh(CYL, '#C98A5A', OX + 3.4, .5, -.6, .07, 2, .07);
+    curParent = houseG; curPick = pickH;
+  }
+  function useCourse(i) {
+    course = Math.max(0, Math.min(COURSES.length - 1, i | 0)); buildCourse(course);
+    COURSES.forEach((C, k) => { if (C.g) C.g.visible = k === course; });
+    const C = COURSES[course]; PLATS = C.plats; CPS = C.cps; FIN = C.fin; flags = C.flags; trophy = C.trophy;
+  }
   function obReset() {
     flags.forEach(f => { f.material = toon('#B9C6D0'); });
-    for (const pl of PLATS) { pl.cx = pl.cz = undefined; }
+    for (const pl of PLATS) { pl.cx = pl.cz = undefined; pl.dx = pl.dz = undefined; }
     ob = { cp: 0, y: 0, vy: 0, ground: true, plat: null, time: 0, clock: 0, done: false, onEvent: ob ? ob.onEvent : null };
     st.x = OX; st.z = .6; st.lift = 0; st.path = []; st.mode = 'idle'; st.face = st.faceGoal = Math.PI; st.camX = OX; st.camZ = 0; st.camY = 0;
   }
@@ -1740,10 +1793,19 @@ const World = (() => {
   function obbyStep(dt) {
     const o = ob; if (o.done) return;
     o.time += dt; o.clock += dt;
-    for (const pl of PLATS) if (pl.ax || pl.az) {
-      const k = Math.sin(o.clock * pl.sp), nx = pl.x + (pl.ax || 0) * k, nz = pl.z + (pl.az || 0) * k;
-      pl.dx = nx - (pl.cx ?? nx); pl.dz = nz - (pl.cz ?? nz); pl.cx = nx; pl.cz = nz;
-      pl.mesh.position.set(OX + nx, pl.y - .25, nz);
+    for (const pl of PLATS) {
+      if (pl.ax || pl.az) {
+        const k = Math.sin(o.clock * pl.sp), nx = pl.x + (pl.ax || 0) * k, nz = pl.z + (pl.az || 0) * k;
+        pl.dx = nx - (pl.cx ?? nx); pl.dz = nz - (pl.cz ?? nz); pl.cx = nx; pl.cz = nz;
+        pl.mesh.position.set(OX + nx, pl.y - .25, nz);
+      }
+      if (pl.vanish) {
+        // 보이는 1.8초 중 마지막 0.6초는 깜빡이며 곧 사라진다고 알려 준다
+        const t = (o.clock + pl.ph) % VANISH_T; pl.solid = t < VANISH_ON;
+        pl.mesh.visible = pl.solid; pl.mesh.material.opacity = t > VANISH_ON - .6 ? .35 + .6 * Math.abs(Math.sin(o.clock * 18)) : 1;
+      }
+      if (pl.spinG) pl.spinG.rotation.y = o.clock * pl.spin.sp;
+      if (pl.arrow) pl.arrow.position.y = pl.y + .35 + Math.abs(Math.sin(o.clock * 5)) * .25;
     }
     const len = Math.hypot(obIn.x, obIn.z);
     let x = st.x - OX, z = st.z;
@@ -1755,11 +1817,21 @@ const World = (() => {
     const prevY = o.y; o.vy -= 22 * dt; o.y += o.vy * dt;
     o.ground = false; o.plat = null;
     if (o.vy <= 0) for (const pl of PLATS) {
+      if (pl.vanish && !pl.solid) continue;
       const cx = pl.cx ?? pl.x, cz = pl.cz ?? pl.z;
       if (Math.abs(x - cx) <= pl.w / 2 + .2 && Math.abs(z - cz) <= pl.d / 2 + .2 && prevY >= pl.y - .06 && o.y <= pl.y + .001) {
         if (pl.jelly) return respawnOb('jelly');
-        o.y = pl.y; o.vy = 0; o.ground = true; o.plat = pl; break;
+        o.y = pl.y;
+        if (pl.pad) { o.vy = 14; o.ground = false; sfx('up'); o.onEvent && o.onEvent('pad'); break; }
+        o.vy = 0; o.ground = true; o.plat = pl; break;
       }
+    }
+    // 빙글 막대: 막대 높이보다 낮게 있으면 맞고 체크포인트로 돌아간다 (점프로 넘을 수 있다)
+    for (const pl of PLATS) {
+      if (!pl.spin || o.y > pl.y + .78 || o.y < pl.y - .3) continue;
+      const a = o.clock * pl.spin.sp, dx = Math.cos(a), dz = -Math.sin(a), rx = x - pl.x, rz = z - pl.z;
+      const along = rx * dx + rz * dz, across = Math.abs(rx * dz - rz * dx);
+      if (Math.abs(along) <= pl.spin.len + .2 && across < .42) return respawnOb('bar');
     }
     st.x = OX + x; st.z = z; st.lift = o.y;
     CPS.forEach((c, i) => {
@@ -2126,14 +2198,26 @@ const World = (() => {
     flat = document.createElement('div'); flat.className = 'pet2d'; room.appendChild(flat);
     flat.addEventListener('click', () => onTap && onTap({ o: { userData: { pet: true } } }));
     $('#world').hidden = true;
+    // 3D가 꺼진 이유는 대개 브라우저의 그래픽 가속이 꺼졌거나 잠깐 멈춘 것. 아이·보호자가 고칠 수 있게 알려 준다
+    const note = document.createElement('div'); note.className = 'no3d';
+    note.innerHTML = '<b>지금은 3D가 꺼져 있어요</b><span>브라우저를 모두 껐다가 다시 켜 보세요. 그래도 안 되면 브라우저 설정 › 시스템에서 <em>그래픽 가속 사용</em>을 켜거나 크롬으로 열어 주세요.</span>';
+    room.appendChild(note);
+  }
+  // 그래픽 카드가 바쁘거나 막혀 있어도 3D를 최대한 켜 보도록 설정을 낮춰 가며 다시 시도한다
+  function makeRenderer() {
+    const opts = [{ antialias: true }, { antialias: false, powerPreference: 'default' }, { antialias: false, powerPreference: 'low-power', failIfMajorPerformanceCaveat: false, precision: 'mediump' }];
+    for (const o of opts) {
+      try { const r = new T.WebGLRenderer(Object.assign({ canvas: $('#world') }, o)); if (r.getContext()) return r; } catch (e) {}
+    }
+    return null;
   }
 
   return {
     init() {
       if (!T) { fallback(); return false; }
       try {
-        renderer = new T.WebGLRenderer({ canvas: $('#world'), antialias: true });
-        if (!renderer.getContext()) throw new Error('no gl');
+        renderer = makeRenderer();
+        if (!renderer) throw new Error('no gl');
       } catch (e) { fallback(); return false; }
       SPH = new T.SphereGeometry(1, 28, 20); BOX = new T.BoxGeometry(1, 1, 1); CYL = new T.CylinderGeometry(1, 1, 1, 28);
       CONE = new T.ConeGeometry(1, 1, 18); HALF = new T.SphereGeometry(1, 28, 14, 0, Math.PI * 2, 0, Math.PI / 2); STAR = starGeo();
@@ -2219,10 +2303,12 @@ const World = (() => {
     goToPlot(i, cb) { const [x, z] = GARDEN[i]; goTo(VX + x, z + 1, true, () => { st.faceGoal = Math.PI; cb && cb(); }); },
     obbyInput: obIn,
     obbyTime() { return ob ? ob.time : 0; },
-    enterObby(onEvent) {
+    enterObby(onEvent, stage = 0) {
       if (!ok) return say('점프 코스는 3D를 켤 수 있는 기기에서 할 수 있어요', 3000);
-      fadeTo(() => { ob = { onEvent }; setArea('obby'); obReset(); for (const n of Object.values(npcs)) n.tag.hidden = true; });
+      fadeTo(() => { ob = { onEvent }; useCourse(stage); setArea('obby'); obReset(); for (const n of Object.values(npcs)) n.tag.hidden = true; });
     },
+    obbyCourses() { return COURSES.map(C => ({ name: C.name, tip: C.tip, cps: C.cps.length - 1 })); },
+    obbyStage() { return course; },
     obbyRestart() { if (ob) obReset(); },
     exitObby() {
       fadeTo(() => {
@@ -3503,20 +3589,38 @@ function boundedReward(key, coins, max = 3) {
   const n = S.rewardClaims[key]; if (n >= max) return 0;
   S.rewardClaims[key] = n + 1; S.coins += coins; renderHUD(); persist(); return coins;
 }
-function startObby() {
+// 단계별 기록 키: 1단계는 예전 기록(S.best.obby)을 그대로 쓰고, 2단계부터 obby2·obby3…
+const obbyKey = i => i ? 'obby' + (i + 1) : 'obby';
+const OBBY_COINS = [25, 35, 45, 55, 70];
+const obbyOpen = i => i === 0 || !!S.best[obbyKey(i - 1)];
+let obbyStageNow = 0;
+function startObby(stage) {
   const p = P();
   if (!p.hatched || obbyUI) return;
   if (p.energy < 15) return say('너무 졸려서 점프를 못 하겠어요… 먼저 재워 주세요', 3000);
+  if (typeof stage !== 'number') return openObbySelect();
+  if (!obbyOpen(stage)) return toast('앞 단계를 먼저 깨면 열려요!');
   if (talking) closeTalk();
   if (following) { following = null; World.setFollow(null); }
-  World.enterObby(obbyEvent);
+  closeSheet();
+  obbyStageNow = stage;
+  World.enterObby(obbyEvent, stage);
   setTimeout(buildObbyUI, 420);
+}
+function openObbySelect() {
+  const list = World.obbyCourses(), done = list.filter((c, i) => S.best[obbyKey(i)]).length;
+  const cards = list.map((c, i) => {
+    const best = S.best[obbyKey(i)], open = obbyOpen(i);
+    return `<button class="dex-card" data-stage="${i}"${open ? '' : ' disabled style="opacity:.55"'}><span class="emo day">${open ? ['🌈', '☁️', '✨', '🌀', '🏔️'][i] : '🔒'}</span><span class="txt"><span class="t1">${i + 1}단계 · ${escapeHTML(c.name)}</span><br><span class="t2">${open ? escapeHTML(c.tip) : '앞 단계를 깨면 열려요'}</span></span><span class="go">${best ? `🏆 ${best.toFixed(1)}초` : open ? '도전!' : '잠김'}</span></button>`;
+  }).join('');
+  openSheet('🌈 점프 코스 고르기', `<p class="msub">${done} / ${list.length}단계 완주. 떨어져도 체크포인트 🚩에서 다시 시작해요. 키보드는 WASD·방향키 + 스페이스바!</p><div class="dex">${cards}</div>`,
+    body => body.addEventListener('click', e => { const b = e.target.closest('[data-stage]'); if (b && !b.disabled) startObby(+b.dataset.stage); }));
 }
 function buildObbyUI() {
   obbyUI = document.createElement('div'); obbyUI.className = 'obby-ui';
-  const best = S.best.obby;
-  obbyUI.innerHTML = `<div class="ob-top"><span class="pill">⏱ <b id="obTime">0.0</b>초</span><span class="pill">🚩 <b id="obCp">0/2</b></span>${best ? `<span class="pill">🏆 ${best.toFixed(1)}</span>` : ''}<button class="icon-btn" id="obExit" aria-label="나가기">✕</button></div>
-    <p class="ob-tip">왼쪽 동그라미로 움직이고, 점프 버튼으로 뛰어요! 분홍 젤리는 조심!</p>
+  const C = World.obbyCourses()[obbyStageNow], best = S.best[obbyKey(obbyStageNow)];
+  obbyUI.innerHTML = `<div class="ob-top"><span class="pill">${obbyStageNow + 1}단계</span><span class="pill">⏱ <b id="obTime">0.0</b>초</span><span class="pill">🚩 <b id="obCp">0/${C.cps}</b></span>${best ? `<span class="pill">🏆 ${best.toFixed(1)}</span>` : ''}<button class="icon-btn" id="obExit" aria-label="나가기">✕</button></div>
+    <p class="ob-tip">${escapeHTML(C.tip)}</p>
     <div class="joy" id="joy"><i id="joyKnob"></i></div><button class="jump-btn" id="obJump">점프!</button>`;
   room.appendChild(obbyUI);
   const joy = obbyUI.querySelector('#joy'), knob = obbyUI.querySelector('#joyKnob'), inp = World.obbyInput;
@@ -3556,21 +3660,34 @@ function closeObbyUI() {
 }
 function exitObby() { closeObbyUI(); World.exitObby(); setTimeout(renderHUD, 500); }
 function obbyEvent(kind, v) {
-  if (kind === 'cp') { const el = $('#obCp'); if (el) el.textContent = `${v}/2`; toast('🚩 체크포인트! 떨어져도 여기서 다시 시작해요'); }
+  if (kind === 'cp') { const el = $('#obCp'); if (el) el.textContent = `${v}/${World.obbyCourses()[obbyStageNow].cps}`; toast('🚩 체크포인트! 떨어져도 여기서 다시 시작해요'); }
+  else if (kind === 'bar') say('앗, 빙글 막대에 맞았어요! 막대가 오면 점프!', 2500);
+  else if (kind === 'pad') say('슈웅~! 하늘로 날아올라요!', 1800);
   else if (kind === 'jelly') say('앗, 끈적 젤리! 체크포인트로 돌아가요', 2500);
   else if (kind === 'fall') say('으앗! 괜찮아, 다시 해 보자!', 2500);
   else if (kind === 'finish') obbyFinish(v);
 }
 function obbyFinish(time) {
-  const prev = S.best.obby, isBest = !prev || time < prev;
-  if (isBest) S.best.obby = time;
-  const coins = boundedReward('obby', 25);
-  change({ fun: 20, energy: -10 }); addXP(15); mission('obby'); badge('obby'); if (time <= 60) badge('obbyFast');
+  const i = obbyStageNow, key = obbyKey(i), prev = S.best[key], isBest = !prev || time < prev, firstClear = !prev;
+  if (isBest) S.best[key] = time;
+  const coins = boundedReward(key, OBBY_COINS[i] || 25);
+  change({ fun: 20, energy: -10 }); addXP(15 + i * 5); mission('obby'); badge('obby'); if (i === 0 && time <= 60) badge('obbyFast');
+  const total = World.obbyCourses().length;
+  if (World.obbyCourses().every((c, k) => S.best[obbyKey(k)])) badge('obbyAll');
   confetti(100); persist(); render();
+  const hasNext = i + 1 < total;
   const card = document.createElement('div'); card.className = 'g-card'; card.id = 'obResult';
-  card.innerHTML = `<h3>🏁 완주했어요!</h3><div class="big-score">${time.toFixed(1)}초</div><p>${isBest ? '🏆 새 최고 기록!' : `최고 기록 ${prev.toFixed(1)}초`}</p><p>${coins ? `<i class="coin"></i> ${coins}코인 · ` : ''}경험치 15 · 행복 +20</p><button class="candy primary" id="obHome">마을로 돌아가기</button>`;
+  card.innerHTML = `<h3>🏁 ${i + 1}단계 완주!</h3><div class="big-score">${time.toFixed(1)}초</div><p>${isBest ? '🏆 새 최고 기록!' : `최고 기록 ${prev.toFixed(1)}초`}${firstClear && hasNext ? `<br>🔓 ${i + 2}단계가 열렸어요!` : ''}</p><p>${coins ? `<i class="coin"></i> ${coins}코인 · ` : ''}경험치 ${15 + i * 5} · 행복 +20</p>
+    ${hasNext ? '<button class="candy primary" id="obNext">다음 단계 ▶</button>' : '<p>🏔️ 모든 코스를 정복했어요!</p>'}
+    <div style="display:flex;gap:8px"><button class="candy" id="obAgain" style="flex:1">다시 하기</button><button class="candy" id="obHome" style="flex:1">마을로</button></div>`;
   room.appendChild(card);
   card.querySelector('#obHome').addEventListener('click', exitObby);
+  card.querySelector('#obAgain').addEventListener('click', () => { closeObbyUI(); World.obbyRestart(); buildObbyUI(); });
+  if (hasNext) card.querySelector('#obNext').addEventListener('click', () => {
+    const p = P(); if (p.energy < 15) { exitObby(); return say('너무 졸려요… 먼저 재워 주면 다음 단계도 할 수 있어요!', 3500); }
+    closeObbyUI(); obbyStageNow = i + 1; World.enterObby(obbyEvent, i + 1); setTimeout(buildObbyUI, 420);
+  });
+  (card.querySelector('#obNext') || card.querySelector('#obHome')).focus({ preventScroll: true });
 }
 
 /* ---------- 감정 표현 ---------- */
@@ -3591,6 +3708,7 @@ $('#emoteTray').addEventListener('click', e => {
 
 /* ---------- 배지 ---------- */
 const BADGES = {
+  obbyAll: ['🏔️', '코스 정복자', '점프 코스 5단계 모두 완주'],
   explorer: ['🔎', '꼬마 탐험가', '숨은 스티커 30개 모두 찾기'],
   hatch:    ['🐣', '첫 부화', '알에서 친구가 태어났어요'],
   form1:    ['🌱', '첫 변신', 'Lv.5 어린이로 변신'],
@@ -3900,6 +4018,7 @@ function openStand() {
 function goStand() { World.area() === 'village' ? World.goVillage('garden', true, openStand) : openStand(); }
 
 const NEWS = [
+  { v: '2.1', date: '10월 30일', items: ['🌈 점프 코스가 5단계로! 구름 징검다리 · 사라지는 발판 · 빙글빙글 막대 · 무지개 탑', '🟡 점프대를 밟으면 하늘 높이 슈웅!', '🏆 단계마다 최고 기록, 다 깨면 코스 정복자 배지'] },
   { v: '2.0', date: '10월 30일', items: ['🕹️ 화면을 끌거나 WASD·방향키로 펫을 직접 조종해요. 점프 버튼(스페이스바)도 생겼어요', '🔎 집과 마을에 숨은 스티커 30개! 5개마다 선물, 높이 뜬 스티커는 점프로 잡아요', '🥚 알은 세 번만 톡톡, 걷는 속도도 빨라졌어요'] },
   { v: '1.9', date: '10월 29일', items: ['📷 방 왼쪽 📷 버튼으로 펫 사진을 찍고 설정 > 사진 앨범에서 볼 수 있어요', '🎵 집·마을·점프 코스마다 다른 배경음악 (설정에서 끌 수 있어요)', '💾 보호자 메뉴에서 기록 백업 코드를 만들고 되살릴 수 있어요', '⌨️ 키보드와 Esc 키로도 놀 수 있어요'] },
   { v: '1.8', date: '10월 29일', items: ['👫 기른 펫들이 졸졸 따라다녀요! 따라오는 펫을 누르면 그 친구와 놀아요', '🌧️ 마을에 가끔 단비가 와요. 텃밭에 물이 저절로 뿌려져요', '✨ 수확할 때 가끔 황금·무지개 채소가 나와요 (비 올 때 더 잘 나와요)', '🧺 텃밭 옆 채소 가게에서 채소를 팔 수 있어요'] },
