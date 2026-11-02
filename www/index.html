@@ -372,6 +372,8 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
 .titles button.on{background:var(--butter);box-shadow:0 0 0 2.5px var(--ink) inset}
 .titles button:disabled{opacity:.5}
 .titles small{display:block;font-family:var(--body);font-size:10.5px;color:var(--muted)}
+.ride-btn{position:absolute;right:10px;bottom:132px;z-index:6;width:54px;height:54px;border-radius:50%;border:0;font-size:26px;background:var(--paper);box-shadow:0 0 0 2.5px var(--ink) inset,0 4px 0 rgba(91,69,80,.25)}
+.ride-btn.on{background:var(--butter)}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
 
@@ -421,6 +423,7 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
       <button class="quest" id="questBtn" hidden></button>
       <button class="photo-btn" id="photoBtn" aria-label="사진 찍기">📷</button>
       <button class="jump-mini" id="jumpBtn" aria-label="점프">점프</button>
+      <button class="ride-btn" id="rideBtn" aria-label="탈것 타기" aria-pressed="false" hidden>🛴</button>
       <button class="emote-btn" id="emoteBtn" aria-label="감정 표현" aria-expanded="false" aria-controls="emoteTray">😀</button>
       <div class="emote-tray" id="emoteTray" role="group" aria-label="감정 표현 고르기" hidden><button data-emote="wave">👋<small>인사</small></button><button data-emote="dance">💃<small>춤</small></button><button data-emote="spin">🌀<small>빙글</small></button><button data-emote="jump">🙌<small>점프</small></button><button data-emote="hop">🎵<small>신나!</small></button></div>
       <div class="fade" id="fade"></div>
@@ -868,6 +871,11 @@ function renderHUD() {
   $('#roomTabs').hidden = outside || inObby; $('#villageTabs').hidden = !outside;
   $('#photoBtn').hidden = egg || inObby || bathing || !!placing;
   $('#jumpBtn').hidden = egg || inObby || bathing || !!placing || !!p.asleep;
+  const riding = World.riding();
+  $('#rideBtn').hidden = egg || !outside || !!p.asleep;
+  $('#rideBtn').classList.toggle('on', !!riding); $('#rideBtn').setAttribute('aria-pressed', String(!!riding));
+  $('#rideBtn').textContent = riding ? '🛑' : (RIDES[S.rideSel] || RIDES.scooter).e;
+  $('#rideBtn').setAttribute('aria-label', riding ? '탈것에서 내리기' : '탈것 타기');
   $('#emoteBtn').hidden = egg || inObby; if (inObby || egg) { $('#emoteTray').hidden = true; $('#emoteBtn').setAttribute('aria-expanded', 'false'); }
   renderQuest(inObby);
   document.querySelectorAll('#roomTabs button').forEach(b => { b.disabled = egg || bathing || p.asleep; b.classList.toggle('on', b.dataset.go === World.roomNow()); });
@@ -921,6 +929,10 @@ const World = (() => {
     trick: null, trickT: 0, t: 0, blink: 3, camX: -4, camZ: 4.6, mood: 'normal', formHold: null, eatT: 0, flick: 0, driving: false };
   // 직접 조종 입력 (화면 끌기·WASD). 길: x = 오른쪽, z = 화면 아래쪽. 크기 0~1
   const drive = { x: 0, z: 0 };
+  // 탈것: 마을에서만 탄다. lift = 펫이 올라서는 높이, mul = 빨라지는 배수
+  const RIDE3 = { scooter: { lift: .2, mul: 1.7 }, bike: { lift: .42, mul: 2.1 }, cloud: { lift: .4, mul: 2.5, hover: true } };
+  let rideKind = null, rideG = null, rideWheels = [], rideLast = null;
+  const RIDE_SCALE = 1.3;   // 펫 크기(변신하면 1.1~1.5배)에 맞춘 탈것 크기
   let stickers = [], onSticker = null;
   const cache = {};
   const toon = c => cache[c] || (cache[c] = new T.MeshToonMaterial({ color: c, gradientMap: grad }));
@@ -1986,6 +1998,7 @@ const World = (() => {
   }
   function setArea(a) {
     trail = [];
+    if (a !== 'village' && rideKind) setRide(null);
     if (a !== 'village') for (const n of Object.values(npcs)) { n.follow = false; n.hidden = false; n.racing = false; }
     bushMarks.forEach(m => { m.visible = false; });
     st.area = a; houseG.visible = a === 'house'; villageG.visible = a === 'village'; if (obbyG) obbyG.visible = a === 'obby';
@@ -2003,11 +2016,38 @@ const World = (() => {
     if (Math.abs(nx) < W && !door(nz)) nz = z;
     return [nx, nz];
   }
+  function buildRide(kind) {
+    const g = new T.Group(); rideWheels = [];
+    const wheel = (z, r) => { const w = mesh(new T.TorusGeometry(r, r * .32, 8, 18), INK, 0, r, z, 1, 1, 1, g); w.rotation.y = Math.PI / 2; mesh(CYL, '#FFFFFF', 0, r, z, r * .35, .06, r * .35, g, { cast: false }).rotation.z = Math.PI / 2; rideWheels.push({ m: w, r }); };
+    if (kind === 'scooter') {
+      mesh(BOX, '#7ED9C3', 0, .14, 0, .42, .07, 1.25, g, { outline: 1.06 });
+      wheel(.52, .11); wheel(-.52, .11);
+      const pole = mesh(CYL, '#FF8FA3', 0, .62, .55, .045, 1, .045, g, { outline: 1.1 }); pole.rotation.x = -.18;
+      mesh(CYL, '#FF8FA3', 0, 1.1, .64, .04, .62, .04, g, { outline: 1.1 }).rotation.z = Math.PI / 2;
+      for (const sx of [-1, 1]) mesh(SPH, '#5B4550', sx * .31, 1.1, .64, .06, .06, .06, g);
+    } else if (kind === 'bike') {
+      wheel(.5, .26); wheel(-.5, .26);
+      const fr = mesh(CYL, '#E8476A', 0, .4, 0, .05, 1, .05, g, { outline: 1.1 }); fr.rotation.x = Math.PI / 2;
+      mesh(CYL, '#E8476A', 0, .45, .48, .04, .42, .04, g, { outline: 1.1 });
+      mesh(CYL, '#E8476A', 0, .66, .48, .035, .55, .035, g, { outline: 1.1 }).rotation.z = Math.PI / 2;
+      mesh(BOX, '#5B4550', 0, .44, -.12, .26, .06, .34, g, { outline: 1.06 });
+      mesh(BOX, '#FFE27A', 0, .55, .62, .22, .16, .2, g, { outline: 1.06 });
+    } else if (kind === 'cloud') {
+      for (const [x, z, r] of [[0, 0, .5], [-.36, -.25, .36], [.36, -.2, .38], [0, .42, .38], [-.3, .3, .3], [.3, .32, .3]]) mesh(SPH, '#FFFFFF', x, .18, z, r, r * .45, r, g, { outline: 1.05 });
+      for (const [x, z] of [[-.5, .1], [.52, -.05], [0, -.55]]) mesh(STAR, '', x, .32, z, .07, .07, .07, g, { mat: basic('#FFE27A'), cast: false });
+    }
+    return g;
+  }
+  function setRide(kind) {
+    if (rideG) { scene.remove(rideG); rideG = null; }
+    rideKind = ok && kind && RIDE3[kind] && st.area === 'village' ? kind : null; rideLast = null;
+    if (rideKind) { rideG = buildRide(rideKind); rideG.scale.setScalar(RIDE_SCALE); scene.add(rideG); }
+  }
   function think(dt, p) {
     if (race) return;
     if ((drive.x || drive.z) && p.hatched && !p.asleep && !bathing && !talking && st.area !== 'obby') {
       // 아이가 직접 조종하면 자동 걷기·가구 자리는 바로 풀고 그쪽으로 달린다
-      const l = Math.min(1, Math.hypot(drive.x, drive.z)), a = Math.atan2(drive.x, drive.z), sp = (2.2 + 3.4 * l) * dt;
+      const l = Math.min(1, Math.hypot(drive.x, drive.z)), a = Math.atan2(drive.x, drive.z), sp = (2.2 + 3.4 * l) * dt * (rideKind ? RIDE3[rideKind].mul : 1);
       st.path = []; st.mode = 'idle'; st.arrive = null; st.at = null; st.lift = 0; st.idleT = 6; st.driving = true; st.run = l > .55;
       let nx = st.x + Math.sin(a) * sp, nz = st.z + Math.cos(a) * sp;
       if (st.area === 'village') { [nx, nz] = clampVillage(nx - VX, nz); nx += VX; }
@@ -2019,7 +2059,7 @@ const World = (() => {
     st.driving = false;
     const free = p.hatched && !p.asleep && !bathing && !gameOn && !scrim && !talking && !document.querySelector('.mini, .race-ui') && !hide && st.mode === 'idle' && !st.trick && st.eatT <= 0;
     if (st.mode === 'walk' && st.path.length) {
-      const [tx, tz] = st.path[0], dx = tx - st.x, dz = tz - st.z, d = Math.hypot(dx, dz), sp = (st.run ? 5 : 2.4) * dt;
+      const [tx, tz] = st.path[0], dx = tx - st.x, dz = tz - st.z, d = Math.hypot(dx, dz), sp = (st.run ? 5 : 2.4) * dt * (rideKind ? RIDE3[rideKind].mul : 1);
       if (d <= sp) {
         st.x = tx; st.z = tz; st.path.shift();
         if (!st.path.length) { st.mode = 'idle'; st.idleT = rand(2.5, 5); st.faceGoal = 0; const cb = st.arrive; st.arrive = null; cb && cb(); }
@@ -2061,7 +2101,7 @@ const World = (() => {
       else rz = Math.sin(t * 1.6) * .03;
       ry = 0;
     } else {
-      if (walking) { y += Math.abs(Math.sin(cyc)) * .14; rz = Math.sin(cyc) * .07; const s = Math.cos(cyc * 2) * .05; sx = 1 + s; sy = 1 - s; }
+      if (walking && !rideKind) { y += Math.abs(Math.sin(cyc)) * .14; rz = Math.sin(cyc) * .07; const s = Math.cos(cyc * 2) * .05; sx = 1 + s; sy = 1 - s; }
       else { const s = Math.sin(t * 2.4) * .02; sx = 1 - s; sy = 1 + s; }
       if (p.asleep && st.at === 'bed') { rz = 1.4; y += .1; sy = 1 + Math.sin(t * 1.3) * .03; ry = 0; }
       if (st.at === 'bath') rz = Math.sin(t * 2) * .07;
@@ -2094,6 +2134,15 @@ const World = (() => {
       st.blink -= dt; if (st.blink < 0) st.blink = rand(2.5, 5);
       if (pet.eyesOpen) pet.eyesOpen.scale.y = st.blink < .12 ? .15 : 1;
       if (pet.mouthOpen && st.eatT > 0) pet.mouthOpen.scale.y = .02 + Math.abs(Math.sin(t * 14)) * .05;
+    }
+    if (rideKind && rideG && !pet.isEgg) {
+      // 탈것 위에 올라선다. 구름 보드는 둥실둥실, 바퀴는 간 거리만큼 굴러간다
+      const R3 = RIDE3[rideKind], hv = R3.hover ? .12 + Math.sin(t * 2.4) * .06 : 0;
+      y += R3.lift * RIDE_SCALE + hv; if (walking) rz = Math.sin(t * 3) * .04;
+      rideG.position.set(st.x, hv, st.z); rideG.rotation.y = st.face;
+      if (walking && rideKind === 'bike') rideG.rotation.z = Math.sin(t * 6) * .03;
+      const moved = rideLast ? Math.hypot(st.x - rideLast[0], st.z - rideLast[1]) : 0; rideLast = [st.x, st.z];
+      for (const w of rideWheels) w.m.rotation.x += moved / (w.r * RIDE_SCALE);
     }
     pet.root.position.set(st.x, y, st.z); pet.root.rotation.set(rx, ry, rz); pet.body.scale.set(sx, sy, sx);
   }
@@ -2405,6 +2454,8 @@ const World = (() => {
     },
     raceTap() { if (race && race.t >= 0) race.boost = Math.min(5, race.boost + .7); },
     drive,
+    setRide(kind) { setRide(kind); renderHUD(); return rideKind; },
+    riding() { return rideKind; },
     spawnStickers(list, cb) {
       stickers.forEach(sk => sk.parent && sk.parent.remove(sk)); stickers = []; onSticker = cb;
       if (!ok) return;
@@ -2509,6 +2560,7 @@ window.addEventListener('keydown', e => {
   if (driveBlocked()) return;
   const k = DRIVE_MAP[e.key];
   if (k) { e.preventDefault(); driveKeys[k] = true; return applyDriveKeys(); }
+  if ((e.key === 'r' || e.key === 'R') && !e.repeat) { e.preventDefault(); return toggleRide(); }
   if (e.key === ' ' && (document.activeElement === document.body || document.activeElement === $('#world'))) { e.preventDefault(); if (!e.repeat) doJump(); }
 });
 window.addEventListener('keyup', e => { const k = DRIVE_MAP[e.key]; if (k && driveKeys[k]) { driveKeys[k] = false; applyDriveKeys(); } });
@@ -4040,6 +4092,24 @@ const TITLES = [
 const titleOpen = t => !t.badge || !!(S.badges && S.badges[t.badge]);
 const titleName = id => (TITLES.find(t => t.id === id) || {}).name || '';
 
+/* ---------- 탈것: 마을에서 타고 빨리 달린다. 저장: S.rides = 가진 탈것, S.rideSel = 고른 탈것 ---------- */
+const RIDES = {
+  scooter: { e: '🛴', name: '씽씽 킥보드', price: 0, desc: '걷기보다 1.7배 빨라요' },
+  bike:    { e: '🚲', name: '꼬마 자전거', price: 90, desc: '2배 넘게 빨라요' },
+  cloud:   { e: '☁️', name: '구름 보드',  price: 160, desc: '둥실둥실 떠서 가장 빨라요' }
+};
+function toggleRide() {
+  const p = P(); if (!p || !p.hatched || p.asleep) return;
+  if (World.area() !== 'village') return say('탈것은 마을에서 탈 수 있어요! 밖으로 나가 봐요', 3000);
+  if (World.riding()) { World.setRide(null); sfx('pop'); return say('내렸어요! 다시 걸어 볼까?', 2000); }
+  const own = S.rides || [];
+  if (!own.length) { toast('상점 › 탈것에서 무료 킥보드를 받아 보세요!'); return openShop('ride'); }
+  const kind = own.includes(S.rideSel) ? S.rideSel : own[0];
+  World.setRide(kind); sfx('up'); World.trick('hop');
+  say(pick([`${RIDES[kind].name} 출발! 화면을 끌거나 WASD로 달려요!`, '씽씽~ 바람이 시원해요!', '꽉 잡아요, 출발!']), 3000);
+}
+$('#rideBtn').addEventListener('click', () => toggleRide());
+
 /* ---------- 펫 염색 (내 펫만의 색) ---------- */
 const DYES = { base: ['원래 색', null, 0], pink: ['딸기우유', '#FFC9DA', 40], mint: ['민트', '#BFF0E0', 40], sky: ['하늘', '#CDE8FF', 40], lemon: ['레몬', '#FFF1A8', 40], lavender: ['라벤더', '#DCD0FF', 40], choco: ['초코', '#D9B08C', 40] };
 const dyeColor = p => (DYES[p.dye] || DYES.base)[1];
@@ -4098,6 +4168,7 @@ function openStand() {
 function goStand() { World.area() === 'village' ? World.goVillage('garden', true, openStand) : openStand(); }
 
 const NEWS = [
+  { v: '2.3', date: '10월 30일', items: ['🛴 탈것이 생겼어요! 상점 › 탈것에서 무료 킥보드를 받고, 마을에서 오른쪽 🛴 버튼(키보드 R)으로 타요', '🚲 꼬마 자전거, ☁️ 둥실둥실 구름 보드는 더 빨라요'] },
   { v: '2.2', date: '10월 30일', items: ['🦸 상점 > 꾸미기: 천사·박쥐 날개, 영웅 망토, 로켓 가방, 풍선, 목도리, 금메달…', '🏷️ 배지를 따면 칭호가 열려요. 이름 아래에 보여요', '💬 마을 친구들이 새 모습을 알아봐 줘요'] },
   { v: '2.1', date: '10월 30일', items: ['🌈 점프 코스가 5단계로! 구름 징검다리 · 사라지는 발판 · 빙글빙글 막대 · 무지개 탑', '🟡 점프대를 밟으면 하늘 높이 슈웅!', '🏆 단계마다 최고 기록, 다 깨면 코스 정복자 배지'] },
   { v: '2.0', date: '10월 30일', items: ['🕹️ 화면을 끌거나 WASD·방향키로 펫을 직접 조종해요. 점프 버튼(스페이스바)도 생겼어요', '🔎 집과 마을에 숨은 스티커 30개! 5개마다 선물, 높이 뜬 스티커는 점프로 잡아요', '🥚 알은 세 번만 톡톡, 걷는 속도도 빨라졌어요'] },
@@ -4199,6 +4270,11 @@ function openShop(tab = 'hat') {
     const own = ds.owned.includes(id), on = !!ds.placed[id];
     return `<div class="item decor${on ? ' on' : ''}"><span class="em">${DECOR[id].e}</span><span class="nm">${DECOR[id].name}</span>${own ? `<span class="dbtns"><button class="mini-btn" data-place="${id}">${on ? '옮기기' : '놓기'}</button>${on ? `<button class="mini-btn" data-store="${id}">넣기</button>` : ''}</span>` : `<button class="mini-btn buy" data-buyd="${id}">${priceTag(DECOR[id].price)}</button>`}</div>`;
   }).join('');
+  const rideOwned = S.rides || [];
+  const rideHTML = `<p class="msub">마을에서 오른쪽 🛴 버튼(키보드 R)으로 타고 내려요. 고른 탈것을 타요.</p><div class="grid">${Object.entries(RIDES).map(([id, r]) => {
+    const own = rideOwned.includes(id), on = S.rideSel === id && own;
+    return `<button class="item${on ? ' on' : ''}" data-ride="${id}"><span class="em">${r.e}</span><span class="nm">${r.name}</span>${own ? `<span class="pr">${on ? '고른 탈것' : '가지고 있어요'}</span>` : (r.price ? priceTag(r.price) : '<span class="pr">무료로 받기</span>')}<span class="eff">${r.desc}</span></button>`;
+  }).join('')}</div>`;
   const wearOwned = S.wear || [];
   const wearGrid = slot => Object.entries(WEAR).filter(([, w]) => w.slot === slot).map(([id, w]) => {
     const own = wearOwned.includes(id), on = p[slot] === id;
@@ -4214,8 +4290,19 @@ function openShop(tab = 'hat') {
     const own = k === 'base' || dyes.includes(k), on = (p.dye || 'base') === k;
     return `<button class="item${on ? ' on' : ''}" data-dye="${k}"><span class="swatch dye" style="background:${col || 'linear-gradient(135deg,#FFFFFF 50%,#EADDE3 50%)'}"></span><span class="nm">${name}</span>${own ? `<span class="pr">${on ? '지금 색' : '가지고 있어요'}</span>` : priceTag(price)}</button>`;
   }).join('');
-  openSheet('반짝 상점', `<div class="tabs" role="tablist"><button role="tab" aria-selected="${tab === 'hat'}" data-tab="hat">모자</button><button role="tab" aria-selected="${tab === 'wear'}" data-tab="wear">꾸미기</button><button role="tab" aria-selected="${tab === 'dye'}" data-tab="dye">염색</button><button role="tab" aria-selected="${tab === 'decor'}" data-tab="decor">가구</button><button role="tab" aria-selected="${tab === 'room'}" data-tab="room">벽지</button></div>${tab === 'wear' ? wearHTML : `<div class="grid">${tab === 'hat' ? hatHTML : tab === 'dye' ? dyeHTML : tab === 'decor' ? decorHTML : roomHTML}</div>`}`,
+  openSheet('반짝 상점', `<div class="tabs" role="tablist"><button role="tab" aria-selected="${tab === 'hat'}" data-tab="hat">모자</button><button role="tab" aria-selected="${tab === 'wear'}" data-tab="wear">꾸미기</button><button role="tab" aria-selected="${tab === 'dye'}" data-tab="dye">염색</button><button role="tab" aria-selected="${tab === 'ride'}" data-tab="ride">탈것</button><button role="tab" aria-selected="${tab === 'decor'}" data-tab="decor">가구</button><button role="tab" aria-selected="${tab === 'room'}" data-tab="room">벽지</button></div>${tab === 'wear' ? wearHTML : tab === 'ride' ? rideHTML : `<div class="grid">${tab === 'hat' ? hatHTML : tab === 'dye' ? dyeHTML : tab === 'decor' ? decorHTML : roomHTML}</div>`}`,
     body => body.addEventListener('click', e => {
+      const rd = e.target.closest('[data-ride]');
+      if (rd) {
+        const id = rd.dataset.ride, r = RIDES[id]; S.rides = S.rides || [];
+        if (!S.rides.includes(id)) {
+          if (S.coins < r.price) return toast(`코인이 ${r.price - S.coins}개 모자라요`);
+          S.coins -= r.price; S.rides.push(id); sfx('buy'); toast(`${r.e} ${josa(r.name, '을', '를')} ${r.price ? '샀어요' : '받았어요'}! 마을에서 타 봐요`);
+        }
+        S.rideSel = id;
+        if (World.riding()) World.setRide(id);
+        render(); persist(); return openShop('ride');
+      }
       const wr = e.target.closest('[data-wear]');
       if (wr) {
         const id = wr.dataset.wear, w = WEAR[id]; S.wear = S.wear || [];
