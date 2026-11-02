@@ -374,6 +374,11 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
 .titles small{display:block;font-family:var(--body);font-size:10.5px;color:var(--muted)}
 .ride-btn{position:absolute;right:10px;bottom:132px;z-index:6;width:54px;height:54px;border-radius:50%;border:0;font-size:26px;background:var(--paper);box-shadow:0 0 0 2.5px var(--ink) inset,0 4px 0 rgba(91,69,80,.25)}
 .ride-btn.on{background:var(--butter)}
+.round-ui{position:absolute;top:52px;left:10px;right:10px;z-index:8;display:flex;align-items:center;gap:6px;justify-content:center;pointer-events:none}
+.round-ui .pill{background:rgba(255,255,255,.95);font-size:16px;pointer-events:auto}
+.round-ui .icon-btn{pointer-events:auto}
+.round-big{position:absolute;top:30%;left:50%;transform:translateX(-50%);z-index:9;font-family:var(--display);font-size:64px;color:#fff;text-shadow:0 4px 0 var(--ink),0 0 20px rgba(91,69,80,.35);pointer-events:none;white-space:nowrap}
+.round-tip{position:absolute;top:96px;left:16px;right:16px;z-index:8;margin:0;text-align:center;font-family:var(--display);font-size:15px;color:#fff;text-shadow:0 2px 0 var(--ink);pointer-events:none}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
 
@@ -933,7 +938,7 @@ const World = (() => {
   const RIDE3 = { scooter: { lift: .2, mul: 1.7 }, bike: { lift: .42, mul: 2.1 }, cloud: { lift: .4, mul: 2.5, hover: true } };
   let rideKind = null, rideG = null, rideWheels = [], rideLast = null;
   const RIDE_SCALE = 1.3;   // 펫 크기(변신하면 1.1~1.5배)에 맞춘 탈것 크기
-  let stickers = [], onSticker = null;
+  let stickers = [], onSticker = null, treasures = [], onTreasure = null, onTagged = null;
   const cache = {};
   const toon = c => cache[c] || (cache[c] = new T.MeshToonMaterial({ color: c, gradientMap: grad }));
   let SPH, BOX, CYL, CONE, STAR, HALF;
@@ -1563,7 +1568,21 @@ const World = (() => {
       n.t += dt;
       if (n.hidden) { p.root.visible = false; n.tag.hidden = true; continue; }
       p.root.visible = true;
-      if (n.racing) { n.walk = !!race && race.t >= 0; n.faceGoal = Math.PI; }
+      if (n.fleeing) {
+        // 술래잡기: 가까이 오면 반대쪽으로 달아나고(조금씩 방향을 틀며), 벽에 막히면 옆으로 비켜 달린다
+        const d = Math.hypot(dx, dz);
+        if (n.caught) { n.walk = false; n.faceGoal = Math.atan2(dx, dz); }
+        else if (d < 1.25) { n.caught = true; n.jumpT = .6; n.walk = false; onTagged && onTagged(n.id); }
+        else {
+          let ax, az, sp;
+          if (d < 7) { const w = Math.sin(n.t * 1.7 + n.hx) * .6, ux = -dx / d, uz = -dz / d; ax = ux * Math.cos(w) - uz * Math.sin(w); az = ux * Math.sin(w) + uz * Math.cos(w); sp = n.flee; }
+          else { ax = Math.sin(n.t * .5 + n.hz); az = Math.cos(n.t * .5 + n.hx); sp = 1.4; }
+          let [nx, nz] = clampVillage(n.x + ax * sp * dt, n.z + az * sp * dt);
+          if (Math.hypot(nx - n.x, nz - n.z) < sp * dt * .4) { const sd = Math.sin(n.t * 3 + n.hx) > 0 ? 1 : -1; [nx, nz] = clampVillage(n.x + az * sd * sp * dt * 1.2, n.z - ax * sd * sp * dt * 1.2); }
+          n.faceGoal = Math.atan2(nx - n.x, nz - n.z); n.x = nx; n.z = nz; n.walk = true;
+        }
+      }
+      else if (n.racing) { n.walk = !!race && race.t >= 0; n.faceGoal = Math.PI; }
       else if (n.follow && !n.talking) {
         const bx = st.x - VX - Math.sin(st.face) * 1.5 + Math.cos(st.face) * .9, bz = st.z - Math.cos(st.face) * 1.5 - Math.sin(st.face) * .9;
         const ex = bx - n.x, ez = bz - n.z, d = Math.hypot(ex, ez);
@@ -2159,6 +2178,11 @@ const World = (() => {
     else for (let left = dt; left > 1e-4; left -= .05) think(Math.min(.05, left), p);
     animate(Math.min(dt, .1), p);
     moveCompanions(Math.min(dt, .1));
+    for (let i = treasures.length - 1; i >= 0; i--) {
+      const tr = treasures[i]; if (st.area !== 'village') break;
+      tr.position.y = .65 + Math.sin(st.t * 4 + i) * .12; tr.material.rotation = Math.sin(st.t * 3 + i) * .2;
+      if (Math.hypot(tr.position.x - st.x, tr.position.z - st.z) < 1.2) { villageG.remove(tr); treasures.splice(i, 1); onTreasure && onTreasure(tr.userData.idx); }
+    }
     for (let i = stickers.length - 1; i >= 0; i--) {
       const sk = stickers[i], u = sk.userData; if (u.area !== st.area) continue;
       sk.position.y = u.y + Math.sin(st.t * 3 + i) * .1; sk.material.rotation = Math.sin(st.t * 2 + i) * .25;
@@ -2454,6 +2478,18 @@ const World = (() => {
     },
     raceTap() { if (race && race.t >= 0) race.boost = Math.min(5, race.boost + .7); },
     drive,
+    // 술래잡기: 고른 친구들이 달아난다. 잡히면 cb(id)
+    tagStart(ids, cb) {
+      onTagged = cb;
+      ids.forEach((id, k) => { const n = npcs[id]; if (!n) return; n.fleeing = true; n.caught = false; n.follow = false; n.hidden = false; n.talking = false; n.flee = 3.5 + k * .25; });
+    },
+    tagStop() { onTagged = null; for (const n of Object.values(npcs)) { if (n.fleeing) { n.fleeing = false; n.caught = false; n.wt = 0; } } },
+    spawnTreasure(list, cb) {
+      treasures.forEach(tr => villageG.remove(tr)); treasures = []; onTreasure = cb;
+      if (!ok) return;
+      for (const [i, x, z] of list) { const [cx, cz] = clampVillage(x, z); const sp = emojiSprite('🎁', .7); sp.position.set(VX + cx, .65, cz); sp.userData.idx = i; villageG.add(sp); treasures.push(sp); }
+    },
+    clearTreasure() { treasures.forEach(tr => villageG.remove(tr)); treasures = []; onTreasure = null; },
     setRide(kind) { setRide(kind); renderHUD(); return rideKind; },
     riding() { return rideKind; },
     spawnStickers(list, cb) {
@@ -2526,7 +2562,7 @@ World.onTap = hit => {
   if (talking) return;
   if (u.comp !== undefined) { World.compJump(u.comp); return switchPet(u.comp); }
   if (u.use === 'stand') return goStand();
-  if (u.npc) return World.hidden(u.npc) ? hideGuess(-1) : talkTo(u.npc);
+  if (u.npc) return round ? null : World.hidden(u.npc) ? hideGuess(-1) : talkTo(u.npc);
   if (u.use === 'home') return World.goHome();
   if (u.use && u.use.startsWith('water:')) return waterBed(+u.use.slice(6));
   if (u.use && u.use.startsWith('bush:')) return hideGuess(+u.use.slice(5));
@@ -3152,6 +3188,86 @@ Object.assign(SPECIAL, {
   neurit: () => [{ label: fs('neurit').q === 'active' ? '🐚 조개 가져왔어!' : '🏖️ 도와줄 일 있어?', fn: shellQuest }],
   mongsil: () => [{ label: '🙈 숨바꼭질 하자!', fn: hideSeek }]
 });
+
+/* ---------- 마을 놀이 라운드: 술래잡기(달아나는 친구 3명 잡기 60초) · 보물찾기(선물 상자 8개 45초) ----------
+   코인은 놀이마다 처음 3번만 (boundedReward), 친구 하트와 재미는 매번 오른다 */
+const TAG_FRIENDS = ['somsom', 'banjjak', 'mongsil'];
+const TREASURE_SPOTS = [[-11, -4], [-8, 9], [-3, 15], [3, 17.5], [9, 16], [14, 12], [20, 16], [26, 15], [25, 2], [21, -6], [14, -2], [7, -3], [-2, -4], [-6, 4], [4, 6], [16, 6]];
+let round = null;
+function startRound(kind) {
+  const p = P();
+  if (!p || !p.hatched || p.asleep) return;
+  if (p.energy < 15) return say('너무 졸려서 못 뛰겠어요… 먼저 재워 주세요', 3000);
+  if (World.area() !== 'village') { say('마을로 나가서 해요!', 2500); return World.area() === 'house' ? goOutsideThen(() => startRound(kind)) : null; }
+  if (round) return;
+  closeSheet(); if (talking) closeTalk();
+  if (following) { following = null; World.setFollow(null); }
+  if (World.riding()) World.setRide(null);
+  const tag = kind === 'tag', total = tag ? TAG_FRIENDS.length : 8, sec = tag ? 60 : 45;
+  round = { kind, total, got: 0, left: sec, on: false };
+  const ui = document.createElement('div'); ui.className = 'round-ui';
+  ui.innerHTML = `<span class="pill">${tag ? '🏃 술래잡기' : '🎁 보물찾기'}</span><span class="pill">⏱ <b id="rdTime">${sec}</b></span><span class="pill">${tag ? '잡음' : '찾음'} <b id="rdGot">0</b>/${total}</span><button class="icon-btn" id="rdQuit" aria-label="그만하기">✕</button>`;
+  const tip = document.createElement('p'); tip.className = 'round-tip';
+  tip.textContent = tag ? '내가 술래! 도망가는 친구 3명에게 가까이 달려가서 잡아요' : '마을 곳곳의 🎁 선물 상자로 달려가서 주워요';
+  const big = document.createElement('div'); big.className = 'round-big';
+  room.append(ui, tip, big);
+  round.ui = ui; round.tip = tip; round.big = big;
+  ui._close = () => endRound(true);
+  ui.querySelector('#rdQuit').addEventListener('click', () => endRound(true));
+  let k = 3;
+  const count = () => {
+    if (!round || round.ui !== ui) return;
+    if (k > 0) { big.textContent = k; sfx('pop'); k--; return setTimeout(count, 800); }
+    big.textContent = tag ? '도망가!' : '찾아라!'; sfx('up'); setTimeout(() => { if (big.isConnected) big.textContent = ''; }, 800);
+    round.on = true;
+    if (tag) World.tagStart(TAG_FRIENDS, id => { if (!round || !round.on) return; round.got++; sfx('coin'); addFriend(id, 5); toast(`잡았다! ${FRIENDS[id].name} (${round.got}/${round.total})`); $('#rdGot').textContent = round.got; if (round.got >= round.total) endRound(false); });
+    else {
+      const spots = shuffle(TREASURE_SPOTS.map((c, i) => [i, c[0], c[1]])).slice(0, total);
+      World.spawnTreasure(spots, () => { if (!round || !round.on) return; round.got++; sfx('coin'); burst(['🎁', '✨'], 3, -.2); $('#rdGot').textContent = round.got; if (round.got >= round.total) endRound(false); });
+    }
+    round.timer = setInterval(() => {
+      if (!round || document.hidden) return;
+      round.left--; const el = $('#rdTime'); if (el) el.textContent = round.left;
+      if (round.left <= 0) endRound(false);
+    }, 1000);
+    setTimeout(() => { if (tip.isConnected) tip.remove(); }, 5000);
+  };
+  setTimeout(count, 300);
+  renderHUD();
+}
+// 집에 있으면 현관으로 나가서 마을에 도착한 뒤 이어서 한다
+function goOutsideThen(cb) {
+  goOutside();
+  let tries = 0; const iv = setInterval(() => { if (World.area() === 'village') { clearInterval(iv); setTimeout(cb, 900); } else if (++tries > 40) clearInterval(iv); }, 250);
+}
+function endRound(quit) {
+  const r = round; if (!r) return;
+  round = null; clearInterval(r.timer);
+  World.tagStop(); World.clearTreasure();
+  [r.ui, r.tip, r.big].forEach(el => el && el.remove());
+  if (quit) { say('괜찮아! 하고 싶을 때 또 하자!', 2500); return renderHUD(); }
+  const tag = r.kind === 'tag', all = r.got >= r.total;
+  change({ fun: 10 + r.got * 2, energy: -6 }); addXP(5 + r.got * 2); if (r.got) mission('friend');
+  let coins = 0;
+  if (r.got) coins = boundedReward(tag ? 'tagGame' : 'treasureGame', all ? 25 : 8 + r.got * 2);
+  if (all) { badge(tag ? 'tagger' : 'treasure'); confetti(90); sfx('up'); } else sfx('coin');
+  render(); persist();
+  const card = document.createElement('div'); card.className = 'g-card'; card.id = 'rdResult';
+  card.innerHTML = `<h3>${all ? (tag ? '모두 잡았다! 🏆' : '보물을 다 찾았어요! 💎') : (r.got ? '잘했어요!' : '다음엔 꼭!')}</h3><div class="big-score">${r.got} / ${r.total}</div><p>${all && r.left > 0 ? `${r.left}초 남기고 성공!<br>` : ''}${coins ? `<i class="coin"></i> ${coins}코인 · ` : ''}경험치 ${5 + r.got * 2} · 행복 +${10 + r.got * 2}</p>
+    <div style="display:flex;gap:8px"><button class="candy primary" id="rdAgain" style="flex:1">다시 하기</button><button class="candy" id="rdClose" style="flex:1">닫기</button></div>`;
+  room.appendChild(card);
+  const close = () => card.remove();
+  card._close = close;
+  card.querySelector('#rdClose').addEventListener('click', close);
+  card.querySelector('#rdAgain').addEventListener('click', () => { close(); startRound(r.kind); });
+  card.querySelector('#rdAgain').focus({ preventScroll: true });
+}
+// 광장 솜솜은 술래잡기, 도서관 꼬깔 선생님은 보물찾기를 연다
+{
+  const s0 = SPECIAL.somsom, k0 = SPECIAL.kokkal;
+  SPECIAL.somsom = () => [...(s0 ? s0() : []), { label: '🏃 술래잡기 하자! (내가 술래)', fn: () => { setTimeout(() => startRound('tag'), 50); return null; } }];
+  SPECIAL.kokkal = () => [...(k0 ? k0() : []), { label: '🎁 보물찾기 하고 싶어요!', fn: () => { setTimeout(() => startRound('treasure'), 50); return null; } }];
+}
 
 function waterBed(i) {
   const s = fs('porong');
@@ -3813,6 +3929,8 @@ $('#emoteTray').addEventListener('click', e => {
 
 /* ---------- 배지 ---------- */
 const BADGES = {
+  tagger:   ['🏃', '술래잡기 왕', '술래잡기에서 친구 3명 모두 잡기'],
+  treasure: ['💎', '보물 사냥꾼', '보물찾기에서 상자 8개 모두 찾기'],
   obbyAll: ['🏔️', '코스 정복자', '점프 코스 5단계 모두 완주'],
   explorer: ['🔎', '꼬마 탐험가', '숨은 스티커 30개 모두 찾기'],
   hatch:    ['🐣', '첫 부화', '알에서 친구가 태어났어요'],
@@ -4087,7 +4205,8 @@ const TITLES = [
   { id: 'explorer', name: '꼬마 탐험가', badge: 'explorer' }, { id: 'racer', name: '달리기 왕', badge: 'racer' },
   { id: 'chef', name: '꼬마 요리사', badge: 'chef' }, { id: 'farmer', name: '꼬마 농부', badge: 'farmer' },
   { id: 'bestie', name: '인기쟁이', badge: 'bestie' }, { id: 'merchant', name: '꼬마 사장님', badge: 'merchant' },
-  { id: 'decor', name: '인테리어 장인', badge: 'decor' }, { id: 'form4', name: '무지개 전설', badge: 'form4' }
+  { id: 'decor', name: '인테리어 장인', badge: 'decor' }, { id: 'form4', name: '무지개 전설', badge: 'form4' },
+  { id: 'tagger', name: '술래잡기 왕', badge: 'tagger' }, { id: 'treasure', name: '보물 사냥꾼', badge: 'treasure' }
 ];
 const titleOpen = t => !t.badge || !!(S.badges && S.badges[t.badge]);
 const titleName = id => (TITLES.find(t => t.id === id) || {}).name || '';
@@ -4168,6 +4287,7 @@ function openStand() {
 function goStand() { World.area() === 'village' ? World.goVillage('garden', true, openStand) : openStand(); }
 
 const NEWS = [
+  { v: '2.4', date: '11월 2일', items: ['🏃 술래잡기: 내가 술래! 도망가는 친구 3명을 60초 안에 잡아요 (놀이 버튼 또는 광장 솜솜)', '🎁 보물찾기: 마을에 숨은 선물 상자 8개를 45초 안에 (놀이 버튼 또는 도서관 꼬깔)', '🏷️ 새 칭호: 술래잡기 왕, 보물 사냥꾼'] },
   { v: '2.3', date: '10월 30일', items: ['🛴 탈것이 생겼어요! 상점 › 탈것에서 무료 킥보드를 받고, 마을에서 오른쪽 🛴 버튼(키보드 R)으로 타요', '🚲 꼬마 자전거, ☁️ 둥실둥실 구름 보드는 더 빨라요'] },
   { v: '2.2', date: '10월 30일', items: ['🦸 상점 > 꾸미기: 천사·박쥐 날개, 영웅 망토, 로켓 가방, 풍선, 목도리, 금메달…', '🏷️ 배지를 따면 칭호가 열려요. 이름 아래에 보여요', '💬 마을 친구들이 새 모습을 알아봐 줘요'] },
   { v: '2.1', date: '10월 30일', items: ['🌈 점프 코스가 5단계로! 구름 징검다리 · 사라지는 발판 · 빙글빙글 막대 · 무지개 탑', '🟡 점프대를 밟으면 하늘 높이 슈웅!', '🏆 단계마다 최고 기록, 다 깨면 코스 정복자 배지'] },
@@ -4228,6 +4348,8 @@ function closeTopLayer() {
   if (mini) { mini._close ? mini._close() : mini.remove(); return true; }
   const race = document.querySelector('.race-ui');
   if (race) { race._close && race._close(); return true; }
+  const rd = document.querySelector('#rdResult, .round-ui');
+  if (rd) { rd._close && rd._close(); return true; }
   const game = document.querySelector('#gHome, #obHome') || document.querySelector('#gClose, #obExit');
   if (game) { game.click(); return true; }
   if (scrim) { closeSheet(); return true; }
@@ -4910,12 +5032,17 @@ function openPlayMenu() {
   const card = (id, emoji, title, desc, cls = '') =>
     `<button class="dex-card" data-game="${id}"><span class="emo ${cls}">${emoji}</span><span class="txt"><span class="t1">${title}</span><br><span class="t2">${desc}</span></span><span class="go">${best[id] ? `최고 ${best[id]}` : '해 보기'}</span></button>`;
   openSheet('뭐 하고 놀까?', `<div class="dex">
+    <p class="arcade-head" style="margin-top:0">마을 놀이 <span class="arcade-tag">직접 달려요</span></p>
+    ${card('tag', '🏃', '술래잡기', '내가 술래! 도망가는 친구 3명을 60초 안에 잡아요', 'day')}
+    ${card('treasure', '🎁', '보물찾기', '마을에 숨은 선물 상자 8개를 45초 안에 찾아요', 'day')}
+    <p class="arcade-head">미니게임</p>
     ${card('stars', '⭐', '별똥별 받기', '떨어지는 별과 하트를 받아요. 30초 동안!', 'day')}
     <p class="arcade-head">추억의 오락실 <span class="arcade-tag">엄마 아빠 어릴 적 오락실 느낌</span></p>
     ${Object.values(ARCADE).map(d => card(d.id, d.emo, d.title, d.desc)).join('')}
   </div>`, body => body.addEventListener('click', e => {
     const b = e.target.closest('[data-game]'); if (!b) return;
     closeSheet();
+    if (b.dataset.game === 'tag' || b.dataset.game === 'treasure') return startRound(b.dataset.game);
     return b.dataset.game === 'stars' ? openGame() : openArcade(ARCADE[b.dataset.game]);
   }));
 }
