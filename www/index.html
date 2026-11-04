@@ -258,8 +258,8 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
 .item .eff{font-size:11px;color:var(--muted)}
 .item.on{box-shadow:0 0 0 3px var(--ink) inset;background:#FFF7D6}
 .item.fav::before{content:"최애";position:absolute;top:6px;right:6px;font-size:10px;font-family:var(--display);background:var(--coral);color:#fff;border-radius:99px;padding:1px 6px}
-.tabs{display:flex;gap:6px;margin-bottom:12px}
-.tabs button{flex:1;border:0;border-radius:14px;padding:8px 4px;font-family:var(--display);font-size:15px;background:var(--soft);box-shadow:0 0 0 2px var(--line) inset}
+.tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none;padding:2px}
+.tabs button{flex:1 0 auto;white-space:nowrap;border:0;border-radius:14px;padding:8px 9px;font-family:var(--display);font-size:15px;background:var(--soft);box-shadow:0 0 0 2px var(--line) inset}
 .tabs button[aria-selected="true"]{background:var(--butter);box-shadow:0 0 0 2.5px var(--ink) inset}
 .swatch{width:72px;height:52px;border-radius:12px;box-shadow:0 0 0 2px var(--ink) inset}
 .dex{display:grid;gap:10px}
@@ -566,7 +566,111 @@ const SPECIES = {
     }
   }
 };
-const SPECIES_ORDER = ['bunny', 'hamster', 'penguin', 'dragon', 'squirrel'];
+Object.assign(SPECIES, {
+  fox: {
+    name: '노을이', kind: '노을 여우', color: '#FFB27A', bg: '#FFF0E2', fav: 'cake',
+    hatTop: 66, eye: 124, mouth: 141,
+    desc: '해 질 녘 하늘에서 내려온 여우예요. 복슬복슬한 꼬리 끝이 노을처럼 하얘요.',
+    draw() {
+      const f = '#FFB27A';
+      return {
+        back: ol('<path d="M58 96 L52 42 L92 72Z"/><path d="M142 96 L148 42 L108 72Z"/>', f) + `<path d="M55 60 L52 42 L68 54Z" fill="${INK}"/><path d="M145 60 L148 42 L132 54Z" fill="${INK}"/>`
+          + ol('<path d="M142 168 Q190 170 186 122 Q182 98 166 104 Q172 134 140 146Z"/>', f) + '<path d="M186 122 Q182 98 166 104 Q171 116 169 126Z" fill="#FFF4E8"/>',
+        body: ol('<ellipse cx="100" cy="128" rx="62" ry="55"/>', f) + '<ellipse cx="100" cy="162" rx="36" ry="20" fill="#FFF4E8"/><ellipse cx="62" cy="142" rx="19" ry="13" fill="#FFF4E8"/><ellipse cx="138" cy="142" rx="19" ry="13" fill="#FFF4E8"/>',
+        front: ol('<ellipse cx="80" cy="181" rx="12" ry="7"/><ellipse cx="120" cy="181" rx="12" ry="7"/>', '#8A5530', 6)
+      };
+    }
+  },
+  turtle: {
+    name: '느긋이', kind: '풀잎 거북', color: '#9BD77E', bg: '#EEF9E6', fav: 'carrot',
+    hatTop: 70, eye: 126, mouth: 143,
+    desc: '등에 풀잎 무늬를 지고 다니는 거북이에요. 느려 보여도 끝까지 해내요.',
+    draw() {
+      return {
+        back: ol('<ellipse cx="100" cy="112" rx="72" ry="58"/>', '#7FB86A') + '<g fill="#6AA35A"><ellipse cx="46" cy="104" rx="12" ry="16"/><ellipse cx="154" cy="104" rx="12" ry="16"/><ellipse cx="100" cy="66" rx="18" ry="10"/></g>',
+        body: ol('<ellipse cx="100" cy="134" rx="54" ry="48"/>', '#9BD77E') + '<ellipse cx="100" cy="164" rx="32" ry="17" fill="#F3F7D0"/>',
+        front: ol('<ellipse cx="72" cy="180" rx="15" ry="8"/><ellipse cx="128" cy="180" rx="15" ry="8"/>', '#8FCB72', 6)
+      };
+    }
+  },
+  sheep: {
+    name: '뭉실이', kind: '구름 양', color: '#E9C79A', bg: '#FFF7EC', fav: 'apple',
+    hatTop: 58, eye: 126, mouth: 143,
+    desc: '온몸이 구름 같은 털로 덮인 양이에요. 안기면 스르르 잠이 와요.',
+    draw() {
+      const w = '#FFFFFF';
+      return {
+        back: ol('<circle cx="52" cy="104" r="26"/><circle cx="148" cy="104" r="26"/><circle cx="72" cy="74" r="26"/><circle cx="128" cy="74" r="26"/><circle cx="100" cy="62" r="28"/><circle cx="46" cy="146" r="24"/><circle cx="154" cy="146" r="24"/>', w)
+          + ol('<ellipse cx="42" cy="118" rx="16" ry="8" transform="rotate(-20 42 118)"/><ellipse cx="158" cy="118" rx="16" ry="8" transform="rotate(20 158 118)"/>', '#F2D2BC', 5),
+        body: ol('<ellipse cx="100" cy="130" rx="58" ry="52"/>', '#FCE9D8') + '<ellipse cx="100" cy="92" rx="44" ry="16" fill="#FFFFFF"/>',
+        front: ol('<ellipse cx="80" cy="181" rx="12" ry="7"/><ellipse cx="120" cy="181" rx="12" ry="7"/>', '#8E7A85', 6)
+      };
+    }
+  }
+});
+Object.assign(SPECIES, {
+  kitten: {
+    name: '나비', kind: '치즈 고양이', color: '#FFC98A', bg: '#FFF4E6', fav: 'milk',
+    hatTop: 58, eye: 112, mouth: 128,
+    desc: '꼬리를 물음표처럼 세우고 다니는 아기 고양이예요. 기분이 좋으면 골골골 소리를 내요.',
+    draw() {
+      const f = '#FFD9A6', d = '#F7A65A';
+      return {
+        back: ol('<path d="M140 176 Q182 176 180 136 Q178 118 166 120 Q158 124 164 130 Q170 132 170 140 Q170 162 136 164Z"/>', d, 6)
+          + ol('<path d="M46 92 L44 34 Q46 28 52 32 L92 62Z"/><path d="M154 92 L156 34 Q154 28 148 32 L108 62Z"/>', f)
+          + '<path d="M54 76 L52 44 L78 62Z" fill="#FFB6C6"/><path d="M146 76 L148 44 L122 62Z" fill="#FFB6C6"/>'
+          + ol('<ellipse cx="100" cy="166" rx="34" ry="24"/>', f),
+        body: ol('<ellipse cx="100" cy="108" rx="66" ry="56"/>', f)
+          + `<g fill="${d}"><path d="M100 52 q-7 13 0 24 q7 -11 0 -24Z"/><path d="M78 56 q-5 10 3 19 q4 -10 -3 -19Z"/><path d="M122 56 q5 10 -3 19 q-4 -10 3 -19Z"/></g>`
+          + '<ellipse cx="100" cy="134" rx="26" ry="16" fill="#FFF6E9"/>'
+          + `<path d="M95 120 q5 5 10 0 q-5 6 -10 0Z" fill="#FF8FA3" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>`
+          + `<g stroke="${INK}" stroke-width="2.4" stroke-linecap="round"><path d="M38 118 L18 112"/><path d="M38 128 L18 130"/><path d="M162 118 L182 112"/><path d="M162 128 L182 130"/></g>`,
+        front: ol('<ellipse cx="82" cy="186" rx="13" ry="8"/><ellipse cx="118" cy="186" rx="13" ry="8"/>', f, 6)
+      };
+    }
+  },
+  puppy: {
+    name: '멍실이', kind: '솜뭉치 강아지', color: '#E8B77E', bg: '#FFF7EA', fav: 'rice',
+    hatTop: 56, eye: 112, mouth: 132,
+    desc: '귀가 축 늘어진 아기 강아지예요. 좋아하는 친구를 보면 꼬리가 프로펠러처럼 돌아가요.',
+    draw() {
+      const f = '#FFF0D8', e = '#C98F5A';
+      return {
+        back: ol('<ellipse cx="156" cy="158" rx="15" ry="11" transform="rotate(-35 156 158)"/>', f, 6) + ol('<ellipse cx="100" cy="166" rx="34" ry="24"/>', f),
+        body: ol('<ellipse cx="100" cy="106" rx="66" ry="58"/>', f)
+          + `<ellipse cx="124" cy="106" rx="24" ry="27" fill="#F2CFA0"/>`
+          + '<ellipse cx="100" cy="132" rx="27" ry="19" fill="#FFFBF3"/>'
+          + `<ellipse cx="100" cy="122" rx="8.5" ry="6.5" fill="${INK}"/><ellipse cx="97.5" cy="120" rx="2.4" ry="1.6" fill="#fff"/>`
+          + '<path d="M93 138 q7 12 14 0Z" fill="#FF8FA3"/>',
+        front: ol('<ellipse cx="40" cy="108" rx="19" ry="36" transform="rotate(10 40 108)"/><ellipse cx="160" cy="108" rx="19" ry="36" transform="rotate(-10 160 108)"/>', e)
+          + ol('<ellipse cx="82" cy="186" rx="13" ry="8"/><ellipse cx="118" cy="186" rx="13" ry="8"/>', f, 6)
+      };
+    }
+  },
+  otter: {
+    name: '퐁당이', kind: '조개 수달', color: '#B98A62', bg: '#E8F7FB', fav: 'chestnut',
+    hatTop: 60, eye: 110, mouth: 130,
+    desc: '배 위에 제일 아끼는 조개를 올려놓고 다니는 아기 수달이에요. 물장구치는 걸 제일 좋아해요.',
+    draw() {
+      const f = '#C99A70', c = '#FFF0DC';
+      return {
+        back: ol('<path d="M140 178 Q186 186 188 150 Q190 138 178 140 Q172 160 134 160Z"/>', '#A97C56', 6)
+          + ol('<circle cx="30" cy="92" r="11"/><circle cx="170" cy="92" r="11"/>', f) + '<circle cx="30" cy="92" r="5.5" fill="#8A6244"/><circle cx="170" cy="92" r="5.5" fill="#8A6244"/>'
+          + ol('<ellipse cx="100" cy="166" rx="36" ry="25"/>', f),
+        body: ol('<ellipse cx="100" cy="106" rx="76" ry="50"/>', f)
+          + `<ellipse cx="100" cy="128" rx="50" ry="26" fill="${c}"/><ellipse cx="58" cy="116" rx="20" ry="12" fill="${c}"/><ellipse cx="142" cy="116" rx="20" ry="12" fill="${c}"/>`
+          + `<g stroke="${INK}" stroke-width="2.4" stroke-linecap="round"><path d="M34 120 L12 116"/><path d="M34 128 L12 130"/><path d="M166 120 L188 116"/><path d="M166 128 L188 130"/></g>`
+          + `<ellipse cx="100" cy="120" rx="9" ry="6.5" fill="${INK}"/><ellipse cx="97.5" cy="118" rx="2.4" ry="1.6" fill="#fff"/>`
+          + `<g fill="${INK}"><circle cx="72" cy="128" r="1.8"/><circle cx="66" cy="124" r="1.8"/><circle cx="128" cy="128" r="1.8"/><circle cx="134" cy="124" r="1.8"/></g>`,
+        front: ol('<path d="M82 172 Q100 150 118 172 Q100 184 82 172Z"/>', '#FFB6C6', 5)
+          + `<g stroke="${INK}" stroke-width="2" stroke-linecap="round"><path d="M100 160 L100 176"/><path d="M92 165 L95 176"/><path d="M108 165 L105 176"/></g>`
+          + ol('<ellipse cx="74" cy="168" rx="11" ry="8" transform="rotate(25 74 168)"/><ellipse cx="126" cy="168" rx="11" ry="8" transform="rotate(-25 126 168)"/>', f, 5)
+      };
+    }
+  }
+});
+const SPECIES_ORDER = ['kitten', 'puppy', 'otter', 'bunny', 'hamster', 'penguin', 'dragon', 'squirrel', 'fox', 'turtle', 'sheep'];
+const START_SPECIES = SPECIES_ORDER.slice(0, 5);   // 첫 화면은 5종. 나머지는 친구들 메뉴에서 데려오거나 놀다 보면 열린다
 
 function eyesSVG(mood, y, big) {
   const xs = [78, 122];
@@ -574,9 +678,9 @@ function eyesSVG(mood, y, big) {
   if (mood === 'happy' || mood === 'love') return xs.map(x => line(`M${x - 8} ${y + 3} Q${x} ${y - 8} ${x + 8} ${y + 3}`)).join('');
   if (mood === 'sleep') return xs.map(x => line(`M${x - 8} ${y} Q${x} ${y + 7} ${x + 8} ${y}`)).join('');
   if (mood === 'eat') return line(`M${xs[0] - 6} ${y - 6} L${xs[0] + 5} ${y} L${xs[0] - 6} ${y + 6}`) + line(`M${xs[1] + 6} ${y - 6} L${xs[1] - 5} ${y} L${xs[1] + 6} ${y + 6}`);
-  const rx = big ? 8 : 7, ry = big ? 10.5 : 9;
+  const rx = big ? 10.5 : 9.5, ry = big ? 13 : 12;
   let s = '<g class="eyes">' + xs.map(x =>
-    `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${INK}"/><circle cx="${x + 2.6}" cy="${y - 3.4}" r="2.9" fill="#fff"/><circle cx="${x - 2.4}" cy="${y + 3.6}" r="1.3" fill="#fff"/>`).join('') + '</g>';
+    `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="#3A2A33"/><ellipse cx="${x}" cy="${y + ry * .42}" rx="${rx * .68}" ry="${ry * .42}" fill="#6B4A5A"/><circle cx="${x + rx * .36}" cy="${y - ry * .42}" r="${rx * .42}" fill="#fff"/><circle cx="${x - rx * .36}" cy="${y + ry * .36}" r="${rx * .2}" fill="#fff"/>`).join('') + '</g>';
   if (mood === 'sad') {
     s += line(`M${xs[0] - 9} ${y - 13} L${xs[0] + 6} ${y - 18}`) + line(`M${xs[1] - 6} ${y - 18} L${xs[1] + 9} ${y - 13}`);
     s += `<path d="M${xs[0] - 6} ${y + 9} q4 7 0 11 q-4 -4 0 -11Z" fill="#8FD3FF" stroke="${INK}" stroke-width="1.5"/>`;
@@ -798,7 +902,7 @@ function idleLine() {
   ]);
 }
 function addXP(n) {
-  const p = P(); p.xp += n;
+  const p = P(); p.xp += n; passAdd(n);
   let up = false;
   const formBefore = formOf(p.level);
   while (p.xp >= needXP(p.level) && p.level < 30) {
@@ -854,7 +958,7 @@ function renderHUD() {
   $('#stageTxt').innerHTML = p.hatched ? `${SPECIES[p.sp].kind} · ${FORMS[f].name}${f < FORMS.length - 1 ? `<span class="form-chip">Lv.${FORMS[f + 1].lv} 변신!</span>` : ''}` : '알';
   $('#xpBar').style.width = (p.xp / needXP(p.level) * 100) + '%';
   $('#coinTxt').textContent = S.coins;
-  const ms = todayMissions(), ready = ms.list.filter(x => !x.claimed && x.prog >= MISSIONS[x.id].goal).length, fresh = S.newsSeen !== NEWS[0].v;
+  const ms = todayMissions(), ready = ms.list.filter(x => !x.claimed && x.prog >= MISSIONS[x.id].goal).length + Math.max(0, passReady()), fresh = S.newsSeen !== NEWS[0].v;
   $('#missionBadge').textContent = ready || (fresh ? 'N' : ''); $('#missionBadge').hidden = !ready && !fresh;
   for (const s of STATS) {
     const el = $('#st-' + s.k), v = p.hatched ? p[s.k] : 100;
@@ -915,7 +1019,11 @@ const World = (() => {
   };
   const TRICK_LEN = { spin: .8, hop: .9, jump: .5, dance: 1.6, wave: 1.2, wobble: .5, transform: 1.8 };
   const FORM_SCALE = [1.1, 1.26, 1.4, 1.46, 1.52];
+  const LOOK_UP = -.3;   // 게임 카메라는 위에서 내려다보므로 몸을 살짝 뒤로 젖혀 얼굴이 카메라를 향하게 한다
   const PET3 = {
+    kitten: { body: '#FFD9A6', R: .6, cy: .92, hat: 1.56, accent: '#FF8FA3', twoBody: true },
+    puppy:  { body: '#FFF0D8', R: .6, cy: .92, hat: 1.54, accent: '#7EC8F2', twoBody: true },
+    otter:  { body: '#B98A62', R: .6, cy: .88, hat: 1.4,  accent: '#7ED9C3', twoBody: true, headW: 1.2, headH: .78, longBody: true },
     bunny:    { body: '#F7FCFF', R: .6, cy: .62, hat: 1.3, accent: '#A9DDF7' },
     hamster:  { body: '#FFEBC8', R: .64, cy: .62, hat: 1.22, accent: '#FF9EB0' },
     penguin:  { body: '#9BE7D6', R: .58, cy: .68, hat: 1.36, accent: '#FF6B7A' },
@@ -935,7 +1043,7 @@ const World = (() => {
   // 직접 조종 입력 (화면 끌기·WASD). 길: x = 오른쪽, z = 화면 아래쪽. 크기 0~1
   const drive = { x: 0, z: 0 };
   // 탈것: 마을에서만 탄다. lift = 펫이 올라서는 높이, mul = 빨라지는 배수
-  const RIDE3 = { scooter: { lift: .2, mul: 1.7 }, bike: { lift: .42, mul: 2.1 }, cloud: { lift: .4, mul: 2.5, hover: true } };
+  const RIDE3 = { scooter: { lift: .2, mul: 1.7 }, bike: { lift: .42, mul: 2.1 }, cloud: { lift: .4, mul: 2.5, hover: true }, rainbow: { lift: .4, mul: 2.8, hover: true } };
   let rideKind = null, rideG = null, rideWheels = [], rideLast = null;
   const RIDE_SCALE = 1.3;   // 펫 크기(변신하면 1.1~1.5배)에 맞춘 탈것 크기
   let stickers = [], onSticker = null, treasures = [], onTreasure = null, onTagged = null;
@@ -1080,11 +1188,51 @@ const World = (() => {
     const bc = tint || c.body;
 
     // 몸 (머리와 몸이 하나인 동글동글 2등신)
-    add(bc, 0, cy, 0, R, R * (spId === 'penguin' ? 1.1 : .93), R * .96);
+    add(bc, 0, cy, 0, R * (c.headW || (c.twoBody ? 1.1 : 1)), c.headH ? R * c.headH : R * (spId === 'penguin' ? 1.1 : .93), R * .96);
+    if (c.twoBody) add(bc, 0, c.longBody ? .38 : .36, -.02, c.longBody ? .33 : .36, c.longBody ? .4 : .34, .32);      // 2등신: 머리 아래 작은 몸
+    // 작은 앞발
+    if (c.twoBody && spId !== 'otter') for (const sd of [-1, 1]) add(bc, sd * .3, .42, .16, .1, .09, .1);
     const feet = (color = bc) => {
       pt.footL = add(color, -.24, .07, .28, .16, .08, .2, root); pt.footR = add(color, .24, .07, .28, .16, .08, .2, root); pt.footBase = .07;
     };
-    if (spId === 'bunny') {
+    if (spId === 'kitten') {
+      pt.earL = pivot(-.36, cy + .42, -.04); pt.earR = pivot(.36, cy + .42, -.04); pt.earBase = .2;
+      for (const [e, sd] of [[pt.earL, 1], [pt.earR, -1]]) { add(bc, 0, .13, 0, .2, .32, .1, e, 1.1, CONE); add('#FFB6C6', 0, .11, .06, .11, .2, .03, e, 0, CONE); e.rotation.z = sd * .2; }
+      for (const [x, r] of [[0, 0], [-.15, .18], [.15, -.18]]) { const st2 = add('#F7A65A', x, cy + R * .78, zAt(x, cy + R * .78) - .04, .04, .13, .03, body, 0); st2.rotation.z = r; }
+      add('#FFF6E9', 0, cy - .2, zAt(0, cy - .2) - .15, .28, .17, .19, body, 0);
+      add('#FF8FA3', 0, cy - .11, zAt(0, cy - .11) + .015, .035, .026, .02, body, 0);
+      for (const sd of [-1, 1]) for (const k of [0, 1]) { const w = mesh(CYL, INK, sd * .55, cy - .1 - k * .07, zAt(.4, cy - .1) + .02, .007, .24, .007, body, { cast: false }); w.rotation.z = sd * (Math.PI / 2 + (k ? -.14 : .14)); }
+      pt.tail = pivot(0, .3, -.3);
+      add('#F7A65A', 0, .2, -.1, .07, .3, .07, pt.tail, 1.08, CYL); add('#F7A65A', 0, .42, -.13, .1, .1, .1, pt.tail, 1.08);
+      feet();
+    } else if (spId === 'puppy') {
+      pt.earL = pivot(-.52, cy + .36, .06); pt.earR = pivot(.52, cy + .36, .06); pt.earBase = -.32;
+      for (const e of [pt.earL, pt.earR]) add('#C98F5A', 0, -.3, 0, .19, .37, .11, e, 1.08);
+      add('#E8B77E', .25, cy + .12, zAt(.25, cy + .12) - .1, .2, .2, .1, body, 0);
+      add('#FFFBF3', 0, cy - .2, zAt(0, cy - .2) - .15, .28, .19, .19, body, 0);
+      add(INK, 0, cy - .12, zAt(0, cy - .12) + .02, .055, .043, .03, body, 0);
+      add('#FFFFFF', -.016, cy - .105, zAt(0, cy - .12) + .05, .014, .01, .006, body, 0);
+      add('#FF8FA3', 0, cy - .3, zAt(0, cy - .3) + .012, .06, .07, .025, body, 1.08);
+      pt.tail = pivot(0, .42, -.32);
+      add(bc, 0, .1, -.06, .1, .15, .1, pt.tail, 1.08);
+      feet();
+    } else if (spId === 'otter') {
+      pt.earL = pivot(-.62, cy + .16, -.02); pt.earR = pivot(.62, cy + .16, -.02); pt.earBase = .05;
+      for (const e of [pt.earL, pt.earR]) { add(bc, 0, .03, 0, .1, .1, .07, e, 1.1); add('#7A5638', 0, .03, .05, .055, .055, .02, e, 0); }
+      add('#FFF0DC', 0, cy - .17, zAt(0, cy - .17) - .15, .42, .22, .2, body, 0);
+      for (const sd of [-1, 1]) add('#FFF0DC', sd * .36, cy - .1, zAt(.36, cy - .1) - .07, .2, .13, .1, body, 0);
+      add(INK, 0, cy - .1, zAt(0, cy - .1) + .03, .065, .046, .03, body, 0);
+      add('#FFFFFF', -.02, cy - .085, zAt(0, cy - .1) + .06, .016, .011, .006, body, 0);
+      for (const sd of [-1, 1]) for (const k of [0, 1]) { const w = mesh(CYL, INK, sd * .55, cy - .13 - k * .06, zAt(.42, cy - .13) + .03, .007, .3, .007, body, { cast: false }); w.rotation.z = sd * (Math.PI / 2 + (k ? -.12 : .12)); }
+      add('#FFF0DC', 0, .36, .1, .24, .28, .22, body, 0);
+      // 배 위의 조개와 앞발: 수달의 상징
+      add('#FFB6C6', 0, .42, .35, .13, .11, .05, body, 1.08);
+      for (const k of [-1, 0, 1]) mesh(CYL, '#E88AA0', k * .045, .42, .4, .007, .13, .007, body, { cast: false }).rotation.z = k * .35;
+      for (const sd of [-1, 1]) add(bc, sd * .16, .47, .32, .085, .075, .075, body, 1.08);
+      pt.tail = pivot(.12, .16, -.28);
+      add('#A0754F', .1, 0, -.2, .15, .09, .32, pt.tail, 1.08); add('#A0754F', .28, .02, -.48, .11, .07, .22, pt.tail, 1.08);
+      feet('#8F6545');
+    } else if (spId === 'bunny') {
       for (const [x, y, z, r] of [[-.48, cy - .12, -.02, .27], [.48, cy - .12, -.02, .27], [-.25, cy + .42, -.06, .25], [.25, cy + .42, -.06, .25], [0, cy + .5, -.1, .27]]) add(bc, x, y, z, r, r * .92, r);
       pt.earL = pivot(-.2, cy + .62, -.05); pt.earR = pivot(.2, cy + .62, -.05); pt.earBase = .18;
       for (const [e, s] of [[pt.earL, 1], [pt.earR, -1]]) { add(bc, 0, .36, 0, .13, .4, .09, e, 1.1); add('#FFC9DA', 0, .36, .06, .065, .3, .03, e, 0); e.rotation.z = s * .18; }
@@ -1097,10 +1245,10 @@ const World = (() => {
       pt.handL = add(bc, -.22, cy - .3, zAt(.22, cy - .3) - .02, .1, .08, .08); pt.handR = add(bc, .22, cy - .3, zAt(.22, cy - .3) - .02, .1, .08, .08);
       feet();
     } else if (spId === 'penguin') {
-      add('#F4FFFC', 0, cy - .14, zAt(0, cy - .14) - .16, .4, .44, .22, body, 0);
+      add('#F4FFFC', 0, cy - .3, zAt(0, cy - .3) - .16, .38, .34, .22, body, 0);
       pt.flL = pivot(-.5, cy + .12, 0); pt.flR = pivot(.5, cy + .12, 0); pt.flBase = .35;
       add('#7FD8C6', 0, -.22, 0, .09, .26, .18, pt.flL, 1.1); add('#7FD8C6', 0, -.22, 0, .09, .26, .18, pt.flR, 1.1);
-      const beak = add('#FFB35C', 0, cy - .06, zAt(0, cy - .06) + .07, .08, .16, .08, body, 1.12, CONE); beak.rotation.x = Math.PI / 2;
+      const beak = add('#FFB35C', 0, cy + .02, zAt(0, cy + .02) + .07, .08, .16, .08, body, 1.12, CONE); beak.rotation.x = Math.PI / 2;
       pt.tuft = pivot(0, cy + R * 1.08, 0); const tf = add('#7FD8C6', 0, .08, 0, .07, .16, .07, pt.tuft, 1.1, CONE); tf.rotation.z = .3;
       feet('#FFB35C');
     } else if (spId === 'dragon') {
@@ -1148,20 +1296,23 @@ const World = (() => {
     }
 
     // 얼굴: 기분마다 눈·입 모양을 바꿔 보여 준다
-    const ey = cy + .02, ex = .19, face = group(0, 0, 0, body);
+    const ey = spId === 'penguin' ? cy + .14 : cy - .01, ex = .23, face = group(0, 0, 0, body);
     const ink = toon(INK);
     pt.eyesOpen = group(0, 0, 0, face); pt.eyesHappy = group(0, 0, 0, face); pt.eyesSleep = group(0, 0, 0, face);
-    const arc = new T.TorusGeometry(.07, .02, 8, 16, Math.PI), mArc = new T.TorusGeometry(.045, .015, 8, 12, Math.PI);
+    const arc = new T.TorusGeometry(.09, .024, 8, 16, Math.PI), mArc = new T.TorusGeometry(.045, .015, 8, 12, Math.PI);
     for (const s of [-1, 1]) {
       const z = zAt(s * ex, ey);
-      mesh(SPH, '', s * ex, ey, z - .02, .075, .1, .05, pt.eyesOpen, { mat: ink, cast: false });
-      mesh(SPH, '#FFFFFF', s * ex + .025, ey + .035, z + .025, .028, .028, .02, pt.eyesOpen, { cast: false });
+      // 큰 눈: 짙은 눈동자 + 아래쪽 밝은 빛 + 하이라이트 2개
+      const eb = mesh(SPH, '', s * ex, ey, z - .02, .105, .13, .05, pt.eyesOpen, { mat: ink, cast: false }); eb.rotation.y = s * .32;
+      mesh(SPH, '#7A5566', s * ex, ey - .055, z + .012, .068, .055, .02, pt.eyesOpen, { cast: false }).rotation.y = s * .32;
+      mesh(SPH, '#FFFFFF', s * ex + .036, ey + .05, z + .022, .04, .04, .02, pt.eyesOpen, { cast: false });
+      mesh(SPH, '#FFFFFF', s * ex - .036, ey - .05, z + .022, .018, .018, .01, pt.eyesOpen, { cast: false });
       mesh(arc, '', s * ex, ey - .02, z + .01, 1, 1, 1, pt.eyesHappy, { mat: ink, cast: false });
       const sl = mesh(arc, '', s * ex, ey + .03, z + .01, 1, 1, 1, pt.eyesSleep, { mat: ink, cast: false }); sl.rotation.z = Math.PI;
-      const bl = mesh(SPH, '', s * .33, ey - .1, zAt(.33, ey - .1) - .01, form >= 2 && spId === 'hamster' ? .11 : .085, .045, .02, face, { mat: new T.MeshToonMaterial({ color: '#FF9DB5', gradientMap: grad, transparent: true, opacity: .85 }), cast: false });
+      const bl = mesh(SPH, '', s * .38, ey - .14, zAt(.38, ey - .14) - .005, form >= 2 && spId === 'hamster' ? .125 : .105, .055, .02, face, { mat: new T.MeshToonMaterial({ color: '#FF9DB5', gradientMap: grad, transparent: true, opacity: .85 }), cast: false });
       bl.rotation.y = s * .55;
     }
-    const my = spId === 'penguin' ? ey - .22 : ey - .15, mz = zAt(0, my) + .01;
+    const my = spId === 'penguin' ? ey - .3 : c.twoBody ? ey - .21 : ey - .15, mz = zAt(0, my) + .01;
     pt.mouthSmile = mesh(mArc, '', 0, my, mz, 1, 1, 1, face, { mat: ink, cast: false }); pt.mouthSmile.rotation.z = Math.PI;
     pt.mouthFrown = mesh(mArc, '', 0, my - .02, mz, 1, 1, 1, face, { mat: ink, cast: false });
     pt.mouthOpen = mesh(SPH, '#F07A8E', 0, my - .01, mz - .01, .06, .05, .03, face, { cast: false });
@@ -1179,7 +1330,7 @@ const World = (() => {
     // 변신 장식: 어린이(목도리·나비넥타이) → 어른(이마 별) → 반짝(별 궤도) → 무지개(무지개 날개·후광)
     if (form >= 1 && !neck) {
       if (spId === 'penguin') { for (const s of [-1, 1]) { const b = add(c.accent, s * .09, cy - R * .62, zAt(0, cy - R * .62) - .02, .07, .12, .07, body, 1.1, CONE); b.rotation.z = s * Math.PI / 2; } add(c.accent, 0, cy - R * .62, zAt(0, cy - R * .62), .04, .04, .04, body, 1.1); }
-      else { const sc = add(c.accent, 0, cy - R * .6, 0, R * .78, R * .78, R * .78, body, 1.03, new T.TorusGeometry(1, .1, 10, 32)); sc.rotation.x = Math.PI / 2; }
+      else { const ny = c.twoBody ? cy - R * .82 : cy - R * .6, nr = c.twoBody ? R * .6 : R * .78, sc = add(c.accent, 0, ny, 0, nr, nr, nr, body, 1.03, new T.TorusGeometry(1, .1, 10, 32)); sc.rotation.x = Math.PI / 2; }
     }
     if (form >= 2 && spId !== 'dragon') add('#FFD95A', 0, cy + R * .55, zAt(0, cy + R * .55) + .02, .07, .07, .07, body, 1.12, STAR);
     if (form >= 2 && spId === 'penguin') for (const x of [-.12, 0, .12]) add('#BFEFFF', x, cy + R * 1.02, .1, .04, x ? .09 : .13, .04, body, 1.1, CONE);
@@ -1209,8 +1360,8 @@ const World = (() => {
     // 등 장식 (날개는 걸을 때 퍼덕이도록 날개 자리 wingL/wingR에 붙인다)
     if (back) {
       const bz = -R * .92;
-      if (back === 'angel' || back === 'bat') {
-        const col = back === 'angel' ? '#FFF1B8' : '#8A6CC8';
+      if (back === 'angel' || back === 'bat' || back === 'fairy') {
+        const col = back === 'angel' ? '#FFF1B8' : back === 'fairy' ? '#FFB7D8' : '#8A6CC8';
         pt.wingL = pivot(-.22, cy + .2, bz + .1); pt.wingR = pivot(.22, cy + .2, bz + .1); pt.wingBase = .45;
         for (const [w, sx] of [[pt.wingL, -1], [pt.wingR, 1]]) {
           add(col, sx * .42, .2, 0, .46, .32, .05, w, 1.1); add(col, sx * .76, .04, 0, .28, .2, .045, w, 1.1);
@@ -1239,11 +1390,12 @@ const World = (() => {
     }
     // 목 장식 (있으면 변신 목도리 대신 이걸 둔다)
     if (neck) {
-      const ny = cy - R * .62, nz = zAt(0, ny);
-      const ring = col => { const t = add(col, 0, ny, 0, R * .78, R * .78, R * .78, body, 1.03, new T.TorusGeometry(1, .07, 10, 32)); t.rotation.x = Math.PI / 2; };
+      const ny = c.twoBody ? cy - R * .82 : cy - R * .62, nz = zAt(0, ny), nr = c.twoBody ? R * .6 : R * .78;
+      const ring = col => { const t = add(col, 0, ny, 0, nr, nr, nr, body, 1.03, new T.TorusGeometry(1, .07, 10, 32)); t.rotation.x = Math.PI / 2; };
       if (neck === 'bowtie') { for (const sx of [-1, 1]) { const b = add('#E8476A', sx * .09, ny, nz - .02, .07, .12, .07, body, 1.1, CONE); b.rotation.z = sx * Math.PI / 2; } add('#FF8FA3', 0, ny, nz, .04, .04, .04, body, 1.1); }
       else if (neck === 'scarf') { ring('#7ED9C3'); const tl = add('#7ED9C3', -.16, ny - .14, nz - .02, .08, .18, .04, body, 1.08, BOX); tl.rotation.z = .2; add('#FFFFFF', -.16, ny - .14, nz + .01, .085, .03, .02, body, 0, BOX); }
       else if (neck === 'medal') { ring('#4E7BD9'); add('#FFD54F', 0, ny - .13, nz + .01, .1, .1, .03, body, 1.1, CYL).rotation.x = Math.PI / 2; add('#FFF3A8', 0, ny - .13, nz + .04, .05, .05, .02, body, 0, STAR); }
+      else if (neck === 'star') { ring('#FFD54F'); add('#FFD54F', 0, ny - .13, nz + .03, .12, .12, .05, body, 1.1, STAR); }
       else if (neck === 'bell') { ring('#E8476A'); add('#FFD54F', 0, ny - .08, nz + .02, .08, .08, .08, body, 1.1); }
     }
     root.scale.setScalar(FORM_SCALE[form]);
@@ -1600,7 +1752,7 @@ const World = (() => {
       const cyc = n.t * 9, s = n.walk ? Math.cos(cyc * 2) * .04 : Math.sin(n.t * 2.2) * .02;
       p.root.position.set(VX + n.x, n.walk ? Math.abs(Math.sin(cyc)) * .12 : (n.talking ? Math.abs(Math.sin(n.t * 5)) * .05 : 0), n.z);
       p.root.rotation.set(0, n.face, n.walk ? Math.sin(cyc) * .06 : 0);
-      p.body.scale.set(1 + s, 1 - s, 1 + s);
+      p.body.scale.set(1 + s, 1 - s, 1 + s); p.body.rotation.x = LOOK_UP;
       if (n.jumpT > 0) { n.jumpT -= dt; p.root.position.y += Math.sin((1 - n.jumpT / .6) * Math.PI) * .8; }
       if (p.footL) { p.footL.position.y = p.footBase + (n.walk ? Math.max(0, Math.sin(cyc)) * .1 : 0); p.footR.position.y = p.footBase + (n.walk ? Math.max(0, -Math.sin(cyc)) * .1 : 0); }
       if (p.earL) { const sw = Math.sin(n.t * 2.5) * .06; p.earL.rotation.z = p.earBase + sw; p.earR.rotation.z = -p.earBase - sw; }
@@ -1792,20 +1944,20 @@ const World = (() => {
       { x: 0, z: -46.5, w: 2, d: 2, y: 3.3, vanish: true, ph: 1.3 }, { x: 0, z: -50.5, w: 4, d: 4, y: 3.3, c: '#FFF3A8' }],
       cps: [{ x: 0, z: 0, y: 0 }, { x: 0, z: -16.5, y: .9 }, { x: 0, z: -34.5, y: 2.1 }], fin: { x: 0, z: -50.5, y: 3.3 } },
     { name: '빙글빙글 막대', tip: '빨간 막대가 빙글빙글 돌아요! 막대가 오면 점프해서 넘어요!', plats: [
-      { x: 0, z: 0, w: 4, d: 4, y: 0, c: '#FFFFFF' }, { x: 0, z: -5, w: 5, d: 5, y: 0, spin: { len: 2.3, sp: 1.6 } }, { x: 0, z: -10, w: 2, d: 2, y: .5 },
-      { x: 0, z: -15, w: 5, d: 5, y: .5, spin: { len: 2.3, sp: -2 } }, { x: 0, z: -20, w: 4, d: 3, y: .8, c: '#E9F7FF' },
-      { x: -2, z: -24, w: 2, d: 2, y: 1.2, ax: 1.5, sp: 2 }, { x: 0, z: -29, w: 5, d: 5, y: 1.4, spin: { len: 2.3, sp: 2.4 } },
+      { x: 0, z: 0, w: 4, d: 4, y: 0, c: '#FFFFFF' }, { x: 0, z: -5, w: 5, d: 5, y: 0, spin: { len: 2.3, sp: 1.1 } }, { x: 0, z: -10, w: 2, d: 2, y: .5 },
+      { x: 0, z: -15, w: 5, d: 5, y: .5, spin: { len: 2.3, sp: -1.3 } }, { x: 0, z: -20, w: 4, d: 3, y: .8, c: '#E9F7FF' },
+      { x: -2, z: -24, w: 2, d: 2, y: 1.2, ax: 1.5, sp: 2 }, { x: 0, z: -29, w: 5, d: 5, y: 1.4, spin: { len: 2.3, sp: 1.5 } },
       { x: 2, z: -34, w: 2, d: 2, y: 1.8, az: 1.2, sp: 1.8 }, { x: 0, z: -38.5, w: 4, d: 3, y: 2.2, c: '#E9F7FF' },
-      { x: 0, z: -43.5, w: 5, d: 5, y: 2.2, spin: { len: 2.3, sp: -2.6 } }, { x: 0, z: -48.5, w: 2, d: 2, y: 2.6 }, { x: 0, z: -52.5, w: 4, d: 4, y: 2.6, c: '#FFF3A8' }],
+      { x: 0, z: -43.5, w: 5, d: 5, y: 2.2, spin: { len: 2.3, sp: -1.7 } }, { x: 0, z: -48.5, w: 2, d: 2, y: 2.6 }, { x: 0, z: -52.5, w: 4, d: 4, y: 2.6, c: '#FFF3A8' }],
       cps: [{ x: 0, z: 0, y: 0 }, { x: 0, z: -20, y: .8 }, { x: 0, z: -38.5, y: 2.2 }], fin: { x: 0, z: -52.5, y: 2.6 } },
     { name: '무지개 탑', tip: '마지막 도전! 지금까지 나온 함정이 모두 나와요. 체크포인트를 꼭 밟아요!', plats: [
       { x: 0, z: 0, w: 4, d: 4, y: 0, c: '#FFFFFF' }, { x: 0, z: -4, w: 1.4, d: 1.4, y: .6 }, { x: 1.8, z: -6.8, w: 1.4, d: 1.4, y: 1.2 },
       { x: 0, z: -9.6, w: 1.4, d: 1.4, y: 1.8, vanish: true, ph: 0 }, { x: -1.8, z: -12.4, w: 1.4, d: 1.4, y: 2.4 },
       { x: 0, z: -15.2, w: 1.8, d: 1.8, y: 2.4, pad: true }, { x: 0, z: -18.8, w: 3, d: 3, y: 5.6 }, { x: 0, z: -22.5, w: 4, d: 3, y: 5.6, c: '#E9F7FF' },
-      { x: 0, z: -27, w: 5, d: 5, y: 5.6, spin: { len: 2.3, sp: 2.8 } }, { x: -2, z: -31.5, w: 1.6, d: 1.6, y: 6, ax: 1.6, sp: 2.2 },
+      { x: 0, z: -27, w: 5, d: 5, y: 5.6, spin: { len: 2.3, sp: 1.8 } }, { x: -2, z: -31.5, w: 1.6, d: 1.6, y: 6, ax: 1.6, sp: 2.2 },
       { x: 0, z: -34.5, w: 1.6, d: 1.6, y: 6.4, vanish: true, ph: .7 }, { x: 2, z: -37.5, w: 1.6, d: 1.6, y: 6.8, az: .9, sp: 2.4 },
       { x: 0, z: -41.5, w: 4, d: 3, y: 7.2, c: '#E9F7FF' }, { x: 0, z: -45.5, w: 2, d: .8, y: 7.25, jelly: true }, { x: 0, z: -45.5, w: 2, d: 4, y: 7.2 },
-      { x: 0, z: -50, w: 5, d: 5, y: 7.2, spin: { len: 2.3, sp: -3 } }, { x: 0, z: -55, w: 1.4, d: 1.4, y: 7.6, vanish: true, ph: 1.2 },
+      { x: 0, z: -50, w: 5, d: 5, y: 7.2, spin: { len: 2.3, sp: -2 } }, { x: 0, z: -55, w: 1.4, d: 1.4, y: 7.6, vanish: true, ph: 1.2 },
       { x: 0, z: -58.5, w: 1.4, d: 1.4, y: 8, ax: 1.4, sp: 2.6 }, { x: 0, z: -62.5, w: 4, d: 4, y: 8, c: '#FFF3A8' }],
       cps: [{ x: 0, z: 0, y: 0 }, { x: 0, z: -22.5, y: 5.6 }, { x: 0, z: -41.5, y: 7.2 }], fin: { x: 0, z: -62.5, y: 8 } }
   ];
@@ -1912,7 +2064,7 @@ const World = (() => {
       if (!pl.spin || o.y > pl.y + .78 || o.y < pl.y - .3) continue;
       const a = o.clock * pl.spin.sp, dx = Math.cos(a), dz = -Math.sin(a), rx = x - pl.x, rz = z - pl.z;
       const along = rx * dx + rz * dz, across = Math.abs(rx * dz - rz * dx);
-      if (Math.abs(along) <= pl.spin.len + .2 && across < .42) return respawnOb('bar');
+      if (Math.abs(along) <= pl.spin.len + .2 && across < .34) return respawnOb('bar');
     }
     st.x = OX + x; st.z = z; st.lift = o.y;
     CPS.forEach((c, i) => {
@@ -1988,7 +2140,7 @@ const World = (() => {
       const cyc = c.t * 10, sq = c.walk ? Math.cos(cyc * 2) * .04 : Math.sin(c.t * 2.2) * .02;
       let y = c.walk ? Math.abs(Math.sin(cyc)) * .12 : 0;
       if (c.jumpT > 0) { c.jumpT -= dt; y += Math.sin((1 - c.jumpT / .6) * Math.PI) * .6; }
-      p.root.position.set(c.x, y, c.z); p.root.rotation.set(0, c.face, c.walk ? Math.sin(cyc) * .06 : 0); p.body.scale.set(1 + sq, 1 - sq, 1 + sq);
+      p.root.position.set(c.x, y, c.z); p.root.rotation.set(0, c.face, c.walk ? Math.sin(cyc) * .06 : 0); p.body.rotation.x = LOOK_UP; p.body.scale.set(1 + sq, 1 - sq, 1 + sq);
       if (p.footL) { p.footL.position.y = p.footBase + (c.walk ? Math.max(0, Math.sin(cyc)) * .1 : 0); p.footR.position.y = p.footBase + (c.walk ? Math.max(0, -Math.sin(cyc)) * .1 : 0); }
       if (p.earL) { const sw = Math.sin(c.t * 2.5) * .06; p.earL.rotation.z = p.earBase + sw; p.earR.rotation.z = -p.earBase - sw; }
       if (p.tail) p.tail.rotation.y = Math.sin(c.t * 6) * .35;
@@ -2051,6 +2203,9 @@ const World = (() => {
       mesh(CYL, '#E8476A', 0, .66, .48, .035, .55, .035, g, { outline: 1.1 }).rotation.z = Math.PI / 2;
       mesh(BOX, '#5B4550', 0, .44, -.12, .26, .06, .34, g, { outline: 1.06 });
       mesh(BOX, '#FFE27A', 0, .55, .62, .22, .16, .2, g, { outline: 1.06 });
+    } else if (kind === 'rainbow') {
+      for (const [x, z, r, col] of [[0, .46, .4, '#FF9DB5'], [0, .1, .46, '#FFE27A'], [0, -.28, .44, '#7ED9C3'], [0, -.6, .34, '#A9DDF7']]) mesh(SPH, col, x, .18, z, r, r * .42, r, g, { outline: 1.05 });
+      for (const [x, z] of [[-.55, .1], [.55, -.1], [0, .85]]) mesh(STAR, '', x, .34, z, .08, .08, .08, g, { mat: basic('#FFFFFF'), cast: false });
     } else if (kind === 'cloud') {
       for (const [x, z, r] of [[0, 0, .5], [-.36, -.25, .36], [.36, -.2, .38], [0, .42, .38], [-.3, .3, .3], [.3, .32, .3]]) mesh(SPH, '#FFFFFF', x, .18, z, r, r * .45, r, g, { outline: 1.05 });
       for (const [x, z] of [[-.5, .1], [.52, -.05], [0, -.55]]) mesh(STAR, '', x, .32, z, .07, .07, .07, g, { mat: basic('#FFE27A'), cast: false });
@@ -2163,7 +2318,7 @@ const World = (() => {
       const moved = rideLast ? Math.hypot(st.x - rideLast[0], st.z - rideLast[1]) : 0; rideLast = [st.x, st.z];
       for (const w of rideWheels) w.m.rotation.x += moved / (w.r * RIDE_SCALE);
     }
-    pet.root.position.set(st.x, y, st.z); pet.root.rotation.set(rx, ry, rz); pet.body.scale.set(sx, sy, sx);
+    pet.root.position.set(st.x, y, st.z); pet.root.rotation.set(rx, ry, rz); pet.body.scale.set(sx, sy, sx); pet.body.rotation.x = pet.isEgg || (p.asleep && st.at === 'bed') ? 0 : LOOK_UP;
   }
 
   function loop(now) {
@@ -3189,7 +3344,7 @@ Object.assign(SPECIAL, {
   mongsil: () => [{ label: '🙈 숨바꼭질 하자!', fn: hideSeek }]
 });
 
-/* ---------- 마을 놀이 라운드: 술래잡기(달아나는 친구 3명 잡기 60초) · 보물찾기(선물 상자 8개 45초) ----------
+/* ---------- 마을 놀이 라운드: 술래잡기(달아나는 친구 3명 잡기 45초) · 보물찾기(선물 상자 8개 45초) ----------
    코인은 놀이마다 처음 3번만 (boundedReward), 친구 하트와 재미는 매번 오른다 */
 const TAG_FRIENDS = ['somsom', 'banjjak', 'mongsil'];
 const TREASURE_SPOTS = [[-11, -4], [-8, 9], [-3, 15], [3, 17.5], [9, 16], [14, 12], [20, 16], [26, 15], [25, 2], [21, -6], [14, -2], [7, -3], [-2, -4], [-6, 4], [4, 6], [16, 6]];
@@ -3203,7 +3358,7 @@ function startRound(kind) {
   closeSheet(); if (talking) closeTalk();
   if (following) { following = null; World.setFollow(null); }
   if (World.riding()) World.setRide(null);
-  const tag = kind === 'tag', total = tag ? TAG_FRIENDS.length : 8, sec = tag ? 60 : 45;
+  const tag = kind === 'tag', total = tag ? TAG_FRIENDS.length : 8, sec = 45;
   round = { kind, total, got: 0, left: sec, on: false };
   const ui = document.createElement('div'); ui.className = 'round-ui';
   ui.innerHTML = `<span class="pill">${tag ? '🏃 술래잡기' : '🎁 보물찾기'}</span><span class="pill">⏱ <b id="rdTime">${sec}</b></span><span class="pill">${tag ? '잡음' : '찾음'} <b id="rdGot">0</b>/${total}</span><button class="icon-btn" id="rdQuit" aria-label="그만하기">✕</button>`;
@@ -3336,6 +3491,7 @@ function openMissions(tab = 'm') {
   if (tab === 'e') return openSeason();
   if (tab === 'n') return openNews();
   if (tab === 's') return openStickers();
+  if (tab === 'p') return openPass();
   const m = todayMissions();
   const rows = m.list.map((it, i) => {
     const M = MISSIONS[it.id], done = it.prog >= M.goal;
@@ -3814,6 +3970,9 @@ function boundedReward(key, coins, max = 3) {
 const obbyKey = i => i ? 'obby' + (i + 1) : 'obby';
 const OBBY_COINS = [25, 35, 45, 55, 70];
 const obbyOpen = i => i === 0 || !!S.best[obbyKey(i - 1)];
+// 메달: 완주하면 동, 시간 안에 들어오면 은·금. 최고 기록에서 계산하므로 따로 저장하지 않는다
+const OBBY_MEDAL = [[35, 60], [40, 70], [40, 70], [45, 80], [60, 100]];
+const obbyMedal = (i, t) => !t ? '' : t <= OBBY_MEDAL[i][0] ? '🥇' : t <= OBBY_MEDAL[i][1] ? '🥈' : '🥉';
 let obbyStageNow = 0;
 function startObby(stage) {
   const p = P();
@@ -3832,9 +3991,9 @@ function openObbySelect() {
   const list = World.obbyCourses(), done = list.filter((c, i) => S.best[obbyKey(i)]).length;
   const cards = list.map((c, i) => {
     const best = S.best[obbyKey(i)], open = obbyOpen(i);
-    return `<button class="dex-card" data-stage="${i}"${open ? '' : ' disabled style="opacity:.55"'}><span class="emo day">${open ? ['🌈', '☁️', '✨', '🌀', '🏔️'][i] : '🔒'}</span><span class="txt"><span class="t1">${i + 1}단계 · ${escapeHTML(c.name)}</span><br><span class="t2">${open ? escapeHTML(c.tip) : '앞 단계를 깨면 열려요'}</span></span><span class="go">${best ? `🏆 ${best.toFixed(1)}초` : open ? '도전!' : '잠김'}</span></button>`;
+    return `<button class="dex-card" data-stage="${i}"${open ? '' : ' disabled style="opacity:.55"'}><span class="emo day">${open ? ['🌈', '☁️', '✨', '🌀', '🏔️'][i] : '🔒'}</span><span class="txt"><span class="t1">${i + 1}단계 · ${escapeHTML(c.name)}</span><br><span class="t2">${open ? escapeHTML(c.tip) : '앞 단계를 깨면 열려요'}</span></span><span class="go">${best ? `${obbyMedal(i, best)} ${best.toFixed(1)}초` : open ? '도전!' : '잠김'}</span></button>`;
   }).join('');
-  openSheet('🌈 점프 코스 고르기', `<p class="msub">${done} / ${list.length}단계 완주. 떨어져도 체크포인트 🚩에서 다시 시작해요. 키보드는 WASD·방향키 + 스페이스바!</p><div class="dex">${cards}</div>`,
+  openSheet('🌈 점프 코스 고르기', `<p class="msub">${done} / ${list.length}단계 완주. 빨리 깰수록 🥉→🥈→🥇 메달이 올라가요. 떨어져도 체크포인트 🚩에서 다시 시작해요. 키보드는 WASD·방향키 + 스페이스바!</p><div class="dex">${cards}</div>`,
     body => body.addEventListener('click', e => { const b = e.target.closest('[data-stage]'); if (b && !b.disabled) startObby(+b.dataset.stage); }));
 }
 function buildObbyUI() {
@@ -3895,10 +4054,13 @@ function obbyFinish(time) {
   change({ fun: 20, energy: -10 }); addXP(15 + i * 5); mission('obby'); badge('obby'); if (i === 0 && time <= 60) badge('obbyFast');
   const total = World.obbyCourses().length;
   if (World.obbyCourses().every((c, k) => S.best[obbyKey(k)])) badge('obbyAll');
+  const medal = obbyMedal(i, time), goldNow = time <= OBBY_MEDAL[i][0], goldCoins = goldNow ? boundedReward('obbyGold' + i, 30, 1) : 0;
+  if (World.obbyCourses().every((c, k) => S.best[obbyKey(k)] && S.best[obbyKey(k)] <= OBBY_MEDAL[k][0])) badge('goldAll');
+  const nextMedal = goldNow ? '' : time <= OBBY_MEDAL[i][1] ? `🥇은 ${OBBY_MEDAL[i][0]}초 안에!` : `🥈은 ${OBBY_MEDAL[i][1]}초 안에!`;
   confetti(100); persist(); render();
   const hasNext = i + 1 < total;
   const card = document.createElement('div'); card.className = 'g-card'; card.id = 'obResult';
-  card.innerHTML = `<h3>🏁 ${i + 1}단계 완주!</h3><div class="big-score">${time.toFixed(1)}초</div><p>${isBest ? '🏆 새 최고 기록!' : `최고 기록 ${prev.toFixed(1)}초`}${firstClear && hasNext ? `<br>🔓 ${i + 2}단계가 열렸어요!` : ''}</p><p>${coins ? `<i class="coin"></i> ${coins}코인 · ` : ''}경험치 ${15 + i * 5} · 행복 +20</p>
+  card.innerHTML = `<h3>🏁 ${i + 1}단계 완주!</h3><div class="big-score">${medal} ${time.toFixed(1)}초</div><p>${nextMedal ? nextMedal + '<br>' : ''}${goldCoins ? `금메달 보너스 +${goldCoins}코인!<br>` : ''}${isBest ? '🏆 새 최고 기록!' : `최고 기록 ${prev.toFixed(1)}초`}${firstClear && hasNext ? `<br>🔓 ${i + 2}단계가 열렸어요!` : ''}</p><p>${coins ? `<i class="coin"></i> ${coins}코인 · ` : ''}경험치 ${15 + i * 5} · 행복 +20</p>
     ${hasNext ? '<button class="candy primary" id="obNext">다음 단계 ▶</button>' : '<p>🏔️ 모든 코스를 정복했어요!</p>'}
     <div style="display:flex;gap:8px"><button class="candy" id="obAgain" style="flex:1">다시 하기</button><button class="candy" id="obHome" style="flex:1">마을로</button></div>`;
   room.appendChild(card);
@@ -3929,6 +4091,9 @@ $('#emoteTray').addEventListener('click', e => {
 
 /* ---------- 배지 ---------- */
 const BADGES = {
+  collector: ['🐾', '펫 수집가', '펫 8종 모두 데려오기'],
+  goldAll:   ['🥇', '금메달 챔피언', '점프 코스 5단계 모두 금메달'],
+  passDone:  ['🎖️', '성장길 완주', '성장길 20칸 끝까지 가기'],
   tagger:   ['🏃', '술래잡기 왕', '술래잡기에서 친구 3명 모두 잡기'],
   treasure: ['💎', '보물 사냥꾼', '보물찾기에서 상자 8개 모두 찾기'],
   obbyAll: ['🏔️', '코스 정복자', '점프 코스 5단계 모두 완주'],
@@ -3961,7 +4126,7 @@ function badge(id) {
   S.badges[id] = today(); persist();
   setTimeout(() => { toast(`🏅 배지 획득! ${BADGES[id][0]} ${BADGES[id][1]}`); sfx('hatch'); confetti(40); }, 900);
 }
-const missionTabs = t => `<div class="tabs" role="tablist"><button role="tab" data-mtab="m" aria-selected="${t === 'm'}">📋 목표</button><button role="tab" data-mtab="b" aria-selected="${t === 'b'}">🏅 배지</button>${seasonState() ? `<button role="tab" data-mtab="e" aria-selected="${t === 'e'}">${SEASON ? '🎃 축제' : '🍬 사탕'}</button>` : ''}<button role="tab" data-mtab="s" aria-selected="${t === 's'}">🔎 탐험</button><button role="tab" data-mtab="n" aria-selected="${t === 'n'}">📰 소식</button></div>`;
+const missionTabs = t => `<div class="tabs" role="tablist"><button role="tab" data-mtab="m" aria-selected="${t === 'm'}">📋 목표</button><button role="tab" data-mtab="p" aria-selected="${t === 'p'}">🎖️ 성장</button><button role="tab" data-mtab="b" aria-selected="${t === 'b'}">🏅 배지</button>${seasonState() ? `<button role="tab" data-mtab="e" aria-selected="${t === 'e'}">${SEASON ? '🎃 축제' : '🍬 사탕'}</button>` : ''}<button role="tab" data-mtab="s" aria-selected="${t === 's'}">🔎 탐험</button><button role="tab" data-mtab="n" aria-selected="${t === 'n'}">📰 소식</button></div>`;
 function openBadges() {
   const got = S.badges || {}, n = Object.keys(got).length;
   openSheet('배지 수집첩', `${missionTabs('b')}<p class="msub">${n} / ${Object.keys(BADGES).length}개 모았어요</p><div class="badges">${Object.entries(BADGES).map(([k, [e, name, how]]) => `<div class="badge-card${got[k] ? ' got' : ''}"><span class="be">${got[k] ? e : '🔒'}</span><b>${name}</b><small>${how}</small></div>`).join('')}</div>`,
@@ -4195,7 +4360,9 @@ const WEAR = {
   bowtie:   { slot: 'neck', e: '🎀', name: '나비넥타이', price: 30 },
   scarf:    { slot: 'neck', e: '🧣', name: '민트 목도리', price: 40 },
   medal:    { slot: 'neck', e: '🥇', name: '금메달',    price: 60 },
-  bell:     { slot: 'neck', e: '🔔', name: '방울 목걸이', price: 35 }
+  bell:     { slot: 'neck', e: '🔔', name: '방울 목걸이', price: 35 },
+  fairy:    { slot: 'back', e: '🧚', name: '요정 날개',  pass: 5 },
+  star:     { slot: 'neck', e: '⭐', name: '별 목걸이',  pass: 10 }
 };
 // 칭호: 처음부터 쓸 수 있는 것 하나 + 배지를 따면 열리는 것들 (돈으로는 못 산다)
 const TITLES = [
@@ -4206,7 +4373,8 @@ const TITLES = [
   { id: 'chef', name: '꼬마 요리사', badge: 'chef' }, { id: 'farmer', name: '꼬마 농부', badge: 'farmer' },
   { id: 'bestie', name: '인기쟁이', badge: 'bestie' }, { id: 'merchant', name: '꼬마 사장님', badge: 'merchant' },
   { id: 'decor', name: '인테리어 장인', badge: 'decor' }, { id: 'form4', name: '무지개 전설', badge: 'form4' },
-  { id: 'tagger', name: '술래잡기 왕', badge: 'tagger' }, { id: 'treasure', name: '보물 사냥꾼', badge: 'treasure' }
+  { id: 'tagger', name: '술래잡기 왕', badge: 'tagger' }, { id: 'treasure', name: '보물 사냥꾼', badge: 'treasure' },
+  { id: 'collector', name: '펫 수집가', badge: 'collector' }, { id: 'goldAll', name: '금메달 챔피언', badge: 'goldAll' }, { id: 'legend', name: '말랑 전설', badge: 'passDone' }
 ];
 const titleOpen = t => !t.badge || !!(S.badges && S.badges[t.badge]);
 const titleName = id => (TITLES.find(t => t.id === id) || {}).name || '';
@@ -4215,7 +4383,8 @@ const titleName = id => (TITLES.find(t => t.id === id) || {}).name || '';
 const RIDES = {
   scooter: { e: '🛴', name: '씽씽 킥보드', price: 0, desc: '걷기보다 1.7배 빨라요' },
   bike:    { e: '🚲', name: '꼬마 자전거', price: 90, desc: '2배 넘게 빨라요' },
-  cloud:   { e: '☁️', name: '구름 보드',  price: 160, desc: '둥실둥실 떠서 가장 빨라요' }
+  cloud:   { e: '☁️', name: '구름 보드',  price: 160, desc: '둥실둥실 떠서 아주 빨라요' },
+  rainbow: { e: '🌈', name: '무지개 보드', pass: 15, desc: '성장길 선물. 제일 빨라요' }
 };
 function toggleRide() {
   const p = P(); if (!p || !p.hatched || p.asleep) return;
@@ -4228,6 +4397,60 @@ function toggleRide() {
   say(pick([`${RIDES[kind].name} 출발! 화면을 끌거나 WASD로 달려요!`, '씽씽~ 바람이 시원해요!', '꽉 잡아요, 출발!']), 3000);
 }
 $('#rideBtn').addEventListener('click', () => toggleRide());
+
+/* ---------- 펫 해금 조건 ---------- */
+const SPECIES_UNLOCK = {
+  fox:    { how: '마을 친구 3명 만나면 열려요', ok: () => metCount() >= 3 },
+  turtle: { how: '숨은 스티커 15개 찾으면 열려요', ok: () => stickerState().found.length >= 15 },
+  sheep:  { how: '점프 코스 3단계 완주하면 열려요', ok: () => !!S.best.obby3 }
+};
+
+/* ---------- 성장길: 놀수록 쌓이는 점수로 20칸을 간다. 날짜와 상관없고 만료도 없으며 끝이 있다 ----------
+   저장: S.pass = { pts: 점수, got: 받은 칸 수 }. 쓰다듬기처럼 아주 작은 경험치는 세지 않아 한 가지만 반복해서 채우기 어렵다 */
+const PASS_STEP = 40;
+const PASS = [
+  { coins: 15 }, { coins: 20 }, { coins: 25 }, { coins: 30 }, { wear: 'fairy' },
+  { coins: 30 }, { coins: 35 }, { coins: 40 }, { coins: 45 }, { wear: 'star' },
+  { coins: 50 }, { coins: 50 }, { coins: 55 }, { coins: 60 }, { ride: 'rainbow' },
+  { coins: 60 }, { coins: 65 }, { coins: 70 }, { coins: 80 }, { coins: 150, badge: 'passDone' }
+];
+function passState() {
+  // 이미 많이 키운 펫은 그만큼 앞에서 시작한다 (최대 10칸)
+  if (!S.pass) S.pass = { pts: Math.min(PASS_STEP * 10, S.pets.reduce((a, q) => a + (q.level - 1) * 20, 0)), got: 0 };
+  return S.pass;
+}
+const passReached = () => Math.min(PASS.length, Math.floor(passState().pts / PASS_STEP));
+const passReady = () => passReached() - passState().got;
+function passAdd(n) {
+  if (n < 3) return;
+  const before = passReached(); passState().pts += n; const now = passReached();
+  if (now > before) setTimeout(() => toast(`🎖️ 성장길 ${now}칸 도착! 📋에서 선물을 받아요`), 1600);
+}
+const passLabel = r => r.wear ? `${WEAR[r.wear].e} ${WEAR[r.wear].name}` : r.ride ? `${RIDES[r.ride].e} ${RIDES[r.ride].name}` : `${r.coins}코인${r.badge ? ' + 칭호 말랑 전설' : ''}`;
+function claimPass() {
+  const st = passState(); if (st.got >= passReached()) return;
+  const r = PASS[st.got]; st.got++;
+  if (r.coins) S.coins += r.coins;
+  if (r.wear) { S.wear = S.wear || []; if (!S.wear.includes(r.wear)) S.wear.push(r.wear); }
+  if (r.ride) { S.rides = S.rides || []; if (!S.rides.includes(r.ride)) S.rides.push(r.ride); S.rideSel = r.ride; }
+  if (r.badge) badge(r.badge);
+  sfx('buy'); confetti(r.coins && !r.badge ? 40 : 90); toast(`🎁 ${passLabel(r)} 받았어요!`);
+  render(); persist();
+}
+function openPass() {
+  const st = passState(), reached = passReached(), done = reached >= PASS.length, into = st.pts % PASS_STEP;
+  const rows = PASS.map((r, i) => {
+    const got = i < st.got, can = !got && i === st.got && i < reached, big = !!(r.wear || r.ride || r.badge);
+    return `<div class="mission${got ? ' done' : ''}"><span class="mi">${got ? '✅' : i < reached ? '🎁' : big ? '🌟' : '🔒'}</span><span class="mt"><b>${i + 1}칸 · ${passLabel(r)}</b></span>${can ? '<button class="candy primary" data-pass>받기</button>' : got ? '<span class="mclaimed">받음 ✓</span>' : ''}</div>`;
+  }).join('');
+  openSheet('🎖️ 성장길', `${missionTabs('p')}<p class="msub">돌보기·탐험·코스·마을 놀이를 하면 점수가 쌓여요. 언제 해도 되고 없어지지 않아요.</p>
+    <div class="mission" style="margin-bottom:10px"><span class="mi">🎖️</span><span class="mt"><b>${done ? '성장길을 끝까지 왔어요!' : `${reached} / ${PASS.length}칸 · 다음 칸까지 ${PASS_STEP - into}점`}</b><span class="mbar"><i style="width:${done ? 100 : into / PASS_STEP * 100}%"></i></span></span></div>
+    <div class="missions">${rows}</div>`,
+    body => body.addEventListener('click', e => {
+      const tb = e.target.closest('[data-mtab]'); if (tb) return openMissions(tb.dataset.mtab);
+      if (e.target.closest('[data-pass]')) { claimPass(); openPass(); }
+    }));
+}
 
 /* ---------- 펫 염색 (내 펫만의 색) ---------- */
 const DYES = { base: ['원래 색', null, 0], pink: ['딸기우유', '#FFC9DA', 40], mint: ['민트', '#BFF0E0', 40], sky: ['하늘', '#CDE8FF', 40], lemon: ['레몬', '#FFF1A8', 40], lavender: ['라벤더', '#DCD0FF', 40], choco: ['초코', '#D9B08C', 40] };
@@ -4287,6 +4510,7 @@ function openStand() {
 function goStand() { World.area() === 'village' ? World.goVillage('garden', true, openStand) : openStand(); }
 
 const NEWS = [
+  { v: '2.5', date: '11월 4일', items: ['🐱 새 친구: 치즈 고양이·솜뭉치 강아지·조개 수달! 친구들 메뉴에서 데려와요', '✨ 모든 펫의 눈과 얼굴을 더 귀엽게 다시 그렸어요', '🦊 노을 여우·풀잎 거북·구름 양은 놀다 보면 열려요', '🎖️ 성장길 20칸: 놀수록 쌓이고 요정 날개·별 목걸이·무지개 보드를 받아요', '🥇 점프 코스 메달: 빨리 깰수록 동→은→금'] },
   { v: '2.4', date: '11월 2일', items: ['🏃 술래잡기: 내가 술래! 도망가는 친구 3명을 60초 안에 잡아요 (놀이 버튼 또는 광장 솜솜)', '🎁 보물찾기: 마을에 숨은 선물 상자 8개를 45초 안에 (놀이 버튼 또는 도서관 꼬깔)', '🏷️ 새 칭호: 술래잡기 왕, 보물 사냥꾼'] },
   { v: '2.3', date: '10월 30일', items: ['🛴 탈것이 생겼어요! 상점 › 탈것에서 무료 킥보드를 받고, 마을에서 오른쪽 🛴 버튼(키보드 R)으로 타요', '🚲 꼬마 자전거, ☁️ 둥실둥실 구름 보드는 더 빨라요'] },
   { v: '2.2', date: '10월 30일', items: ['🦸 상점 > 꾸미기: 천사·박쥐 날개, 영웅 망토, 로켓 가방, 풍선, 목도리, 금메달…', '🏷️ 배지를 따면 칭호가 열려요. 이름 아래에 보여요', '💬 마을 친구들이 새 모습을 알아봐 줘요'] },
@@ -4395,12 +4619,12 @@ function openShop(tab = 'hat') {
   const rideOwned = S.rides || [];
   const rideHTML = `<p class="msub">마을에서 오른쪽 🛴 버튼(키보드 R)으로 타고 내려요. 고른 탈것을 타요.</p><div class="grid">${Object.entries(RIDES).map(([id, r]) => {
     const own = rideOwned.includes(id), on = S.rideSel === id && own;
-    return `<button class="item${on ? ' on' : ''}" data-ride="${id}"><span class="em">${r.e}</span><span class="nm">${r.name}</span>${own ? `<span class="pr">${on ? '고른 탈것' : '가지고 있어요'}</span>` : (r.price ? priceTag(r.price) : '<span class="pr">무료로 받기</span>')}<span class="eff">${r.desc}</span></button>`;
+    return `<button class="item${on ? ' on' : ''}" data-ride="${id}"><span class="em">${r.e}</span><span class="nm">${r.name}</span>${own ? `<span class="pr">${on ? '고른 탈것' : '가지고 있어요'}</span>` : (r.pass ? `<span class="pr">🎖️ 성장길 ${r.pass}칸</span>` : r.price ? priceTag(r.price) : '<span class="pr">무료로 받기</span>')}<span class="eff">${r.desc}</span></button>`;
   }).join('')}</div>`;
   const wearOwned = S.wear || [];
   const wearGrid = slot => Object.entries(WEAR).filter(([, w]) => w.slot === slot).map(([id, w]) => {
     const own = wearOwned.includes(id), on = p[slot] === id;
-    return `<button class="item${on ? ' on' : ''}" data-wear="${id}"><span class="em">${w.e}</span><span class="nm">${w.name}</span>${own ? `<span class="pr">${on ? '하는 중 · 빼기' : '가지고 있어요'}</span>` : priceTag(w.price)}</button>`;
+    return `<button class="item${on ? ' on' : ''}" data-wear="${id}"><span class="em">${w.e}</span><span class="nm">${w.name}</span>${own ? `<span class="pr">${on ? '하는 중 · 빼기' : '가지고 있어요'}</span>` : w.pass ? `<span class="pr">🎖️ 성장길 ${w.pass}칸</span>` : priceTag(w.price)}</button>`;
   }).join('');
   const titleHTML = TITLES.map(t => {
     const open = titleOpen(t), on = p.title === t.id;
@@ -4418,6 +4642,7 @@ function openShop(tab = 'hat') {
       if (rd) {
         const id = rd.dataset.ride, r = RIDES[id]; S.rides = S.rides || [];
         if (!S.rides.includes(id)) {
+          if (r.pass) return toast(`🎖️ 성장길 ${r.pass}칸에서 받을 수 있어요`);
           if (S.coins < r.price) return toast(`코인이 ${r.price - S.coins}개 모자라요`);
           S.coins -= r.price; S.rides.push(id); sfx('buy'); toast(`${r.e} ${josa(r.name, '을', '를')} ${r.price ? '샀어요' : '받았어요'}! 마을에서 타 봐요`);
         }
@@ -4429,6 +4654,7 @@ function openShop(tab = 'hat') {
       if (wr) {
         const id = wr.dataset.wear, w = WEAR[id]; S.wear = S.wear || [];
         if (!S.wear.includes(id)) {
+          if (w.pass) return toast(`🎖️ 성장길 ${w.pass}칸에서 받을 수 있어요`);
           if (S.coins < w.price) return toast(`코인이 ${w.price - S.coins}개 모자라요`);
           S.coins -= w.price; S.wear.push(id); sfx('buy'); toast(`${w.e} ${josa(w.name, '을', '를')} 샀어요!`); p[w.slot] = id;
         } else p[w.slot] = p[w.slot] === id ? null : id;
@@ -4491,13 +4717,15 @@ function openDex() {
       const art = p.hatched ? petSVG(sp, { mood: 'happy', stage: stageOf(p.level), hat: p.hat }) : eggSVG(sp, p.taps);
       return `<button class="dex-card${i === S.active ? ' cur' : ''}" data-switch="${i}"><span class="art">${art}</span><span class="txt"><span class="t1">${escapeHTML(p.name)}</span><br><span class="t2">${s.kind} · Lv.${p.level} ${p.hatched ? FORMS[formOf(p.level)].name : '알'}</span></span><span class="go">${i === S.active ? '함께 있어요' : '만나러 가기'}</span></button>`;
     }
+    const lock = SPECIES_UNLOCK[sp];
+    if (lock && !lock.ok()) return `<div class="dex-card" style="opacity:.7"><span class="art">${petSVG(sp, { sil: true, stage: 'kid' })}</span><span class="txt"><span class="t1">??? <small>(${s.kind})</small></span><br><span class="t2">🔒 ${lock.how}</span></span><span class="go">잠김</span></div>`;
     return `<button class="dex-card" data-adopt="${sp}"><span class="art">${petSVG(sp, { sil: true, stage: 'kid' })}</span><span class="txt"><span class="t1">??? <small>(${s.kind})</small></span><br><span class="t2">${s.desc}</span></span><span class="go"><i class="coin"></i>${ADOPT_PRICE}</span></button>`;
   }).join('');
   const village = Object.entries(FRIENDS).map(([id, f]) => {
     const met = fs(id).met, h = heartsOf(id);
     return `<div class="dex-card"><span class="art"><img src="${World.portrait(id)}" alt=""${met ? '' : ' class="sil"'}></span><span class="txt"><span class="t1">${met ? f.name : '???'}</span><br><span class="t2">${met ? `${f.job} · ${'♥'.repeat(h)}${'♡'.repeat(5 - h)}` : '마을에서 만나 보세요'}</span></span></div>`;
   }).join('');
-  openSheet(`우리 친구들 ${S.pets.length}/5`, `<div class="dex">${cards}<p class="arcade-head">마을 친구 <span class="arcade-tag">대화할수록 하트가 쌓여요</span></p>${village}</div>`, body => body.addEventListener('click', e => {
+  openSheet(`우리 친구들 ${S.pets.length}/${SPECIES_ORDER.length}`, `<div class="dex">${cards}<p class="arcade-head">마을 친구 <span class="arcade-tag">대화할수록 하트가 쌓여요</span></p>${village}</div>`, body => body.addEventListener('click', e => {
     const sw = e.target.closest('[data-switch]');
     if (sw) {
       if (bathing) endBath();
@@ -4517,6 +4745,7 @@ function adoptSheet(sp) {
       if (S.coins < ADOPT_PRICE) return toast(`코인이 ${ADOPT_PRICE - S.coins}개 모자라요. 놀이로 모아 봐요!`);
       const name = cleanName(body.querySelector('#adoptName').value, s.name);
       S.coins -= ADOPT_PRICE; S.pets.push(newPet(sp, name)); S.active = S.pets.length - 1;
+      if (S.pets.length >= SPECIES_ORDER.length) badge('collector');
       if (bathing) endBath();
       tempMood = null; World.place(-4, 4.6); sfx('buy'); closeSheet(); render(); persist();
       say(idleLine(), 8000);
@@ -5033,7 +5262,7 @@ function openPlayMenu() {
     `<button class="dex-card" data-game="${id}"><span class="emo ${cls}">${emoji}</span><span class="txt"><span class="t1">${title}</span><br><span class="t2">${desc}</span></span><span class="go">${best[id] ? `최고 ${best[id]}` : '해 보기'}</span></button>`;
   openSheet('뭐 하고 놀까?', `<div class="dex">
     <p class="arcade-head" style="margin-top:0">마을 놀이 <span class="arcade-tag">직접 달려요</span></p>
-    ${card('tag', '🏃', '술래잡기', '내가 술래! 도망가는 친구 3명을 60초 안에 잡아요', 'day')}
+    ${card('tag', '🏃', '술래잡기', '내가 술래! 도망가는 친구 3명을 45초 안에 잡아요', 'day')}
     ${card('treasure', '🎁', '보물찾기', '마을에 숨은 선물 상자 8개를 45초 안에 찾아요', 'day')}
     <p class="arcade-head">미니게임</p>
     ${card('stars', '⭐', '별똥별 받기', '떨어지는 별과 하트를 받아요. 30초 동안!', 'day')}
@@ -5170,7 +5399,7 @@ $('#missionBtn').addEventListener('click', () => { sfx('tap'); openMissions(); }
 /* =========================================================
    13. 시작(입양) 화면
    ========================================================= */
-let chosen = 'bunny';
+let chosen = 'kitten';
 function renderPick() {
   const s = SPECIES[chosen];
   $('#pickBig').innerHTML = petSVG(chosen, { mood: 'happy', stage: 'kid' });
@@ -5183,7 +5412,7 @@ function renderPick() {
 }
 function showStart() {
   $('#start').hidden = false; $('#home').hidden = true;
-  $('#chips').innerHTML = SPECIES_ORDER.map(sp => `<button class="chip" data-sp="${sp}" aria-label="${SPECIES[sp].name}" style="--chip:${SPECIES[sp].color};--chipbg:${SPECIES[sp].bg}">${petSVG(sp, { stage: 'kid' })}</button>`).join('');
+  $('#chips').innerHTML = START_SPECIES.map(sp => `<button class="chip" data-sp="${sp}" aria-label="${SPECIES[sp].name}" style="--chip:${SPECIES[sp].color};--chipbg:${SPECIES[sp].bg}">${petSVG(sp, { stage: 'kid' })}</button>`).join('');
   $('#chips').addEventListener('click', e => { const c = e.target.closest('.chip'); if (c) { chosen = c.dataset.sp; sfx('pop'); renderPick(); } });
   renderPick();
 }
