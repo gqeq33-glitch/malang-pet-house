@@ -39,7 +39,7 @@ for path, title, desc, text, main in FILES:
     items.append({"path": path, "title": title, "desc": desc, "main": main, "lines": text.count("\n") + 1,
                   "kb": round(len(text.encode("utf-8")) / 1024), "b64": base64.b64encode(text.encode("utf-8")).decode("ascii")})
 
-PAGE = """<title>말랑 펫하우스 코드</title>
+PAGE = """<title>말랑 영어 펫하우스 코드</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">
@@ -85,7 +85,7 @@ textarea{width:100%;height:320px;resize:vertical;font-family:var(--mono);font-si
 </style>
 
 <main class="wrap">
-  <h1>말랑 펫하우스 전체 코드</h1>
+  <h1>말랑 영어 펫하우스 전체 코드</h1>
   <p class="lead">버튼을 누르면 파일 내용이 통째로 복사돼요. 메모장에 붙여 넣고 파일 이름 그대로 저장하면 돼요. 게임만 실행해 보려면 맨 위 <b>index.html</b> 하나면 충분해요.</p>
   <div class="links">
     <a href="https://github.com/gqeq33-glitch/malang-pet-house" target="_blank" rel="noopener">GitHub 저장소</a>
