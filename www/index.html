@@ -1034,19 +1034,28 @@ const World = (() => {
   };
   const TRICK_LEN = { spin: .8, hop: .9, jump: .5, dance: 1.6, wave: 1.2, wobble: .5, transform: 1.8 };
   const FORM_SCALE = [1.1, 1.26, 1.4, 1.46, 1.52];
-  const LOOK_UP = -.3;   // 게임 카메라는 위에서 내려다보므로 몸을 살짝 뒤로 젖혀 얼굴이 카메라를 향하게 한다
+  const LOOK_UP = -.2;   // 게임 카메라는 위에서 내려다보므로 몸을 살짝 뒤로 젖혀 얼굴이 카메라를 향하게 한다
+  // 입히는 옷: 몸통·소매 색 c, 무늬 색 t
+  const TOP3 = {
+    stripe: { c: '#7EC8F2', t: '#FFFFFF', rings: true },
+    hoodie: { c: '#FF8FA3', t: '#FFD3DE', hood: true },
+    jersey: { c: '#E8476A', t: '#FFFFFF', star: true },
+    dress:  { c: '#C9A7FF', t: '#FFFFFF', skirt: true },
+    tux:    { c: '#3B3650', t: '#FFFFFF', bow: true, pants: true },
+    space:  { c: '#F1F5F9', t: '#7EC8F2', panel: true, pants: true }
+  };
   const PET3 = {
-    kitten: { body: '#FFCF93', R: .6, cy: .92, hat: 1.56, accent: '#FF8FA3', twoBody: true, eye: { w: 1.04, h: 1.06 } },
-    puppy:  { body: '#FFE7C4', R: .6, cy: .92, hat: 1.54, accent: '#7EC8F2', twoBody: true, eye: { w: 1.12, h: 1.12 } },
-    otter:  { body: '#B98A62', R: .6, cy: .88, hat: 1.4,  accent: '#7ED9C3', twoBody: true, headW: 1.2, headH: .78, longBody: true },
-    bunny:    { body: '#F7FCFF', R: .6, cy: .62, hat: 1.3, accent: '#A9DDF7', eye: { w: 1.05, h: 1.08 } },
-    hamster:  { body: '#FFD9A0', R: .64, cy: .62, hat: 1.22, accent: '#FF9EB0', eye: { w: .92, h: 1, x: .2 } },
+    kitten: { body: '#FFCF93', R: .6, cy: 1.02, hat: 1.66, accent: '#FF8FA3', twoBody: true, eye: { w: 1.04, h: 1.06 } },
+    puppy:  { body: '#FFE7C4', R: .6, cy: 1.02, hat: 1.64, accent: '#7EC8F2', twoBody: true, eye: { w: 1.12, h: 1.12 } },
+    otter:  { body: '#B98A62', R: .6, cy: 0.98, hat: 1.5,  accent: '#7ED9C3', twoBody: true, headW: 1.2, headH: .78, longBody: true },
+    bunny:    { body: '#F7FCFF', R: .6, cy: 1.02, hat: 1.7, accent: '#A9DDF7', twoBody: true, eye: { w: 1.05, h: 1.08 } },
+    hamster:  { body: '#FFD9A0', R: .6, cy: 1.02, hat: 1.62, accent: '#FF9EB0', twoBody: true, eye: { w: .92, h: 1, x: .2 } },
     penguin:  { body: '#7FDCC8', R: .58, cy: .68, hat: 1.36, accent: '#FF6B7A' },
-    dragon:   { body: '#B9A2FF', R: .6, cy: .92, hat: 1.64, accent: '#FFD95A', twoBody: true, eye: { w: 1.08, h: 1.12, x: .25 } },
-    squirrel: { body: '#E9A766', R: .6, cy: .92, hat: 1.68, accent: '#8FD694', twoBody: true, eye: { w: 1, h: 1.1 } },
-    fox:      { body: '#FF9E5E', R: .6, cy: .92, hat: 1.7, accent: '#7ED9C3', twoBody: true, eye: { w: .86, h: .94, x: .26 } },
-    sheep:    { body: '#F7CFB4', R: .56, cy: .92, hat: 1.7, accent: '#A9DDF7', twoBody: true, eye: { w: .95, h: .76 } },
-    turtle:   { body: '#A8E08A', R: .52, cy: 1, hat: 1.56, accent: '#FFB35C', twoBody: true, eye: { w: .92, h: 1, x: .22 } }
+    dragon:   { body: '#B9A2FF', R: .6, cy: 1.02, hat: 1.74, accent: '#FFD95A', twoBody: true, eye: { w: 1.08, h: 1.12, x: .25 } },
+    squirrel: { body: '#E9A766', R: .6, cy: 1.02, hat: 1.78, accent: '#8FD694', twoBody: true, eye: { w: 1, h: 1.1 } },
+    fox:      { body: '#FF9E5E', R: .6, cy: 1.02, hat: 1.8, accent: '#7ED9C3', twoBody: true, eye: { w: .86, h: .94, x: .26 } },
+    sheep:    { body: '#F7CFB4', R: .56, cy: 1.02, hat: 1.8, accent: '#A9DDF7', twoBody: true, eye: { w: .95, h: .76 } },
+    turtle:   { body: '#A8E08A', R: .52, cy: 1.1, hat: 1.66, accent: '#FFB35C', twoBody: true, eye: { w: .92, h: 1, x: .22 } }
   };
 
   let ok = false, renderer, scene, camera, grad, inkMat, dirtMat, hemi, sun, lamp, wallMat, rugMat, glassMat;
@@ -1195,10 +1204,37 @@ const World = (() => {
   }
 
   /* ---------- 펫 만들기 ---------- */
-  function buildPet(spId, hatId, form, tint, back, neck) {
+  /* 로블록스 캐릭터처럼 몸·팔·다리가 따로 움직인다. 목표 자세를 정하고 부드럽게 따라간다
+     o: walk 걷는 중, run 달리는 중, cyc 걸음 위상, air 공중, act 동작 이름, k 동작 시간, t 시간, ride 탈것 */
+  function poseLimbs(pt, dt, o = {}) {
+    if (!pt.legL) return;
+    const t = o.t || 0, k = o.k || 0, s = Math.sin(o.cyc || 0), amp = o.run ? 1 : .62;
+    let lx = 0, rx = 0, alx = Math.sin(t * 2) * .05, arx = -Math.sin(t * 2) * .05, alz = -.2, arz = .2;
+    if (o.walk) { lx = s * amp; rx = -s * amp; alx = -s * amp * .95; arx = s * amp * .95; alz = o.run ? -.35 : -.24; arz = -alz; }
+    if (o.air) { alx = arx = 0; alz = -2.1; arz = 2.1; lx = -.7; rx = .45; }
+    if (o.eat) { alx = arx = -2; alz = .55; arz = -.55; }
+    switch (o.act) {
+      case 'wave': arx = 0; arz = 2.15 + Math.sin(k * 12) * .38; alx = .1; break;
+      case 'dance': { const d = Math.sin(k * 9); alx = arx = 0; alz = -1.5 - d * .75; arz = 1.5 - d * .75; lx = d * .5; rx = -d * .5; break; }
+      case 'spin': alz = -1.45; arz = 1.45; alx = arx = 0; lx = -.25; rx = .25; break;
+      case 'jump': case 'hop': alx = arx = 0; alz = -2.1; arz = 2.1; lx = -.7; rx = .45; break;
+      case 'transform': alx = arx = 0; alz = -2.4; arz = 2.4; lx = rx = 0; break;
+      case 'talk': arx = 0; arz = 1.1 + Math.sin(t * 7) * .35; break;
+    }
+    if (o.ride === 'scooter') { alx = arx = -1.4; alz = .12; arz = -.12; lx = -.12; rx = .18; }
+    else if (o.ride === 'bike') { alx = arx = -1.35; alz = .1; arz = -.1; lx = -1.2 + s * .55; rx = -1.2 - s * .55; }
+    else if (o.ride) { alz = -1; arz = 1; alx = arx = -.35; lx = -.18; rx = .28; }
+    const f = Math.min(1, dt * 15), go = (obj, axis, to) => { obj.rotation[axis] += (to - obj.rotation[axis]) * f; };
+    go(pt.legL, 'x', lx); go(pt.legR, 'x', rx);
+    go(pt.armL, 'x', alx); go(pt.armR, 'x', arx);
+    if (pt.armZ !== false) { go(pt.armL, 'z', alz); go(pt.armR, 'z', arz); }
+  }
+  function buildPet(spId, hatId, form, tint, back, neck, top) {
     const c = PET3[spId], R = c.R, cy = c.cy;
     const root = new T.Group(), body = new T.Group(); root.add(body);
     const pt = { root, body, isEgg: false };
+    body.position.y = .15;      // 다리가 보이도록 몸을 올린다
+    const cloth = TOP3[top];
     const add = (color, x, y, z, sx, sy, sz, parent = body, ol = 1.07, geo = SPH) => mesh(geo, color, x, y, z, sx, sy, sz, parent, { outline: ol });
     const zAt = (x, y) => Math.sqrt(Math.max(0, R * R - x * x - (y - cy) * (y - cy)));
     const pivot = (x, y, z, parent = body) => group(x, y, z, parent);
@@ -1206,12 +1242,16 @@ const World = (() => {
 
     // 몸 (머리와 몸이 하나인 동글동글 2등신)
     add(bc, 0, cy, 0, R * (c.headW || (c.twoBody ? 1.1 : 1)), c.headH ? R * c.headH : R * (spId === 'penguin' ? 1.1 : .93), R * .96);
-    if (c.twoBody && spId !== 'turtle') add(bc, 0, c.longBody ? .38 : .33, -.02, c.longBody ? .33 : .35, c.longBody ? .4 : .33, .32);      // 2등신: 머리 아래 작은 몸
-    // 작은 앞발
-    if (c.twoBody && spId !== 'otter' && spId !== 'turtle') for (const sd of [-1, 1]) add(bc, sd * .3, .42, .16, .1, .09, .1);
+    if (c.twoBody && spId !== 'turtle') add(bc, 0, c.longBody ? .46 : .42, -.02, c.longBody ? .33 : .35, c.longBody ? .44 : .41, .32);      // 2등신: 머리 아래 작은 몸
     const feet = (color = bc) => {
-      const fx = c.twoBody ? .19 : .24, fz = c.twoBody ? .17 : .26;
-      pt.footL = add(color, -fx, .07, fz, .15, .08, .19, root); pt.footR = add(color, fx, .07, fz, .15, .08, .19, root); pt.footBase = .07;
+      const fx = .19, hip = .3, legCol = cloth && cloth.pants ? cloth.c : bc;
+      for (const sd of [-1, 1]) {
+        const leg = group(sd * fx, hip, .03, root);
+        add(legCol, 0, -.1, 0, .105, .17, .105, leg, 1.07);
+        add(color, 0, -.23, .07, .135, .07, .175, leg, 1.08);
+        if (sd < 0) pt.legL = leg; else pt.legR = leg;
+      }
+      pt.footL = pt.legL; pt.footR = pt.legR; pt.footBase = hip;
     };
     if (spId === 'kitten') {
       pt.earL = pivot(-.36, cy + .42, -.04); pt.earR = pivot(.36, cy + .42, -.04); pt.earBase = .2;
@@ -1242,11 +1282,10 @@ const World = (() => {
       add(INK, 0, cy - .1, zAt(0, cy - .1) + .03, .065, .046, .03, body, 0);
       add('#FFFFFF', -.02, cy - .085, zAt(0, cy - .1) + .06, .016, .011, .006, body, 0);
       for (const sd of [-1, 1]) for (const k of [0, 1]) { const w = mesh(CYL, INK, sd * .55, cy - .13 - k * .06, zAt(.42, cy - .13) + .03, .007, .3, .007, body, { cast: false }); w.rotation.z = sd * (Math.PI / 2 + (k ? -.12 : .12)); }
-      add('#FFF0DC', 0, .36, .1, .24, .28, .22, body, 0);
+      add('#FFF0DC', 0, .44, .1, .24, .32, .22, body, 0);
       // 배 위의 조개와 앞발: 수달의 상징
-      add('#FFB6C6', 0, .42, .35, .13, .11, .05, body, 1.08);
-      for (const k of [-1, 0, 1]) mesh(CYL, '#E88AA0', k * .045, .42, .4, .007, .13, .007, body, { cast: false }).rotation.z = k * .35;
-      for (const sd of [-1, 1]) add(bc, sd * .16, .47, .32, .085, .075, .075, body, 1.08);
+      add('#FFB6C6', 0, .46, .33, .14, .12, .05, body, 1.08);
+      for (const k of [-1, 0, 1]) mesh(CYL, '#E88AA0', k * .045, .46, .385, .007, .14, .007, body, { cast: false }).rotation.z = k * .35;
       pt.tail = pivot(.12, .16, -.28);
       add('#A0754F', .1, 0, -.2, .15, .09, .32, pt.tail, 1.08); add('#A0754F', .28, .02, -.48, .11, .07, .22, pt.tail, 1.08);
       feet('#8F6545');
@@ -1258,10 +1297,10 @@ const World = (() => {
     } else if (spId === 'hamster') {
       pt.earL = pivot(-.4, cy + .48, -.05); pt.earR = pivot(.4, cy + .48, -.05); pt.earBase = .1;
       for (const e of [pt.earL, pt.earR]) { add(bc, 0, .08, 0, .17, .17, .1, e, 1.1); add('#FFC1C8', 0, .08, .07, .1, .1, .02, e, 0); }
-      add('#FFF8EA', 0, cy - .24, zAt(0, cy - .24) - .14, .4, .3, .2, body, 0);
+      add('#FFF8EA', 0, cy - .22, zAt(0, cy - .22) - .14, .3, .2, .2, body, 0);
+      add('#FFF8EA', 0, .42, .22, .22, .26, .12, body, 0);
       for (const [x, z, r] of [[-.13, .1, -.4], [0, .15, 0], [.13, .1, .4]]) { const m = add('#A57A63', x, cy + R * .9, z, .06, .04, .045, body, 0); m.rotation.y = r; }
       for (const sd of [-1, 1]) { add(bc, sd * .5, cy - .16, .1, .25, .23, .24, body, 1.05); add('#FFF2DC', sd * .5, cy - .19, .3, .15, .13, .05, body, 0); }
-      pt.handL = add(bc, -.22, cy - .3, zAt(.22, cy - .3) - .02, .1, .08, .08); pt.handR = add(bc, .22, cy - .3, zAt(.22, cy - .3) - .02, .1, .08, .08);
       feet();
     } else if (spId === 'penguin') {
       add('#F4FFFC', 0, cy - .3, zAt(0, cy - .3) - .16, .38, .34, .22, body, 0);
@@ -1273,7 +1312,7 @@ const World = (() => {
     } else if (spId === 'dragon') {
       for (const [x, y] of [[-.38, cy + .3], [.38, cy + .3], [-.18, cy + .48], [.18, cy + .48]]) add('#9A80F0', x, y, zAt(x, y) - .03, .06, .06, .03, body, 0);
       const ws = form >= 1 ? 1.25 : 1;
-      pt.wingL = pivot(-.24, .5, -.26); pt.wingR = pivot(.24, .5, -.26); pt.wingBase = .4;
+      pt.wingL = pivot(-.24, .62, -.26); pt.wingR = pivot(.24, .62, -.26); pt.wingBase = .4;
       for (const [w, sd] of [[pt.wingL, -1], [pt.wingR, 1]]) {
         const a1 = add('#FF9AD0', sd * .26 * ws, .1, 0, .13 * ws, .34 * ws, .03, w, 1.12, CONE); a1.rotation.z = -sd * 1.05;
         const a2 = add('#FFB7DE', sd * .2 * ws, -.04, 0, .1 * ws, .26 * ws, .03, w, 1.12, CONE); a2.rotation.z = -sd * 1.5;
@@ -1308,19 +1347,41 @@ const World = (() => {
       add(bc, .16, .12, -.04, .19, .24, .19, pt.tail, 1.08); add(bc, .36, .42, -.04, .22, .27, .2, pt.tail, 1.08); add('#FFF4E8', .46, .72, -.04, .15, .17, .14, pt.tail, 1.1);
       feet('#8A5530');
     } else if (spId === 'sheep') {
-      for (const [x, y, z, r] of [[-.52, cy + .08, -.1, .3], [.52, cy + .08, -.1, .3], [-.34, cy + .42, -.06, .3], [.34, cy + .42, -.06, .3], [0, cy + .52, -.02, .33], [0, cy + .2, -.36, .42], [-.46, cy - .24, -.14, .26], [.46, cy - .24, -.14, .26], [0, .34, -.04, .4], [-.28, .36, .02, .24], [.28, .36, .02, .24]]) add('#FFFFFF', x, y, z, r, r * .92, r, body, 1.05);
+      for (const [x, y, z, r] of [[-.52, cy + .08, -.1, .3], [.52, cy + .08, -.1, .3], [-.34, cy + .42, -.06, .3], [.34, cy + .42, -.06, .3], [0, cy + .52, -.02, .33], [0, cy + .2, -.36, .42], [-.46, cy - .24, -.14, .26], [.46, cy - .24, -.14, .26], [0, .44, -.04, .4], [-.26, .42, .02, .24], [.26, .42, .02, .24]]) add('#FFFFFF', x, y, z, r, r * .92, r, body, 1.05);
       pt.earL = pivot(-.6, cy + .08, .14); pt.earR = pivot(.6, cy + .08, .14); pt.earBase = .5;
       add('#F2D2BC', -.13, 0, 0, .15, .07, .09, pt.earL, 1.1); add('#F2D2BC', .13, 0, 0, .15, .07, .09, pt.earR, 1.1);
 
       feet('#8E7A85');
     } else if (spId === 'turtle') {
-      add('#5FA352', 0, .5, -.2, .64, .54, .5, body, 1.04);
-      for (const [x, y] of [[0, .86], [-.36, .66], [.36, .66], [-.5, .34], [.5, .34]]) add('#4A8A42', x, y, zAt(0, 0) * 0 - .02 + (.12 - Math.abs(x) * .28), .13, .12, .05, body, 0);
-      add(bc, 0, .36, .12, .36, .32, .26, body);
-      add('#F6F4C8', 0, .34, .34, .25, .23, .08, body, 0);
-      for (const sd of [-1, 1]) add(bc, sd * .46, .36, .22, .13, .1, .12, body);
+      add('#5FA352', 0, .56, -.2, .64, .56, .5, body, 1.04);
+      for (const [x, y] of [[0, .96], [-.36, .76], [.36, .76], [-.5, .42], [.5, .42]]) add('#4A8A42', x, y, -.02 + (.12 - Math.abs(x) * .28), .13, .12, .05, body, 0);
+      add(bc, 0, .42, .1, .36, .38, .26, body);
+      add('#F6F4C8', 0, .42, .32, .25, .28, .08, body, 0);
       add('#F6F4C8', 0, cy - .19, zAt(0, cy - .19) - .12, .22, .14, .16, body, 0);
       feet('#8FCB72');
+    }
+
+    // 팔: 어깨에서 돌아가는 관절. 펭귄은 날개가 곧 팔이다
+    if (spId === 'penguin') { pt.armL = pt.flL; pt.armR = pt.flR; pt.armZ = false; }
+    else {
+      const ax = spId === 'turtle' ? .42 : .36, ay = spId === 'turtle' ? .62 : .64, az = spId === 'otter' ? .12 : .03;
+      for (const sd of [-1, 1]) {
+        const arm = pivot(sd * ax, ay, az);
+        add(cloth ? cloth.c : bc, 0, -.16, 0, .09, .21, .09, arm, 1.07);
+        add(bc, 0, -.36, 0, .1, .09, .1, arm, 1.08);
+        if (sd < 0) pt.armL = arm; else pt.armR = arm;
+      }
+    }
+    // 옷: 몸통 위에 한 겹 입힌다
+    if (cloth) {
+      if (spId === 'penguin') { const w = add(cloth.c, 0, cy - .12, 0, R * 1.03, R * .92, R * .99, body, 1.03, HALF); w.rotation.x = Math.PI; }
+      else add(cloth.c, 0, c.longBody ? .46 : .42, -.02, c.longBody ? .35 : .37, c.longBody ? .45 : .43, .34, body, 1.04);
+      if (cloth.rings) for (const y of [.24, .4, .56]) { const r = Math.sqrt(Math.max(.01, .137 - (y - .42) * (y - .42) * .75)); const g = add(cloth.t, 0, y, -.02, r, r, r * .93, body, 0, new T.TorusGeometry(1, .05, 8, 28)); g.rotation.x = Math.PI / 2; }
+      if (cloth.hood) { add(cloth.c, 0, .72, -.3, .32, .22, .2, body, 1.05); add(cloth.t, 0, .36, .31, .15, .1, .05, body, 0); }
+      if (cloth.star) add(cloth.t, 0, .45, .34, .12, .12, .05, body, 1.1, STAR);
+      if (cloth.skirt) { add(cloth.c, 0, .22, -.02, .52, .44, .48, body, 1.04, CONE); add(cloth.t, 0, .52, .32, .09, .07, .04, body, 1.08); }
+      if (cloth.bow) { add(cloth.t, 0, .44, .26, .17, .3, .1, body, 0); for (const sd of [-1, 1]) { const b = add('#E8476A', sd * .07, .66, .3, .06, .1, .05, body, 1.1, CONE); b.rotation.z = sd * Math.PI / 2; } }
+      if (cloth.panel) { add(cloth.t, 0, .46, .33, .13, .11, .04, body, 1.08); const rg = add('#B9C6D0', 0, .72, -.02, .31, .31, .29, body, 0, new T.TorusGeometry(1, .09, 8, 28)); rg.rotation.x = Math.PI / 2; }
     }
 
     // 얼굴: 기분마다 눈·입 모양을 바꿔 보여 준다
@@ -1397,24 +1458,23 @@ const World = (() => {
       const bz = -R * .92;
       if (back === 'angel' || back === 'bat' || back === 'fairy') {
         const col = back === 'angel' ? '#FFF1B8' : back === 'fairy' ? '#FFB7D8' : '#8A6CC8';
-        pt.wingL = pivot(-.22, cy + .2, bz + .1); pt.wingR = pivot(.22, cy + .2, bz + .1); pt.wingBase = .45;
+        pt.wingL = pivot(-.22, .68, bz + .22); pt.wingR = pivot(.22, .68, bz + .22); pt.wingBase = .45;
         for (const [w, sx] of [[pt.wingL, -1], [pt.wingR, 1]]) {
           add(col, sx * .42, .2, 0, .46, .32, .05, w, 1.1); add(col, sx * .76, .04, 0, .28, .2, .045, w, 1.1);
           if (back === 'bat') for (const k of [0, 1, 2]) { const tip = add('#6B4FA0', sx * (.34 + k * .22), -.14, 0, .06, .12, .04, w, 1.1, CONE); tip.rotation.z = Math.PI; }
         }
       } else if (back === 'cape') {
-        const cp = add('#E8476A', 0, cy - .12, bz - .02, R * .95, R * 1.05, .05, body, 1.05, BOX); cp.rotation.x = .18;
-        add('#FFD54F', 0, cy + R * .45, bz + .12, .1, .1, .06, body, 1.1, STAR);
+        const cp = add('#E8476A', 0, .48, bz + .18, .72, .86, .05, body, 1.05, BOX); cp.rotation.x = .16;
       } else if (back === 'backpack') {
-        add('#FF9A3D', 0, cy - .02, bz - .06, .38, .42, .22, body, 1.06, BOX);
-        add('#FFC07A', 0, cy + .16, bz - .17, .4, .12, .06, body, 1.06, BOX);
-        add('#FFE27A', 0, cy - .08, bz - .2, .06, .06, .04, body, 0);
+        add('#FF9A3D', 0, .46, bz + .1, .42, .46, .22, body, 1.06, BOX);
+        add('#FFC07A', 0, .64, bz - .02, .44, .12, .06, body, 1.06, BOX);
+        add('#FFE27A', 0, .4, bz - .03, .07, .07, .04, body, 0);
       } else if (back === 'jetpack') {
         for (const sx of [-1, 1]) {
-          add('#D9DEE8', sx * .13, cy, bz - .08, .1, .38, .1, body, 1.06, CYL);
-          const cap = add('#E8476A', sx * .13, cy + .24, bz - .08, .1, .12, .1, body, 1.08, CONE); cap.rotation.x = 0;
+          add('#D9DEE8', sx * .14, .5, bz + .12, .1, .42, .1, body, 1.06, CYL);
+          add('#E8476A', sx * .14, .77, bz + .12, .1, .13, .1, body, 1.08, CONE);
         }
-        pt.flame = group(0, cy - .26, bz - .08, body);
+        pt.flame = group(0, .24, bz + .12, body);
         for (const sx of [-1, 1]) { const fl = mesh(CONE, '', sx * .13, -.1, 0, .07, .18, .07, pt.flame, { mat: basic('#FF8A3D'), cast: false }); fl.rotation.x = Math.PI; }
       } else if (back === 'balloon') {
         pt.balloon = group(.34, cy - .1, -.05, body);
@@ -1790,6 +1850,7 @@ const World = (() => {
       p.root.rotation.set(0, n.face, n.walk ? Math.sin(cyc) * .06 : 0);
       p.body.scale.set(1 + s, 1 - s, 1 + s); p.body.rotation.x = LOOK_UP;
       if (n.jumpT > 0) { n.jumpT -= dt; p.root.position.y += Math.sin((1 - n.jumpT / .6) * Math.PI) * .8; }
+      poseLimbs(p, dt, { walk: n.walk, run: !!(n.fleeing || n.racing), cyc, t: n.t, air: n.jumpT > 0, act: n.talking ? 'talk' : null });
       if (p.footL) { p.footL.position.y = p.footBase + (n.walk ? Math.max(0, Math.sin(cyc)) * .1 : 0); p.footR.position.y = p.footBase + (n.walk ? Math.max(0, -Math.sin(cyc)) * .1 : 0); }
       if (p.earL) { const sw = Math.sin(n.t * 2.5) * .06; p.earL.rotation.z = p.earBase + sw; p.earR.rotation.z = -p.earBase - sw; }
       if (p.tail) p.tail.rotation.y = Math.sin(n.t * 5) * .35;
@@ -2156,7 +2217,7 @@ const World = (() => {
     compKey = key;
     comps.forEach(c => scene.remove(c.parts.root)); comps = [];
     list.forEach((d, k) => {
-      const parts = buildPet(d.sp, d.hat, d.form, d.tint, d.back, d.neck);
+      const parts = buildPet(d.sp, d.hat, d.form, d.tint, d.back, d.neck, d.top);
       parts.root.scale.multiplyScalar(.82); parts.dirt.visible = false; parts.setFace('happy');
       parts.root.traverse(o => { o.userData.pet = false; o.userData.comp = d.idx; });
       scene.add(parts.root);
@@ -2198,6 +2259,7 @@ const World = (() => {
     const cyc = d.t * 13, sq = d.walk ? Math.cos(cyc * 2) * .05 : Math.sin(d.t * 2.4) * .02;
     p.root.position.set(d.x, d.walk ? Math.abs(Math.sin(cyc)) * .14 : 0, d.z);
     p.root.rotation.set(0, d.face, d.walk ? Math.sin(cyc) * .07 : 0); p.body.rotation.x = LOOK_UP; p.body.scale.set(1 + sq, 1 - sq, 1 + sq);
+    poseLimbs(p, dt, { walk: d.walk, run: true, cyc, t: d.t });
     if (p.footL) { p.footL.position.y = p.footBase + (d.walk ? Math.max(0, Math.sin(cyc)) * .12 : 0); p.footR.position.y = p.footBase + (d.walk ? Math.max(0, -Math.sin(cyc)) * .12 : 0); }
     placeTag(d.tag, d.x, 2.6, d.z); placeTag(d.tag1, st.x, 2.6, st.z);
   }
@@ -2207,7 +2269,7 @@ const World = (() => {
     if (!ok) return;
     pals.forEach(q => { villageG.remove(q.parts.root); q.tag.remove(); const at = pickV.indexOf(q.parts.root); if (at >= 0) pickV.splice(at, 1); });
     pals = list.map((d, i) => {
-      const parts = buildPet(d.s, d.h, d.f, d.tint, d.b, d.k); parts.dirt.visible = false; parts.setFace('happy');
+      const parts = buildPet(d.s, d.h, d.f, d.tint, d.b, d.k, d.o); parts.dirt.visible = false; parts.setFace('happy');
       parts.root.traverse(o => { o.userData.pet = false; o.userData.use = 'pal:' + i; });
       villageG.add(parts.root); pickV.push(parts.root);
       const [hx, hz] = clampVillage(...PAL_HOMES[i % PAL_HOMES.length]);
@@ -2227,6 +2289,7 @@ const World = (() => {
       const cyc = q.t * 9, p = q.parts, sq = q.walk ? Math.cos(cyc * 2) * .04 : Math.sin(q.t * 2.2) * .02;
       p.root.position.set(VX + q.x, q.walk ? Math.abs(Math.sin(cyc)) * .12 : 0, q.z);
       p.root.rotation.set(0, q.face, q.walk ? Math.sin(cyc) * .06 : 0); p.body.rotation.x = LOOK_UP; p.body.scale.set(1 + sq, 1 - sq, 1 + sq);
+      poseLimbs(p, dt, { walk: q.walk, cyc, t: q.t });
       placeTag(q.tag, VX + q.x, 2.6, q.z);
     }
   }
@@ -2248,6 +2311,7 @@ const World = (() => {
       let y = c.walk ? Math.abs(Math.sin(cyc)) * .12 : 0;
       if (c.jumpT > 0) { c.jumpT -= dt; y += Math.sin((1 - c.jumpT / .6) * Math.PI) * .6; }
       p.root.position.set(c.x, y, c.z); p.root.rotation.set(0, c.face, c.walk ? Math.sin(cyc) * .06 : 0); p.body.rotation.x = LOOK_UP; p.body.scale.set(1 + sq, 1 - sq, 1 + sq);
+      poseLimbs(p, dt, { walk: c.walk, run: d > 2.5, cyc, t: c.t, air: c.jumpT > 0 });
       if (p.footL) { p.footL.position.y = p.footBase + (c.walk ? Math.max(0, Math.sin(cyc)) * .1 : 0); p.footR.position.y = p.footBase + (c.walk ? Math.max(0, -Math.sin(cyc)) * .1 : 0); }
       if (p.earL) { const sw = Math.sin(c.t * 2.5) * .06; p.earL.rotation.z = p.earBase + sw; p.earR.rotation.z = -p.earBase - sw; }
       if (p.tail) p.tail.rotation.y = Math.sin(c.t * 6) * .35;
@@ -2402,7 +2466,9 @@ const World = (() => {
         if (k >= TRICK_LEN[st.trick]) st.trick = null;
       }
       const wave = st.trick === 'wave' ? Math.sin(st.trickT * 12) * .5 + .9 : 0;
-      if (pet.footL) { pet.footL.position.y = pet.footBase + (walking ? Math.max(0, Math.sin(cyc)) * .12 : 0); pet.footR.position.y = pet.footBase + (walking ? Math.max(0, -Math.sin(cyc)) * .12 : 0); }
+      const inAir = st.area === 'obby' && ob ? !ob.ground : false;
+      poseLimbs(pet, dt, { walk: walking, run: st.run || st.area === 'obby', cyc, t, air: inAir, act: st.trick, k: st.trickT, ride: rideKind, eat: st.eatT > 0 });
+      if (pet.footL) { pet.footL.position.y = pet.footBase + (walking && !rideKind ? Math.max(0, Math.sin(cyc)) * .12 : 0); pet.footR.position.y = pet.footBase + (walking && !rideKind ? Math.max(0, -Math.sin(cyc)) * .12 : 0); }
       st.flick -= dt; const flick = st.flick > 0 ? Math.sin(st.flick * 40) * .25 : 0; if (st.flick < -rand(2, 6)) st.flick = .3;
       if (pet.earL) { const sw = walking ? Math.sin(cyc) * .18 : Math.sin(t * 2.3) * .05; pet.earL.rotation.z = pet.earBase + sw + flick + wave; pet.earR.rotation.z = -pet.earBase - sw; }
       if (pet.tail) pet.tail.rotation.y = Math.sin(t * (st.mood === 'happy' || st.mood === 'love' ? 9 : 4)) * .38;
@@ -2427,7 +2493,7 @@ const World = (() => {
       const moved = rideLast ? Math.hypot(st.x - rideLast[0], st.z - rideLast[1]) : 0; rideLast = [st.x, st.z];
       for (const w of rideWheels) w.m.rotation.x += moved / (w.r * RIDE_SCALE);
     }
-    pet.root.position.set(st.x, y, st.z); pet.root.rotation.set(rx, ry, rz); pet.body.scale.set(sx, sy, sx); pet.body.rotation.x = pet.isEgg || (p.asleep && st.at === 'bed') ? 0 : LOOK_UP;
+    pet.root.position.set(st.x, y, st.z); pet.root.rotation.set(rx, ry, rz); pet.body.scale.set(sx, sy, sx); pet.body.rotation.x = pet.isEgg || (p.asleep && st.at === 'bed') ? 0 : LOOK_UP + (walking && st.run && !rideKind ? .22 : 0);
   }
 
   function loop(now) {
@@ -2499,8 +2565,10 @@ const World = (() => {
     const dist0 = (camera.aspect < .8 ? 8.8 : 8.6) * (vill ? 1.3 : inOb ? 1.15 : 1);
     if (duo) { const want = Math.hypot(st.x - duo.x, st.z - duo.z) * 1.55 / Math.min(camera.aspect, 1), goal = Math.max(1, want / dist0); st.camZoom = (st.camZoom || 1) + (goal - (st.camZoom || 1)) * Math.min(1, dt * 2); } else st.camZoom = 1;
     const dist = dist0 * st.camZoom;
-    camera.position.set(st.camX, st.camY + dist * .72, st.camZ + dist * .98);
-    camera.lookAt(st.camX, st.camY + .8, st.camZ - .6);
+    // 집·마을은 조금 낮은 각도로 몸 전체가 보이게, 점프 코스는 앞 발판이 잘 보이게 높은 각도로
+    const camH = inOb ? .72 : .56, camB = inOb ? .98 : 1.06;
+    camera.position.set(st.camX, st.camY + dist * camH, st.camZ + dist * camB);
+    camera.lookAt(st.camX, st.camY + (inOb ? .8 : 1), st.camZ - .6);
     renderer.render(scene, camera);
     placeBubble();
   }
@@ -2705,8 +2773,8 @@ const World = (() => {
       st.mood = mood;
       if (!ok) { if (flat) flat.innerHTML = p.hatched ? petSVG(p.sp, { mood, stage: stageOf(p.level), hat: p.hat, dirt: Math.round(dirt * 10) / 10 }) : eggSVG(p.sp, p.taps); return; }
       const form = st.formHold !== null ? st.formHold : formOf(p.level);
-      const tint = p.hatched ? dyeColor(p) : null, key = p.hatched ? `${p.sp}|${p.hat}|${form}|${tint}|${p.back || ''}|${p.neck || ''}` : `egg|${p.sp}|${p.taps}`;
-      if (key !== petKey) { if (pet) scene.remove(pet.root); pet = p.hatched ? buildPet(p.sp, p.hat, form, tint, p.back, p.neck) : buildEgg(p.sp, p.taps); scene.add(pet.root); petKey = key; }
+      const tint = p.hatched ? dyeColor(p) : null, key = p.hatched ? `${p.sp}|${p.hat}|${form}|${tint}|${p.back || ''}|${p.neck || ''}|${p.top || ''}` : `egg|${p.sp}|${p.taps}`;
+      if (key !== petKey) { if (pet) scene.remove(pet.root); pet = p.hatched ? buildPet(p.sp, p.hat, form, tint, p.back, p.neck, p.top) : buildEgg(p.sp, p.taps); scene.add(pet.root); petKey = key; }
       if (pet.setFace) { pet.setFace(mood); pet.setDirt(dirt); }
     },
     place(x, z) { trail = []; if (ok && st.area !== 'house') setArea('house'); st.x = x; st.z = z; st.path = []; st.mode = 'idle'; st.at = null; st.lift = 0; st.camX = clamp(x, -4.4, 4.4); st.camZ = clamp(z, -4.4, 5); },
@@ -2809,8 +2877,8 @@ const World = (() => {
     },
     raceTap() { if (race && race.t >= 0) race.boost = Math.min(5, race.boost + .7); },
     drive,
-    makePet(q) { const parts = buildPet(q.sp, q.hat, formOf(q.level), dyeColor(q), q.back, q.neck); parts.dirt.visible = false; parts.setFace('happy'); return parts; },
-    get ok() { return ok; }, get gradMap() { return grad; }, get starGeo() { return STAR; },
+    makePet(q) { const parts = buildPet(q.sp, q.hat, formOf(q.level), dyeColor(q), q.back, q.neck, q.top); parts.dirt.visible = false; parts.setFace('happy'); return parts; },
+    poseLimbs, get ok() { return ok; }, get gradMap() { return grad; }, get starGeo() { return STAR; },
     duoStart, duoStop,
     get duoInput() { return duo ? duo.input : null; },
     duoSpeeds(p1, p2) { st.speedMul = p1; if (duo) duo.mul = p2; },
@@ -3750,7 +3818,7 @@ function myPalId() { if (!S.palId) { S.palId = Math.random().toString(36).slice(
 function makePalCode() {
   const p = P(), best = {};
   for (const k in S.best) if (/^obby\d?$/.test(k) && S.best[k] > 0) best[k] = +S.best[k].toFixed(1);
-  const json = JSON.stringify({ id: myPalId(), n: p.name, s: p.sp, h: p.hat || null, d: p.dye || null, b: p.back || null, k: p.neck || null, f: formOf(p.level), t: p.title || null, best });
+  const json = JSON.stringify({ id: myPalId(), n: p.name, s: p.sp, h: p.hat || null, d: p.dye || null, b: p.back || null, k: p.neck || null, o: p.top || null, f: formOf(p.level), t: p.title || null, best });
   return PAL_PREFIX + toB64(json) + '.' + hashStr(json);
 }
 function readPalCode(code) {
@@ -3767,7 +3835,7 @@ function readPalCode(code) {
   const best = {};
   if (d.best && typeof d.best === 'object') for (const k of Object.keys(d.best)) if (/^obby\d?$/.test(k) && +d.best[k] > 0 && +d.best[k] < 100000) best[k] = +d.best[k];
   const wearOk = (v, slot) => has(WEAR, v) && WEAR[v].slot === slot ? v : null;
-  return { pal: { id: d.id.replace(/[^a-z0-9]/gi, '').slice(0, 12), n: cleanName(d.n, SPECIES[d.s].name), s: d.s, h: has(HATS, d.h) ? d.h : null, d: has(DYES, d.d) ? d.d : null, b: wearOk(d.b, 'back'), k: wearOk(d.k, 'neck'), f: clamp(d.f | 0, 0, FORMS.length - 1), t: TITLES.some(t => t.id === d.t) ? d.t : null, best } };
+  return { pal: { id: d.id.replace(/[^a-z0-9]/gi, '').slice(0, 12), n: cleanName(d.n, SPECIES[d.s].name), s: d.s, h: has(HATS, d.h) ? d.h : null, d: has(DYES, d.d) ? d.d : null, b: wearOk(d.b, 'back'), k: wearOk(d.k, 'neck'), o: wearOk(d.o, 'top'), f: clamp(d.f | 0, 0, FORMS.length - 1), t: TITLES.some(t => t.id === d.t) ? d.t : null, best } };
 }
 const palList = () => (Array.isArray(S.pals) ? S.pals : []);
 function syncPals() { World.setPals(palList().map(q => Object.assign({}, q, { tint: (DYES[q.d] || DYES.base)[1] }))); }
@@ -4758,6 +4826,12 @@ const WEAR = {
   scarf:    { slot: 'neck', e: '🧣', name: '민트 목도리', price: 40 },
   medal:    { slot: 'neck', e: '🥇', name: '금메달',    price: 60 },
   bell:     { slot: 'neck', e: '🔔', name: '방울 목걸이', price: 35 },
+  stripe:   { slot: 'top', e: '👕', name: '줄무늬 티',  price: 30 },
+  hoodie:   { slot: 'top', e: '🧥', name: '분홍 후드',  price: 50 },
+  jersey:   { slot: 'top', e: '⚽', name: '축구 유니폼', price: 60 },
+  dress:    { slot: 'top', e: '👗', name: '보라 드레스', price: 70 },
+  tux:      { slot: 'top', e: '🤵', name: '멋쟁이 정장', price: 90 },
+  space:    { slot: 'top', e: '🧑‍🚀', name: '우주복',   price: 120 },
   fairy:    { slot: 'back', e: '🧚', name: '요정 날개',  pass: 5 },
   star:     { slot: 'neck', e: '⭐', name: '별 목걸이',  pass: 10 }
 };
@@ -4862,7 +4936,7 @@ const SELL = { carrot: 4, strawberry: 5, tomato: 9, corn: 12, pumpkin: 25 };
 let rainUntil = 0;
 function companionList() {
   return S.pets.map((q, i) => ({ q, i })).filter(o => o.i !== S.active && o.q.hatched).slice(0, 2)
-    .map(({ q, i }) => ({ sp: q.sp, hat: q.hat, form: formOf(q.level), tint: dyeColor(q), back: q.back, neck: q.neck, idx: i }));
+    .map(({ q, i }) => ({ sp: q.sp, hat: q.hat, form: formOf(q.level), tint: dyeColor(q), back: q.back, neck: q.neck, top: q.top, idx: i }));
 }
 function switchPet(idx) {
   if (bathing || gameOn || talking || idx === S.active || !S.pets[idx]) return;
@@ -4908,6 +4982,7 @@ function openStand() {
 function goStand() { World.area() === 'village' ? World.goVillage('garden', true, openStand) : openStand(); }
 
 const NEWS = [
+  { v: '2.8', date: '11월 5일', items: ['🦾 이제 펫의 팔다리가 움직여요! 걸을 때 팔을 흔들고, 점프하면 만세, 춤도 온몸으로 춰요', '👕 옷을 입혀요: 줄무늬 티·후드·축구 유니폼·드레스·정장·우주복 (상점 › 꾸미기)', '🛴 탈것에서는 손잡이를 잡고, 자전거는 페달을 밟아요'] },
   { v: '2.7', date: '11월 5일', items: ['👆 조이스틱이 없어졌어요! 화면을 누른 채 가리키면 그쪽으로 달려요. 점프 코스는 발판 끝에서 저절로 뛰고, 톡 하면 점프해요', '🏃 새 놀이 말랑 달리기: 좌우로 밀어 피하고, 위로 밀어 점프!', '✨ 모든 펫을 다시 그렸어요. 용의 작은 날개, 거북 등껍질, 여우 꼬리, 쓰다듬으면 하트 눈!', '📳 안드로이드 휴대폰에서는 살짝 떨려요 (설정에서 끌 수 있어요)'] },
   { v: '2.6', date: '11월 4일', items: ['🎮 친구랑 둘이! 한 화면에서 둘이 술래잡기·보물 대결 (놀이 버튼)', '🤝 친구 코드: 친구 펫이 내 마을에 놀러 오고, 점프 코스 기록으로 겨뤄요'] },
   { v: '2.5', date: '11월 4일', items: ['🐱 새 친구: 치즈 고양이·솜뭉치 강아지·조개 수달! 친구들 메뉴에서 데려와요', '✨ 모든 펫의 눈과 얼굴을 더 귀엽게 다시 그렸어요', '🦊 노을 여우·풀잎 거북·구름 양은 놀다 보면 열려요', '🎖️ 성장길 20칸: 놀수록 쌓이고 요정 날개·별 목걸이·무지개 보드를 받아요', '🥇 점프 코스 메달: 빨리 깰수록 동→은→금'] },
@@ -5030,7 +5105,7 @@ function openShop(tab = 'hat') {
     const open = titleOpen(t), on = p.title === t.id;
     return `<button data-title="${t.id}" class="${on ? 'on' : ''}"${open ? '' : ' disabled'}>${open ? '' : '🔒 '}${t.name}${open ? '' : `<small>${BADGES[t.badge] ? BADGES[t.badge][2] : ''}</small>`}</button>`;
   }).join('');
-  const wearHTML = `<p class="msub">한 번 사면 모든 펫이 같이 쓸 수 있어요. 칭호는 배지를 따면 열려요.</p><h3 class="wear-h">🪽 등 장식</h3><div class="grid">${wearGrid('back')}</div><h3 class="wear-h">🎀 목 장식</h3><div class="grid">${wearGrid('neck')}</div><h3 class="wear-h">🏷️ 칭호</h3><div class="titles">${titleHTML}</div>`;
+  const wearHTML = `<p class="msub">한 번 사면 모든 펫이 같이 쓸 수 있어요. 칭호는 배지를 따면 열려요.</p><h3 class="wear-h">👕 옷</h3><div class="grid">${wearGrid('top')}</div><h3 class="wear-h">🪽 등 장식</h3><div class="grid">${wearGrid('back')}</div><h3 class="wear-h">🎀 목 장식</h3><div class="grid">${wearGrid('neck')}</div><h3 class="wear-h">🏷️ 칭호</h3><div class="titles">${titleHTML}</div>`;
   const dyes = S.dyes || [];
   const dyeHTML = Object.entries(DYES).map(([k, [name, col, price]]) => {
     const own = k === 'base' || dyes.includes(k), on = (p.dye || 'base') === k;
@@ -5779,6 +5854,7 @@ function openRunner() {
     parts.root.position.set(g.x, g.y + bob, 0);
     parts.root.rotation.set(0, Math.PI + (RUN_LANES[g.lane] - g.x) * -.22, Math.sin(cyc) * (g.run ? .06 : .02));
     parts.root.visible = g.inv <= 0 || Math.floor(g.t * 12) % 2 === 0;
+    World.poseLimbs(parts, dt, { walk: g.run && g.y === 0, run: true, cyc, t: g.t, air: g.y > .05 });
     if (parts.footL) { const f = g.run && g.y === 0 ? Math.sin(cyc) * .14 : 0; parts.footL.position.y = parts.footBase + Math.max(0, f); parts.footR.position.y = parts.footBase + Math.max(0, -f); }
     if (parts.wingL) { const f = Math.sin(g.t * 16) * .35; parts.wingL.rotation.y = parts.wingBase + f; parts.wingR.rotation.y = -parts.wingBase - f; }
     if (parts.flame) parts.flame.scale.set(1, .7 + Math.abs(Math.sin(g.t * 22)) * .6, 1);
