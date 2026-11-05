@@ -352,8 +352,6 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
 .warn{background:#FFF1D6;border-radius:12px;padding:10px 12px;font-size:13.5px;line-height:1.5;margin-top:8px}
 .jump-mini{position:absolute;right:10px;bottom:66px;z-index:6;width:58px;height:58px;border-radius:50%;border:0;background:var(--coral);color:#fff;font-family:var(--display);font-size:16px;box-shadow:0 5px 0 #B54A60,0 0 0 3px #fff inset;touch-action:manipulation}
 .jump-mini:active{transform:translateY(3px);box-shadow:0 2px 0 #B54A60,0 0 0 3px #fff inset}
-.drag-ring{position:absolute;width:96px;height:96px;margin:-48px 0 0 -48px;border-radius:50%;background:rgba(255,255,255,.35);box-shadow:0 0 0 3px rgba(91,69,80,.45) inset;pointer-events:none;z-index:6;display:grid;place-items:center}
-.drag-ring i{width:42px;height:42px;border-radius:50%;background:var(--paper);box-shadow:0 0 0 3px var(--ink) inset}
 .stk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:8px}
 .stk{display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--soft);border-radius:14px;padding:8px 2px 6px;box-shadow:0 0 0 2px var(--line) inset;font-size:11px;color:var(--muted)}
 .stk b{font-size:28px;line-height:1.1;font-weight:400}
@@ -380,16 +378,19 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
 .round-big{position:absolute;top:30%;left:50%;transform:translateX(-50%);z-index:9;font-family:var(--display);font-size:64px;color:#fff;text-shadow:0 4px 0 var(--ink),0 0 20px rgba(91,69,80,.35);pointer-events:none;white-space:nowrap}
 .round-tip{position:absolute;top:96px;left:16px;right:16px;z-index:8;margin:0;text-align:center;font-family:var(--display);font-size:15px;color:#fff;text-shadow:0 2px 0 var(--ink);pointer-events:none}
 .room.duo .photo-btn,.room.duo .emote-btn,.room.duo .jump-mini,.room.duo .ride-btn,.room.duo .quest,.room.duo .bubble{display:none!important}
-.duo-joy{width:104px;height:104px;bottom:12px;z-index:8}
-.duo-joy i{width:44px;height:44px}
-.duo-joy.p1{left:10px}
-.duo-joy.p2{left:auto;right:10px}
-.duo-joy b{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-family:var(--display);font-weight:400;font-size:14px;background:var(--paper);border-radius:99px;padding:0 8px;box-shadow:0 0 0 2px var(--ink) inset}
 .ntag.p1{background:#FFD3DE}.ntag.p2{background:#CDEBFF}.ntag.pal{background:#FFF1A8}
 .pal-code{width:100%;min-height:72px;font:12px/1.4 ui-monospace,Consolas,monospace;border:0;border-radius:12px;padding:10px;box-shadow:0 0 0 2px var(--line) inset;background:var(--soft);color:var(--ink);user-select:text;-webkit-user-select:text;word-break:break-all;resize:vertical}
 .pal-table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
 .pal-table th,.pal-table td{padding:6px 4px;border-bottom:1.5px solid var(--line);text-align:center;font-weight:400}
 .pal-table td.me{font-family:var(--display)}
+.room.duo,.room.inobby{touch-action:none}
+body{-webkit-touch-callout:none}
+.finger-dot{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:rgba(255,255,255,.4);box-shadow:0 0 0 3px rgba(91,69,80,.5) inset;pointer-events:none;z-index:6}
+.finger-dot.p2{background:rgba(126,200,242,.45)}
+.duo-zones{position:absolute;inset:auto 0 0 0;height:38%;z-index:5;display:flex;pointer-events:none}
+.duo-zones span{flex:1;display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px;font-family:var(--display);font-size:15px;color:#fff;text-shadow:0 2px 0 var(--ink)}
+.duo-zones span+span{border-left:2px dashed rgba(255,255,255,.65)}
+#runCanvas{flex:1;width:100%;min-height:0;display:block;touch-action:none}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
 
@@ -815,9 +816,12 @@ const SFX = {
   tap: [[740, .05]], pop: [[660, .06], [880, .08]], coin: [[988, .07], [1319, .14]],
   eat: [[330, .06], [262, .06], [349, .07]], hatch: [[523, .1], [659, .1], [784, .1], [1047, .28]],
   up: [[523, .08], [659, .08], [784, .08], [1047, .08], [1319, .22]], bad: [[247, .12], [196, .18]],
-  bub: [[1000, .035]], night: [[523, .18], [392, .3]], buy: [[784, .06], [1047, .06], [1568, .12]]
+  bub: [[1000, .035]], night: [[523, .18], [392, .3]], buy: [[784, .06], [1047, .06], [1568, .12]], jump: [[620, .05], [880, .06]]
 };
+const BUZZ = { jump: 12, coin: 20, up: 45, bad: 90, pop: 10, hatch: 70, buy: 25 };
 function sfx(kind) {
+  // 안드로이드 휴대폰은 살짝 떨린다 (아이폰은 브라우저가 지원하지 않는다)
+  if (S && S.haptic !== false && BUZZ[kind] && navigator.vibrate) { try { navigator.vibrate(BUZZ[kind]); } catch (e) {} }
   if (!S || !S.sound) return;
   try {
     AC = AC || new (window.AudioContext || window.webkitAudioContext)();
@@ -909,7 +913,7 @@ function idleLine() {
   return pick([
     `${p.name} 기분 최고!`, '쓰다듬어 주면 좋겠다~', '오늘은 뭐 하고 놀까?', '나랑 놀아 줘서 고마워!',
     `${fav.name} 먹고 싶다…`, '새 모자 써 보고 싶어!', '천천히 건강하게 크고 싶어!',
-    ...(S.stickers && S.stickers.found.length >= STICKERS.length ? [] : ['어딘가 스티커가 반짝이는 것 같아! 화면을 끌어서 찾아볼까?', '점프 버튼으로 높이 뛰어 볼래?'])
+    ...(S.stickers && S.stickers.found.length >= STICKERS.length ? [] : ['어딘가 스티커가 반짝이는 것 같아! 화면을 눌러서 찾아볼까?', '점프 버튼으로 높이 뛰어 볼래?'])
   ]);
 }
 function addXP(n) {
@@ -1032,21 +1036,21 @@ const World = (() => {
   const FORM_SCALE = [1.1, 1.26, 1.4, 1.46, 1.52];
   const LOOK_UP = -.3;   // 게임 카메라는 위에서 내려다보므로 몸을 살짝 뒤로 젖혀 얼굴이 카메라를 향하게 한다
   const PET3 = {
-    kitten: { body: '#FFD9A6', R: .6, cy: .92, hat: 1.56, accent: '#FF8FA3', twoBody: true },
-    puppy:  { body: '#FFF0D8', R: .6, cy: .92, hat: 1.54, accent: '#7EC8F2', twoBody: true },
+    kitten: { body: '#FFCF93', R: .6, cy: .92, hat: 1.56, accent: '#FF8FA3', twoBody: true, eye: { w: 1.04, h: 1.06 } },
+    puppy:  { body: '#FFE7C4', R: .6, cy: .92, hat: 1.54, accent: '#7EC8F2', twoBody: true, eye: { w: 1.12, h: 1.12 } },
     otter:  { body: '#B98A62', R: .6, cy: .88, hat: 1.4,  accent: '#7ED9C3', twoBody: true, headW: 1.2, headH: .78, longBody: true },
-    bunny:    { body: '#F7FCFF', R: .6, cy: .62, hat: 1.3, accent: '#A9DDF7' },
-    hamster:  { body: '#FFEBC8', R: .64, cy: .62, hat: 1.22, accent: '#FF9EB0' },
-    penguin:  { body: '#9BE7D6', R: .58, cy: .68, hat: 1.36, accent: '#FF6B7A' },
-    dragon:   { body: '#CDBBFF', R: .6, cy: .62, hat: 1.3, accent: '#FFD95A' },
-    squirrel: { body: '#F5BE88', R: .6, cy: .62, hat: 1.4, accent: '#8FD694' },
-    fox:      { body: '#FFB27A', R: .6, cy: .62, hat: 1.42, accent: '#7ED9C3' },
-    sheep:    { body: '#FCE9D8', R: .58, cy: .62, hat: 1.42, accent: '#A9DDF7' },
-    turtle:   { body: '#9BD77E', R: .6, cy: .64, hat: 1.32, accent: '#FFB35C' }
+    bunny:    { body: '#F7FCFF', R: .6, cy: .62, hat: 1.3, accent: '#A9DDF7', eye: { w: 1.05, h: 1.08 } },
+    hamster:  { body: '#FFD9A0', R: .64, cy: .62, hat: 1.22, accent: '#FF9EB0', eye: { w: .92, h: 1, x: .2 } },
+    penguin:  { body: '#7FDCC8', R: .58, cy: .68, hat: 1.36, accent: '#FF6B7A' },
+    dragon:   { body: '#B9A2FF', R: .6, cy: .92, hat: 1.64, accent: '#FFD95A', twoBody: true, eye: { w: 1.08, h: 1.12, x: .25 } },
+    squirrel: { body: '#E9A766', R: .6, cy: .92, hat: 1.68, accent: '#8FD694', twoBody: true, eye: { w: 1, h: 1.1 } },
+    fox:      { body: '#FF9E5E', R: .6, cy: .92, hat: 1.7, accent: '#7ED9C3', twoBody: true, eye: { w: .86, h: .94, x: .26 } },
+    sheep:    { body: '#F7CFB4', R: .56, cy: .92, hat: 1.7, accent: '#A9DDF7', twoBody: true, eye: { w: .95, h: .76 } },
+    turtle:   { body: '#A8E08A', R: .52, cy: 1, hat: 1.56, accent: '#FFB35C', twoBody: true, eye: { w: .92, h: 1, x: .22 } }
   };
 
   let ok = false, renderer, scene, camera, grad, inkMat, dirtMat, hemi, sun, lamp, wallMat, rugMat, glassMat;
-  let pet = null, petKey = '', ball = null, food = null, onTap = null;
+  let glossMat = null, pet = null, petKey = '', ball = null, food = null, onTap = null;
   const pickH = [], pickV = [];
   let curPick = pickH, curParent = null;
   const st = { area: 'house', x: -4, z: 4.6, face: 0, faceGoal: 0, path: [], run: false, mode: 'idle', idleT: 3, arrive: null, at: null, lift: 0,
@@ -1058,6 +1062,7 @@ const World = (() => {
   let rideKind = null, rideG = null, rideWheels = [], rideLast = null;
   const RIDE_SCALE = 1.3;   // 펫 크기(변신하면 1.1~1.5배)에 맞춘 탈것 크기
   let duo = null, pals = [];
+  const fingers = new Map(); let steering = false, steerFingers = () => {};
   let stickers = [], onSticker = null, treasures = [], onTreasure = null, onTagged = null;
   const cache = {};
   const toon = c => cache[c] || (cache[c] = new T.MeshToonMaterial({ color: c, gradientMap: grad }));
@@ -1201,11 +1206,12 @@ const World = (() => {
 
     // 몸 (머리와 몸이 하나인 동글동글 2등신)
     add(bc, 0, cy, 0, R * (c.headW || (c.twoBody ? 1.1 : 1)), c.headH ? R * c.headH : R * (spId === 'penguin' ? 1.1 : .93), R * .96);
-    if (c.twoBody) add(bc, 0, c.longBody ? .38 : .36, -.02, c.longBody ? .33 : .36, c.longBody ? .4 : .34, .32);      // 2등신: 머리 아래 작은 몸
+    if (c.twoBody && spId !== 'turtle') add(bc, 0, c.longBody ? .38 : .33, -.02, c.longBody ? .33 : .35, c.longBody ? .4 : .33, .32);      // 2등신: 머리 아래 작은 몸
     // 작은 앞발
-    if (c.twoBody && spId !== 'otter') for (const sd of [-1, 1]) add(bc, sd * .3, .42, .16, .1, .09, .1);
+    if (c.twoBody && spId !== 'otter' && spId !== 'turtle') for (const sd of [-1, 1]) add(bc, sd * .3, .42, .16, .1, .09, .1);
     const feet = (color = bc) => {
-      pt.footL = add(color, -.24, .07, .28, .16, .08, .2, root); pt.footR = add(color, .24, .07, .28, .16, .08, .2, root); pt.footBase = .07;
+      const fx = c.twoBody ? .19 : .24, fz = c.twoBody ? .17 : .26;
+      pt.footL = add(color, -fx, .07, fz, .15, .08, .19, root); pt.footR = add(color, fx, .07, fz, .15, .08, .19, root); pt.footBase = .07;
     };
     if (spId === 'kitten') {
       pt.earL = pivot(-.36, cy + .42, -.04); pt.earR = pivot(.36, cy + .42, -.04); pt.earBase = .2;
@@ -1214,8 +1220,8 @@ const World = (() => {
       add('#FFF6E9', 0, cy - .2, zAt(0, cy - .2) - .15, .28, .17, .19, body, 0);
       add('#FF8FA3', 0, cy - .11, zAt(0, cy - .11) + .015, .035, .026, .02, body, 0);
       for (const sd of [-1, 1]) for (const k of [0, 1]) { const w = mesh(CYL, INK, sd * .55, cy - .1 - k * .07, zAt(.4, cy - .1) + .02, .007, .24, .007, body, { cast: false }); w.rotation.z = sd * (Math.PI / 2 + (k ? -.14 : .14)); }
-      pt.tail = pivot(0, .3, -.3);
-      add('#F7A65A', 0, .2, -.1, .07, .3, .07, pt.tail, 1.08, CYL); add('#F7A65A', 0, .42, -.13, .1, .1, .1, pt.tail, 1.08);
+      pt.tail = pivot(.2, .26, -.22);
+      add('#F7A65A', .14, .16, -.03, .07, .4, .07, pt.tail, 1.08, CYL).rotation.z = -.7; add('#F7A65A', .32, .34, -.03, .1, .1, .1, pt.tail, 1.08);
       feet();
     } else if (spId === 'puppy') {
       pt.earL = pivot(-.52, cy + .36, .06); pt.earR = pivot(.52, cy + .36, .06); pt.earBase = -.32;
@@ -1225,8 +1231,8 @@ const World = (() => {
       add(INK, 0, cy - .12, zAt(0, cy - .12) + .02, .055, .043, .03, body, 0);
       add('#FFFFFF', -.016, cy - .105, zAt(0, cy - .12) + .05, .014, .01, .006, body, 0);
       add('#FF8FA3', 0, cy - .3, zAt(0, cy - .3) + .012, .06, .07, .025, body, 1.08);
-      pt.tail = pivot(0, .42, -.32);
-      add(bc, 0, .1, -.06, .1, .15, .1, pt.tail, 1.08);
+      pt.tail = pivot(.24, .34, -.2);
+      add(bc, .1, .08, -.02, .1, .15, .1, pt.tail, 1.08).rotation.z = -.6;
       feet();
     } else if (spId === 'otter') {
       pt.earL = pivot(-.62, cy + .16, -.02); pt.earR = pivot(.62, cy + .16, -.02); pt.earBase = .05;
@@ -1254,6 +1260,7 @@ const World = (() => {
       for (const e of [pt.earL, pt.earR]) { add(bc, 0, .08, 0, .17, .17, .1, e, 1.1); add('#FFC1C8', 0, .08, .07, .1, .1, .02, e, 0); }
       add('#FFF8EA', 0, cy - .24, zAt(0, cy - .24) - .14, .4, .3, .2, body, 0);
       for (const [x, z, r] of [[-.13, .1, -.4], [0, .15, 0], [.13, .1, .4]]) { const m = add('#A57A63', x, cy + R * .9, z, .06, .04, .045, body, 0); m.rotation.y = r; }
+      for (const sd of [-1, 1]) { add(bc, sd * .5, cy - .16, .1, .25, .23, .24, body, 1.05); add('#FFF2DC', sd * .5, cy - .19, .3, .15, .13, .05, body, 0); }
       pt.handL = add(bc, -.22, cy - .3, zAt(.22, cy - .3) - .02, .1, .08, .08); pt.handR = add(bc, .22, cy - .3, zAt(.22, cy - .3) - .02, .1, .08, .08);
       feet();
     } else if (spId === 'penguin') {
@@ -1264,61 +1271,74 @@ const World = (() => {
       pt.tuft = pivot(0, cy + R * 1.08, 0); const tf = add('#7FD8C6', 0, .08, 0, .07, .16, .07, pt.tuft, 1.1, CONE); tf.rotation.z = .3;
       feet('#FFB35C');
     } else if (spId === 'dragon') {
-      add('#F3EEFF', 0, cy - .24, zAt(0, cy - .24) - .14, .36, .28, .2, body, 0);
-      for (const [x, y] of [[-.34, cy + .3], [.34, cy + .3], [-.2, cy + .45], [.2, cy + .45]]) add('#B6A0F5', x, y, zAt(x, y) - .03, .06, .06, .03, body, 0);
-      const ws = form >= 1 ? 1.35 : 1;
-      pt.wingL = pivot(-.32, cy + .15, -.4); pt.wingR = pivot(.32, cy + .15, -.4); pt.wingBase = .5;
-      add('#FFC7E5', -.28 * ws, .12, 0, .32 * ws, .24 * ws, .05, pt.wingL, 1.1); add('#FFC7E5', .28 * ws, .12, 0, .32 * ws, .24 * ws, .05, pt.wingR, 1.1);
-      pt.tail = pivot(0, .32, -.5);
-      add(bc, 0, 0, -.16, .15, .13, .24, pt.tail, 1.1); add(bc, 0, .1, -.4, .1, .1, .16, pt.tail, 1.1);
-      add('#FFD95A', 0, .22, -.55, .13, .13, .13, pt.tail, 1.1, STAR);
+      for (const [x, y] of [[-.38, cy + .3], [.38, cy + .3], [-.18, cy + .48], [.18, cy + .48]]) add('#9A80F0', x, y, zAt(x, y) - .03, .06, .06, .03, body, 0);
+      const ws = form >= 1 ? 1.25 : 1;
+      pt.wingL = pivot(-.24, .5, -.26); pt.wingR = pivot(.24, .5, -.26); pt.wingBase = .4;
+      for (const [w, sd] of [[pt.wingL, -1], [pt.wingR, 1]]) {
+        const a1 = add('#FF9AD0', sd * .26 * ws, .1, 0, .13 * ws, .34 * ws, .03, w, 1.12, CONE); a1.rotation.z = -sd * 1.05;
+        const a2 = add('#FFB7DE', sd * .2 * ws, -.04, 0, .1 * ws, .26 * ws, .03, w, 1.12, CONE); a2.rotation.z = -sd * 1.5;
+      }
+      add('#F3EEFF', 0, cy - .17, zAt(0, cy - .17) - .13, .3, .2, .19, body, 0);
+      for (const sd of [-1, 1]) { add('#7C65D9', sd * .06, cy - .1, zAt(.06, cy - .1) + .03, .018, .014, .01, body, 0); const hn = add('#FFD95A', sd * .3, cy + R * .78, -.02, .07, .17, .07, body, 1.1, CONE); hn.rotation.z = -sd * .28; }
+      pt.tail = pivot(.2, .24, -.2);
+      add(bc, .14, 0, -.06, .16, .12, .2, pt.tail, 1.1); add(bc, .34, .1, -.08, .1, .1, .14, pt.tail, 1.1);
+      add('#FFD95A', .48, .26, -.08, .13, .13, .13, pt.tail, 1.1, STAR);
       const horn = add('#FFD95A', 0, cy + R * .93 + .12, 0, .22 * (form >= 2 ? 1.3 : 1), .22 * (form >= 2 ? 1.3 : 1), .22, body, 1.1, STAR);
       if (form >= 2) horn.material = new T.MeshToonMaterial({ color: '#FFE27A', emissive: '#FFB300', emissiveIntensity: .45, gradientMap: grad });
       feet();
     } else if (spId === 'squirrel') {
-      pt.tail = pivot(0, .3, -.42);
-      for (const [y, z, r] of [[.05, -.12, .26], [.4, -.32, .32], [.82, -.3, .34], [1.15, -.08, .3]]) add('#E9A066', 0, y, z, r, r, r * .9, pt.tail, 1.06);
-      add('#F7C796', 0, 1.2, .02, .18, .16, .16, pt.tail, 0);
+      pt.tail = pivot(.3, .18, -.26);
+      for (const [x, y, z, r] of [[.08, .05, -.04, .22], [.34, .36, -.08, .3], [.5, .78, -.08, .33], [.42, 1.14, -.02, .28]]) add('#C97F45', x, y, z, r, r, r * .9, pt.tail, 1.06);
+      add('#F2C08A', .42, 1.2, .16, .15, .13, .1, pt.tail, 0);
       pt.earL = pivot(-.3, cy + .5, 0); pt.earR = pivot(.3, cy + .5, 0); pt.earBase = .25;
       for (const [e, s] of [[pt.earL, 1], [pt.earR, -1]]) { add(bc, 0, .12, 0, .1, .17, .07, e, 1.1); add('#E9A066', 0, .27, 0, .05, .07, .04, e, 0); e.rotation.z = s * .25; }
       add('#FFF0DD', 0, cy - .24, zAt(0, cy - .24) - .14, .36, .28, .2, body, 0);
       const capColor = form >= 2 ? '#E8B54A' : '#A86E43';
-      add(capColor, 0, cy + .22, 0, R * 1.03, R * .62, R * 1.03, body, 1.05, HALF);
-      add('#8A5530', 0, cy + .22 + R * .62 + .06, 0, .05, .14, .05, body, 1.1, CYL);
+      add(capColor, 0, cy + .34, -.02, R * .86, R * .42, R * .86, body, 1.05, HALF);
+      add('#8A5530', 0, cy + .34 + R * .42 + .05, -.02, .04, .11, .04, body, 1.1, CYL);
+      for (const sd of [-1, 1]) add('#FFD9B0', sd * .42, cy - .16, zAt(.42, cy - .16) - .05, .15, .12, .08, body, 0);
       feet();
     } else if (spId === 'fox') {
-      add('#FFF4E8', 0, cy - .22, zAt(0, cy - .22) - .15, .4, .3, .2, body, 0);
-      for (const s of [-1, 1]) add('#FFF4E8', s * .32, cy - .1, zAt(.32, cy - .1) - .08, .15, .11, .1, body, 0);
-      pt.earL = pivot(-.28, cy + .48, -.02); pt.earR = pivot(.28, cy + .48, -.02); pt.earBase = .22;
-      for (const [e, s] of [[pt.earL, 1], [pt.earR, -1]]) { add(bc, 0, .2, 0, .15, .32, .1, e, 1.1, CONE); add(INK, 0, .34, .01, .06, .1, .05, e, 0, CONE); e.rotation.z = s * .22; }
-      pt.tail = pivot(0, .35, -.48);
-      add(bc, 0, .12, -.18, .2, .2, .32, pt.tail, 1.08); add(bc, 0, .34, -.42, .22, .2, .26, pt.tail, 1.08); add('#FFF4E8', 0, .5, -.56, .14, .13, .14, pt.tail, 1.1);
+      add('#FFF4E8', 0, cy - .22, zAt(0, cy - .22) - .15, .34, .25, .2, body, 0);
+      for (const s of [-1, 1]) add('#FFF4E8', s * .42, cy - .14, zAt(.42, cy - .14) - .05, .2, .15, .08, body, 0);
+      pt.earL = pivot(-.36, cy + .44, -.02); pt.earR = pivot(.36, cy + .44, -.02); pt.earBase = .22;
+      for (const [e, s] of [[pt.earL, 1], [pt.earR, -1]]) { add(bc, 0, .22, 0, .2, .4, .1, e, 1.1, CONE); add(INK, 0, .34, .01, .06, .1, .05, e, 0, CONE); e.rotation.z = s * .22; }
+      add(INK, 0, cy - .13, zAt(0, cy - .13) + .02, .05, .036, .03, body, 0);
+      pt.tail = pivot(.26, .24, -.2);
+      add(bc, .16, .12, -.04, .19, .24, .19, pt.tail, 1.08); add(bc, .36, .42, -.04, .22, .27, .2, pt.tail, 1.08); add('#FFF4E8', .46, .72, -.04, .15, .17, .14, pt.tail, 1.1);
       feet('#8A5530');
     } else if (spId === 'sheep') {
-      for (const [x, y, z, r] of [[-.44, cy + .08, -.12, .3], [.44, cy + .08, -.12, .3], [-.26, cy + .44, -.12, .3], [.26, cy + .44, -.12, .3], [0, cy + .56, -.08, .3], [0, cy + .22, -.36, .4], [-.38, cy - .28, -.16, .26], [.38, cy - .28, -.16, .26]]) add('#FFFFFF', x, y, z, r, r * .92, r, body, 1.06);
-      pt.earL = pivot(-.46, cy + .1, .12); pt.earR = pivot(.46, cy + .1, .12); pt.earBase = .5;
+      for (const [x, y, z, r] of [[-.52, cy + .08, -.1, .3], [.52, cy + .08, -.1, .3], [-.34, cy + .42, -.06, .3], [.34, cy + .42, -.06, .3], [0, cy + .52, -.02, .33], [0, cy + .2, -.36, .42], [-.46, cy - .24, -.14, .26], [.46, cy - .24, -.14, .26], [0, .34, -.04, .4], [-.28, .36, .02, .24], [.28, .36, .02, .24]]) add('#FFFFFF', x, y, z, r, r * .92, r, body, 1.05);
+      pt.earL = pivot(-.6, cy + .08, .14); pt.earR = pivot(.6, cy + .08, .14); pt.earBase = .5;
       add('#F2D2BC', -.13, 0, 0, .15, .07, .09, pt.earL, 1.1); add('#F2D2BC', .13, 0, 0, .15, .07, .09, pt.earR, 1.1);
-      for (const s of [-1, 1]) { const h = add('#E9C79A', s * .32, cy + .44, .12, .09, .09, .09, body, 1.1, new T.TorusGeometry(1, .38, 8, 16)); h.rotation.y = Math.PI / 2; }
+
       feet('#8E7A85');
     } else if (spId === 'turtle') {
-      const shell = add('#7FB86A', 0, .38, -.24, R * 1.05, R * .95, R * .92, body, 1.04, HALF); shell.rotation.x = -1.1;
-      for (const [x, y] of [[0, .95], [-.32, .74], [.32, .74], [0, .6]]) add('#6AA35A', x, y, -.6, .13, .13, .05, body, 0);
-      add('#F3F7D0', 0, cy - .26, zAt(0, cy - .26) - .14, .36, .26, .2, body, 0);
+      add('#5FA352', 0, .5, -.2, .64, .54, .5, body, 1.04);
+      for (const [x, y] of [[0, .86], [-.36, .66], [.36, .66], [-.5, .34], [.5, .34]]) add('#4A8A42', x, y, zAt(0, 0) * 0 - .02 + (.12 - Math.abs(x) * .28), .13, .12, .05, body, 0);
+      add(bc, 0, .36, .12, .36, .32, .26, body);
+      add('#F6F4C8', 0, .34, .34, .25, .23, .08, body, 0);
+      for (const sd of [-1, 1]) add(bc, sd * .46, .36, .22, .13, .1, .12, body);
+      add('#F6F4C8', 0, cy - .19, zAt(0, cy - .19) - .12, .22, .14, .16, body, 0);
       feet('#8FCB72');
     }
 
     // 얼굴: 기분마다 눈·입 모양을 바꿔 보여 준다
-    const ey = spId === 'penguin' ? cy + .14 : cy - .01, ex = .23, face = group(0, 0, 0, body);
+    const eyeK = c.eye || {}, ew = eyeK.w || 1, eh = eyeK.h || 1;
+    const ey = spId === 'penguin' ? cy + .14 : cy - .01, ex = eyeK.x || .23, face = group(0, 0, 0, body);
     const ink = toon(INK);
-    pt.eyesOpen = group(0, 0, 0, face); pt.eyesHappy = group(0, 0, 0, face); pt.eyesSleep = group(0, 0, 0, face);
+    pt.eyesOpen = group(0, 0, 0, face); pt.eyesHappy = group(0, 0, 0, face); pt.eyesSleep = group(0, 0, 0, face); pt.eyesLove = group(0, 0, 0, face);
     const arc = new T.TorusGeometry(.09, .024, 8, 16, Math.PI), mArc = new T.TorusGeometry(.045, .015, 8, 12, Math.PI);
     for (const s of [-1, 1]) {
       const z = zAt(s * ex, ey);
       // 큰 눈: 짙은 눈동자 + 아래쪽 밝은 빛 + 하이라이트 2개
-      const eb = mesh(SPH, '', s * ex, ey, z - .02, .105, .13, .05, pt.eyesOpen, { mat: ink, cast: false }); eb.rotation.y = s * .32;
-      mesh(SPH, '#7A5566', s * ex, ey - .055, z + .012, .068, .055, .02, pt.eyesOpen, { cast: false }).rotation.y = s * .32;
-      mesh(SPH, '#FFFFFF', s * ex + .036, ey + .05, z + .022, .04, .04, .02, pt.eyesOpen, { cast: false });
-      mesh(SPH, '#FFFFFF', s * ex - .036, ey - .05, z + .022, .018, .018, .01, pt.eyesOpen, { cast: false });
+      const eb = mesh(SPH, '', s * ex, ey, z - .02, .105 * ew, .13 * eh, .05, pt.eyesOpen, { mat: ink, cast: false }); eb.rotation.y = s * .32;
+      mesh(SPH, '#7A5566', s * ex, ey - .055 * eh, z + .012, .068 * ew, .055 * eh, .02, pt.eyesOpen, { cast: false }).rotation.y = s * .32;
+      mesh(SPH, '#FFFFFF', s * ex + .036 * ew, ey + .05 * eh, z + .022, .04 * ew, .04 * ew, .02, pt.eyesOpen, { cast: false });
+      mesh(SPH, '#FFFFFF', s * ex - .036 * ew, ey - .05 * eh, z + .022, .018, .018, .01, pt.eyesOpen, { cast: false });
+      // 쓰다듬을 때의 하트 눈
+      for (const hx of [-.045, .045]) mesh(SPH, '#FF4F86', s * ex + hx, ey + .03, z + .012, .058, .058, .02, pt.eyesLove, { cast: false });
+      mesh(CONE, '#FF4F86', s * ex, ey - .045, z + .012, .1, .1, .02, pt.eyesLove, { cast: false }).rotation.z = Math.PI;
       mesh(arc, '', s * ex, ey - .02, z + .01, 1, 1, 1, pt.eyesHappy, { mat: ink, cast: false });
       const sl = mesh(arc, '', s * ex, ey + .03, z + .01, 1, 1, 1, pt.eyesSleep, { mat: ink, cast: false }); sl.rotation.z = Math.PI;
       const bl = mesh(SPH, '', s * .38, ey - .14, zAt(.38, ey - .14) - .005, form >= 2 && spId === 'hamster' ? .125 : .105, .055, .02, face, { mat: new T.MeshToonMaterial({ color: '#FF9DB5', gradientMap: grad, transparent: true, opacity: .85 }), cast: false });
@@ -1331,10 +1351,13 @@ const World = (() => {
     pt.tear = mesh(SPH, '#8FD3FF', -ex - .03, ey - .11, zAt(ex, ey - .11) + .02, .03, .045, .03, face, { cast: false });
     pt.setFace = mood => {
       const happy = ['happy', 'love', 'eat'].includes(mood);
-      pt.eyesOpen.visible = mood === 'normal' || mood === 'sad'; pt.eyesHappy.visible = happy; pt.eyesSleep.visible = mood === 'sleep';
+      pt.eyesOpen.visible = mood === 'normal' || mood === 'sad'; pt.eyesHappy.visible = happy && mood !== 'love'; pt.eyesLove.visible = mood === 'love'; pt.eyesSleep.visible = mood === 'sleep';
       pt.mouthSmile.visible = mood === 'normal'; pt.mouthFrown.visible = mood === 'sad'; pt.tear.visible = mood === 'sad';
       pt.mouthOpen.visible = happy || mood === 'sleep'; pt.mouthOpen.scale.set(mood === 'sleep' ? .03 : .06, mood === 'sleep' ? .03 : .05, .03);
     };
+    // 머리의 작은 윤기: 말랑한 인형 느낌
+    if (!glossMat) glossMat = new T.MeshBasicMaterial({ color: '#FFFFFF', transparent: true, opacity: .5 });
+    { const gx = -.22, gy = cy + R * .58; const g = mesh(SPH, '', gx, gy, zAt(gx, gy) - .012, .12, .06, .02, body, { mat: glossMat, cast: false }); g.rotation.z = .35; }
     pt.dirt = group(0, 0, 0, body);
     for (const [x, y] of [[-.3, cy - .3], [.35, cy - .05], [.12, cy - .42], [-.2, cy + .25]]) mesh(SPH, '', x, y, zAt(x, y) - .01, .07, .05, .02, pt.dirt, { mat: dirtMat, cast: false });
     pt.setDirt = v => { pt.dirt.visible = v > 0; dirtMat.opacity = v; };
@@ -1342,7 +1365,7 @@ const World = (() => {
     // 변신 장식: 어린이(목도리·나비넥타이) → 어른(이마 별) → 반짝(별 궤도) → 무지개(무지개 날개·후광)
     if (form >= 1 && !neck) {
       if (spId === 'penguin') { for (const s of [-1, 1]) { const b = add(c.accent, s * .09, cy - R * .62, zAt(0, cy - R * .62) - .02, .07, .12, .07, body, 1.1, CONE); b.rotation.z = s * Math.PI / 2; } add(c.accent, 0, cy - R * .62, zAt(0, cy - R * .62), .04, .04, .04, body, 1.1); }
-      else { const ny = c.twoBody ? cy - R * .82 : cy - R * .6, nr = c.twoBody ? R * .6 : R * .78, sc = add(c.accent, 0, ny, 0, nr, nr, nr, body, 1.03, new T.TorusGeometry(1, .1, 10, 32)); sc.rotation.x = Math.PI / 2; }
+      else { const ny = c.twoBody ? cy - R * .82 : cy - R * .6, nr = c.twoBody ? R * .55 : R * .78, sc = add(c.accent, 0, ny, 0, nr, nr, nr, body, 1.03, new T.TorusGeometry(1, .1, 10, 32)); sc.rotation.x = Math.PI / 2; }
     }
     if (form >= 2 && spId !== 'dragon') add('#FFD95A', 0, cy + R * .55, zAt(0, cy + R * .55) + .02, .07, .07, .07, body, 1.12, STAR);
     if (form >= 2 && spId === 'penguin') for (const x of [-.12, 0, .12]) add('#BFEFFF', x, cy + R * 1.02, .1, .04, x ? .09 : .13, .04, body, 1.1, CONE);
@@ -1402,7 +1425,7 @@ const World = (() => {
     }
     // 목 장식 (있으면 변신 목도리 대신 이걸 둔다)
     if (neck) {
-      const ny = c.twoBody ? cy - R * .82 : cy - R * .62, nz = zAt(0, ny), nr = c.twoBody ? R * .6 : R * .78;
+      const ny = c.twoBody ? cy - R * .82 : cy - R * .62, nz = zAt(0, ny), nr = c.twoBody ? R * .55 : R * .78;
       const ring = col => { const t = add(col, 0, ny, 0, nr, nr, nr, body, 1.03, new T.TorusGeometry(1, .07, 10, 32)); t.rotation.x = Math.PI / 2; };
       if (neck === 'bowtie') { for (const sx of [-1, 1]) { const b = add('#E8476A', sx * .09, ny, nz - .02, .07, .12, .07, body, 1.1, CONE); b.rotation.z = sx * Math.PI / 2; } add('#FF8FA3', 0, ny, nz, .04, .04, .04, body, 1.1); }
       else if (neck === 'scarf') { ring('#7ED9C3'); const tl = add('#7ED9C3', -.16, ny - .14, nz - .02, .08, .18, .04, body, 1.08, BOX); tl.rotation.z = .2; add('#FFFFFF', -.16, ny - .14, nz + .01, .085, .03, .02, body, 0, BOX); }
@@ -1933,7 +1956,7 @@ const World = (() => {
   // 점프 높이 약 1.8, 같은 높이에서 약 3.5칸까지 건너뛸 수 있게 간격을 맞췄다
   const OX = 240;
   const COURSES = [
-    { name: '무지개 첫걸음', tip: '왼쪽 동그라미로 움직이고, 점프 버튼으로 뛰어요! 분홍 젤리는 조심!', plats: [
+    { name: '무지개 첫걸음', tip: '화면을 누른 채 가고 싶은 곳을 가리켜요. 분홍 젤리는 조심!', plats: [
       { x: 0, z: 0, w: 4, d: 4, y: 0, c: '#FFFFFF' }, { x: 0, z: -4, w: 2, d: 2, y: .5 }, { x: 2, z: -7, w: 2, d: 2, y: 1 }, { x: -1, z: -10, w: 2, d: 2, y: 1.5 },
       { x: 0, z: -14, w: 4, d: 3, y: 1.5, c: '#E9F7FF' }, { x: 0, z: -18, w: 2.2, d: 2.2, y: 2, ax: 2.2, sp: 1.2 }, { x: 0, z: -22, w: 1.6, d: 1.6, y: 2.5 },
       { x: 0, z: -26, w: 2, d: .8, y: 2.55, jelly: true }, { x: 0, z: -26, w: 2, d: 4, y: 2.5 }, { x: 0, z: -31.5, w: 4, d: 3, y: 3, c: '#E9F7FF' },
@@ -1970,9 +1993,9 @@ const World = (() => {
       { x: 0, z: -27, w: 5, d: 5, y: 5.6, spin: { len: 2.3, sp: 1.8 } }, { x: -2, z: -31.5, w: 1.6, d: 1.6, y: 6, ax: 1.6, sp: 2.2 },
       { x: 0, z: -34.5, w: 1.6, d: 1.6, y: 6.4, vanish: true, ph: .7 }, { x: 2, z: -37.5, w: 1.6, d: 1.6, y: 6.8, az: .9, sp: 2.4 },
       { x: 0, z: -41.5, w: 4, d: 3, y: 7.2, c: '#E9F7FF' }, { x: 0, z: -45.5, w: 2, d: .8, y: 7.25, jelly: true }, { x: 0, z: -45.5, w: 2, d: 4, y: 7.2 },
-      { x: 0, z: -50, w: 5, d: 5, y: 7.2, spin: { len: 2.3, sp: -2 } }, { x: 0, z: -55, w: 1.4, d: 1.4, y: 7.6, vanish: true, ph: 1.2 },
-      { x: 0, z: -58.5, w: 1.4, d: 1.4, y: 8, ax: 1.4, sp: 2.6 }, { x: 0, z: -62.5, w: 4, d: 4, y: 8, c: '#FFF3A8' }],
-      cps: [{ x: 0, z: 0, y: 0 }, { x: 0, z: -22.5, y: 5.6 }, { x: 0, z: -41.5, y: 7.2 }], fin: { x: 0, z: -62.5, y: 8 } }
+      { x: 0, z: -50, w: 5, d: 5, y: 7.2, spin: { len: 2.3, sp: -2 } }, { x: 0, z: -54.6, w: 4, d: 3, y: 7.4, c: '#E9F7FF' }, { x: 0, z: -58.6, w: 1.8, d: 1.8, y: 7.8, vanish: true, ph: 1.2 },
+      { x: 0, z: -62, w: 1.8, d: 1.8, y: 8.1, ax: 1.2, sp: 2 }, { x: 0, z: -66, w: 4, d: 4, y: 8.1, c: '#FFF3A8' }],
+      cps: [{ x: 0, z: 0, y: 0 }, { x: 0, z: -22.5, y: 5.6 }, { x: 0, z: -41.5, y: 7.2 }, { x: 0, z: -54.6, y: 7.4 }], fin: { x: 0, z: -66, y: 8.1 } }
   ];
   const VANISH_T = 3, VANISH_ON = 1.8;
   let course = 0, PLATS = COURSES[0].plats, CPS = COURSES[0].cps, FIN = COURSES[0].fin;
@@ -1982,7 +2005,7 @@ const World = (() => {
     obbyG = new T.Group(); obbyG.visible = false; scene.add(obbyG);
     curParent = obbyG; curPick = [];
     for (let i = 0; i < 30; i++) {
-      const x = OX + (i * 7.3) % 24 - 12, z = 6 - (i * 4.1) % 72, y = -4 - (i % 3);
+      const x = OX + (i * 7.3) % 24 - 12, z = 6 - (i * 4.1) % 76, y = -4 - (i % 3);
       mesh(SPH, '#FFFFFF', x, y, z, 2.2, 1, 1.6, null, { cast: false }); mesh(SPH, '#FFFFFF', x + 1.4, y + .3, z, 1.5, .9, 1.2, null, { cast: false });
     }
     mesh(CYL, '#C98A5A', OX - 3.2, .5, -.6, .07, 2, .07); sign('점프 코스', OX - 3.2, 1.6, -.55, 2.2);
@@ -2058,7 +2081,11 @@ const World = (() => {
     if (len > .15) { const k = 4.6 / Math.max(1, len); x += obIn.x * k * dt; z += obIn.z * k * dt; st.faceGoal = Math.atan2(obIn.x, obIn.z); }
     if (o.ground && o.plat && o.plat.dx !== undefined) { x += o.plat.dx; z += o.plat.dz; }
     st.obMove = len > .15 && o.ground;
-    if (obIn.jump && o.ground) { o.vy = 9; o.ground = false; sfx('tap'); }
+    if (st.assist && o.ground && o.plat && len > .15) {
+      const px = o.plat.cx ?? o.plat.x, pz = o.plat.cz ?? o.plat.z;
+      if (Math.abs(x - px) > o.plat.w / 2 + .08 || Math.abs(z - pz) > o.plat.d / 2 + .08) obIn.jump = true;
+    }
+    if (obIn.jump && o.ground) { o.vy = 9; o.ground = false; sfx('jump'); }
     obIn.jump = false;
     const prevY = o.y; o.vy -= 22 * dt; o.y += o.vy * dt;
     o.ground = false; o.plat = null;
@@ -2253,6 +2280,7 @@ const World = (() => {
     if (a !== 'village') { duoStop(); pals.forEach(q => { q.tag.hidden = true; }); }
     if (a !== 'village') for (const n of Object.values(npcs)) { n.follow = false; n.hidden = false; n.racing = false; }
     bushMarks.forEach(m => { m.visible = false; });
+    room.classList.toggle('inobby', a === 'obby');
     st.area = a; houseG.visible = a === 'house'; villageG.visible = a === 'village'; if (obbyG) obbyG.visible = a === 'obby';
     for (const n of Object.values(npcs)) n.tag.hidden = a !== 'village';
     renderHUD();
@@ -2410,6 +2438,10 @@ const World = (() => {
     const p = P(); if (!p) return;
     st.t += dt;
     if (race) stepRace(dt);
+    steerFingers();
+    // 3초 평균이 25프레임 아래면 해상도를 한 단계 낮춘다
+    st.fpsT = (st.fpsT || 0) + dt; st.fpsN = (st.fpsN || 0) + 1;
+    if (st.fpsT > 3) { const pr = renderer.getPixelRatio(); if (st.fpsN / st.fpsT < 25 && pr > 1) renderer.setPixelRatio(Math.max(1, pr - .25)); st.fpsT = 0; st.fpsN = 0; }
     if (st.area === 'obby' && ob) { for (let left = dt; left > 1e-4; left -= .02) obbyStep(Math.min(.02, left)); }
     else for (let left = dt; left > 1e-4; left -= .05) think(Math.min(.05, left), p);
     animate(Math.min(dt, .1), p);
@@ -2511,36 +2543,94 @@ const World = (() => {
       const h = hitAt(e.clientX, e.clientY);
       if (h && h.o.userData.pet) rubPet(x, y);
     };
-    let ring = null, dragging = false;
-    const canDrive = () => !bathing && !placing && st.area !== 'obby' && !talking && P() && P().hatched && !P().asleep;
-    const stopDrive = () => { drive.x = 0; drive.z = 0; dragging = false; ring && ring.remove(); ring = null; };
-    cv.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY, id: e.pointerId }; try { cv.setPointerCapture(e.pointerId); } catch (err) {} if (bathing) rub(e); });
+    /* 휴대폰 조작: 조이스틱 없이 손가락을 대고 있으면 펫이 손가락 쪽으로 달린다. 짧게 누르면 그 자리를 누른 것.
+       점프 코스: 짧게 톡 또는 다른 손가락으로 톡 = 점프, 발판 끝에 닿으면 저절로 뛴다.
+       둘이 하기: 화면 왼쪽 손가락은 1P, 오른쪽 손가락은 2P */
+    const canSteer = () => !bathing && !placing && !talking && !gameOn && !scrim && P() && P().hatched && !P().asleep;
+    const midX = () => { const r = room.getBoundingClientRect(); return r.left + r.width / 2; };
+    const dotFor = f => { const el = document.createElement('div'); el.className = 'finger-dot' + (f.who === 2 ? ' p2' : ''); const r = room.getBoundingClientRect(); el.style.left = (f.sx - r.left) + 'px'; el.style.top = (f.sy - r.top) + 'px'; room.appendChild(el); return el; };
+    const endFinger = f => { fingers.delete(f.id); f.dot && f.dot.remove(); };
+    cv.addEventListener('contextmenu', e => e.preventDefault());
+    cv.addEventListener('pointerdown', e => {
+      try { cv.setPointerCapture(e.pointerId); } catch (err) {}
+      const sideWho = duo ? (e.clientX < midX() ? 1 : 2) : 1;
+      if (bathing) { down = { x: e.clientX, y: e.clientY, id: e.pointerId }; return rub(e); }
+      const busy = [...fingers.values()].find(f => f.who === sideWho && !f.jumper);
+      const f = { id: e.pointerId, sx: e.clientX, sy: e.clientY, x0: e.clientX, y0: e.clientY, t0: performance.now(), active: false, who: sideWho, jumper: false, dot: null };
+      if (busy) { f.jumper = true; if (st.area === 'obby') obIn.jump = true; else if (!duo) doJump(); }
+      fingers.set(e.pointerId, f);
+    });
     cv.addEventListener('pointermove', e => {
       if (bathing) return rub(e);
-      if (!down || e.pointerId !== down.id || !canDrive()) return;
-      const dx = e.clientX - down.x, dy = e.clientY - down.y, d = Math.hypot(dx, dy);
-      if (!dragging && d > 14) {
-        dragging = true; const r = room.getBoundingClientRect();
-        ring = document.createElement('div'); ring.className = 'drag-ring'; ring.innerHTML = '<i></i>';
-        ring.style.left = (down.x - r.left) + 'px'; ring.style.top = (down.y - r.top) + 'px'; room.appendChild(ring);
-      }
-      if (!dragging) return;
-      const k = Math.min(1, d / 60), nx = dx / (d || 1), ny = dy / (d || 1);
-      drive.x = nx * k; drive.z = ny * k;
-      ring.firstChild.style.transform = `translate(${nx * k * 28}px, ${ny * k * 28}px)`;
+      const f = fingers.get(e.pointerId); if (!f) return;
+      f.sx = e.clientX; f.sy = e.clientY;
+      if (!f.jumper && !f.active && Math.hypot(f.sx - f.x0, f.sy - f.y0) > 12) f.active = true;
+      if (f.dot) { const r = room.getBoundingClientRect(); f.dot.style.left = (f.sx - r.left) + 'px'; f.dot.style.top = (f.sy - r.top) + 'px'; }
     });
-    cv.addEventListener('pointercancel', () => { down = null; stopDrive(); });
+    cv.addEventListener('pointercancel', e => { down = null; const f = fingers.get(e.pointerId); if (f) endFinger(f); });
     cv.addEventListener('pointerup', e => {
-      if (!down) return;
-      const wasDrag = dragging; stopDrive();
-      const moved = Math.hypot(e.clientX - down.x, e.clientY - down.y); down = null;
-      if (wasDrag || moved > 12 || bathing) return;
+      if (bathing) { down = null; return; }
+      const f = fingers.get(e.pointerId); if (!f) return;
+      const wasActive = f.active, jumper = f.jumper; endFinger(f);
+      if (wasActive || jumper) return;
+      if (st.area === 'obby') { obIn.jump = true; return; }      // 코스에서 톡 = 점프
+      if (duo) return;
       const h = hitAt(e.clientX, e.clientY);
       if (h && onTap) onTap(h);
     });
+    // 땅 위에서 손가락이 가리키는 곳
+    const groundAt = (sx, sy, y) => {
+      const r = room.getBoundingClientRect();
+      v2.set((sx - r.left) / r.width * 2 - 1, -(sy - r.top) / r.height * 2 + 1);
+      ray.setFromCamera(v2, camera);
+      const o = ray.ray.origin, d = ray.ray.direction; if (d.y > -1e-3) return null;
+      const k = (y - o.y) / d.y;
+      return [o.x + d.x * k, o.z + d.z * k];
+    };
+    const aim = (f, px, pz, y) => {
+      const g = groundAt(f.sx, f.sy, y); if (!g) return [0, 0];
+      const dx = g[0] - px, dz = g[1] - pz, dd = Math.hypot(dx, dz); if (dd < .35) return [0, 0];
+      const k = Math.min(1, dd / 1) / dd; return [dx * k, dz * k];
+    };
+    // 점프 코스: 손가락 아래에 있는 발판을 찾아 그 발판 높이로 계산한다 (높이가 달라도 가리킨 곳으로 정확히 간다)
+    const aimObby = f => {
+      const here = st.x - OX; let best = null, bestD = Infinity;
+      for (const pl of PLATS) {
+        if (pl.jelly || (pl.vanish && !pl.solid)) continue;
+        const g = groundAt(f.sx, f.sy, pl.y); if (!g) continue;
+        const cx = pl.cx ?? pl.x, cz = pl.cz ?? pl.z, gx = g[0] - OX;
+        if (Math.abs(gx - cx) > pl.w / 2 + .5 || Math.abs(g[1] - cz) > pl.d / 2 + .5) continue;
+        const d = Math.hypot(gx - here, g[1] - st.z);
+        if (d < bestD) { bestD = d; best = [clamp(gx, cx - pl.w / 2, cx + pl.w / 2), clamp(g[1], cz - pl.d / 2, cz + pl.d / 2)]; }
+      }
+      if (!best) return aim(f, st.x, st.z, st.lift);
+      const dx = best[0] - here, dz = best[1] - st.z, dd = Math.hypot(dx, dz); if (dd < .3) return [0, 0];
+      const k = Math.min(1, dd / .8) / dd; return [dx * k, dz * k];
+    };
+    steerFingers = () => {
+      const now = performance.now();
+      let one = null, two = null;
+      for (const f of fingers.values()) {
+        if (f.jumper) continue;
+        if (!f.active && now - f.t0 > 170) f.active = true;      // 가만히 눌러도 달린다
+        if (!f.active) continue;
+        if (!f.dot) f.dot = dotFor(f);
+        if (f.who === 2) two = f; else one = f;
+      }
+      const onObby = st.area === 'obby' && ob;
+      if (!one && !two) {
+        if (steering) { drive.x = drive.z = 0; if (onObby) { obIn.x = obIn.z = 0; } if (duo) duo.input.x = duo.input.z = 0; steering = false; }
+        st.assist = false; return;
+      }
+      if (!canSteer()) return;
+      steering = true;
+      if (onObby) { const a = aimObby(one || two); obIn.x = a[0]; obIn.z = a[1]; st.assist = true; return; }
+      if (one) { const a = aim(one, st.x, st.z, 0); drive.x = a[0]; drive.z = a[1]; } else { drive.x = drive.z = 0; }
+      if (duo) { if (two) { const a = aim(two, duo.x, duo.z, 0); duo.input.x = a[0]; duo.input.z = a[1]; } else duo.input.x = duo.input.z = 0; }
+    };
   }
 
-  function trick(name) { if (pet && !pet.isEgg && name === 'wobble') return; st.trick = name; st.trickT = 0; }
+  function trick(name) { if (pet && !pet.isEgg && name === 'wobble') return; st.trick = name; st.trickT = 0; if (name === 'jump') st.flick = .35; }
   function kickBall(fromTap) {
     if (!ball) return;
     const bx = ball.m.position.x, bz = ball.m.position.z;
@@ -2587,7 +2677,7 @@ const World = (() => {
       } catch (e) { fallback(); return false; }
       SPH = new T.SphereGeometry(1, 28, 20); BOX = new T.BoxGeometry(1, 1, 1); CYL = new T.CylinderGeometry(1, 1, 1, 28);
       CONE = new T.ConeGeometry(1, 1, 18); HALF = new T.SphereGeometry(1, 28, 14, 0, Math.PI * 2, 0, Math.PI / 2); STAR = starGeo();
-      renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+      renderer.setPixelRatio(Math.min(matchMedia('(pointer: coarse)').matches ? 1.75 : 2, window.devicePixelRatio || 1));
       renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap;
       scene = new T.Scene(); scene.background = new T.Color('#BFE8FF'); scene.fog = new T.Fog('#BFE8FF', 32, 70);
       camera = new T.PerspectiveCamera(38, 1, .1, 150);
@@ -2719,6 +2809,8 @@ const World = (() => {
     },
     raceTap() { if (race && race.t >= 0) race.boost = Math.min(5, race.boost + .7); },
     drive,
+    makePet(q) { const parts = buildPet(q.sp, q.hat, formOf(q.level), dyeColor(q), q.back, q.neck); parts.dirt.visible = false; parts.setFace('happy'); return parts; },
+    get ok() { return ok; }, get gradMap() { return grad; }, get starGeo() { return STAR; },
     duoStart, duoStop,
     get duoInput() { return duo ? duo.input : null; },
     duoSpeeds(p1, p2) { st.speedMul = p1; if (duo) duo.mul = p2; },
@@ -2770,7 +2862,7 @@ const World = (() => {
       }
       const f = FRIENDS[id], parts = buildPet(f.sp, f.hat, 2);
       parts.dirt.visible = false; parts.setFace('happy'); prScene.add(parts.root);
-      const h = 1.55 * parts.root.scale.y; prCam.position.set(0, h * .62, h * 2.2); prCam.lookAt(0, h * .5, 0);
+      const h = 1.85 * parts.root.scale.y; prCam.position.set(0, h * .62, h * 2.2); prCam.lookAt(0, h * .5, 0);
       pr.render(prScene, prCam); portraits[id] = pr.domElement.toDataURL('image/png');
       prScene.remove(parts.root);
       return portraits[id];
@@ -2935,7 +3027,7 @@ function tapEgg() {
       sfx('hatch'); confetti(100);
       setMood('happy', 2500);
       render(); World.trick('jump'); burst(['✨', '⭐', '💖'], 8, -.2);
-      say(`안녕! 나는 ${p.name}! 화면을 끌면 나를 직접 움직일 수 있어! 숨은 스티커도 찾아 줘!`, 7000);
+      say(`안녕! 나는 ${p.name}! 화면을 누른 채 가리키면 그쪽으로 달려가! 숨은 스티커도 찾아 줘!`, 7000);
       persist();
     }, 260);
   } else say(['톡! 알이 살짝 흔들려요', '안에서 꼼지락거려요!', '눈이 보여요! 조금만 더!', '거의 다 됐어요!'][p.taps - 1] + ` (${p.taps}/${HATCH_TAPS})`, 4000);
@@ -3526,18 +3618,8 @@ const p2Keys = {};
 function applyP2Keys() { const d = World.duoInput; if (!d) return; d.x = (p2Keys.r ? 1 : 0) - (p2Keys.l ? 1 : 0); d.z = (p2Keys.d ? 1 : 0) - (p2Keys.u ? 1 : 0); const l = Math.hypot(d.x, d.z); if (l > 1) { d.x /= l; d.z /= l; } }
 function openDuoSetup(kind) {
   const cards = SPECIES_ORDER.map(sp => `<button class="item${(S.duoSp || 'puppy') === sp ? ' on' : ''}" data-duosp="${sp}"><span class="art">${petSVG(sp, { mood: 'happy', stage: 'kid' })}</span><span class="nm">${SPECIES[sp].name}</span></button>`).join('');
-  openSheet(kind === 'duoTag' ? '🏃 둘이 술래잡기' : '🎁 둘이 보물 대결', `<p class="msub">${kind === 'duoTag' ? `번갈아 술래를 해요. 술래를 피해 ${DUO_TAG_SEC}초 동안 오래 버틴 쪽이 이겨요.` : `상자 ${DUO_BOXES}개를 ${DUO_TREASURE_SEC}초 안에 더 많이 주운 쪽이 이겨요.`}<br>1P는 지금 내 펫이에요. 키보드는 <b>1P WASD · 2P 방향키</b>, 터치 화면은 양쪽 동그라미로 움직여요.</p><h3 class="wear-h">2P 친구는 누구로 할까요?</h3><div class="grid">${cards}</div>`,
+  openSheet(kind === 'duoTag' ? '🏃 둘이 술래잡기' : '🎁 둘이 보물 대결', `<p class="msub">${kind === 'duoTag' ? `번갈아 술래를 해요. 술래를 피해 ${DUO_TAG_SEC}초 동안 오래 버틴 쪽이 이겨요.` : `상자 ${DUO_BOXES}개를 ${DUO_TREASURE_SEC}초 안에 더 많이 주운 쪽이 이겨요.`}<br>1P는 지금 내 펫이에요. 휴대폰은 <b>화면 왼쪽을 1P, 오른쪽을 2P</b>가 손가락으로 눌러 가리키면 달려요. 키보드는 1P WASD · 2P 방향키예요.</p><h3 class="wear-h">2P 친구는 누구로 할까요?</h3><div class="grid">${cards}</div>`,
     body => body.addEventListener('click', e => { const b = e.target.closest('[data-duosp]'); if (b) { S.duoSp = b.dataset.duosp; persist(); startDuo(kind); } }));
-}
-function duoJoy(cls, label, inp) {
-  const joy = document.createElement('div'); joy.className = 'joy duo-joy ' + cls; joy.innerHTML = `<b>${label}</b><i></i>`;
-  const knob = joy.querySelector('i'); let id = null;
-  const set = e => { const r = joy.getBoundingClientRect(), R = r.width / 2; let x = (e.clientX - r.left - R) / R, z = (e.clientY - r.top - R) / R; const l = Math.hypot(x, z); if (l > 1) { x /= l; z /= l; } inp.x = x; inp.z = z; knob.style.transform = `translate(${x * R * .5}px, ${z * R * .5}px)`; };
-  joy.addEventListener('pointerdown', e => { e.preventDefault(); id = e.pointerId; try { joy.setPointerCapture(id); } catch (err) {} set(e); });
-  joy.addEventListener('pointermove', e => { if (e.pointerId === id) set(e); });
-  const end = () => { id = null; inp.x = 0; inp.z = 0; knob.style.transform = ''; };
-  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(t => joy.addEventListener(t, end));
-  return joy;
 }
 function startDuo(kind) {
   const p = P();
@@ -3555,7 +3637,8 @@ function startDuo(kind) {
   const tip = document.createElement('p'); tip.className = 'round-tip';
   const big = document.createElement('div'); big.className = 'round-big';
   ui.innerHTML = `<span class="pill" id="duoLabel"></span><span class="pill">⏱ <b id="rdTime">0</b></span><span class="pill" id="duoScore"></span><button class="icon-btn" id="rdQuit" aria-label="그만하기">✕</button>`;
-  const joys = matchMedia('(pointer: coarse)').matches ? [duoJoy('p1', '1P', World.drive), duoJoy('p2', '2P', World.duoInput)] : [];
+  const zones = document.createElement('div'); zones.className = 'duo-zones'; zones.innerHTML = '<span>1P 손가락</span><span>2P 손가락</span>';
+  const joys = TOUCH ? [zones] : [];
   room.append(ui, tip, big, ...joys);
   round = { duo: true, kind, ui, tip, big, joys, timers: [], score: [0, 0], held: [0, 0], turn: 0 };
   ui._close = () => endDuo(true);
@@ -3941,12 +4024,14 @@ function openSettings() {
   openSheet('설정', `<div class="set-list">
     <button class="set-row" id="setSound"><span>${S.sound ? '🔊' : '🔈'} 효과음</span><b>${S.sound ? '켜짐' : '꺼짐'}</b></button>
     <button class="set-row" id="setMusic"><span>${S.music !== false ? '🎵' : '🔇'} 배경음악</span><b>${S.music !== false ? '켜짐' : '꺼짐'}</b></button>
+    <button class="set-row" id="setHaptic"><span>📳 진동</span><b>${S.haptic !== false ? '켜짐' : '꺼짐'}</b></button>
     <button class="set-row" id="setAlbum"><span>📷 사진 앨범</span><b>${loadPhotos().length} / ${PHOTO_MAX}장 ›</b></button>
     <div class="set-row"><span>⏱️ 오늘 논 시간</span><b>${Math.floor(playSec() / 60)}분</b></div>
     <button class="set-row" id="setParent"><span>🔒 보호자 메뉴</span><b>열기 ›</b></button>
   </div>`, body => {
     body.querySelector('#setSound').addEventListener('click', () => { S.sound = !S.sound; persist(); sfx('pop'); openSettings(); });
     body.querySelector('#setMusic').addEventListener('click', () => { S.music = S.music === false; persist(); Music.sync(); openSettings(); });
+    body.querySelector('#setHaptic').addEventListener('click', () => { S.haptic = S.haptic === false; persist(); sfx('pop'); openSettings(); });
     body.querySelector('#setAlbum').addEventListener('click', () => openAlbum());
     body.querySelector('#setParent').addEventListener('click', () => { closeSheet(); parentGate(openParent); });
   });
@@ -4276,6 +4361,7 @@ function cookGame(r) {
 /* ---------- 점프 코스 ---------- */
 let obbyUI = null, obTimer = 0;
 const obKeys = {};
+const TOUCH = matchMedia('(pointer: coarse)').matches;
 function boundedReward(key, coins, max = 3) {
   S.rewardClaims = S.rewardClaims || {};
   // Migrate an already-earned count once; this cap never resets by calendar day.
@@ -4317,24 +4403,14 @@ function buildObbyUI() {
   obbyUI = document.createElement('div'); obbyUI.className = 'obby-ui';
   const C = World.obbyCourses()[obbyStageNow], best = S.best[obbyKey(obbyStageNow)];
   obbyUI.innerHTML = `<div class="ob-top"><span class="pill">${obbyStageNow + 1}단계</span><span class="pill">⏱ <b id="obTime">0.0</b>초</span><span class="pill">🚩 <b id="obCp">0/${C.cps}</b></span>${best ? `<span class="pill">🏆 ${best.toFixed(1)}</span>` : ''}<button class="icon-btn" id="obExit" aria-label="나가기">✕</button></div>
-    <p class="ob-tip">${escapeHTML(C.tip)}</p>
-    <div class="joy" id="joy"><i id="joyKnob"></i></div><button class="jump-btn" id="obJump">점프!</button>`;
+    <p class="ob-tip">${TOUCH ? '손가락을 대면 그쪽으로 달려요. 발판 끝에서는 저절로 뛰어요. 막대·젤리는 톡! 하면 점프!' : escapeHTML(C.tip)}</p>
+    ${TOUCH ? '' : '<button class="jump-btn" id="obJump">점프!</button>'}`;
   room.appendChild(obbyUI);
-  const joy = obbyUI.querySelector('#joy'), knob = obbyUI.querySelector('#joyKnob'), inp = World.obbyInput;
-  let jid = null;
-  const setJ = e => {
-    const r = joy.getBoundingClientRect(), R = r.width / 2;
-    let dx = (e.clientX - r.left - R) / R, dy = (e.clientY - r.top - R) / R; const l = Math.hypot(dx, dy);
-    if (l > 1) { dx /= l; dy /= l; }
-    inp.x = dx; inp.z = dy; knob.style.transform = `translate(${dx * R * .55}px, ${dy * R * .55}px)`;
-  };
-  joy.addEventListener('pointerdown', e => { e.preventDefault(); jid = e.pointerId; joy.setPointerCapture?.(jid); setJ(e); });
-  joy.addEventListener('pointermove', e => { if (e.pointerId === jid) setJ(e); });
-  const endJ = () => { jid = null; inp.x = 0; inp.z = 0; knob.style.transform = ''; };
-  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(t => joy.addEventListener(t, endJ));
-  const jb = obbyUI.querySelector('#obJump');
-  jb.addEventListener('pointerdown', e => { e.preventDefault(); inp.jump = true; jb.classList.add('on'); });
-  ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => jb.addEventListener(t, () => jb.classList.remove('on')));
+  const inp = World.obbyInput, jb = obbyUI.querySelector('#obJump');
+  if (jb) {
+    jb.addEventListener('pointerdown', e => { e.preventDefault(); inp.jump = true; jb.classList.add('on'); });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => jb.addEventListener(t, () => jb.classList.remove('on')));
+  }
   obbyUI.querySelector('#obExit').addEventListener('click', exitObby);
   window.addEventListener('keydown', obKey); window.addEventListener('keyup', obKey);
   obTimer = setInterval(() => { const el = $('#obTime'); if (el) el.textContent = World.obbyTime().toFixed(1); }, 100);
@@ -4409,6 +4485,7 @@ $('#emoteTray').addEventListener('click', e => {
 
 /* ---------- 배지 ---------- */
 const BADGES = {
+  runGoal:  ['🏁', '말랑 러너', '말랑 달리기 60초 끝까지 달리기'],
   duo:      ['🎮', '같이 놀기', '한 화면에서 친구와 한 판 끝내기'],
   rival:    ['🥊', '기록 라이벌', '친구 코드로 온 친구의 코스 기록 깨기'],
   collector: ['🐾', '펫 수집가', '펫 8종 모두 데려오기'],
@@ -4664,7 +4741,7 @@ function openStickers() {
     ? `<div class="stk got"><b>${it.e}</b>찾음</div>`
     : `<div class="stk"><b>❔</b>${it.area === 'house' ? '집' : '마을'}${it.high ? ' ⬆️' : ''}</div>`).join('');
   const gifts = STICKER_GIFTS.map(g => `<span class="${n >= g.n ? 'got' : ''}">${g.n}개: ${g.decor ? DECOR[g.decor].e + ' ' : g.hat ? '🎩 ' : ''}${g.coins}코인</span>`).join('');
-  openSheet('🔎 숨은 스티커', `${missionTabs('s')}<p class="msub">${n} / ${STICKERS.length}개 찾았어요. 화면을 끌거나 WASD로 직접 달려가서 주워요. ⬆️ 표시는 높이 떠 있어서 점프로 잡아요.</p><div class="gift-row">${gifts}</div><div class="stk-grid">${cards}</div>`,
+  openSheet('🔎 숨은 스티커', `${missionTabs('s')}<p class="msub">${n} / ${STICKERS.length}개 찾았어요. 화면을 누른 채 가리키면 달려가요. 키보드는 WASD예요. ⬆️ 표시는 높이 떠 있어서 점프로 잡아요.</p><div class="gift-row">${gifts}</div><div class="stk-grid">${cards}</div>`,
     body => body.addEventListener('click', e => { const tb = e.target.closest('[data-mtab]'); if (tb) openMissions(tb.dataset.mtab); }));
 }
 
@@ -4694,7 +4771,7 @@ const TITLES = [
   { id: 'bestie', name: '인기쟁이', badge: 'bestie' }, { id: 'merchant', name: '꼬마 사장님', badge: 'merchant' },
   { id: 'decor', name: '인테리어 장인', badge: 'decor' }, { id: 'form4', name: '무지개 전설', badge: 'form4' },
   { id: 'tagger', name: '술래잡기 왕', badge: 'tagger' }, { id: 'treasure', name: '보물 사냥꾼', badge: 'treasure' },
-  { id: 'duo', name: '베스트 프렌드', badge: 'duo' }, { id: 'rival', name: '기록 라이벌', badge: 'rival' },
+  { id: 'runGoal', name: '말랑 러너', badge: 'runGoal' }, { id: 'duo', name: '베스트 프렌드', badge: 'duo' }, { id: 'rival', name: '기록 라이벌', badge: 'rival' },
   { id: 'collector', name: '펫 수집가', badge: 'collector' }, { id: 'goldAll', name: '금메달 챔피언', badge: 'goldAll' }, { id: 'legend', name: '말랑 전설', badge: 'passDone' }
 ];
 const titleOpen = t => !t.badge || !!(S.badges && S.badges[t.badge]);
@@ -4715,7 +4792,7 @@ function toggleRide() {
   if (!own.length) { toast('상점 › 탈것에서 무료 킥보드를 받아 보세요!'); return openShop('ride'); }
   const kind = own.includes(S.rideSel) ? S.rideSel : own[0];
   World.setRide(kind); sfx('up'); World.trick('hop');
-  say(pick([`${RIDES[kind].name} 출발! 화면을 끌거나 WASD로 달려요!`, '씽씽~ 바람이 시원해요!', '꽉 잡아요, 출발!']), 3000);
+  say(pick([`${RIDES[kind].name} 출발! 화면을 누른 채 가리켜요!`, '씽씽~ 바람이 시원해요!', '꽉 잡아요, 출발!']), 3000);
 }
 $('#rideBtn').addEventListener('click', () => toggleRide());
 
@@ -4831,6 +4908,7 @@ function openStand() {
 function goStand() { World.area() === 'village' ? World.goVillage('garden', true, openStand) : openStand(); }
 
 const NEWS = [
+  { v: '2.7', date: '11월 5일', items: ['👆 조이스틱이 없어졌어요! 화면을 누른 채 가리키면 그쪽으로 달려요. 점프 코스는 발판 끝에서 저절로 뛰고, 톡 하면 점프해요', '🏃 새 놀이 말랑 달리기: 좌우로 밀어 피하고, 위로 밀어 점프!', '✨ 모든 펫을 다시 그렸어요. 용의 작은 날개, 거북 등껍질, 여우 꼬리, 쓰다듬으면 하트 눈!', '📳 안드로이드 휴대폰에서는 살짝 떨려요 (설정에서 끌 수 있어요)'] },
   { v: '2.6', date: '11월 4일', items: ['🎮 친구랑 둘이! 한 화면에서 둘이 술래잡기·보물 대결 (놀이 버튼)', '🤝 친구 코드: 친구 펫이 내 마을에 놀러 오고, 점프 코스 기록으로 겨뤄요'] },
   { v: '2.5', date: '11월 4일', items: ['🐱 새 친구: 치즈 고양이·솜뭉치 강아지·조개 수달! 친구들 메뉴에서 데려와요', '✨ 모든 펫의 눈과 얼굴을 더 귀엽게 다시 그렸어요', '🦊 노을 여우·풀잎 거북·구름 양은 놀다 보면 열려요', '🎖️ 성장길 20칸: 놀수록 쌓이고 요정 날개·별 목걸이·무지개 보드를 받아요', '🥇 점프 코스 메달: 빨리 깰수록 동→은→금'] },
   { v: '2.4', date: '11월 2일', items: ['🏃 술래잡기: 내가 술래! 도망가는 친구 3명을 60초 안에 잡아요 (놀이 버튼 또는 광장 솜솜)', '🎁 보물찾기: 마을에 숨은 선물 상자 8개를 45초 안에 (놀이 버튼 또는 도서관 꼬깔)', '🏷️ 새 칭호: 술래잡기 왕, 보물 사냥꾼'] },
@@ -5578,13 +5656,173 @@ function shooterWave(g) {
 }
 for (const id in ARCADE) ARCADE[id].id = id;
 
+/* ---------- 말랑 달리기: 휴대폰용 달리기 게임. 좌우로 밀어 줄을 바꾸고, 위로 밀거나 톡 하면 점프 ----------
+   본편 3D 화면과 따로 작은 장면을 쓴다. 60초를 달리면 골인 (끝없이 붙잡아 두지 않는다). 코인은 처음 5번까지 */
+const RUN_SEC = 60, RUN_LANES = [-1.55, 0, 1.55];
+function openRunner() {
+  const p = P();
+  if (!World.ok) return say('달리기는 3D를 켤 수 있는 기기에서 할 수 있어요', 3000);
+  if (p.energy < 15) return say('너무 졸려서 못 달리겠어요… 먼저 재워 주세요');
+  if (p.hunger < 12) return say('배가 고파서 힘이 없어요…');
+  gameOn = true;
+  const backFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  const wrap = document.createElement('div'); wrap.id = 'game';
+  wrap.setAttribute('role', 'dialog'); wrap.setAttribute('aria-modal', 'true'); wrap.setAttribute('aria-label', '말랑 달리기');
+  wrap.innerHTML = `<div class="g-top gut"><span class="ttl">🏃 말랑 달리기</span><span class="pill">⭐ <span id="rnScore">0</span></span><span class="pill" id="rnHearts">♥♥♥</span><span class="pill">⏱ <span id="rnTime">${RUN_SEC}</span></span><button class="icon-btn" id="gClose" aria-label="그만하기">✕</button></div><canvas id="runCanvas"></canvas>
+    <div class="g-card" id="gCard"><h3>🏃 말랑 달리기</h3><p>손가락을 <b>좌우로 밀면</b> 옆 줄로,<br><b>위로 밀거나 톡</b> 하면 점프!<br>별을 모으고 상자를 피해요</p><p class="fine">키보드: 방향키 + 스페이스바</p><button class="candy primary" id="gStart">달리기 시작!</button></div>`;
+  $('#app').appendChild(wrap); pushBack();
+  const T3 = window.THREE, cv = wrap.querySelector('#runCanvas');
+  const rd = new T3.WebGLRenderer({ canvas: cv, antialias: true });
+  rd.setPixelRatio(Math.min(1.5, window.devicePixelRatio || 1));
+  const scene = new T3.Scene(); scene.background = new T3.Color('#BFE8FF'); scene.fog = new T3.Fog('#BFE8FF', 22, 52);
+  scene.add(new T3.HemisphereLight('#FFFFFF', '#D9C2B0', .6)); const sun = new T3.DirectionalLight('#FFF6E6', .42); sun.position.set(-3, 9, 9); scene.add(sun);
+  const cam = new T3.PerspectiveCamera(52, 1, .1, 80);
+  const size = () => { const w = cv.clientWidth || 300, h = cv.clientHeight || 300; rd.setSize(w, h, false); cam.aspect = w / h;
+    // 세로 화면에서도 세 줄과 펫이 다 보이도록 뒤로 물러나 내려다본다
+    const tall = cam.aspect < .8; cam.fov = tall ? 58 : 50; cam.position.set(0, tall ? 6.4 : 4.8, tall ? 8.4 : 6.6); cam.lookAt(0, tall ? .2 : .7, tall ? -4.5 : -5); cam.updateProjectionMatrix(); };
+  size(); window.addEventListener('resize', size);
+  const mats = {}, mat = c => mats[c] || (mats[c] = new T3.MeshToonMaterial({ color: c, gradientMap: World.gradMap }));
+  const BOX = new T3.BoxGeometry(1, 1, 1), CYL = new T3.CylinderGeometry(1, 1, 1, 18), CONE = new T3.ConeGeometry(1, 1, 16), SPH = new T3.SphereGeometry(1, 18, 14);
+  const add = (geo, c, x, y, z, sx, sy, sz, parent = scene) => { const m = new T3.Mesh(geo, mat(c)); m.position.set(x, y, z); m.scale.set(sx, sy, sz); parent.add(m); return m; };
+  add(BOX, '#7FCF7A', 0, -.3, -20, 40, .5, 90);
+  add(BOX, '#E9B98A', 0, -.05, -20, 4.9, .1, 90);
+  for (const x of [-2.55, 2.55]) add(BOX, '#FFF3D6', x, -.02, -20, .2, .1, 90);
+  const dashes = [];
+  for (let i = 0; i < 16; i++) for (const x of [-.78, .78]) dashes.push(add(BOX, '#FFF3D6', x, .02, -i * 4, .1, .02, 1.6));
+  const scenery = [];
+  for (let i = 0; i < 18; i++) {
+    const g = new T3.Group(), side = i % 2 ? 1 : -1; g.position.set(side * (4 + (i * 7 % 5)), 0, -i * 3.4); scene.add(g);
+    if (i % 3 === 2) { for (const [x, r, c] of [[0, .55, '#FF9DB5'], [.5, .4, '#FFE27A'], [-.5, .4, '#CDBBFF']]) add(SPH, c, x, r, 0, r, r, r, g); }
+    else { add(CYL, '#C98A5A', 0, .6, 0, .16, 1.2, .16, g); add(CONE, i % 3 ? '#8FD694' : '#7ED9C3', 0, 1.9, 0, .9, 1.8, .9, g); add(CONE, '#A8E39A', 0, 2.8, 0, .6, 1.2, .6, g); }
+    scenery.push(g);
+  }
+  const parts = World.makePet(p); scene.add(parts.root);
+  parts.root.scale.setScalar(1.05); parts.root.rotation.y = Math.PI;
+  const g = { lane: 1, x: 0, y: 0, vy: 0, run: false, over: false, time: 0, score: 0, hearts: 3, inv: 0, speed: 10, items: [], next: 18, t: 0, last: 0, stars: 0 };
+  const scoreEl = wrap.querySelector('#rnScore'), heartEl = wrap.querySelector('#rnHearts'), timeEl = wrap.querySelector('#rnTime');
+  const showHearts = () => { heartEl.textContent = '♥'.repeat(g.hearts) + '♡'.repeat(3 - g.hearts); };
+  function makeItem(kind, lane, z) {
+    const m = new T3.Group(); m.position.set(RUN_LANES[lane], 0, z); scene.add(m);
+    if (kind === 'wall') { add(BOX, '#B5723F', 0, .7, 0, 1.25, 1.4, .9, m); add(BOX, '#DFA468', 0, .7, .46, 1.05, .2, .02, m); add(BOX, '#DFA468', 0, 1.12, .46, 1.05, .16, .02, m); add(BOX, '#DFA468', 0, .28, .46, 1.05, .16, .02, m); }
+    else if (kind === 'low') { add(BOX, '#FF5C8A', 0, .28, 0, 1.4, .56, .3, m); for (const x of [-.45, 0, .45]) add(CYL, '#FFFFFF', x, .34, .17, .09, .02, .09, m).rotation.x = Math.PI / 2; }
+    else if (kind === 'star') { const st = new T3.Mesh(World.starGeo, new T3.MeshBasicMaterial({ color: '#FFD23F' })); st.position.y = .95; st.scale.set(.42, .42, .42); m.add(st); }
+    else if (kind === 'heart') { add(SPH, '#FF5C8A', -.14, 1, 0, .2, .2, .1, m); add(SPH, '#FF5C8A', .14, 1, 0, .2, .2, .1, m); const c = add(CONE, '#FF5C8A', 0, .78, 0, .32, .36, .1, m); c.rotation.z = Math.PI; }
+    g.items.push({ kind, lane, z, m, used: false });
+  }
+  // 한 줄은 늘 비워 두어 언제나 피할 길이 있게 한다
+  function spawnRow(z) {
+    const k = Math.random(), free = Math.floor(Math.random() * 3);
+    if (k < .55) {
+      const lanes = [0, 1, 2].filter(l => l !== free), two = g.time > 18 && Math.random() < .4;
+      makeItem(Math.random() < .4 ? 'low' : 'wall', lanes[0], z);
+      if (two) makeItem(Math.random() < .5 ? 'low' : 'wall', lanes[1], z);
+      for (let i = 0; i < 3; i++) makeItem('star', free, z - i * 1.4);
+    } else if (k < .92) {
+      const l = Math.floor(Math.random() * 3); for (let i = 0; i < 5; i++) makeItem('star', l, z - i * 1.3);
+    } else if (g.hearts < 3) makeItem('heart', free, z);
+    else makeItem('low', free, z);
+  }
+  const moveLane = d => { if (!g.run) return; const n = clamp(g.lane + d, 0, 2); if (n !== g.lane) { g.lane = n; sfx('pop'); } };
+  const jump = () => { if (!g.run || g.y > .01) return; g.vy = 9.4; sfx('jump'); };
+  // 밀기: 손가락을 떼지 않아도 일정 거리마다 바로 반응한다
+  let sw = null;
+  cv.addEventListener('pointerdown', e => { e.preventDefault(); sw = { x: e.clientX, y: e.clientY, id: e.pointerId, used: false }; try { cv.setPointerCapture(e.pointerId); } catch (err) {} });
+  cv.addEventListener('pointermove', e => {
+    if (!sw || e.pointerId !== sw.id) return;
+    const dx = e.clientX - sw.x, dy = e.clientY - sw.y;
+    if (Math.abs(dx) > 26 && Math.abs(dx) > Math.abs(dy)) { moveLane(dx > 0 ? 1 : -1); sw.x = e.clientX; sw.y = e.clientY; sw.used = true; }
+    else if (dy < -26) { jump(); sw.x = e.clientX; sw.y = e.clientY; sw.used = true; }
+    else if (dy > 26) { sw.y = e.clientY; sw.used = true; }
+  });
+  cv.addEventListener('pointerup', e => { if (sw && e.pointerId === sw.id && !sw.used) jump(); sw = null; });
+  cv.addEventListener('pointercancel', () => { sw = null; });
+  const kd = e => {
+    const k = { ArrowLeft: -1, a: -1, ArrowRight: 1, d: 1 }[e.key];
+    if (k) { e.preventDefault(); if (!e.repeat) moveLane(k); }
+    else if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w') { e.preventDefault(); jump(); }
+  };
+  window.addEventListener('keydown', kd);
+  function hit() {
+    g.hearts--; g.inv = 1.3; showHearts(); sfx('bad');
+    if (g.hearts <= 0) finish(false);
+  }
+  function loop(t) {
+    if (!wrap.isConnected) return;
+    requestAnimationFrame(loop);
+    const dt = Math.min(.05, (t - (g.last || t)) / 1000); g.last = t; g.t += dt;
+    if (g.run && !document.hidden) {
+      g.time += dt; g.speed = Math.min(19, 10 + g.time * .16);
+      const dz = g.speed * dt;
+      timeEl.textContent = Math.max(0, Math.ceil(RUN_SEC - g.time));
+      g.vy -= 26 * dt; g.y = Math.max(0, g.y + g.vy * dt); if (g.y === 0) g.vy = 0;
+      g.inv = Math.max(0, g.inv - dt);
+      for (const d of dashes) { d.position.z += dz; if (d.position.z > 6) d.position.z -= 64; }
+      for (const gr of scenery) { gr.position.z += dz * .9; if (gr.position.z > 7) gr.position.z -= 61; }
+      g.next -= dz;
+      if (g.next <= 0) { spawnRow(-46); g.next = Math.max(7.5, 13 - g.time * .08); }
+      for (let i = g.items.length - 1; i >= 0; i--) {
+        const it = g.items[i]; it.z += dz; it.m.position.z = it.z;
+        if (it.kind === 'star' || it.kind === 'heart') it.m.rotation.y += dt * 4;
+        if (!it.used && it.lane === g.lane && Math.abs(it.z) < .75) {
+          if (it.kind === 'star') { if (g.y < 1.9) { it.used = true; it.m.visible = false; g.score++; g.stars++; scoreEl.textContent = g.score; sfx('coin'); } }
+          else if (it.kind === 'heart') { it.used = true; it.m.visible = false; g.hearts = Math.min(3, g.hearts + 1); showHearts(); sfx('up'); }
+          else if (it.kind === 'low' && g.y > .62) { /* 넘었다 */ }
+          else if (g.inv <= 0 && g.y < 1.7) { it.used = true; hit(); if (g.over) return; }
+        }
+        if (it.z > 8) { scene.remove(it.m); g.items.splice(i, 1); }
+      }
+      if (g.time >= RUN_SEC) { finish(true); return; }
+    }
+    // 줄 바꾸기는 부드럽게, 달릴 때 통통 튄다
+    g.x += (RUN_LANES[g.lane] - g.x) * Math.min(1, dt * 13);
+    const cyc = g.t * (g.run ? 15 : 3), bob = g.run && g.y === 0 ? Math.abs(Math.sin(cyc)) * .16 : 0;
+    parts.root.position.set(g.x, g.y + bob, 0);
+    parts.root.rotation.set(0, Math.PI + (RUN_LANES[g.lane] - g.x) * -.22, Math.sin(cyc) * (g.run ? .06 : .02));
+    parts.root.visible = g.inv <= 0 || Math.floor(g.t * 12) % 2 === 0;
+    if (parts.footL) { const f = g.run && g.y === 0 ? Math.sin(cyc) * .14 : 0; parts.footL.position.y = parts.footBase + Math.max(0, f); parts.footR.position.y = parts.footBase + Math.max(0, -f); }
+    if (parts.wingL) { const f = Math.sin(g.t * 16) * .35; parts.wingL.rotation.y = parts.wingBase + f; parts.wingR.rotation.y = -parts.wingBase - f; }
+    if (parts.flame) parts.flame.scale.set(1, .7 + Math.abs(Math.sin(g.t * 22)) * .6, 1);
+    rd.render(scene, cam);
+  }
+  function finish(goal) {
+    if (g.over) return; g.over = true; g.run = false;
+    const key = 'runner', prev = S.best[key] || 0, isBest = g.score > prev;
+    if (isBest) S.best[key] = g.score;
+    const total = g.score + (goal ? 20 : 0);
+    const coins = boundedReward('runnerGame', clamp(5 + Math.floor(total / 4), 5, 40), 5);
+    change({ fun: 20, energy: -10, hunger: -5 }); addXP(5 + Math.min(20, Math.floor(total / 5))); mission('play');
+    if (goal) badge('runGoal');
+    if (goal) confetti(90); sfx(goal ? 'hatch' : 'coin'); persist();
+    const card = document.createElement('div'); card.className = 'g-card';
+    card.innerHTML = `<h3>${goal ? '🏁 골인!' : '조금만 더!'}</h3><div class="big-score">⭐ ${g.score}</div><p>${isBest && g.score ? '🏆 새 최고 기록!' : `최고 기록 ${prev}`}${goal ? '<br>60초를 끝까지 달렸어요!' : `<br>${Math.floor(g.time)}초 달렸어요`}</p><p>${coins ? `<i class="coin"></i> ${coins}코인 · ` : ''}행복 +20</p><div style="display:flex;gap:8px"><button class="candy primary" id="rnAgain" style="flex:1">한 번 더</button><button class="candy" id="gHome" style="flex:1">돌아가기</button></div>`;
+    wrap.appendChild(card);
+    card.querySelector('#gHome').addEventListener('click', closeGame);
+    card.querySelector('#rnAgain').addEventListener('click', () => { closeGame(); openRunner(); });
+    card.querySelector('#rnAgain').focus({ preventScroll: true });
+  }
+  function closeGame() {
+    gameOn = false;
+    window.removeEventListener('resize', size); window.removeEventListener('keydown', kd);
+    wrap.remove(); try { rd.forceContextLoss(); rd.dispose(); } catch (e) {}
+    setMood('happy', 1500); say('달리기 재밌었어요! 잠깐 쉬어도 좋아요.'); render();
+    if (backFocus?.isConnected) backFocus.focus(); else $('#world').focus({ preventScroll: true });
+  }
+  wrap.querySelector('#gStart').addEventListener('click', () => { wrap.querySelector('#gCard').remove(); g.run = true; sfx('pop'); wrap.querySelector('#gClose').focus({ preventScroll: true }); });
+  wrap.querySelector('#gClose').addEventListener('click', () => { if (g.run && g.score > 0) finish(false); else closeGame(); });
+  wrap.addEventListener('keydown', trapTab);
+  wrap.querySelector('#gStart').focus({ preventScroll: true });
+  requestAnimationFrame(loop);
+}
+
 function openPlayMenu() {
   const p = P(), best = S.best || {};
   if (p.energy < 15) return say('너무 졸려서 못 놀겠어요… 먼저 재워 주세요');
   const card = (id, emoji, title, desc, cls = '') =>
     `<button class="dex-card" data-game="${id}"><span class="emo ${cls}">${emoji}</span><span class="txt"><span class="t1">${title}</span><br><span class="t2">${desc}</span></span><span class="go">${best[id] ? `최고 ${best[id]}` : '해 보기'}</span></button>`;
   openSheet('뭐 하고 놀까?', `<div class="dex">
-    <p class="arcade-head" style="margin-top:0">친구랑 같이 <span class="arcade-tag">한 화면에서 둘이</span></p>
+    <p class="arcade-head" style="margin-top:0">새 놀이 <span class="arcade-tag">휴대폰으로 슥슥</span></p>
+    ${card('runner', '🏃', '말랑 달리기', '좌우로 밀어 피하고, 위로 밀어 점프! 60초 달리기', 'day')}
+    <p class="arcade-head">친구랑 같이 <span class="arcade-tag">한 화면에서 둘이</span></p>
     ${card('duoTag', '🏃', '둘이 술래잡기', '번갈아 술래! 오래 버틴 쪽이 이겨요', 'day')}
     ${card('duoTreasure', '🎁', '둘이 보물 대결', '상자 12개를 누가 더 많이 주울까?', 'day')}
     ${card('pals', '🤝', '친구 코드', '친구 펫을 내 마을에 초대하고 코스 기록으로 겨뤄요', 'day')}
@@ -5598,6 +5836,7 @@ function openPlayMenu() {
   </div>`, body => body.addEventListener('click', e => {
     const b = e.target.closest('[data-game]'); if (!b) return;
     closeSheet();
+    if (b.dataset.game === 'runner') return openRunner();
     if (b.dataset.game === 'duoTag' || b.dataset.game === 'duoTreasure') return openDuoSetup(b.dataset.game);
     if (b.dataset.game === 'pals') return openPals();
     if (b.dataset.game === 'tag' || b.dataset.game === 'treasure') return startRound(b.dataset.game);
