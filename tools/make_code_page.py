@@ -13,6 +13,7 @@ game = (ROOT / "www" / "index.html").read_text(encoding="utf-8")
 game_nocsp = re.sub(r'<meta http-equiv="Content-Security-Policy"[^>]*>\s*', "", game)
 single = game_nocsp.replace('<script src="vendor/three.min.js"></script>',
                       '<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>')
+single = single.replace("PEER_SRC = 'vendor/peerjs.min.js'", "PEER_SRC = 'https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js'")
 single = re.sub(r'@font-face\{font-family:"(Jua|Gowun Dodum)";src:url\("fonts/[^)]*\) format\("woff2"\);font-display:swap\}\n', "", single)
 single = single.replace('<link rel="preload" href="fonts/Jua-Regular.woff2" as="font" type="font/woff2" crossorigin>\n',
                         '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">\n')
