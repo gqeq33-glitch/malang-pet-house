@@ -379,6 +379,17 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
 .round-ui .icon-btn{pointer-events:auto}
 .round-big{position:absolute;top:30%;left:50%;transform:translateX(-50%);z-index:9;font-family:var(--display);font-size:64px;color:#fff;text-shadow:0 4px 0 var(--ink),0 0 20px rgba(91,69,80,.35);pointer-events:none;white-space:nowrap}
 .round-tip{position:absolute;top:96px;left:16px;right:16px;z-index:8;margin:0;text-align:center;font-family:var(--display);font-size:15px;color:#fff;text-shadow:0 2px 0 var(--ink);pointer-events:none}
+.room.duo .photo-btn,.room.duo .emote-btn,.room.duo .jump-mini,.room.duo .ride-btn,.room.duo .quest,.room.duo .bubble{display:none!important}
+.duo-joy{width:104px;height:104px;bottom:12px;z-index:8}
+.duo-joy i{width:44px;height:44px}
+.duo-joy.p1{left:10px}
+.duo-joy.p2{left:auto;right:10px}
+.duo-joy b{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-family:var(--display);font-weight:400;font-size:14px;background:var(--paper);border-radius:99px;padding:0 8px;box-shadow:0 0 0 2px var(--ink) inset}
+.ntag.p1{background:#FFD3DE}.ntag.p2{background:#CDEBFF}.ntag.pal{background:#FFF1A8}
+.pal-code{width:100%;min-height:72px;font:12px/1.4 ui-monospace,Consolas,monospace;border:0;border-radius:12px;padding:10px;box-shadow:0 0 0 2px var(--line) inset;background:var(--soft);color:var(--ink);user-select:text;-webkit-user-select:text;word-break:break-all;resize:vertical}
+.pal-table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
+.pal-table th,.pal-table td{padding:6px 4px;border-bottom:1.5px solid var(--line);text-align:center;font-weight:400}
+.pal-table td.me{font-family:var(--display)}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
 
@@ -1046,6 +1057,7 @@ const World = (() => {
   const RIDE3 = { scooter: { lift: .2, mul: 1.7 }, bike: { lift: .42, mul: 2.1 }, cloud: { lift: .4, mul: 2.5, hover: true }, rainbow: { lift: .4, mul: 2.8, hover: true } };
   let rideKind = null, rideG = null, rideWheels = [], rideLast = null;
   const RIDE_SCALE = 1.3;   // 펫 크기(변신하면 1.1~1.5배)에 맞춘 탈것 크기
+  let duo = null, pals = [];
   let stickers = [], onSticker = null, treasures = [], onTreasure = null, onTagged = null;
   const cache = {};
   const toon = c => cache[c] || (cache[c] = new T.MeshToonMaterial({ color: c, gradientMap: grad }));
@@ -1715,6 +1727,7 @@ const World = (() => {
 
   function animateVillage(dt) {
     const t = st.t;
+    movePals(dt);
     for (const n of Object.values(npcs)) {
       const p = n.parts, dx = st.x - (VX + n.x), dz = st.z - n.z, near = Math.hypot(dx, dz) < 3.2;
       n.t += dt;
@@ -2123,11 +2136,78 @@ const World = (() => {
       comps.push({ parts, idx: d.idx, x: st.x - 1 - k, z: st.z + 1, face: 0, t: rand(0, 5), walk: false, blink: rand(1, 4), jumpT: 0 });
     });
   }
+  // 이름표를 3D 위치에 맞춰 화면에 띄운다
+  function placeTag(tagEl, x, y, z) {
+    const v = new T.Vector3(x, y, z).project(camera), on = v.z < 1 && Math.abs(v.x) < 1.1 && Math.abs(v.y) < 1.1;
+    tagEl.hidden = !on;
+    if (on) { tagEl.style.left = (v.x + 1) / 2 * room.clientWidth + 'px'; tagEl.style.top = (1 - v.y) / 2 * room.clientHeight + 'px'; }
+  }
+  const newTag = (text, cls) => { const el = document.createElement('span'); el.className = 'ntag ' + cls; el.textContent = text; el.hidden = true; $('#tags').appendChild(el); return el; };
+  // 한 화면 둘이 하기: 2P 캐릭터. 1P는 원래 펫(st), 2P는 duo. 화면 밖으로 멀어지지 않게 거리를 제한한다
+  const DUO_LEASH = 13;
+  function duoStop() {
+    if (!duo) return;
+    scene.remove(duo.parts.root); duo.tag.remove(); duo.tag1.remove(); duo = null;
+    st.speedMul = 1;
+  }
+  function duoStart(d) {
+    duoStop();
+    const parts = buildPet(d.sp, null, 1, null); parts.dirt.visible = false; parts.setFace('happy');
+    parts.root.traverse(o => { o.userData.pet = false; });
+    scene.add(parts.root);
+    duo = { parts, x: st.x + 3, z: st.z, face: 0, faceGoal: 0, t: 0, walk: false, mul: 1, input: { x: 0, z: 0 }, tag: newTag('2P', 'p2'), tag1: newTag('1P', 'p1') };
+  }
+  function duoStep(dt) {
+    const d = duo, p = d.parts, l = Math.min(1, Math.hypot(d.input.x, d.input.z));
+    d.t += dt; d.walk = l > .1;
+    if (d.walk) {
+      const a = Math.atan2(d.input.x, d.input.z), sp = (2.2 + 3.4 * l) * dt * d.mul;
+      const [nx, nz] = clampVillage(d.x - VX + Math.sin(a) * sp, d.z + Math.cos(a) * sp);
+      d.x = nx + VX; d.z = nz; d.faceGoal = a;
+    }
+    const gap = Math.hypot(d.x - st.x, d.z - st.z);
+    if (gap > DUO_LEASH) { const k = (gap - DUO_LEASH) / gap; d.x += (st.x - d.x) * k; d.z += (st.z - d.z) * k; }
+    d.face = turn(d.face, d.faceGoal, dt * 9);
+    const cyc = d.t * 13, sq = d.walk ? Math.cos(cyc * 2) * .05 : Math.sin(d.t * 2.4) * .02;
+    p.root.position.set(d.x, d.walk ? Math.abs(Math.sin(cyc)) * .14 : 0, d.z);
+    p.root.rotation.set(0, d.face, d.walk ? Math.sin(cyc) * .07 : 0); p.body.rotation.x = LOOK_UP; p.body.scale.set(1 + sq, 1 - sq, 1 + sq);
+    if (p.footL) { p.footL.position.y = p.footBase + (d.walk ? Math.max(0, Math.sin(cyc)) * .12 : 0); p.footR.position.y = p.footBase + (d.walk ? Math.max(0, -Math.sin(cyc)) * .12 : 0); }
+    placeTag(d.tag, d.x, 2.6, d.z); placeTag(d.tag1, st.x, 2.6, st.z);
+  }
+  // 친구 코드로 놀러 온 펫: 마을 곳곳을 천천히 돌아다닌다. 눌러서 기록을 본다
+  const PAL_HOMES = [[-3, 6], [5, 5], [-8, 0], [12, 3], [2, 11], [15, 9], [-10, 9], [20, 1]];
+  function setPals(list) {
+    if (!ok) return;
+    pals.forEach(q => { villageG.remove(q.parts.root); q.tag.remove(); const at = pickV.indexOf(q.parts.root); if (at >= 0) pickV.splice(at, 1); });
+    pals = list.map((d, i) => {
+      const parts = buildPet(d.s, d.h, d.f, d.tint, d.b, d.k); parts.dirt.visible = false; parts.setFace('happy');
+      parts.root.traverse(o => { o.userData.pet = false; o.userData.use = 'pal:' + i; });
+      villageG.add(parts.root); pickV.push(parts.root);
+      const [hx, hz] = clampVillage(...PAL_HOMES[i % PAL_HOMES.length]);
+      return { parts, tag: newTag('🤝 ' + d.n, 'pal'), hx, hz, x: hx, z: hz, tx: hx, tz: hz, wt: rand(0, 3), face: 0, t: rand(0, 5), walk: false };
+    });
+  }
+  function movePals(dt) {
+    for (const q of pals) {
+      q.t += dt; q.wt -= dt;
+      const dx = st.x - (VX + q.x), dz = st.z - q.z, near = Math.hypot(dx, dz) < 3;
+      if (q.wt <= 0) { [q.tx, q.tz] = clampVillage(q.hx + rand(-2.5, 2.5), q.hz + rand(-2, 2)); q.wt = rand(3, 7); }
+      const ex = q.tx - q.x, ez = q.tz - q.z, d = Math.hypot(ex, ez);
+      q.walk = !near && d > .05;
+      let goal = near ? Math.atan2(dx, dz) : 0;
+      if (q.walk) { const sp = Math.min(d, 1.1 * dt); q.x += ex / d * sp; q.z += ez / d * sp; goal = Math.atan2(ex, ez); }
+      q.face = turn(q.face, goal, dt * 6);
+      const cyc = q.t * 9, p = q.parts, sq = q.walk ? Math.cos(cyc * 2) * .04 : Math.sin(q.t * 2.2) * .02;
+      p.root.position.set(VX + q.x, q.walk ? Math.abs(Math.sin(cyc)) * .12 : 0, q.z);
+      p.root.rotation.set(0, q.face, q.walk ? Math.sin(cyc) * .06 : 0); p.body.rotation.x = LOOK_UP; p.body.scale.set(1 + sq, 1 - sq, 1 + sq);
+      placeTag(q.tag, VX + q.x, 2.6, q.z);
+    }
+  }
   function moveCompanions(dt) {
     const last = trail[trail.length - 1];
     if (!last || Math.hypot(st.x - last[0], st.z - last[1]) > .25) { trail.push([st.x, st.z]); if (trail.length > 80) trail.shift(); }
     comps.forEach((c, k) => {
-      const p = c.parts, vis = st.area !== 'obby';
+      const p = c.parts, vis = st.area !== 'obby' && !duo;
       p.root.visible = vis; if (!vis) return;
       // 펫이 지나간 길을 그대로 따라오기 때문에 문을 지나 방을 옮겨도 벽을 뚫지 않는다
       const back = trail[trail.length - 1 - 7 * (k + 1)] || [st.x - Math.sin(st.face) * 1.4, st.z - Math.cos(st.face) * 1.4];
@@ -2170,6 +2250,7 @@ const World = (() => {
   function setArea(a) {
     trail = [];
     if (a !== 'village' && rideKind) setRide(null);
+    if (a !== 'village') { duoStop(); pals.forEach(q => { q.tag.hidden = true; }); }
     if (a !== 'village') for (const n of Object.values(npcs)) { n.follow = false; n.hidden = false; n.racing = false; }
     bushMarks.forEach(m => { m.visible = false; });
     st.area = a; houseG.visible = a === 'house'; villageG.visible = a === 'village'; if (obbyG) obbyG.visible = a === 'obby';
@@ -2221,7 +2302,7 @@ const World = (() => {
     if (race) return;
     if ((drive.x || drive.z) && p.hatched && !p.asleep && !bathing && !talking && st.area !== 'obby') {
       // 아이가 직접 조종하면 자동 걷기·가구 자리는 바로 풀고 그쪽으로 달린다
-      const l = Math.min(1, Math.hypot(drive.x, drive.z)), a = Math.atan2(drive.x, drive.z), sp = (2.2 + 3.4 * l) * dt * (rideKind ? RIDE3[rideKind].mul : 1);
+      const l = Math.min(1, Math.hypot(drive.x, drive.z)), a = Math.atan2(drive.x, drive.z), sp = (2.2 + 3.4 * l) * dt * (rideKind ? RIDE3[rideKind].mul : 1) * (st.speedMul ?? 1);
       st.path = []; st.mode = 'idle'; st.arrive = null; st.at = null; st.lift = 0; st.idleT = 6; st.driving = true; st.run = l > .55;
       let nx = st.x + Math.sin(a) * sp, nz = st.z + Math.cos(a) * sp;
       if (st.area === 'village') { [nx, nz] = clampVillage(nx - VX, nz); nx += VX; }
@@ -2231,9 +2312,9 @@ const World = (() => {
       return;
     }
     st.driving = false;
-    const free = p.hatched && !p.asleep && !bathing && !gameOn && !scrim && !talking && !document.querySelector('.mini, .race-ui') && !hide && st.mode === 'idle' && !st.trick && st.eatT <= 0;
+    const free = !st.noAuto && p.hatched && !p.asleep && !bathing && !gameOn && !scrim && !talking && !document.querySelector('.mini, .race-ui') && !hide && st.mode === 'idle' && !st.trick && st.eatT <= 0;
     if (st.mode === 'walk' && st.path.length) {
-      const [tx, tz] = st.path[0], dx = tx - st.x, dz = tz - st.z, d = Math.hypot(dx, dz), sp = (st.run ? 5 : 2.4) * dt * (rideKind ? RIDE3[rideKind].mul : 1);
+      const [tx, tz] = st.path[0], dx = tx - st.x, dz = tz - st.z, d = Math.hypot(dx, dz), sp = (st.run ? 5 : 2.4) * dt * (rideKind ? RIDE3[rideKind].mul : 1) * (st.speedMul ?? 1);
       if (d <= sp) {
         st.x = tx; st.z = tz; st.path.shift();
         if (!st.path.length) { st.mode = 'idle'; st.idleT = rand(2.5, 5); st.faceGoal = 0; const cb = st.arrive; st.arrive = null; cb && cb(); }
@@ -2333,10 +2414,12 @@ const World = (() => {
     else for (let left = dt; left > 1e-4; left -= .05) think(Math.min(.05, left), p);
     animate(Math.min(dt, .1), p);
     moveCompanions(Math.min(dt, .1));
+    if (duo) duoStep(Math.min(dt, .1));
     for (let i = treasures.length - 1; i >= 0; i--) {
       const tr = treasures[i]; if (st.area !== 'village') break;
       tr.position.y = .65 + Math.sin(st.t * 4 + i) * .12; tr.material.rotation = Math.sin(st.t * 3 + i) * .2;
-      if (Math.hypot(tr.position.x - st.x, tr.position.z - st.z) < 1.2) { villageG.remove(tr); treasures.splice(i, 1); onTreasure && onTreasure(tr.userData.idx); }
+      const by1 = Math.hypot(tr.position.x - st.x, tr.position.z - st.z) < 1.2, by2 = duo && Math.hypot(tr.position.x - duo.x, tr.position.z - duo.z) < 1.2;
+      if (by1 || by2) { villageG.remove(tr); treasures.splice(i, 1); onTreasure && onTreasure(tr.userData.idx, by1 ? 1 : 2); }
     }
     for (let i = stickers.length - 1; i >= 0; i--) {
       const sk = stickers[i], u = sk.userData; if (u.area !== st.area) continue;
@@ -2375,12 +2458,15 @@ const World = (() => {
     const vill = st.area === 'village', inOb = st.area === 'obby';
     if (inOb) { st.camX += (st.x - st.camX) * Math.min(1, dt * 4); st.camZ += (st.z - st.camZ) * Math.min(1, dt * 4); st.camY = (st.camY || 0) + (st.lift - (st.camY || 0)) * Math.min(1, dt * 3); }
     else {
-      st.camX += (clamp(st.x, vill ? VX - 12.5 : -4.4, vill ? VX + 27.6 : 4.4) - st.camX) * Math.min(1, dt * 2.5);
-      st.camZ += (clamp(st.z, vill ? -6.5 : -4.4, vill ? 15.5 : 5) - st.camZ) * Math.min(1, dt * 2.5);
+      const fx = duo ? (st.x + duo.x) / 2 : st.x, fz = duo ? (st.z + duo.z) / 2 : st.z;
+      st.camX += (clamp(fx, vill ? VX - 12.5 : -4.4, vill ? VX + 27.6 : 4.4) - st.camX) * Math.min(1, dt * 2.5);
+      st.camZ += (clamp(fz, vill ? -6.5 : -4.4, vill ? 15.5 : 5) - st.camZ) * Math.min(1, dt * 2.5);
       st.camY = 0;
     }
     sun.position.set(st.camX - 8, 16 + st.camY, st.camZ + 10); sun.target.position.set(st.camX, st.camY, st.camZ); sun.target.updateMatrixWorld();
-    const dist = (camera.aspect < .8 ? 8.8 : 8.6) * (vill ? 1.3 : inOb ? 1.15 : 1);
+    const dist0 = (camera.aspect < .8 ? 8.8 : 8.6) * (vill ? 1.3 : inOb ? 1.15 : 1);
+    if (duo) { const want = Math.hypot(st.x - duo.x, st.z - duo.z) * 1.55 / Math.min(camera.aspect, 1), goal = Math.max(1, want / dist0); st.camZoom = (st.camZoom || 1) + (goal - (st.camZoom || 1)) * Math.min(1, dt * 2); } else st.camZoom = 1;
+    const dist = dist0 * st.camZoom;
     camera.position.set(st.camX, st.camY + dist * .72, st.camZ + dist * .98);
     camera.lookAt(st.camX, st.camY + .8, st.camZ - .6);
     renderer.render(scene, camera);
@@ -2633,6 +2719,18 @@ const World = (() => {
     },
     raceTap() { if (race && race.t >= 0) race.boost = Math.min(5, race.boost + .7); },
     drive,
+    duoStart, duoStop,
+    get duoInput() { return duo ? duo.input : null; },
+    duoSpeeds(p1, p2) { st.speedMul = p1; if (duo) duo.mul = p2; },
+    duoDist() { return duo ? Math.hypot(st.x - duo.x, st.z - duo.z) : Infinity; },
+    duoPlace() {
+      if (!duo) return;
+      const a = clampVillage(-5, 5), b = clampVillage(5, 5);
+      st.x = VX + a[0]; st.z = a[1]; st.path = []; st.mode = 'idle'; st.at = null; st.lift = 0; st.arrive = null; st.face = st.faceGoal = 0;
+      duo.x = VX + b[0]; duo.z = b[1]; duo.input.x = duo.input.z = 0; duo.face = duo.faceGoal = 0;
+    },
+    setNoAuto(v) { st.noAuto = !!v; if (v) { st.path = []; st.mode = 'idle'; st.arrive = null; } },
+    setPals,
     // 술래잡기: 고른 친구들이 달아난다. 잡히면 cb(id)
     tagStart(ids, cb) {
       onTagged = cb;
@@ -2716,6 +2814,7 @@ World.onTap = hit => {
   if (!p.hatched) return say(u.use === 'door' ? '알에서 깨어나면 같이 나가요!' : idleLine(), 3000);
   if (talking) return;
   if (u.comp !== undefined) { World.compJump(u.comp); return switchPet(u.comp); }
+  if (u.use && u.use.startsWith('pal:')) return round ? null : openPal(+u.use.slice(4));
   if (u.use === 'stand') return goStand();
   if (u.npc) return round ? null : World.hidden(u.npc) ? hideGuess(-1) : talkTo(u.npc);
   if (u.use === 'home') return World.goHome();
@@ -2747,16 +2846,19 @@ function applyDriveKeys() {
   const d = World.drive; d.x = (driveKeys.r ? 1 : 0) - (driveKeys.l ? 1 : 0); d.z = (driveKeys.d ? 1 : 0) - (driveKeys.u ? 1 : 0);
   const l = Math.hypot(d.x, d.z); if (l > 1) { d.x /= l; d.z /= l; }
 }
+const P2_MAP = { ArrowLeft: 'l', ArrowRight: 'r', ArrowUp: 'u', ArrowDown: 'd' };
 window.addEventListener('keydown', e => {
   if (driveBlocked()) return;
+  if (round && round.duo && P2_MAP[e.key]) { e.preventDefault(); p2Keys[P2_MAP[e.key]] = true; return applyP2Keys(); }
   const k = DRIVE_MAP[e.key];
   if (k) { e.preventDefault(); driveKeys[k] = true; return applyDriveKeys(); }
   if ((e.key === 'r' || e.key === 'R') && !e.repeat) { e.preventDefault(); return toggleRide(); }
   if (e.key === ' ' && (document.activeElement === document.body || document.activeElement === $('#world'))) { e.preventDefault(); if (!e.repeat) doJump(); }
 });
-window.addEventListener('keyup', e => { const k = DRIVE_MAP[e.key]; if (k && driveKeys[k]) { driveKeys[k] = false; applyDriveKeys(); } });
+window.addEventListener('keyup', e => { if (P2_MAP[e.key] && p2Keys[P2_MAP[e.key]]) { p2Keys[P2_MAP[e.key]] = false; applyP2Keys(); } const k = DRIVE_MAP[e.key]; if (k && driveKeys[k]) { driveKeys[k] = false; applyDriveKeys(); } });
 window.addEventListener('blur', () => { for (const k in driveKeys) driveKeys[k] = false; applyDriveKeys(); });
 function doJump() {
+  if (round && round.duo) return;
   const p = P(); if (!p || !p.hatched || p.asleep || bathing || World.area() === 'obby') return;
   World.trick('jump'); sfx('pop');
 }
@@ -3359,7 +3461,7 @@ function startRound(kind) {
   if (following) { following = null; World.setFollow(null); }
   if (World.riding()) World.setRide(null);
   const tag = kind === 'tag', total = tag ? TAG_FRIENDS.length : 8, sec = 45;
-  round = { kind, total, got: 0, left: sec, on: false };
+  round = { kind, total, got: 0, left: sec, on: false }; World.setNoAuto(true);
   const ui = document.createElement('div'); ui.className = 'round-ui';
   ui.innerHTML = `<span class="pill">${tag ? '🏃 술래잡기' : '🎁 보물찾기'}</span><span class="pill">⏱ <b id="rdTime">${sec}</b></span><span class="pill">${tag ? '잡음' : '찾음'} <b id="rdGot">0</b>/${total}</span><button class="icon-btn" id="rdQuit" aria-label="그만하기">✕</button>`;
   const tip = document.createElement('p'); tip.className = 'round-tip';
@@ -3397,7 +3499,7 @@ function goOutsideThen(cb) {
 }
 function endRound(quit) {
   const r = round; if (!r) return;
-  round = null; clearInterval(r.timer);
+  round = null; clearInterval(r.timer); World.setNoAuto(false);
   World.tagStop(); World.clearTreasure();
   [r.ui, r.tip, r.big].forEach(el => el && el.remove());
   if (quit) { say('괜찮아! 하고 싶을 때 또 하자!', 2500); return renderHUD(); }
@@ -3417,6 +3519,221 @@ function endRound(quit) {
   card.querySelector('#rdAgain').addEventListener('click', () => { close(); startRound(r.kind); });
   card.querySelector('#rdAgain').focus({ preventScroll: true });
 }
+/* ---------- 한 화면 둘이 하기: 서버·계정 없이 같은 기기에서 친구·형제와 대결 ----------
+   술래잡기: 번갈아 술래를 하고 오래 버틴 쪽이 이긴다. 보물 대결: 상자 12개를 더 많이 주운 쪽이 이긴다 */
+const DUO_TAG_SEC = 30, DUO_TREASURE_SEC = 40, DUO_BOXES = 12;
+const p2Keys = {};
+function applyP2Keys() { const d = World.duoInput; if (!d) return; d.x = (p2Keys.r ? 1 : 0) - (p2Keys.l ? 1 : 0); d.z = (p2Keys.d ? 1 : 0) - (p2Keys.u ? 1 : 0); const l = Math.hypot(d.x, d.z); if (l > 1) { d.x /= l; d.z /= l; } }
+function openDuoSetup(kind) {
+  const cards = SPECIES_ORDER.map(sp => `<button class="item${(S.duoSp || 'puppy') === sp ? ' on' : ''}" data-duosp="${sp}"><span class="art">${petSVG(sp, { mood: 'happy', stage: 'kid' })}</span><span class="nm">${SPECIES[sp].name}</span></button>`).join('');
+  openSheet(kind === 'duoTag' ? '🏃 둘이 술래잡기' : '🎁 둘이 보물 대결', `<p class="msub">${kind === 'duoTag' ? `번갈아 술래를 해요. 술래를 피해 ${DUO_TAG_SEC}초 동안 오래 버틴 쪽이 이겨요.` : `상자 ${DUO_BOXES}개를 ${DUO_TREASURE_SEC}초 안에 더 많이 주운 쪽이 이겨요.`}<br>1P는 지금 내 펫이에요. 키보드는 <b>1P WASD · 2P 방향키</b>, 터치 화면은 양쪽 동그라미로 움직여요.</p><h3 class="wear-h">2P 친구는 누구로 할까요?</h3><div class="grid">${cards}</div>`,
+    body => body.addEventListener('click', e => { const b = e.target.closest('[data-duosp]'); if (b) { S.duoSp = b.dataset.duosp; persist(); startDuo(kind); } }));
+}
+function duoJoy(cls, label, inp) {
+  const joy = document.createElement('div'); joy.className = 'joy duo-joy ' + cls; joy.innerHTML = `<b>${label}</b><i></i>`;
+  const knob = joy.querySelector('i'); let id = null;
+  const set = e => { const r = joy.getBoundingClientRect(), R = r.width / 2; let x = (e.clientX - r.left - R) / R, z = (e.clientY - r.top - R) / R; const l = Math.hypot(x, z); if (l > 1) { x /= l; z /= l; } inp.x = x; inp.z = z; knob.style.transform = `translate(${x * R * .5}px, ${z * R * .5}px)`; };
+  joy.addEventListener('pointerdown', e => { e.preventDefault(); id = e.pointerId; try { joy.setPointerCapture(id); } catch (err) {} set(e); });
+  joy.addEventListener('pointermove', e => { if (e.pointerId === id) set(e); });
+  const end = () => { id = null; inp.x = 0; inp.z = 0; knob.style.transform = ''; };
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(t => joy.addEventListener(t, end));
+  return joy;
+}
+function startDuo(kind) {
+  const p = P();
+  if (!p || !p.hatched || p.asleep) return;
+  if (p.energy < 15) return say('너무 졸려서 못 뛰겠어요… 먼저 재워 주세요', 3000);
+  closeSheet();
+  if (World.area() !== 'village') { say('마을로 나가서 해요!', 2500); return World.area() === 'house' ? goOutsideThen(() => startDuo(kind)) : null; }
+  if (round) return;
+  if (talking) closeTalk();
+  if (following) { following = null; World.setFollow(null); }
+  if (World.riding()) World.setRide(null);
+  World.setNoAuto(true); World.duoStart({ sp: S.duoSp || 'puppy' }); World.duoPlace();
+  room.classList.add('duo');
+  const ui = document.createElement('div'); ui.className = 'round-ui';
+  const tip = document.createElement('p'); tip.className = 'round-tip';
+  const big = document.createElement('div'); big.className = 'round-big';
+  ui.innerHTML = `<span class="pill" id="duoLabel"></span><span class="pill">⏱ <b id="rdTime">0</b></span><span class="pill" id="duoScore"></span><button class="icon-btn" id="rdQuit" aria-label="그만하기">✕</button>`;
+  const joys = matchMedia('(pointer: coarse)').matches ? [duoJoy('p1', '1P', World.drive), duoJoy('p2', '2P', World.duoInput)] : [];
+  room.append(ui, tip, big, ...joys);
+  round = { duo: true, kind, ui, tip, big, joys, timers: [], score: [0, 0], held: [0, 0], turn: 0 };
+  ui._close = () => endDuo(true);
+  ui.querySelector('#rdQuit').addEventListener('click', () => endDuo(true));
+  kind === 'duoTag' ? duoTagTurn() : duoTreasure();
+  renderHUD();
+}
+// 3, 2, 1 뒤 go 실행. 그사이 그만두면 실행하지 않는다
+function duoCount(go) {
+  const r = round; let k = 3;
+  const step = () => {
+    if (round !== r) return;
+    if (k > 0) { r.big.textContent = k; sfx('pop'); k--; r.timers.push(setTimeout(step, 700)); return; }
+    r.big.textContent = '출발!'; sfx('up'); r.timers.push(setTimeout(() => { r.big.textContent = ''; }, 700));
+    go();
+  };
+  step();
+}
+function duoTagTurn() {
+  const r = round, chaser = r.turn === 0 ? 1 : 2;
+  World.duoPlace();
+  World.duoSpeeds(0, 0);      // 출발 신호 전에는 둘 다 멈춘다
+  $('#duoLabel').textContent = `술래: ${chaser}P`;
+  $('#duoScore').textContent = r.turn ? `1P ${r.held[0].toFixed(1)}초` : '1판';
+  $('#rdTime').textContent = DUO_TAG_SEC;
+  r.tip.textContent = `${chaser}P가 술래! ${chaser === 1 ? 2 : 1}P는 ${DUO_TAG_SEC}초 동안 도망가요`;
+  duoCount(() => {
+    World.duoSpeeds(chaser === 1 ? 1 : .88, chaser === 2 ? 1 : .88);      // 술래가 조금 더 빠르다
+    const t0 = performance.now();
+    const iv = setInterval(() => {
+      if (round !== r) return clearInterval(iv);
+      if (document.hidden) return;
+      const sec = (performance.now() - t0) / 1000, el = $('#rdTime');
+      if (el) el.textContent = Math.max(0, Math.ceil(DUO_TAG_SEC - sec));
+      const caught = World.duoDist() < 1.4;
+      if (!caught && sec < DUO_TAG_SEC) return;
+      clearInterval(iv);
+      const runner = chaser === 1 ? 1 : 0;      // held 칸: 0 = 1P, 1 = 2P
+      r.held[runner] = Math.min(sec, DUO_TAG_SEC);
+      World.duoSpeeds(0, 0);
+      if (caught) { sfx('coin'); r.big.textContent = '잡았다!'; } else { sfx('up'); r.big.textContent = '다 버텼어요!'; }
+      r.timers.push(setTimeout(() => {
+        if (round !== r) return;
+        r.big.textContent = ''; r.turn++;
+        if (r.turn < 2) return duoTagTurn();
+        endDuo(false);
+      }, 1200));
+    }, 80);
+    r.timers.push(iv);
+  });
+}
+function duoTreasure() {
+  const r = round;
+  World.duoSpeeds(0, 0);
+  $('#duoLabel').textContent = '보물 대결';
+  const show = () => { const el = $('#duoScore'); if (el) el.textContent = `1P ${r.score[0]} : ${r.score[1]} 2P`; };
+  show(); $('#rdTime').textContent = DUO_TREASURE_SEC;
+  r.tip.textContent = '🎁 상자로 달려가요. 먼저 닿는 쪽이 가져가요!';
+  duoCount(() => {
+    World.duoSpeeds(1, 1);
+    let left = DUO_BOXES;
+    World.spawnTreasure(shuffle(TREASURE_SPOTS.map((c, i) => [i, c[0], c[1]])).slice(0, DUO_BOXES), (idx, who) => {
+      if (round !== r) return;
+      r.score[who - 1]++; left--; sfx('coin'); show();
+      if (left <= 0) endDuo(false);
+    });
+    const t0 = performance.now();
+    const iv = setInterval(() => {
+      if (round !== r) return clearInterval(iv);
+      if (document.hidden) return;
+      const sec = (performance.now() - t0) / 1000, el = $('#rdTime');
+      if (el) el.textContent = Math.max(0, Math.ceil(DUO_TREASURE_SEC - sec));
+      if (sec >= DUO_TREASURE_SEC) { clearInterval(iv); endDuo(false); }
+    }, 200);
+    r.timers.push(iv);
+  });
+}
+function endDuo(quit) {
+  const r = round; if (!r || !r.duo) return;
+  round = null;
+  r.timers.forEach(t => { clearTimeout(t); clearInterval(t); });
+  World.clearTreasure(); World.duoStop(); World.setNoAuto(false);
+  World.drive.x = World.drive.z = 0; for (const k in p2Keys) p2Keys[k] = false;
+  room.classList.remove('duo');
+  [r.ui, r.tip, r.big, ...r.joys].forEach(el => el && el.remove());
+  renderHUD();
+  if (quit) return say('다음에 또 같이 놀자!', 2500);
+  const tag = r.kind === 'duoTag', a = tag ? r.held[0] : r.score[0], b = tag ? r.held[1] : r.score[1];
+  const same = Math.abs(a - b) < (tag ? .05 : .5), title = same ? '🤝 무승부! 둘 다 최고' : `🏆 ${a > b ? '1P' : '2P'} 승리!`;
+  const fmt = v => tag ? `${v.toFixed(1)}초` : `${v}개`;
+  change({ fun: 15, energy: -6 }); addXP(8); mission('friend'); badge('duo');
+  const coins = boundedReward('duoGame', 20);
+  confetti(90); sfx('up'); render(); persist();
+  const card = document.createElement('div'); card.className = 'g-card'; card.id = 'rdResult';
+  card.innerHTML = `<h3>${title}</h3><div class="big-score" style="font-size:34px">1P ${fmt(a)} : ${fmt(b)} 2P</div><p>${coins ? `<i class="coin"></i> ${coins}코인 · ` : ''}경험치 8 · 행복 +15</p>
+    <div style="display:flex;gap:8px"><button class="candy primary" id="rdAgain" style="flex:1">한 판 더</button><button class="candy" id="rdClose" style="flex:1">닫기</button></div>`;
+  room.appendChild(card);
+  const close = () => card.remove();
+  card._close = close;
+  card.querySelector('#rdClose').addEventListener('click', close);
+  card.querySelector('#rdAgain').addEventListener('click', () => { close(); startDuo(r.kind); });
+  card.querySelector('#rdAgain').focus({ preventScroll: true });
+}
+
+/* ---------- 친구 코드: 서버 없이 코드 글자를 주고받으면 친구 펫이 내 마을에 놀러 오고, 코스 기록으로 겨룬다 ----------
+   코드에는 펫 이름·모습·칭호·코스 기록만 들어간다. 받은 코드는 믿지 않고 모든 값을 검사해서 저장한다 (S.pals, 최대 8명) */
+const PAL_PREFIX = 'MALANGF1.', PAL_MAX = 8;
+function myPalId() { if (!S.palId) { S.palId = Math.random().toString(36).slice(2, 10); persist(); } return S.palId; }
+function makePalCode() {
+  const p = P(), best = {};
+  for (const k in S.best) if (/^obby\d?$/.test(k) && S.best[k] > 0) best[k] = +S.best[k].toFixed(1);
+  const json = JSON.stringify({ id: myPalId(), n: p.name, s: p.sp, h: p.hat || null, d: p.dye || null, b: p.back || null, k: p.neck || null, f: formOf(p.level), t: p.title || null, best });
+  return PAL_PREFIX + toB64(json) + '.' + hashStr(json);
+}
+function readPalCode(code) {
+  const c = String(code || '').replace(/\s+/g, '');
+  if (!c.startsWith(PAL_PREFIX)) return { err: '친구 코드가 아니에요. MALANGF1. 로 시작하는 글자 전체를 붙여 넣어 주세요.' };
+  const [b64, sum] = c.slice(PAL_PREFIX.length).split('.');
+  let json, d;
+  try { json = fromB64(b64); d = JSON.parse(json); } catch (e) { return { err: '코드 일부가 빠진 것 같아요. 다시 복사해 주세요.' }; }
+  if (hashStr(json) !== sum || !d || typeof d !== 'object') return { err: '코드 일부가 바뀌었거나 빠졌어요. 다시 복사해 주세요.' };
+  // 받은 값은 믿지 않는다: 'constructor' 같은 내장 이름이 통과하지 않게 자기 항목만 인정한다
+  const has = (o, k) => typeof k === 'string' && Object.prototype.hasOwnProperty.call(o, k);
+  if (!has(SPECIES, d.s) || typeof d.id !== 'string') return { err: '이 코드는 읽을 수 없어요.' };
+  if (d.id === S.palId) return { err: '이건 내 코드예요. 친구의 코드를 붙여 넣어 주세요.' };
+  const best = {};
+  if (d.best && typeof d.best === 'object') for (const k of Object.keys(d.best)) if (/^obby\d?$/.test(k) && +d.best[k] > 0 && +d.best[k] < 100000) best[k] = +d.best[k];
+  const wearOk = (v, slot) => has(WEAR, v) && WEAR[v].slot === slot ? v : null;
+  return { pal: { id: d.id.replace(/[^a-z0-9]/gi, '').slice(0, 12), n: cleanName(d.n, SPECIES[d.s].name), s: d.s, h: has(HATS, d.h) ? d.h : null, d: has(DYES, d.d) ? d.d : null, b: wearOk(d.b, 'back'), k: wearOk(d.k, 'neck'), f: clamp(d.f | 0, 0, FORMS.length - 1), t: TITLES.some(t => t.id === d.t) ? d.t : null, best } };
+}
+const palList = () => (Array.isArray(S.pals) ? S.pals : []);
+function syncPals() { World.setPals(palList().map(q => Object.assign({}, q, { tint: (DYES[q.d] || DYES.base)[1] }))); }
+// 이 단계에서 내 친구들 중 제일 빠른 기록
+function palBest(key) { let b = null; for (const q of palList()) if (q.best[key] && (!b || q.best[key] < b.t)) b = { n: q.n, t: q.best[key] }; return b; }
+function openPals() {
+  const code = makePalCode(), list = palList();
+  const rows = list.map((q, i) => `<button class="dex-card" data-pal="${i}"><span class="art">${petSVG(q.s, { mood: 'happy', stage: 'kid', hat: q.h })}</span><span class="txt"><span class="t1">${escapeHTML(q.n)}</span><br><span class="t2">${SPECIES[q.s].kind}${q.t ? ' · ' + escapeHTML(titleName(q.t)) : ''}</span></span><span class="go">기록 보기</span></button>`).join('');
+  openSheet('🤝 친구 코드', `<p class="msub">코드를 주고받으면 친구 펫이 내 마을에 놀러 오고, 점프 코스 기록으로 겨룰 수 있어요. 코드에는 <b>펫 이름·모습·칭호·코스 기록</b>만 들어 있어요. 아는 친구와, 보호자와 함께 주고받아 주세요.</p>
+    <h3 class="wear-h">내 코드</h3><textarea class="pal-code" id="palMine" readonly aria-label="내 친구 코드">${escapeHTML(code)}</textarea><button class="candy primary" id="palCopy" style="width:100%;margin-top:8px">📋 내 코드 복사</button>
+    <h3 class="wear-h">친구 코드 넣기 (${list.length}/${PAL_MAX})</h3><textarea class="pal-code" id="palIn" aria-label="친구 코드 붙여 넣기" placeholder="MALANGF1. 로 시작하는 글자"></textarea><button class="candy" id="palAdd" style="width:100%;margin-top:8px">🤝 마을로 초대하기</button><div id="palMsg" role="status"></div>
+    ${list.length ? `<h3 class="wear-h">놀러 온 친구</h3><div class="dex">${rows}</div>` : ''}`,
+    body => {
+      body.querySelector('#palCopy').addEventListener('click', () => {
+        const ta = body.querySelector('#palMine'), fallback = () => { ta.focus(); ta.select(); toast('글자가 선택됐어요. 길게 눌러 복사해 주세요'); };
+        try { navigator.clipboard.writeText(code).then(() => toast('내 코드를 복사했어요'), fallback); } catch (e) { fallback(); }
+      });
+      body.querySelector('#palAdd').addEventListener('click', () => {
+        const r = readPalCode(body.querySelector('#palIn').value), msg = body.querySelector('#palMsg');
+        if (r.err) { msg.innerHTML = `<p class="warn">${escapeHTML(r.err)}</p>`; return; }
+        S.pals = palList();
+        const at = S.pals.findIndex(q => q.id === r.pal.id);
+        if (at >= 0) S.pals[at] = r.pal;
+        else if (S.pals.length >= PAL_MAX) { msg.innerHTML = `<p class="warn">친구는 ${PAL_MAX}명까지 초대할 수 있어요. 한 명을 먼저 지워 주세요.</p>`; return; }
+        else S.pals.push(r.pal);
+        syncPals(); sfx('up'); confetti(50); boundedReward('palAdd', 20);
+        toast(`🤝 ${r.pal.n}${at >= 0 ? ' 기록을 새로 받았어요' : '이(가) 마을에 놀러 왔어요!'}`);
+        persist(); openPals();
+      });
+      body.addEventListener('click', e => { const b = e.target.closest('[data-pal]'); if (b) openPal(+b.dataset.pal); });
+    });
+}
+function openPal(i) {
+  const q = palList()[i]; if (!q) return openPals();
+  const rows = World.obbyCourses().map((c, k) => { const key = obbyKey(k), mine = S.best[key], his = q.best[key], win = mine && (!his || mine < his), lose = his && (!mine || his < mine); return `<tr><td>${k + 1}단계</td><td class="me">${mine ? mine.toFixed(1) + '초' : '-'}${win ? ' 🏆' : ''}</td><td class="me">${his ? his.toFixed(1) + '초' : '-'}${lose ? ' 🏆' : ''}</td></tr>`; }).join('');
+  openSheet(`🤝 ${escapeHTML(q.n)}`, `<div class="pick-stage" style="margin-bottom:10px"><div class="big" style="width:120px">${petSVG(q.s, { mood: 'happy', stage: 'kid', hat: q.h })}</div><p class="pick-name">${escapeHTML(q.n)}</p><span class="pick-kind">${SPECIES[q.s].kind}${q.t ? ' · ' + escapeHTML(titleName(q.t)) : ''}</span></div>
+    <table class="pal-table"><thead><tr><th>점프 코스</th><th>나</th><th>${escapeHTML(q.n)}</th></tr></thead><tbody>${rows}</tbody></table>
+    <div style="display:flex;gap:8px;margin-top:12px"><button class="candy primary" id="palHi" style="flex:1">👋 인사하기</button><button class="candy" id="palBack" style="flex:1">‹ 목록</button><button class="candy" id="palDel" style="flex:1">지우기</button></div>
+    <p class="fine" style="margin-top:8px">새 기록을 받으려면 친구의 새 코드를 다시 넣어 주세요.</p>`, body => {
+    body.querySelector('#palHi').addEventListener('click', () => { closeSheet(); World.trick('jump'); sfx('pop'); burst(['👋', '💖'], 4, -.2); change({ fun: 3 }); say(`${q.n} 안녕! 같이 놀자!`, 3000); render(); });
+    body.querySelector('#palBack').addEventListener('click', () => openPals());
+    const del = body.querySelector('#palDel');
+    del.addEventListener('click', () => {
+      if (!del.dataset.armed) { del.dataset.armed = '1'; del.textContent = '한 번 더'; setTimeout(() => { if (del.isConnected) { delete del.dataset.armed; del.textContent = '지우기'; } }, 3000); return; }
+      S.pals.splice(i, 1); syncPals(); persist(); openPals();
+    });
+  });
+}
+
 // 광장 솜솜은 술래잡기, 도서관 꼬깔 선생님은 보물찾기를 연다
 {
   const s0 = SPECIAL.somsom, k0 = SPECIAL.kokkal;
@@ -3675,7 +3992,7 @@ function readBackup(code) {
   let json, d;
   try { json = fromB64(b64); d = JSON.parse(json); } catch (e) { return { err: '코드 일부가 빠진 것 같아요. 처음부터 끝까지 다시 복사해 주세요.' }; }
   if (hashStr(json) !== sum) return { err: '코드 일부가 바뀌었거나 빠졌어요. 다시 복사해 주세요.' };
-  if (!d || d.v !== 1 || !Array.isArray(d.pets) || !d.pets.length || !d.pets.every(q => q && SPECIES[q.sp])) return { err: '이 코드에는 펫 기록이 없어요.' };
+  if (!d || d.v !== 1 || !Array.isArray(d.pets) || !d.pets.length || !d.pets.every(q => q && Object.prototype.hasOwnProperty.call(SPECIES, q.sp))) return { err: '이 코드에는 펫 기록이 없어요.' };
   return { data: d };
 }
 function openBackupOut() {
@@ -3990,8 +4307,8 @@ function startObby(stage) {
 function openObbySelect() {
   const list = World.obbyCourses(), done = list.filter((c, i) => S.best[obbyKey(i)]).length;
   const cards = list.map((c, i) => {
-    const best = S.best[obbyKey(i)], open = obbyOpen(i);
-    return `<button class="dex-card" data-stage="${i}"${open ? '' : ' disabled style="opacity:.55"'}><span class="emo day">${open ? ['🌈', '☁️', '✨', '🌀', '🏔️'][i] : '🔒'}</span><span class="txt"><span class="t1">${i + 1}단계 · ${escapeHTML(c.name)}</span><br><span class="t2">${open ? escapeHTML(c.tip) : '앞 단계를 깨면 열려요'}</span></span><span class="go">${best ? `${obbyMedal(i, best)} ${best.toFixed(1)}초` : open ? '도전!' : '잠김'}</span></button>`;
+    const best = S.best[obbyKey(i)], open = obbyOpen(i), rival = palBest(obbyKey(i));
+    return `<button class="dex-card" data-stage="${i}"${open ? '' : ' disabled style="opacity:.55"'}><span class="emo day">${open ? ['🌈', '☁️', '✨', '🌀', '🏔️'][i] : '🔒'}</span><span class="txt"><span class="t1">${i + 1}단계 · ${escapeHTML(c.name)}</span><br><span class="t2">${open ? escapeHTML(c.tip) : '앞 단계를 깨면 열려요'}</span></span><span class="go">${best ? `${obbyMedal(i, best)} ${best.toFixed(1)}초` : open ? '도전!' : '잠김'}${rival ? `<br><small>🤝 ${escapeHTML(rival.n)} ${rival.t.toFixed(1)}초</small>` : ''}</span></button>`;
   }).join('');
   openSheet('🌈 점프 코스 고르기', `<p class="msub">${done} / ${list.length}단계 완주. 빨리 깰수록 🥉→🥈→🥇 메달이 올라가요. 떨어져도 체크포인트 🚩에서 다시 시작해요. 키보드는 WASD·방향키 + 스페이스바!</p><div class="dex">${cards}</div>`,
     body => body.addEventListener('click', e => { const b = e.target.closest('[data-stage]'); if (b && !b.disabled) startObby(+b.dataset.stage); }));
@@ -4048,7 +4365,8 @@ function obbyEvent(kind, v) {
   else if (kind === 'finish') obbyFinish(v);
 }
 function obbyFinish(time) {
-  const i = obbyStageNow, key = obbyKey(i), prev = S.best[key], isBest = !prev || time < prev, firstClear = !prev;
+  const i = obbyStageNow, key = obbyKey(i), prev = S.best[key], isBest = !prev || time < prev, firstClear = !prev, rival = palBest(key), beatRival = rival && time < rival.t;
+  if (beatRival) badge('rival');
   if (isBest) S.best[key] = time;
   const coins = boundedReward(key, OBBY_COINS[i] || 25);
   change({ fun: 20, energy: -10 }); addXP(15 + i * 5); mission('obby'); badge('obby'); if (i === 0 && time <= 60) badge('obbyFast');
@@ -4060,7 +4378,7 @@ function obbyFinish(time) {
   confetti(100); persist(); render();
   const hasNext = i + 1 < total;
   const card = document.createElement('div'); card.className = 'g-card'; card.id = 'obResult';
-  card.innerHTML = `<h3>🏁 ${i + 1}단계 완주!</h3><div class="big-score">${medal} ${time.toFixed(1)}초</div><p>${nextMedal ? nextMedal + '<br>' : ''}${goldCoins ? `금메달 보너스 +${goldCoins}코인!<br>` : ''}${isBest ? '🏆 새 최고 기록!' : `최고 기록 ${prev.toFixed(1)}초`}${firstClear && hasNext ? `<br>🔓 ${i + 2}단계가 열렸어요!` : ''}</p><p>${coins ? `<i class="coin"></i> ${coins}코인 · ` : ''}경험치 ${15 + i * 5} · 행복 +20</p>
+  card.innerHTML = `<h3>🏁 ${i + 1}단계 완주!</h3><div class="big-score">${medal} ${time.toFixed(1)}초</div><p>${beatRival ? `🤝 ${escapeHTML(rival.n)} 기록(${rival.t.toFixed(1)}초)을 깼어요!<br>` : rival ? `🤝 ${escapeHTML(rival.n)} 기록은 ${rival.t.toFixed(1)}초!<br>` : ''}${nextMedal ? nextMedal + '<br>' : ''}${goldCoins ? `금메달 보너스 +${goldCoins}코인!<br>` : ''}${isBest ? '🏆 새 최고 기록!' : `최고 기록 ${prev.toFixed(1)}초`}${firstClear && hasNext ? `<br>🔓 ${i + 2}단계가 열렸어요!` : ''}</p><p>${coins ? `<i class="coin"></i> ${coins}코인 · ` : ''}경험치 ${15 + i * 5} · 행복 +20</p>
     ${hasNext ? '<button class="candy primary" id="obNext">다음 단계 ▶</button>' : '<p>🏔️ 모든 코스를 정복했어요!</p>'}
     <div style="display:flex;gap:8px"><button class="candy" id="obAgain" style="flex:1">다시 하기</button><button class="candy" id="obHome" style="flex:1">마을로</button></div>`;
   room.appendChild(card);
@@ -4091,6 +4409,8 @@ $('#emoteTray').addEventListener('click', e => {
 
 /* ---------- 배지 ---------- */
 const BADGES = {
+  duo:      ['🎮', '같이 놀기', '한 화면에서 친구와 한 판 끝내기'],
+  rival:    ['🥊', '기록 라이벌', '친구 코드로 온 친구의 코스 기록 깨기'],
   collector: ['🐾', '펫 수집가', '펫 8종 모두 데려오기'],
   goldAll:   ['🥇', '금메달 챔피언', '점프 코스 5단계 모두 금메달'],
   passDone:  ['🎖️', '성장길 완주', '성장길 20칸 끝까지 가기'],
@@ -4374,6 +4694,7 @@ const TITLES = [
   { id: 'bestie', name: '인기쟁이', badge: 'bestie' }, { id: 'merchant', name: '꼬마 사장님', badge: 'merchant' },
   { id: 'decor', name: '인테리어 장인', badge: 'decor' }, { id: 'form4', name: '무지개 전설', badge: 'form4' },
   { id: 'tagger', name: '술래잡기 왕', badge: 'tagger' }, { id: 'treasure', name: '보물 사냥꾼', badge: 'treasure' },
+  { id: 'duo', name: '베스트 프렌드', badge: 'duo' }, { id: 'rival', name: '기록 라이벌', badge: 'rival' },
   { id: 'collector', name: '펫 수집가', badge: 'collector' }, { id: 'goldAll', name: '금메달 챔피언', badge: 'goldAll' }, { id: 'legend', name: '말랑 전설', badge: 'passDone' }
 ];
 const titleOpen = t => !t.badge || !!(S.badges && S.badges[t.badge]);
@@ -4387,7 +4708,7 @@ const RIDES = {
   rainbow: { e: '🌈', name: '무지개 보드', pass: 15, desc: '성장길 선물. 제일 빨라요' }
 };
 function toggleRide() {
-  const p = P(); if (!p || !p.hatched || p.asleep) return;
+  const p = P(); if (!p || !p.hatched || p.asleep || round) return;
   if (World.area() !== 'village') return say('탈것은 마을에서 탈 수 있어요! 밖으로 나가 봐요', 3000);
   if (World.riding()) { World.setRide(null); sfx('pop'); return say('내렸어요! 다시 걸어 볼까?', 2000); }
   const own = S.rides || [];
@@ -4510,6 +4831,7 @@ function openStand() {
 function goStand() { World.area() === 'village' ? World.goVillage('garden', true, openStand) : openStand(); }
 
 const NEWS = [
+  { v: '2.6', date: '11월 4일', items: ['🎮 친구랑 둘이! 한 화면에서 둘이 술래잡기·보물 대결 (놀이 버튼)', '🤝 친구 코드: 친구 펫이 내 마을에 놀러 오고, 점프 코스 기록으로 겨뤄요'] },
   { v: '2.5', date: '11월 4일', items: ['🐱 새 친구: 치즈 고양이·솜뭉치 강아지·조개 수달! 친구들 메뉴에서 데려와요', '✨ 모든 펫의 눈과 얼굴을 더 귀엽게 다시 그렸어요', '🦊 노을 여우·풀잎 거북·구름 양은 놀다 보면 열려요', '🎖️ 성장길 20칸: 놀수록 쌓이고 요정 날개·별 목걸이·무지개 보드를 받아요', '🥇 점프 코스 메달: 빨리 깰수록 동→은→금'] },
   { v: '2.4', date: '11월 2일', items: ['🏃 술래잡기: 내가 술래! 도망가는 친구 3명을 60초 안에 잡아요 (놀이 버튼 또는 광장 솜솜)', '🎁 보물찾기: 마을에 숨은 선물 상자 8개를 45초 안에 (놀이 버튼 또는 도서관 꼬깔)', '🏷️ 새 칭호: 술래잡기 왕, 보물 사냥꾼'] },
   { v: '2.3', date: '10월 30일', items: ['🛴 탈것이 생겼어요! 상점 › 탈것에서 무료 킥보드를 받고, 마을에서 오른쪽 🛴 버튼(키보드 R)으로 타요', '🚲 꼬마 자전거, ☁️ 둥실둥실 구름 보드는 더 빨라요'] },
@@ -4725,7 +5047,8 @@ function openDex() {
     const met = fs(id).met, h = heartsOf(id);
     return `<div class="dex-card"><span class="art"><img src="${World.portrait(id)}" alt=""${met ? '' : ' class="sil"'}></span><span class="txt"><span class="t1">${met ? f.name : '???'}</span><br><span class="t2">${met ? `${f.job} · ${'♥'.repeat(h)}${'♡'.repeat(5 - h)}` : '마을에서 만나 보세요'}</span></span></div>`;
   }).join('');
-  openSheet(`우리 친구들 ${S.pets.length}/${SPECIES_ORDER.length}`, `<div class="dex">${cards}<p class="arcade-head">마을 친구 <span class="arcade-tag">대화할수록 하트가 쌓여요</span></p>${village}</div>`, body => body.addEventListener('click', e => {
+  openSheet(`우리 친구들 ${S.pets.length}/${SPECIES_ORDER.length}`, `<div class="dex">${cards}<button class="candy" id="dexPals" style="width:100%">🤝 친구 코드로 진짜 친구 초대하기</button><p class="arcade-head">마을 친구 <span class="arcade-tag">대화할수록 하트가 쌓여요</span></p>${village}</div>`, body => body.addEventListener('click', e => {
+    if (e.target.closest('#dexPals')) return openPals();
     const sw = e.target.closest('[data-switch]');
     if (sw) {
       if (bathing) endBath();
@@ -5261,7 +5584,11 @@ function openPlayMenu() {
   const card = (id, emoji, title, desc, cls = '') =>
     `<button class="dex-card" data-game="${id}"><span class="emo ${cls}">${emoji}</span><span class="txt"><span class="t1">${title}</span><br><span class="t2">${desc}</span></span><span class="go">${best[id] ? `최고 ${best[id]}` : '해 보기'}</span></button>`;
   openSheet('뭐 하고 놀까?', `<div class="dex">
-    <p class="arcade-head" style="margin-top:0">마을 놀이 <span class="arcade-tag">직접 달려요</span></p>
+    <p class="arcade-head" style="margin-top:0">친구랑 같이 <span class="arcade-tag">한 화면에서 둘이</span></p>
+    ${card('duoTag', '🏃', '둘이 술래잡기', '번갈아 술래! 오래 버틴 쪽이 이겨요', 'day')}
+    ${card('duoTreasure', '🎁', '둘이 보물 대결', '상자 12개를 누가 더 많이 주울까?', 'day')}
+    ${card('pals', '🤝', '친구 코드', '친구 펫을 내 마을에 초대하고 코스 기록으로 겨뤄요', 'day')}
+    <p class="arcade-head">마을 놀이 <span class="arcade-tag">직접 달려요</span></p>
     ${card('tag', '🏃', '술래잡기', '내가 술래! 도망가는 친구 3명을 45초 안에 잡아요', 'day')}
     ${card('treasure', '🎁', '보물찾기', '마을에 숨은 선물 상자 8개를 45초 안에 찾아요', 'day')}
     <p class="arcade-head">미니게임</p>
@@ -5271,6 +5598,8 @@ function openPlayMenu() {
   </div>`, body => body.addEventListener('click', e => {
     const b = e.target.closest('[data-game]'); if (!b) return;
     closeSheet();
+    if (b.dataset.game === 'duoTag' || b.dataset.game === 'duoTreasure') return openDuoSetup(b.dataset.game);
+    if (b.dataset.game === 'pals') return openPals();
     if (b.dataset.game === 'tag' || b.dataset.game === 'treasure') return startRound(b.dataset.game);
     return b.dataset.game === 'stars' ? openGame() : openArcade(ARCADE[b.dataset.game]);
   }));
@@ -5428,7 +5757,7 @@ let worldReady = false;
 function showHome() {
   $('#start').hidden = true; $('#home').hidden = false;
   buildStats();
-  if (!worldReady) { World.init(); worldReady = true; World.setDecor(decorState().placed); World.setGarden(farm().plots); World.setEvent(!!SEASON); spawnStickers(); }
+  if (!worldReady) { World.init(); worldReady = true; World.setDecor(decorState().placed); World.setGarden(farm().plots); World.setEvent(!!SEASON); spawnStickers(); syncPals(); }
   render();
 }
 
