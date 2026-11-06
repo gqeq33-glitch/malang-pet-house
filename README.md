@@ -128,3 +128,13 @@ python tools/make_icons.py serve
 ## 라이선스
 - 폰트: Jua, Gowun Dodum — SIL Open Font License 1.1 (`www/fonts/OFL-*.txt`)
 - 캐릭터·게임 코드: 이 프로젝트의 오리지널 작업물
+
+---
+
+## 상용화 문서와 테스트
+
+- `npm test`: 보안과 영어 내용 자동 테스트
+- [docs/MOBILE.md](docs/MOBILE.md): 모바일 앱 구조와 기기 점검표
+- [docs/CONTENT_REVIEW.md](docs/CONTENT_REVIEW.md): 영어 내용 검수 방법 (아직 교사·원어민 검수 전)
+- [docs/USER_TEST_PLAN.md](docs/USER_TEST_PLAN.md): 보호자 동의 사용자 시험 계획
+- [docs/STORE_SUBMISSION.md](docs/STORE_SUBMISSION.md): 스토어 제출 자료와 수익화 설계

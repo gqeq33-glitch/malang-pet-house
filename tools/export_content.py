@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parent.parent
 html = (ROOT / "www" / "index.html").read_text(encoding="utf-8")
 start = html.index("const ENG = [")
 end = html.index("/* ---------- 단계별 해금", start)
-out = subprocess.run(["node", "-e", html[start:end] + "\nprocess.stdout.write(JSON.stringify(ENG));"],
+out = subprocess.run(["node", "-"], input=html[start:end] + "\nprocess.stdout.write(JSON.stringify(ENG));",
                      capture_output=True, check=True, encoding="utf-8").stdout
 rows = []
 for st in json.loads(out):

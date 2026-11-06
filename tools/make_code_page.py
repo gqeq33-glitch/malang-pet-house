@@ -24,6 +24,13 @@ FILES = [
     ("www/manifest.webmanifest", "앱 설치 정보", "앱 이름·아이콘·전체 화면 설정이에요.", None, False),
     ("www/privacy.html", "개인정보처리방침", "스토어 등록에 필요한 페이지예요.", None, False),
     ("tests/security.test.js", "보안 테스트", "저장 검증과 채팅 제거를 확인해요. 실행: node --test tests/security.test.js", None, False),
+    ("tests/content.test.js", "영어 내용 검사", "번역 누락, 중복, 정답 오류를 기계로 검사해요. 사람 검수를 대신하지는 못해요.", None, False),
+    (".github/workflows/ios.yml", "iOS 빌드 확인", "맥 없이 시뮬레이터용 컴파일을 확인해요.", None, False),
+    ("docs/MOBILE.md", "4단계: 모바일 앱", "빌드 구조와 기기 점검표예요.", None, False),
+    ("docs/CONTENT_REVIEW.md", "3단계: 영어 내용 검수", "교사·원어민 검수 방법이에요.", None, False),
+    ("docs/USER_TEST_PLAN.md", "5단계: 사용자 시험", "보호자 동의서, 지표, 설문이에요.", None, False),
+    ("docs/STORE_SUBMISSION.md", "6단계: 스토어·수익화", "제출 자료와 결제 설계예요.", None, False),
+    ("tools/export_content.py", "검수용 CSV 만들기", "", None, False),
     ("README.md", "설치·출시 안내서", "PWA 설치, 구글 플레이, 앱스토어 출시 방법이에요.", None, False),
     ("capacitor.config.json", "네이티브 앱 설정", "앱 ID와 이름이에요.", None, False),
     ("package.json", "Capacitor 패키지 목록", "", None, False),
@@ -93,6 +100,7 @@ textarea{width:100%;height:320px;resize:vertical;font-family:var(--mono);font-si
     <a href="https://github.com/gqeq33-glitch/malang-pet-house/archive/refs/heads/main.zip" target="_blank" rel="noopener">전체 폴더 zip 받기</a>
     <a href="https://gqeq33-glitch.github.io/malang-pet-house/" target="_blank" rel="noopener">웹앱 바로가기</a>
   </div>
+  <div id="allBox" style="margin-bottom:12px"><button class="copy" id="copyAll" style="width:100%;padding:14px;font-size:17px">📋 전체 코드 한 번에 복사</button><p class="hint" style="margin-top:6px">모든 파일을 파일 이름 표시와 함께 이어서 복사해요. 게임만 실행하려면 아래 index.html 하나만 복사하면 돼요.</p></div>
   <div id="files"></div>
   <p class="hint">아이콘·글꼴·3D 라이브러리 같은 그림과 바이너리 파일은 복사할 수 없어서 목록에 없어요. 전부 필요하면 위의 zip 받기를 눌러 주세요.</p>
 </main>
@@ -105,6 +113,12 @@ textarea{width:100%;height:320px;resize:vertical;font-family:var(--mono);font-si
   const toast = msg => { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), 2200); };
   const box = document.getElementById('files');
   box.style.display = 'flex'; box.style.flexDirection = 'column'; box.style.gap = '12px';
+  const allText = () => files.map(f => `===== 파일: ${f.path} =====` + String.fromCharCode(10) + dec(f.b64)).join(String.fromCharCode(10, 10));
+  document.getElementById('copyAll').addEventListener('click', e => {
+    const b = e.currentTarget, text = allText();
+    const fallback = () => { let a = document.getElementById('allArea'); if (!a) { a = document.createElement('textarea'); a.id = 'allArea'; a.readOnly = true; a.setAttribute('aria-label', '전체 코드'); document.getElementById('allBox').appendChild(a); } a.value = text; a.focus(); a.select(); toast('자동 복사가 막혀 있어요. 선택된 코드를 Ctrl+C로 복사해 주세요'); };
+    try { navigator.clipboard.writeText(text).then(() => { b.textContent = '✓ 전체 복사됨'; toast(`파일 ${files.length}개를 복사했어요`); setTimeout(() => { b.textContent = '📋 전체 코드 한 번에 복사'; }, 2200); }, fallback); } catch (err) { fallback(); }
+  });
   files.forEach((f, i) => {
     const el = document.createElement('section');
     el.className = 'file' + (f.main ? ' main' : '');
