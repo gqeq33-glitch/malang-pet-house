@@ -456,6 +456,16 @@ body{-webkit-touch-callout:none}
 .backup input[type=password]{width:100%;font-size:18px;padding:10px 12px;border:0;border-radius:12px;margin-bottom:8px;box-shadow:inset 0 0 0 2px var(--ink)}
 
 /* ---------- 2.0: 큰 버튼과 태블릿 ---------- */
+.eg-list{display:grid;gap:8px}.eg-list .candy{min-height:54px;font-size:18px}
+.eg-magic{font-size:30px;animation:eStar .7s ease-out}
+.eg-catch{display:grid;grid-template-columns:1fr 1fr;gap:12px}.eg-catch .e-opt{font-size:60px;min-height:108px;padding:6px}
+.eg-float{animation:egFloat 3.6s ease-in-out infinite}
+@keyframes egFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.eg-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.eg-cards.c4,.eg-cards.c6{grid-template-columns:repeat(3,1fr)}
+.eg-card{border:0;border-radius:16px;min-height:88px;padding:6px;background:var(--paper);box-shadow:0 0 0 2.5px var(--ink) inset,0 4px 0 rgba(53,67,90,.15);font-family:var(--display);font-size:19px;color:var(--ink);overflow-wrap:anywhere;transition:transform .15s,background .2s}
+.eg-card span{display:block}.eg-card:has(span:only-child){line-height:1.15}
+.eg-card.sel{background:var(--butter);transform:translateY(-3px)}.eg-card.matched{background:#CFF3E3;opacity:.75}
+.eg-card.down{background:var(--lav)}.eg-card.down span{visibility:hidden}.eg-card.down::after{content:'?';font-size:30px;position:relative;top:-14px}
 #stageTxt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lv .xp{flex:0 0 40px}
 @media (max-width:430px){#stageTxt{display:none}.lv .xp{flex:1;max-width:none}}
 .candy,.tabs button{min-height:44px}
@@ -5503,6 +5513,7 @@ function openStand() {
 function goStand() { World.area() === 'village' ? World.goVillage('garden', true, openStand) : openStand(); }
 
 const NEWS = [
+  { v: '3.5', date: '11월 6일', items: ['🎮 영어 게임 3종: ✨ 알파벳 마법, 🎧 영어 듣고 잡기, 🃏 단어 카드 매칭', '🚌 탈것과 🏠 집안 물건 레슨 추가'] },
   { v: '3.4', date: '11월 6일', items: ['🐻 곰 선생님이 왔어요! 토끼, 민트 드래곤, 여우와 함께 영어를 알려 줘요', '🎨 더 따뜻한 색과 큰 버튼, 태블릿 화면 지원', '🌟 정답을 맞히면 안내 친구가 함께 기뻐하고, 틀려도 힌트를 줘요', '🔊 더 자연스러운 영어 목소리를 자동으로 고르고, 영어 지도에서 직접 고를 수도 있어요'] },
   { v: '3.3', date: '11월 6일', items: ['🎯 정답률에 맞춰 문제가 쉬워지거나 어려워지고, 틀리면 짧은 해설이 나와요', '🌟 오늘의 영어: 5~10분 선택 미션 (쉬어도 잃는 것 없어요)', '🔡 파닉스 레슨 2개, 🎓 졸업 모자·옷 5종·가구 4종 추가', '🗺️ 영어 레슨을 끝낼수록 새 지역이 열려요'] },
   { v: '3.2', date: '11월 5일', items: ['🛡️ 어린이 안전을 위해 온라인 채팅을 없애고, 정해진 영어 쪽지와 이모티콘으로 바꿨어요', '🔑 보호자 메뉴에 PIN을 만들 수 있어요', '💾 백업 코드를 더 꼼꼼히 검사해요'] },
@@ -6284,7 +6295,11 @@ const ENG = [
     { id: 'weather', t: '날씨', e: '🌦️', w: [['sunny', '화창한', '☀️'], ['rainy', '비 오는', '🌧️'], ['cloudy', '흐린', '☁️'], ['snowy', '눈 오는', '❄️'], ['windy', '바람 부는', '🌬️'], ['hot', '더운', '🥵'], ['cold', '추운', '🥶']] },
     { id: 'feel', t: '내 기분', e: '😊', w: [['happy', '행복한', '😄'], ['sad', '슬픈', '😭'], ['angry', '화난', '😠'], ['tired', '피곤한', '🥱'], ['hungry', '배고픈', '🤤'], ['scared', '무서운', '😱']], s: [['I am happy.', '나는 행복해요.'], ['I am hungry.', '나는 배고파요.'], ['Are you tired?', '너는 피곤하니?']] },
     { id: 'ph_vowel', t: '짧은 모음 a e i o u', e: '🔡', w: [['map', '지도', '🗺️'], ['bed', '침대', '🛏️'], ['pig', '돼지', '🐷'], ['dog', '강아지', '🐶'], ['sun', '해', '☀️'], ['cup', '컵', '🥤']],
-      s: [['The cat has a hat.', '고양이는 모자가 있어요.'], ['The dog is on the bed.', '강아지가 침대 위에 있어요.'], ['The sun is hot.', '해는 뜨거워요.']] }
+      s: [['The cat has a hat.', '고양이는 모자가 있어요.'], ['The dog is on the bed.', '강아지가 침대 위에 있어요.'], ['The sun is hot.', '해는 뜨거워요.']] },
+    { id: 'transport', t: '탈것', e: '🚌', w: [['bus', '버스', '🚌'], ['car', '자동차', '🚗'], ['train', '기차', '🚆'], ['airplane', '비행기', '✈️'], ['bike', '자전거', '🚲'], ['boat', '배', '⛵']],
+      s: [['I go to school by bus.', '나는 버스로 학교에 가요.'], ['The train is very long.', '기차는 아주 길어요.'], ['I can ride a bike.', '나는 자전거를 탈 수 있어요.']] },
+    { id: 'home', t: '우리 집 물건', e: '🏠', w: [['bed', '침대', '🛏️'], ['sofa', '소파', '🛋️'], ['door', '문', '🚪'], ['window', '창문', '🪟'], ['lamp', '전등', '💡'], ['clock', '시계', '🕰️']],
+      s: [['Please open the door.', '문을 열어 주세요.'], ['The clock is on the wall.', '시계는 벽에 있어요.'], ['My cat is on the sofa.', '내 고양이는 소파 위에 있어요.']] }
   ] },
   { id: 's2', name: '3~4학년', age: '9~11세', icon: '🌳', pick: 4, desc: '문장을 듣고 만들어요', units: [
     { id: 'me', noPic: true, t: '나를 소개해요', e: '🙋', w: [['name', '이름', '📛'], ['age', '나이', '🎂'], ['student', '학생', '🧑‍🎓'], ['Korea', '한국', '🇰🇷']],
@@ -6632,6 +6647,7 @@ function engMark(key, ok) {
 /* 문제 만들기 */
 // 최근 정답률로 다음 문제 난이도를 맞춘다: 잘하면 보기 하나 더·어려운 유형 먼저, 힘들어하면 보기 하나 덜·쉬운 유형 위주
 function engAdapt() { const r = engState().recent || []; if (r.length < 6) return 0; const a = r.reduce((x, y) => x + y, 0) / r.length; return a >= .85 ? 1 : a <= .5 ? -1 : 0; }
+const engLetterSay = x => (x.l === 'X' ? 'X, as in box' : `${x.l} is for ${x.w}`);
 function engQuiz(stageIdx, unit, count = 8) {
   const adapt = engAdapt(), st = ENG[stageIdx], e = engState(), n = clamp(st.pick + adapt, 2, 4), words = engWords(unit), out = [];
   const others = list => list.filter(Boolean);
@@ -6640,7 +6656,7 @@ function engQuiz(stageIdx, unit, count = 8) {
   const hard = list => list.slice().sort((a, b) => ((e.w[a.w] || {}).b || 0) - ((e.w[b.w] || {}).b || 0) || Math.random() - .5);
   const wordQ = (x, kind) => {
     if (kind === 'listenPic') return { type: kind, key: x.w, say: x.w, a: x.e, o: wrongs(x, 'e'), pic: true, x };
-    if (kind === 'letter') return { type: kind, key: x.w, say: x.l === 'X' ? 'X is in box' : `${x.l} is for ${x.w}`, l: x.l, a: x.e, o: wrongs(x, 'e'), pic: true, x };
+    if (kind === 'letter') return { type: kind, key: x.w, say: engLetterSay(x), l: x.l, a: x.e, o: wrongs(x, 'e'), pic: true, x };
     if (kind === 'picWord') return { type: kind, key: x.w, say: null, e: x.e, a: x.w, o: wrongs(x, 'w'), x };
     if (kind === 'wordKo') return { type: kind, key: x.w, say: x.w, w: x.w, a: x.k, o: wrongs(x, 'k'), x };
     if (kind === 'koWord') return { type: kind, key: x.w, say: null, k: x.k, a: x.w, o: wrongs(x, 'w'), x };
@@ -6734,7 +6750,7 @@ function engLesson(stageIdx, unit, reviewList) {
   const backFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   const e = engState(), p = P(), st = ENG[stageIdx], review = !!reviewList, kid = stageIdx === 0;
   const first = review ? false : !engDone(unit);
-  const cards = first ? [...engWords(unit).map(x => ({ en: x.w, k: x.k, e: x.e, l: x.l, say: x.l ? (x.l === 'X' ? 'X is in box' : `${x.l} is for ${x.w}`) : x.w })), ...(unit.s || []).slice(0, 3).map(x => ({ en: x[0], k: x[1], say: x[0] })), ...(unit.d || []).map(x => ({ dlg: x, say: x[0] }))] : [];
+  const cards = first ? [...engWords(unit).map(x => ({ en: x.w, k: x.k, e: x.e, l: x.l, say: x.l ? (engLetterSay(x)) : x.w })), ...(unit.s || []).slice(0, 3).map(x => ({ en: x[0], k: x[1], say: x[0] })), ...(unit.d || []).map(x => ({ dlg: x, say: x[0] }))] : [];
   const quiz = reviewList || engQuiz(stageIdx, unit), total = quiz.length;
   let ci = 0, qi = 0, firstTry = 0, answered = false, cur = null, timer = 0, retried = new Set();
   const wrap = document.createElement('div'); wrap.id = 'game'; wrap.className = 'eng';
@@ -6912,6 +6928,159 @@ function engLesson(stageIdx, unit, reviewList) {
   showCard();
 }
 
+/* ---------- 영어 게임: 레슨과 같은 단어 데이터와 복습 기록을 쓴다 ----------
+   틀려도 코인이나 아이템을 빼앗지 않고, 힌트를 주고 다시 해 볼 수 있다. 코인은 게임마다 처음 5번까지 */
+const egUnit = id => { for (const g of ENG) { const u = g.units.find(x => x.id === id); if (u) return u; } return null; };
+const egWords = id => engWords(egUnit(id)).filter(x => x.e);
+const EG_CATS = { animal: '🐾 동물', food: '🍱 음식', color: '🎨 색깔', number: '🔢 숫자', transport: '🚌 탈것', home: '🏠 집안 물건' };
+const egLetters = () => ENG[0].units.filter(u => u.abc).flatMap(engWords);
+function egShell(title) {
+  closeSheet(); if (talking) closeTalk();
+  gameOn = true;
+  const backFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  const wrap = document.createElement('div'); wrap.id = 'game'; wrap.className = 'eng';
+  wrap.setAttribute('role', 'dialog'); wrap.setAttribute('aria-modal', 'true'); wrap.setAttribute('aria-label', title);
+  wrap.innerHTML = `<div class="g-top gut"><span class="ttl">${escapeHTML(title)}</span><button class="icon-btn" id="gClose" aria-label="그만하기">✕</button></div><div class="e-prog gut"><i id="eBar"></i></div><div class="e-main gut" id="eMain" aria-live="polite"></div><div class="e-foot gut" id="eFoot"></div>`;
+  $('#app').appendChild(wrap); pushBack();
+  const close = () => { gameOn = false; clearTimeout(sh.timer); engStop(); wrap.remove(); render(); persist(); if (backFocus?.isConnected) backFocus.focus(); };
+  const sh = { wrap, close, timer: 0, main: wrap.querySelector('#eMain'), foot: wrap.querySelector('#eFoot'), bar: wrap.querySelector('#eBar'), bind(id, fn) { const el = wrap.querySelector('#' + id); if (el) el.addEventListener('click', fn); return el; } };
+  sh.bind('gClose', close);
+  wrap.addEventListener('keydown', trapTab);
+  return sh;
+}
+function egFinish(sh, { key, right, total, again }) {
+  engStop();
+  const e = engState(), rate = right / Math.max(1, total), stars = rate >= .9 ? 3 : rate >= .6 ? 2 : 1;
+  const gain = 8 + right * 2, coins = boundedReward('eg:' + key, 10, 5), ups = engAddXP(gain), petXP = Math.max(4, Math.round(gain / 2));
+  change({ fun: 10 }); addXP(petXP);
+  const de = dayEngState(); de.lesson = true; const dayDone = dayEngCheck(), goals = engCheckGoals(), pet = P();
+  sfx(stars === 3 || ups.length ? 'hatch' : 'up'); if (stars >= 2) confetti(40); if (World.ok) World.trick('cheer');
+  persist();
+  sh.bar.style.width = '100%';
+  sh.main.innerHTML = `<div class="e-card done"><span class="e-pet" aria-hidden="true">${petSVG(pet.sp, { mood: 'happy', stage: stageOf(pet.level), hat: pet.hat })}</span><h3>${stars === 3 ? 'Perfect! 완벽해요!' : stars === 2 ? 'Great job! 잘했어요!' : 'Good try! 끝까지 해냈어요!'}</h3><div class="e-stars" aria-label="별 ${stars}개">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
+    <p class="e-gain">영어 경험치 +${gain}${coins ? ` · <i class="coin"></i> ${coins}코인` : ''}</p><p class="e-pet-xp">🐾 ${escapeHTML(pet.name)} 경험치 +${petXP}</p>
+    ${ups.map(u => `<div class="e-gift">🎉 <b>Lv.${u.lv} 달성!</b> 선물: ${u.won.map(escapeHTML).join(', ')}</div>`).join('')}
+    ${dayDone ? `<div class="e-gift">🌟 <b>오늘의 영어 완료!</b> ${DAY_COIN}코인</div>` : ''}
+    ${goals.map(g => `<div class="e-gift">🏆 <b>도전 목표 달성!</b> ${g.e} ${escapeHTML(g.t)} · ${g.c}코인</div>`).join('')}</div>`;
+  sh.foot.innerHTML = '<div class="e-row"><button class="candy" id="eAgain">다시 하기</button><button class="candy primary" id="gHome">게임 목록</button></div>';
+  sh.bind('eAgain', () => { sh.close(); again(); });
+  sh.bind('gHome', () => { sh.close(); openEngGames(); });
+  sh.wrap.querySelector('#gHome').focus({ preventScroll: true });
+}
+const egRight = word => { sfx('coin'); dayEngState().right++; const e = engState(); e.right = (e.right || 0) + 1; if (word) engMark(word, true); };
+const egMiss = word => { sfx('bad'); const e = engState(); e.wrong = (e.wrong || 0) + 1; if (word) engMark(word, false); };
+
+// 게임 A: 알파벳 마법
+function egAlphabet() {
+  const sh = egShell('✨ 알파벳 마법'), e = engState(), all = egLetters();
+  const known = x => (e.w[x.w] || {}).b >= 1, picks = [...shuffle(all.filter(x => !known(x))), ...shuffle(all.filter(known))].slice(0, 8);
+  let i = 0, right = 0;
+  function show() {
+    if (i >= picks.length) return egFinish(sh, { key: 'abc', right, total: picks.length, again: egAlphabet });
+    const x = picks[i], mode = ['case', 'sound', 'pic'][i % 3], others = shuffle(all.filter(y => y.l !== x.l)).slice(0, 2);
+    let first = true; sh.bar.style.width = i / picks.length * 100 + '%';
+    const opts = shuffle([x, ...others]);
+    const label = y => (mode === 'case' ? y.l.toLowerCase() : mode === 'sound' ? y.l : y.e);
+    const prompt = { case: '짝이 되는 소문자를 찾아요', sound: '소리를 듣고 첫 글자를 찾아요', pic: '이 글자로 시작하는 그림을 찾아요' }[mode];
+    const head = mode === 'sound' ? '<button class="e-say big" id="eSay" aria-label="다시 듣기">🔊</button>' : `<div class="e-letter">${x.l}</div>${mode === 'pic' ? '<button class="e-say" id="eSay" aria-label="다시 듣기">🔊</button>' : ''}`;
+    sh.main.innerHTML = `<p class="e-prompt"><span class="e-pet" aria-hidden="true">${petSVG('bunny', { mood: 'talk', stage: 'kid' })}</span><span>${prompt}</span></p><div class="e-card q" id="egCard">${head}</div><div class="e-opts three pic" id="eOpts">${opts.map((y, k) => `<button class="e-opt" data-k="${k}">${escapeHTML(label(y))}</button>`).join('')}</div><p class="e-why" id="egHint" role="status"></p>`;
+    sh.foot.innerHTML = '';
+    const sound = engLetterSay(x);
+    sh.bind('eSay', () => engSay(sound));
+    if (mode === 'case') engSay(x.l); else engSay(sound);
+    sh.main.querySelector('#eOpts').addEventListener('click', ev => {
+      const b = ev.target.closest('[data-k]'); if (!b || b.disabled) return;
+      if (opts[+b.dataset.k] !== x) { first = false; b.disabled = true; b.classList.add('wrong'); egMiss(x.w); sh.main.querySelector('#egHint').textContent = `힌트: ${x.l}${x.l.toLowerCase()}는 ${x.w}의 첫 글자예요. 다시 골라 봐요!`; engSay(sound); return; }
+      if (first) right++;
+      egRight(x.w);
+      sh.main.querySelectorAll('.e-opt').forEach(o => { o.disabled = true; });
+      b.classList.add('right');
+      sh.main.querySelector('#egCard').innerHTML = `<div class="eg-magic" aria-hidden="true">✨⭐✨</div><div class="e-letter">${x.l}<small>${x.l.toLowerCase()}</small></div><div class="e-pic">${x.e}</div><div class="e-word">${escapeHTML(x.w)}</div>`;
+      engSay(sound);
+      sh.foot.innerHTML = '<button class="candy primary e-next" id="eNext">다음 ▶</button>';
+      sh.bind('eNext', () => { i++; show(); }); sh.wrap.querySelector('#eNext').focus({ preventScroll: true });
+    });
+  }
+  show();
+}
+// 게임 C: 영어 듣고 잡기
+function egCatch(cat) {
+  if (!cat) return openSheet('🎧 영어 듣고 잡기', `<p class="msub">영어를 듣고 맞는 그림을 잡아요. 어떤 친구들을 잡을까요?</p><div class="eg-list">${Object.entries(EG_CATS).map(([id, t]) => `<button class="candy" data-cat="${id}">${t}</button>`).join('')}</div><button class="candy" id="eBack" style="width:100%;margin-top:10px">‹ 게임 목록</button>`,
+    body => body.addEventListener('click', ev => { const b = ev.target.closest('[data-cat]'); if (b) return egCatch(b.dataset.cat); if (ev.target.closest('#eBack')) openEngGames(); }));
+  const sh = egShell('🎧 ' + EG_CATS[cat].slice(3) + ' 듣고 잡기'), words = egWords(cat);
+  // 같은 단어를 다른 라운드에서 다시 듣는다. 틀린 단어는 뒤에서 한 번 더
+  const round = [...shuffle(words), ...shuffle(words)].slice(0, 10);
+  for (let k = 1; k < round.length; k++) if (round[k] === round[k - 1]) { const t = round[k]; round[k] = round[(k + 2) % round.length]; round[(k + 2) % round.length] = t; }
+  const total = round.length, again = new Set();
+  let i = 0, right = 0;
+  function show() {
+    if (i >= round.length) return egFinish(sh, { key: 'catch', right, total, again: () => egCatch(cat) });
+    const x = round[i], opts = shuffle([x, ...shuffle(words.filter(y => y.e !== x.e)).slice(0, 3)]);
+    let first = true; sh.bar.style.width = Math.min(1, i / total) * 100 + '%';
+    sh.main.innerHTML = `<p class="e-prompt"><span class="e-pet" aria-hidden="true">${petSVG('fox', { mood: 'talk', stage: 'kid' })}</span><span>잘 듣고 맞는 그림을 잡아요!</span></p><div class="e-card q"><button class="e-say big" id="eSay" aria-label="다시 듣기">🔊</button></div><div class="eg-catch" id="eOpts">${opts.map((y, k) => `<button class="e-opt eg-float" style="animation-delay:${-k * .7}s" data-k="${k}">${y.e}</button>`).join('')}</div><p class="e-why" id="egHint" role="status"></p>`;
+    sh.foot.innerHTML = '';
+    sh.bind('eSay', () => engSay(x.w)); engSay(x.w);
+    sh.main.querySelector('#eOpts').addEventListener('click', ev => {
+      const b = ev.target.closest('[data-k]'); if (!b || b.disabled) return;
+      if (opts[+b.dataset.k] !== x) {
+        if (first && !again.has(x)) { again.add(x); round.push(x); }
+        first = false; b.disabled = true; b.classList.add('wrong'); egMiss(x.w);
+        sh.main.querySelector('#egHint').textContent = '괜찮아요! 한 번 더 듣고 찾아봐요.'; engSay(x.w); return;
+      }
+      if (first && !again.has(x)) right++;
+      egRight(x.w);
+      sh.main.querySelectorAll('.e-opt').forEach(o => { o.disabled = true; o.classList.remove('eg-float'); });
+      b.classList.add('right');
+      sh.main.querySelector('#egHint').textContent = `${x.w}: ${x.k}`;
+      engSay(x.w);
+      sh.foot.innerHTML = '<p class="e-fb ok"><span class="e-star-pop" aria-hidden="true">⭐</span> 잡았다!</p><button class="candy primary e-next" id="eNext">다음 ▶</button>';
+      sh.bind('eNext', () => { i++; show(); }); sh.wrap.querySelector('#eNext').focus({ preventScroll: true });
+    });
+  }
+  show();
+}
+// 게임 D: 단어 카드 매칭. 쉬움·보통은 다 보이고, 어려움은 뒤집어서 기억한다
+const EG_LEVELS = { easy: { t: '쉬움', pairs: 3 }, normal: { t: '보통', pairs: 4 }, hard: { t: '어려움', pairs: 6, hidden: true } };
+function egMatch(level) {
+  if (!level) return openSheet('🃏 단어 카드 매칭', `<p class="msub">그림 카드와 영어 단어 카드를 연결해요. 단어 카드를 누르면 읽어 줘요.</p><div class="eg-list">${Object.entries(EG_LEVELS).map(([id, l]) => `<button class="candy" data-lv="${id}">${l.t} (${l.pairs}쌍)${l.hidden ? ' · 뒤집기' : ''}</button>`).join('')}</div><button class="candy" id="eBack" style="width:100%;margin-top:10px">‹ 게임 목록</button>`,
+    body => body.addEventListener('click', ev => { const b = ev.target.closest('[data-lv]'); if (b) return egMatch(b.dataset.lv); if (ev.target.closest('#eBack')) openEngGames(); }));
+  const L = EG_LEVELS[level], e = engState(), sh = egShell('🃏 단어 카드 매칭 · ' + L.t);
+  // 배운 단어를 먼저 쓰고 그림이 겹치지 않게 고른다
+  const pool = [], seen = new Set();
+  for (const x of shuffle([...engAllWords.values()].filter(x => x.e && !x.noPic && x.stage <= 1 && x.w.length <= 9)).sort((a, b) => ((e.w[b.w] || {}).b >= 1) - ((e.w[a.w] || {}).b >= 1))) { if (!seen.has(x.e)) { seen.add(x.e); pool.push(x); } if (pool.length >= L.pairs) break; }
+  const cards = shuffle(pool.flatMap((x, id) => [{ id, x, pic: true }, { id, x, pic: false }]));
+  let sel = null, done = 0, miss = 0, lock = false;
+  sh.main.innerHTML = `<p class="e-prompt"><span class="e-pet" aria-hidden="true">${petSVG('bunny', { mood: 'talk', stage: 'kid' })}</span><span>같은 뜻의 카드 두 장을 찾아요</span></p><div class="eg-cards c${L.pairs}" id="egCards">${cards.map((c, i) => `<button class="eg-card${L.hidden ? ' down' : ''}" data-i="${i}" aria-label="${L.hidden ? `${i + 1}번 카드` : escapeHTML(c.pic ? c.x.k : c.x.w)}"><span>${c.pic ? c.x.e : escapeHTML(c.x.w)}</span></button>`).join('')}</div><p class="e-why" id="egHint" role="status"></p>`;
+  sh.foot.innerHTML = '';
+  const btn = i => sh.main.querySelector(`[data-i="${i}"]`), hint = t => { sh.main.querySelector('#egHint').textContent = t; };
+  sh.bar.style.width = '0%';
+  sh.main.querySelector('#egCards').addEventListener('click', ev => {
+    const b = ev.target.closest('[data-i]'); if (!b || lock || b.disabled) return;
+    const i = +b.dataset.i, c = cards[i];
+    if (sel === i) { sel = null; b.classList.remove('sel'); if (L.hidden) b.classList.add('down'); return; }
+    b.classList.remove('down'); b.classList.add('sel'); if (!c.pic) engSay(c.x.w); sfx('tap');
+    if (sel === null) { sel = i; return; }
+    const o = cards[sel], ob = btn(sel); sel = null;
+    if (o.id === c.id) {
+      for (const x of [b, ob]) { x.classList.remove('sel'); x.classList.add('matched'); x.disabled = true; }
+      egRight(c.x.w); done++; engSay(c.x.w); hint(`${c.x.w}: ${c.x.k}`); sh.bar.style.width = done / L.pairs * 100 + '%';
+      if (done >= L.pairs) sh.timer = setTimeout(() => egFinish(sh, { key: 'match', right: Math.max(0, L.pairs - Math.floor(miss / 2)), total: L.pairs, again: () => egMatch(level) }), 900);
+    } else {
+      miss++; sfx('bad'); hint('짝이 아니에요. 다시 찾아봐요!'); lock = true;
+      sh.timer = setTimeout(() => { for (const x of [b, ob]) { x.classList.remove('sel'); if (L.hidden) x.classList.add('down'); } lock = false; }, L.hidden ? 1100 : 500);
+    }
+  });
+}
+function openEngGames() {
+  const row = (id, e, t, d) => `<button class="dex-card" data-eg="${id}"><span class="emo day">${e}</span><span class="txt"><span class="t1">${t}</span><br><span class="t2">${d}</span></span><span class="go">시작 ▶</span></button>`;
+  openSheet('🎮 영어 게임', `<p class="msub">놀면서 영어를 익혀요. 맞힌 단어는 복습에 기록되고, 펫도 함께 자라요. 틀려도 잃는 것은 없어요.</p><div class="dex">${row('abc', '✨', '알파벳 마법', '대문자와 소문자, 첫소리를 찾아요')}${row('catch', '🎧', '영어 듣고 잡기', '듣고 맞는 그림을 잡아요')}${row('match', '🃏', '단어 카드 매칭', '그림과 단어를 연결해요')}</div><button class="candy" id="eBack" style="width:100%;margin-top:10px">‹ 영어 지도로</button>`,
+    body => body.addEventListener('click', ev => {
+      const b = ev.target.closest('[data-eg]');
+      if (b) { if (engCanSpeak()) { try { engSay(' '); } catch (err) {} } return b.dataset.eg === 'abc' ? egAlphabet() : b.dataset.eg === 'catch' ? egCatch() : egMatch(); }
+      if (ev.target.closest('#eBack')) openEnglish();
+    }));
+}
+
 /* 영어 지도 */
 function openEngAge() {
   openSheet('📚 누가 배우나요?', `<p class="msub">나이에 맞는 곳에서 시작해요. 나중에 언제든 바꿀 수 있고, 어느 단계든 들어가 볼 수 있어요.</p><div class="dex">${ENG.map((st, i) => `<button class="dex-card" data-age="${i}"><span class="emo day">${st.icon}</span><span class="txt"><span class="t1">${st.name}</span> <small>${st.age}</small><br><span class="t2">${st.desc}</span></span><span class="go">시작 ▶</span></button>`).join('')}</div>`,
@@ -6929,7 +7098,7 @@ function openEnglish(tab) {
   }).join('');
   openSheet('📚 말랑 영어', `<div class="mission" style="margin-bottom:10px"><span class="mi">${rk.cur[1]}</span><span class="mt"><b>영어 Lv.${e.level} ${rk.cur[2]} · 배운 단어 ${learned}개</b><span class="mbar"><i style="width:${e.xp / need * 100}%"></i></span><small>${e.xp} / ${need}${nextGift ? ` · Lv.${nextGift}에 특별 선물 🎁` : ''}${rk.nx ? ` · Lv.${rk.nx[0]} ${rk.nx[1]} ${rk.nx[2]}` : ''}<br>전체 여정 ${Math.round(lessons / lessonAll * 100)}% (레슨 ${lessons}/${lessonAll})</small></span></div>
     <div class="tabs" role="tablist">${ENG.map((g, i) => `<button role="tab" aria-selected="${i === si}" data-st="${i}">${g.icon} ${g.name}</button>`).join('')}</div>
-    <div class="e-actions"><button class="candy" id="eReview">🔁 복습${due ? ` ${due}` : ''}</button><button class="candy" id="eAlbum">📒 단어 도감</button><button class="candy" id="eVoice">🔊 목소리</button><button class="candy" id="eGoals">🏆 도전 목표</button><button class="candy" id="eChat">💌 친구 쪽지</button>${e.grad ? '<button class="candy" id="eCert">🎓 수료증</button>' : ''}<button class="candy" id="eAge">나이 바꾸기</button></div>
+    <div class="e-actions"><button class="candy" id="eReview">🔁 복습${due ? ` ${due}` : ''}</button><button class="candy primary" id="eGames">🎮 영어 게임</button><button class="candy" id="eAlbum">📒 단어 도감</button><button class="candy" id="eVoice">🔊 목소리</button><button class="candy" id="eGoals">🏆 도전 목표</button><button class="candy" id="eChat">💌 친구 쪽지</button>${e.grad ? '<button class="candy" id="eCert">🎓 수료증</button>' : ''}<button class="candy" id="eAge">나이 바꾸기</button></div>
     ${engCanSpeak() && !noEngVoice() ? '' : '<p class="warn">이 기기에서는 영어 소리가 나오지 않아요. 🔊 목소리를 눌러 방법을 확인해 주세요.</p>'}
     <div class="e-guides"><span class="row" aria-hidden="true">${['bear', 'bunny', 'dragon', 'fox'].map(sp => petSVG(sp, { mood: 'happy', stage: 'kid' })).join('')}</span><span>곰 선생님과 친구들이 같이 배워 줄 거예요!</span></div>
     ${dayEngHTML()}<p class="msub">${st.desc}</p><div class="dex">${rows}</div>`,
@@ -6938,6 +7107,7 @@ function openEnglish(tab) {
       const u = ev.target.closest('[data-unit]'); if (u && !u.disabled) { if (engCanSpeak()) { try { engSay(' '); } catch (err) {} } return engLesson(si, st.units[+u.dataset.unit]); }
       if (ev.target.closest('#eReview')) { const q = engReviewQuiz(); if (!q) return toast('먼저 레슨을 하나 끝내면 복습할 수 있어요'); return engLesson(si, st.units[0], q); }
       if (ev.target.closest('#eAlbum')) return openEngAlbum();
+      if (ev.target.closest('#eGames')) return openEngGames();
       if (ev.target.closest('#eVoice')) return openEngVoice();
       if (ev.target.closest('#eGoals')) return openEngGoals();
       if (ev.target.closest('#eChat')) return openPals();
@@ -7147,6 +7317,7 @@ function openPlayMenu() {
   openSheet('뭐 하고 놀까?', `<div class="dex">
     <p class="arcade-head" style="margin-top:0">영어 배우기 <span class="arcade-tag">레벨 올리고 선물 받기</span></p>
     <button class="dex-card" data-game="english"><span class="emo day">📚</span><span class="txt"><span class="t1">말랑 영어</span><br><span class="t2">듣고, 고르고, 써 보며 배워요</span></span><span class="go">시작 ▶</span></button>
+    <button class="dex-card" data-game="enggames"><span class="emo day">🎮</span><span class="txt"><span class="t1">영어 게임</span><br><span class="t2">알파벳 마법, 듣고 잡기, 카드 매칭</span></span><span class="go">시작 ▶</span></button>
     <p class="arcade-head">새 놀이 <span class="arcade-tag">휴대폰으로 슥슥</span></p>
     ${card('runner', '🏃', '말랑 달리기', '좌우로 밀어 피하고, 위로 밀어 점프! 60초 달리기', 'day')}
     <p class="arcade-head">친구랑 같이 <span class="arcade-tag">한 화면에서 둘이</span></p>
@@ -7164,6 +7335,7 @@ function openPlayMenu() {
     const b = e.target.closest('[data-game]'); if (!b) return;
     closeSheet();
     if (b.dataset.game === 'english') return openEnglish();
+    if (b.dataset.game === 'enggames') return openEngGames();
     if (b.dataset.game === 'runner') return openRunner();
     if (b.dataset.game === 'duoTag' || b.dataset.game === 'duoTreasure') return openDuoSetup(b.dataset.game);
     if (b.dataset.game === 'pals') return openPals();

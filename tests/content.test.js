@@ -85,3 +85,13 @@ test('학습 영역이 모두 있다', () => {
   const ids = new Set(units.map(u => u.id));
   for (const k of ['abc1', 'ph_rhyme', 'ph_vowel', 'color', 'number', 'animal', 'food', 'hello', 'c_day', 'c_exam']) assert.ok(ids.has(k), k);
 });
+test('영어 게임에 쓰는 단어 묶음이 충분하다', () => {
+  for (const id of ['animal', 'food', 'color', 'number', 'transport', 'home']) {
+    const u = units.find(x => x.id === id), pics = (u.w || []).map(w => w[2]).filter(Boolean);
+    assert.ok(pics.length >= 6, id);
+    assert.equal(new Set(pics).size, pics.length, id + ' 그림 중복');
+  }
+  const abc = units.filter(u => u.abc).flatMap(u => u.w.map(w => w[3]));
+  assert.equal(abc.sort().join(''), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+});
+test('자연스럽지 않은 알파벳 문장을 쓰지 않는다', () => assert.ok(!html.includes('X is in box')));

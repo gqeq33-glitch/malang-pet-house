@@ -51,3 +51,9 @@ test('영어 음성: 자연스러운 음성을 먼저 고르고, 영어 음성�
   assert.ok(ctx.voiceScore({ name: 'x', lang: 'en_US' }) >= 10);
   assert.ok(html.includes("if (lang.startsWith('en') && noEngVoice()) { warnNoEngVoice(); return; }"));
 });
+test('영어 게임 3종이 메뉴에 연결되어 있고 코인 보상에 한도가 있다', () => {
+  for (const f of ['function egAlphabet', 'function egCatch', 'function egMatch', 'function openEngGames']) assert.ok(html.includes(f), f);
+  assert.ok(html.includes("boundedReward('eg:' + key, 10, 5)"));
+  const g = html.slice(html.indexOf('function egShell'), html.indexOf('function openEngGames'));
+  assert.ok(!/S\.coins\s*-=/.test(g), '게임에서 코인을 빼앗지 않는다');
+});
