@@ -11,7 +11,7 @@
 | 웹앱(PWA) | `www`를 GitHub Pages로 배포 (`.github/workflows/pages.yml`) |
 | Android | `.github/workflows/android.yml`이 `www`로 프로젝트를 만들어 APK 빌드. 서명키가 있으면 AAB도 빌드 |
 | iOS | `.github/workflows/ios.yml`이 시뮬레이터용으로 컴파일 확인 (서명 없음) |
-| 서비스 워커 | `www/sw.js`, 캐시 우선. `window.Capacitor`가 있으면 등록하지 않음 |
+| 서비스 워커 | `www/sw.js`. 게임 화면은 네트워크 우선(오프라인이면 저장본), 나머지는 캐시 우선. 버전이 바뀌면 열린 화면을 한 번 다시 연다. `window.Capacitor`가 있으면 등록하지 않음 |
 | 외부 CDN | 앱·PWA에는 없음. 복사 페이지의 한 파일 실행본만 three.js와 Google Fonts를 CDN에서 받음 |
 | Three.js | `www/vendor/three.min.js` r128 |
 | PeerJS | 삭제됨 |

@@ -143,3 +143,8 @@ test('개인정보처리방침: 실제 메일을 지어내지 않았고 채팅�
   assert.ok(pv.includes('온라인 채팅과 자유 입력 메시지가 없습니다') && pv.includes('no online chat'));
   assert.ok(!/PeerJS/.test(pv));
 });
+test('서비스 워커: 게임 화면은 네트워크 우선이고 옛 화면을 새로 연다', () => {
+  const sw = fs.readFileSync(path.join(root, 'www', 'sw.js'), 'utf8');
+  assert.ok(sw.includes("req.mode === 'navigate'"));
+  assert.ok(sw.includes('c.navigate(c.url)'));
+});
