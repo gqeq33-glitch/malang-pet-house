@@ -11,7 +11,6 @@ ROOT = Path(__file__).resolve().parent.parent
 s = (ROOT / "www" / "index.html").read_text(encoding="utf-8")
 s = s.replace('<script src="vendor/three.min.js"></script>',
               '<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>')
-s = s.replace("PEER_SRC = 'vendor/peerjs.min.js'", "PEER_SRC = 'https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js'")
 s = re.sub(r'<meta http-equiv="Content-Security-Policy"[^>]*>\s*', "", s)  # 공유 페이지는 CDN을 쓰고 호스트가 자체 보안 설정을 둔다
 s = re.sub(r"<!doctype html>\s*<html[^>]*>\s*<head>\s*", "", s, flags=re.I)
 s = re.sub(r'<meta charset="utf-8">\s*', "", s)

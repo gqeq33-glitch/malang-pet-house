@@ -10,9 +10,11 @@
     "ios:add": "npx cap add ios",
     "sync": "npx cap sync",
     "android:open": "npx cap open android",
-    "ios:open": "npx cap open ios"
+    "ios:open": "npx cap open ios",
+    "test": "node --test tests/security.test.js tests/content.test.js"
   },
   "dependencies": {
+    "@capacitor-community/text-to-speech": "^6.1.0",
     "@capacitor/android": "^7.0.0",
     "@capacitor/core": "^7.0.0",
     "@capacitor/ios": "^7.0.0"

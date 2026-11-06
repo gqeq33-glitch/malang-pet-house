@@ -13,7 +13,6 @@ game = (ROOT / "www" / "index.html").read_text(encoding="utf-8")
 game_nocsp = re.sub(r'<meta http-equiv="Content-Security-Policy"[^>]*>\s*', "", game)
 single = game_nocsp.replace('<script src="vendor/three.min.js"></script>',
                       '<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>')
-single = single.replace("PEER_SRC = 'vendor/peerjs.min.js'", "PEER_SRC = 'https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js'")
 single = re.sub(r'@font-face\{font-family:"(Jua|Gowun Dodum)";src:url\("fonts/[^)]*\) format\("woff2"\);font-display:swap\}\n', "", single)
 single = single.replace('<link rel="preload" href="fonts/Jua-Regular.woff2" as="font" type="font/woff2" crossorigin>\n',
                         '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&display=swap">\n')
@@ -24,6 +23,7 @@ FILES = [
     ("www/sw.js", "오프라인 캐시", "인터넷 없이도 앱이 켜지게 해 줘요.", None, False),
     ("www/manifest.webmanifest", "앱 설치 정보", "앱 이름·아이콘·전체 화면 설정이에요.", None, False),
     ("www/privacy.html", "개인정보처리방침", "스토어 등록에 필요한 페이지예요.", None, False),
+    ("tests/security.test.js", "보안 테스트", "저장 검증과 채팅 제거를 확인해요. 실행: node --test tests/security.test.js", None, False),
     ("README.md", "설치·출시 안내서", "PWA 설치, 구글 플레이, 앱스토어 출시 방법이에요.", None, False),
     ("capacitor.config.json", "네이티브 앱 설정", "앱 ID와 이름이에요.", None, False),
     ("package.json", "Capacitor 패키지 목록", "", None, False),

@@ -1,0 +1,35 @@
+# iOS 시뮬레이터용 빌드 확인 (서명 없음). 맥 없이 "컴파일이 되는지"만 확인한다.
+# 스토어 제출이나 실제 아이폰 설치는 Apple Developer 계정과 서명이 따로 필요하다.
+name: iOS build check
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['www/**', 'assets/**', 'capacitor.config.json', 'package.json', '.github/workflows/ios.yml']
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Capacitor
+        run: npm install
+
+      - name: Create iOS project
+        run: |
+          npx cap add ios
+          npx @capacitor/assets generate --ios --iconBackgroundColor "#DDF4EA" --splashBackgroundColor "#DDF4EA"
+          npx cap sync ios
+
+      - name: Build for simulator (no signing)
+        working-directory: ios/App
+        run: |
+          if [ -d App.xcworkspace ]; then TARGET="-workspace App.xcworkspace"; else TARGET="-project App.xcodeproj"; fi
+          xcodebuild $TARGET -scheme App -configuration Debug -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build

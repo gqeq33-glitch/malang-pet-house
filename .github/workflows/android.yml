@@ -35,6 +35,9 @@ jobs:
           npx cap add android
           npx @capacitor/assets generate --android --iconBackgroundColor "#DDF4EA" --splashBackgroundColor "#DDF4EA"
           npx cap sync android
+          # 안드로이드 11 이상에서 기기 음성(TTS) 엔진을 찾으려면 필요하다
+          grep -q 'TTS_SERVICE' android/app/src/main/AndroidManifest.xml || sed -i 's#</manifest>#    <queries><intent><action android:name="android.intent.action.TTS_SERVICE" /></intent></queries>
+</manifest>#' android/app/src/main/AndroidManifest.xml
           # 플레이 스토어는 업데이트마다 versionCode가 커져야 하므로 빌드 번호를 쓴다
           sed -i "s/versionCode 1$/versionCode ${{ github.run_number }}/" android/app/build.gradle
 
