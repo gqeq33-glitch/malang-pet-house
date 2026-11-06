@@ -27,6 +27,7 @@ FILES = [
     ("tests/ui.test.js", "캐릭터·화면 검사", "대표 캐릭터 연결, 색상 대비, 글씨 크기를 확인해요.", None, False),
     ("tests/content.test.js", "영어 내용 검사", "번역 누락, 중복, 정답 오류를 기계로 검사해요. 사람 검수를 대신하지는 못해요.", None, False),
     (".github/workflows/ios.yml", "iOS 빌드 확인", "맥 없이 시뮬레이터용 컴파일을 확인해요.", None, False),
+    ("docs/STORY_DESIGN.md", "이야기 모험 설계", "교육 방식 조사와 구성을 적었어요.", None, False),
     ("docs/MOBILE.md", "4단계: 모바일 앱", "빌드 구조와 기기 점검표예요.", None, False),
     ("docs/CONTENT_REVIEW.md", "3단계: 영어 내용 검수", "교사·원어민 검수 방법이에요.", None, False),
     ("docs/USER_TEST_PLAN.md", "5단계: 사용자 시험", "보호자 동의서, 지표, 설문이에요.", None, False),

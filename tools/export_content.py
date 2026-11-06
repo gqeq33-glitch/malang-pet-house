@@ -26,6 +26,26 @@ for st in json.loads(out):
             rows.append(base + ["읽기", x["p"] + " Q: " + x["q"], x["k"], x["a"], " / ".join(x["o"])])
         for x in u.get("d", []):
             rows.append(base + ["회화", x[0], x[1], x[2] + " (" + x[3] + ")", " / ".join(x[4])])
+# 게임과 이야기에 따로 들어 있는 문장도 함께 내보낸다
+def chunk(start_mark, end_mark, expr, stubs=""):
+    i = html.index(start_mark)
+    j = html.index(end_mark, i)
+    code = stubs + html[i:j] + f"\nprocess.stdout.write(JSON.stringify({expr}));"
+    return json.loads(subprocess.run(["node", "-"], input=code, capture_output=True, check=True, encoding="utf-8").stdout)
+for level, items in chunk("const EG_TRAIN = {", "function egTrain", "EG_TRAIN").items():
+    for en, ko in items:
+        rows.append(["게임", "문장 기차 " + level, "문장", en, ko, "", ""])
+for st in chunk("const STORIES = {", "function egStory", "Object.values(STORIES)"):
+    for sc in st["scenes"].values():
+        rows.append(["게임", "이야기 극장 " + st["t"], "이야기", sc["en"], sc["k"], "", ""])
+        for c in sc["c"]:
+            rows.append(["게임", "이야기 극장 " + st["t"], "선택지", c[0], c[1], "", ""])
+stubs = "const egAlphabet=0,egCatch=0,egCafe=0,egJungle=0,egTrain=0,egSpeak=0;"
+for i, ch in enumerate(chunk("const SAGA_WHO = {", "const SAGA_TREE", "SAGA", stubs), 1):
+    for line in ch["before"] + ch["after"]:
+        rows.append(["이야기 모험", f"{i}장 {ch['t']}", "대사", line[1], line[2], "", ""])
+    a = ch["ask"]
+    rows.append(["이야기 모험", f"{i}장 {ch['t']}", "대답", a["q"], a["k"], a["a"], " / ".join(a["o"])])
 path = ROOT / "docs" / "content_review.csv"
 with path.open("w", encoding="utf-8-sig", newline="") as f:
     w = csv.writer(f)

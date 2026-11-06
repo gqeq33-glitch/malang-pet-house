@@ -107,3 +107,12 @@ test('음악: 놀이 곡은 16마디 이상이고 밝은 장조이며 장면마�
   assert.equal(new Set(mels).size, mels.length);
   assert.ok(html.includes('function openSoundTest'));
 });
+test('영어 게임 9종이 목록에 모두 연결되어 있고, 발음 게임은 마이크를 쓰지 않는다', () => {
+  for (const k of ['abc', 'catch', 'match', 'train', 'hunt', 'cafe', 'jungle', 'story', 'speak']) assert.ok(html.includes(`row('${k}'`), k);
+  assert.ok(!/getUserMedia|SpeechRecognition/.test(html));
+  const g = html.slice(html.indexOf('function egCafe'), html.indexOf('function openEngGames'));
+  assert.ok(!/S\.coins\s*-=/.test(g));
+});
+test('이야기 모험이 지도와 놀이 메뉴에 있고, 게임이 끝나면 이야기로 돌아온다', () => {
+  for (const f of ['function openSaga', 'function sagaPlay', 'function sagaEnd', 'id="eSaga"', 'data-game="saga"', 'if (sagaAfter)', 'cat.sagaLen']) assert.ok(html.includes(f), f);
+});

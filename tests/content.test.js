@@ -106,3 +106,54 @@ test('문장 기차: 문장과 뜻이 있고 첫 글자와 문장 부호가 맞�
   for (const x of c2.T.normal) assert.ok(x[0].split(' ').length >= 5 && x[0].split(' ').length <= 6, x[0]);
   for (const t of ['I like apples.', 'The cat is sleeping.', 'I want a red balloon.', 'Can I have some milk?']) assert.ok(all.some(x => x[0] === t), t);
 });
+function chunk(startMark, endMark, expose) { const m = html.slice(html.indexOf(startMark), html.indexOf(endMark, html.indexOf(startMark))); const c3 = {}; vm.createContext(c3); vm.runInContext(m + `;this.X = ${expose};`, c3); return c3.X; }
+test('이야기 극장: 모든 장면에 갈 수 있고 끝이 있으며, 영어와 뜻이 있고 복습 단어가 실제로 있다', () => {
+  const S = chunk('const STORIES = {', 'function egStory', 'STORIES');
+  const words = new Set(units.flatMap(u => (u.w || []).map(w => w[0])));
+  assert.equal(Object.keys(S).length, 3);
+  for (const [id, st] of Object.entries(S)) {
+    const seen = new Set(), walk = k => { if (seen.has(k)) return; seen.add(k); const sc = st.scenes[k]; assert.ok(sc, id + ':' + k); sc.c.forEach(c => walk(c[2])); };
+    walk(st.start);
+    assert.deepEqual([...seen].sort(), Object.keys(st.scenes).sort(), id + ' 도달 못 하는 장면');
+    assert.ok(Object.values(st.scenes).some(sc => !sc.c.length), id + ' 끝');
+    assert.ok(Object.values(st.scenes).some(sc => sc.c.length > 1), id + ' 갈림길');
+    for (const sc of Object.values(st.scenes)) { assert.ok(/^[A-Z]/.test(sc.en) && /[.!?"]$/.test(sc.en) && EN.test(sc.en), sc.en); assert.ok(KO.test(sc.k), sc.en); for (const c of sc.c) { assert.ok(EN.test(c[0]) && KO.test(c[1]), c[0]); } }
+    for (const w of st.review) assert.ok(words.has(w), id + ' ' + w);
+  }
+});
+test('펫 카페: 주문 문장의 관사와 복수형이 맞다', () => {
+  const m = html.slice(html.indexOf('const CAFE_MENU = ['), html.indexOf('function egCafe'));
+  const c4 = {}; vm.createContext(c4); vm.runInContext(m + ';this.M = CAFE_MENU; this.O = cafeOrder;', c4);
+  const order = (w, n) => c4.O(c4.M.find(x => x.w === w), n).en;
+  assert.equal(order('apple', 1), 'Can I have an apple, please?');
+  assert.equal(order('cookie', 2), 'Can I have two cookies, please?');
+  assert.equal(order('sandwich', 3), 'Can I have three sandwiches, please?');
+  assert.equal(order('milk', 0), 'Can I have some milk, please?');
+  assert.ok(c4.O(c4.M[0], 2).ko.includes('2개'));
+});
+test('방향 단어와 정글 문장에 필요한 단어가 레슨에 있다', () => {
+  const words = new Set(units.flatMap(u => (u.w || []).map(w => w[0])));
+  for (const w of ['left', 'right', 'up', 'down', 'behind', 'next to', 'on']) assert.ok(words.has(w), w);
+});
+test('이야기 모험: 8장 구성과 대사, 답, 단어 연결이 맞다', () => {
+  const m = html.slice(html.indexOf('const SAGA_WHO = {'), html.indexOf('const SAGA_TREE'));
+  const c5 = {}; vm.createContext(c5);
+  for (const f of ['egAlphabet', 'egCatch', 'egCafe', 'egJungle', 'egTrain', 'egSpeak']) c5[f] = () => {};
+  vm.runInContext(m + ';this.W = SAGA_WHO; this.S = SAGA;', c5);
+  assert.equal(c5.S.length, 8);
+  const ids = new Set(units.map(u => u.id)), seen = new Set();
+  for (const ch of c5.S) {
+    assert.ok(KO.test(ch.t), ch.t);
+    if (ch.words) assert.ok(ids.has(ch.words), ch.words);
+    for (const [who, en, ko] of [...ch.before, ...ch.after]) {
+      assert.ok(c5.W[who], who);
+      assert.ok(EN.test(en) && /^[A-Z]/.test(en) && /[.!?]$/.test(en), en);
+      assert.ok(KO.test(ko), en);
+      assert.ok(!seen.has(en), '겹치는 대사: ' + en); seen.add(en);
+    }
+    assert.ok(KO.test(ch.ask.k) && KO.test(ch.ask.ak), ch.t);
+    assert.ok(!ch.ask.o.includes(ch.ask.a) && ch.ask.o.length >= 2, ch.t);
+    assert.ok(EN.test(ch.ask.q) && /\?$/.test(ch.ask.q), ch.ask.q);
+  }
+  assert.ok(c5.S.filter(x => x.gift).length >= 3);
+});

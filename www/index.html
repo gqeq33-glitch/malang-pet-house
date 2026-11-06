@@ -456,6 +456,16 @@ body{-webkit-touch-callout:none}
 .backup input[type=password]{width:100%;font-size:18px;padding:10px 12px;border:0;border-radius:12px;margin-bottom:8px;box-shadow:inset 0 0 0 2px var(--ink)}
 
 /* ---------- 2.0: 큰 버튼과 태블릿 ---------- */
+.saga-card{display:flex;align-items:center;gap:10px;width:100%;border:0;border-radius:18px;background:linear-gradient(120deg,#FFE9A8,#CFF3E3);padding:10px 12px;margin-bottom:10px;color:var(--ink);box-shadow:0 0 0 2.5px var(--ink) inset,0 4px 0 rgba(53,67,90,.18);text-align:left;font-family:var(--display)}.saga-card .row{display:flex;flex:none}.saga-card svg{width:34px;height:34px;margin-right:-8px;display:block}.saga-card .tx{flex:1;min-width:0;padding-left:8px}.saga-card b{font-weight:400;font-size:19px;display:block}.saga-card small{font-family:var(--body);font-size:14px}.saga-card .go{font-size:20px}
+.saga-tree{display:flex;align-items:center;gap:12px;background:#EAF7FF;border-radius:18px;padding:10px 14px;margin-bottom:10px}.saga-tree .pic{font-size:52px;line-height:1}.saga-tree b{font-family:var(--display);font-weight:400;font-size:19px}.saga-tree small{font-size:14px}
+.saga-scene{display:flex;flex-direction:column;align-items:center;gap:12px;padding-top:8px}.saga-who{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:15px}.saga-who svg{width:128px;height:128px;display:block}.saga-who b{font-family:var(--display);font-weight:400;font-size:18px}.saga-scene .e-chat .b{max-width:100%;font-size:22px;text-align:center;align-self:stretch}.saga-big{font-size:84px;line-height:1.1}
+.cafe-guest{display:flex;align-items:center;gap:8px}.cafe-guest .e-chat{flex:1}.cafe-menu{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.cafe-menu .e-opt{padding:6px 2px;min-height:76px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:14px}.cafe-menu .em{font-size:30px}.cafe-menu small{position:static;font-size:13px;color:inherit}
+.cafe-qty{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.cafe-qty[hidden]{display:none}.cafe-qty .candy{font-size:22px}.cafe-qty small{font-size:14px;display:block}.cafe-tray{margin:0;text-align:center;font-size:32px}
+.jg-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;background:#BFEBC6;border-radius:16px;padding:6px;box-shadow:0 0 0 2.5px var(--ink) inset;flex:none}.jg-cell{aspect-ratio:1;display:grid;place-items:center;font-size:26px;background:rgba(255,255,255,.45);border-radius:10px;overflow:hidden}.jg-cell.me{background:var(--butter)}.jg-pet{width:90%;display:block}.jg-pet svg{width:100%;height:auto;display:block}
+.jg-pad{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;flex:none}.jg-pad .candy{padding:6px 2px;font-size:24px;min-height:64px;display:flex;flex-direction:column;align-items:center}.jg-pad small{font-size:13px}
+.jg-scenes{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.jg-scenes .e-opt{padding:8px 2px;min-height:96px}.jg-scene{display:flex;align-items:center;justify-content:center;font-size:36px;position:relative;line-height:1}.jg-behind{transform:translate(12px,-5px) scale(.82);position:relative;z-index:0}.jg-front{position:relative;z-index:1}.jg-stack{display:flex;flex-direction:column;align-items:center;gap:0;font-size:30px}.jg-stack span:first-child{margin-bottom:-6px}
+.e-card.story{align-items:center}.story-pic{font-size:62px;line-height:1.1;letter-spacing:4px}.story-en{margin:0;font-family:var(--display);font-size:21px;line-height:1.35;text-align:center}.opt-ko{position:static!important;display:block;font-family:var(--body);font-size:14px;color:var(--muted);font-weight:400;margin-top:2px}
+.speak-star{margin:0;text-align:center;font-size:24px;letter-spacing:3px}
 .snd-fx{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.snd-fx .candy{padding:6px 2px;font-size:15px}
 .eg-rail{position:relative;overflow:hidden;min-height:64px;padding:6px 0 12px;border-bottom:5px solid var(--ink)}
 .eg-train{display:flex;align-items:center;gap:4px;transition:transform 1.8s ease-in}.eg-train.go{transform:translateX(115%)}
@@ -1042,7 +1052,7 @@ function saveGuard(raw, cat, opt = {}) {
     const tut = sub(d, 'tut', ['step', 't0', 'secs', 'old']); if (tut) { if (!['egg', 'lesson', 'done'].includes(tut.step)) { fail('tut.step'); tut.step = 'done'; } num(tut, 't0', 0, now + 86400000, {}, 'tut.t0'); num(tut, 'secs', 0, 100000000, {}, 'tut.secs'); bool(tut, 'old', 'tut.old'); }
     const de = sub(d, 'dayEng', ['day', 'lesson', 'right', 'care', 'game', 'words', 'got']); if (de) { str(de, 'day', 'dayEng.day'); num(de, 'right', 0, 100000, { int: true, def: 0 }, 'dayEng.right'); bool(de, 'lesson', 'dayEng.lesson'); bool(de, 'care', 'dayEng.care'); bool(de, 'game', 'dayEng.game'); bool(de, 'words', 'dayEng.words'); bool(de, 'got', 'dayEng.got'); }
     const qa = sub(d, 'qa', ['t0', 'firstSec', 'days', 'daily', 'err']); if (qa) { num(qa, 't0', 0, now + 86400000, {}, 'qa.t0'); num(qa, 'firstSec', 0, 100000000, {}, 'qa.firstSec'); num(qa, 'daily', 0, 100000, { int: true }, 'qa.daily'); num(qa, 'err', 0, 100000, { int: true }, 'qa.err'); numList(qa, 'days', 'qa.days'); }
-    const eng = sub(d, 'eng', ['stage', 'viewStage', 'xp', 'level', 'units', 'w', 'right', 'wrong', 'gifts', 'slow', 'goals', 'grad', 'chatN', 'chatNick', 'recent', 'voice']);
+    const eng = sub(d, 'eng', ['stage', 'viewStage', 'xp', 'level', 'units', 'w', 'right', 'wrong', 'gifts', 'slow', 'goals', 'grad', 'chatN', 'chatNick', 'recent', 'voice', 'stories', 'saga']);
     if (eng) {
       if (eng.recent !== undefined && (!Array.isArray(eng.recent) || eng.recent.length > 20 || !eng.recent.every(x => x === 0 || x === 1))) { fail('eng.recent'); delete eng.recent; }
       for (const k of ['stage', 'viewStage']) if (eng[k] !== null) num(eng, k, 0, cat.engStages - 1, { int: true }, 'eng.' + k);
@@ -1051,6 +1061,8 @@ function saveGuard(raw, cat, opt = {}) {
       bool(eng, 'slow', 'eng.slow'); str(eng, 'voice', 'eng.voice');
       const un = sub(eng, 'units', null, 'eng.units'); if (un) for (const k of Object.keys(un)) { if (!cat.engUnits.has(k) || !isObj(un[k])) { delete un[k]; continue; } num(un[k], 'stars', 0, 3, { int: true, def: 0 }, 'eng.units.stars'); }
       const w = sub(eng, 'w', null, 'eng.w'); if (w) for (const k of Object.keys(w)) { if (!cat.engWords.has(k) || !isObj(w[k])) { delete w[k]; continue; } num(w[k], 'b', 0, 5, { int: true, def: 0 }, 'eng.w.b'); num(w[k], 'due', 0, 100000000000000, { def: 0 }, 'eng.w.due'); }
+      const sg = sub(eng, 'saga', ['done'], 'eng.saga'); if (sg) num(sg, 'done', 0, cat.sagaLen, { int: true, def: 0 }, 'eng.saga.done');
+      const sr = sub(eng, 'stories', null, 'eng.stories'); if (sr) for (const k of Object.keys(sr)) num(sr, k, 0, 1, { int: true }, 'eng.stories');
       const gl = sub(eng, 'goals', null, 'eng.goals'); if (gl) for (const k of Object.keys(gl)) num(gl, k, 0, 1, { int: true }, 'eng.goals');
       const gr = sub(eng, 'grad', ['date', 'score'], 'eng.grad'); if (gr) { str(gr, 'date', 'eng.grad.date'); num(gr, 'score', 0, 100, {}, 'eng.grad.score'); }
     }
@@ -1089,7 +1101,7 @@ function saveGuard(raw, cat, opt = {}) {
 }
 /* SAVE-GUARD-END */
 function saveCatalog() {
-  return { SPECIES, HATS, DYES, WEAR, RIDES, ROOMS, DECOR, FRIENDS, CROPS, MISSIONS, titles: TITLES.map(t => t.id), palMax: PAL_MAX, notes: PAL_NOTES.length, normPal, cleanName, engStages: ENG.length, engWords: engAllWords, engUnits: new Set(ENG.flatMap(g => g.units.map(u => u.id))) };
+  return { SPECIES, HATS, DYES, WEAR, RIDES, ROOMS, DECOR, FRIENDS, CROPS, MISSIONS, titles: TITLES.map(t => t.id), palMax: PAL_MAX, notes: PAL_NOTES.length, normPal, cleanName, sagaLen: SAGA.length, engStages: ENG.length, engWords: engAllWords, engUnits: new Set(ENG.flatMap(g => g.units.map(u => u.id))) };
 }
 function load() {
   let raw = null;
@@ -1352,7 +1364,7 @@ function renderHUD() {
   const engE = engState(), engN = engE.stage === null || engE.stage === undefined ? null : engNext();
   syncAreaTabs();
   $('#engBar').hidden = egg || inObby || bathing || !!placing || !!round;
-  $('#engBarTx').textContent = `영어 Lv.${engE.level}` + (engE.stage === null || engE.stage === undefined ? ' · 영어 모험을 시작해요!' : engN ? ` · 다음: ${ENG[engN.si].units[engN.ui].t}` : ' · 모든 레슨 완료! 복습해요');
+  $('#engBarTx').textContent = `영어 Lv.${engE.level}` + (engE.stage === null || engE.stage === undefined ? ' · 영어 모험을 시작해요!' : engN ? (sagaState().done < SAGA.length ? ` · 📖 ${sagaState().done + 1}장 ${SAGA[sagaState().done].t}` : ` · 다음: ${ENG[engN.si].units[engN.ui].t}`) : ' · 모든 레슨 완료! 복습해요');
   $('#photoBtn').hidden = egg || inObby || bathing || !!placing;
   $('#jumpBtn').hidden = egg || inObby || bathing || !!placing || !!p.asleep;
   const riding = World.riding();
@@ -4933,7 +4945,7 @@ const Music = (() => {
   const scene = () => {
     const p = S.pets && S.pets[S.active];
     if (forced) return forced;
-    if (gameOn) return document.querySelector('#game.eng') ? 'learn' : 'game';
+    if (gameOn) { const g = document.querySelector('#game.eng'); return g ? (g.dataset.music || 'learn') : 'game'; }
     if (round) return 'game';
     if (p && p.asleep) return 'sleep';
     const a = World.area(); return a === 'obby' ? 'obby' : a === 'village' ? 'village' : 'house';
@@ -5227,6 +5239,7 @@ const BADGES = {
   eng80:    ['🦉', '영어 박사님', '영어 Lv.80 달성'],
   eng100:   ['👑', '영어 마스터', '영어 Lv.100 달성'],
   engGrad:  ['🎓', '회화 졸업생', '회화 졸업 시험 통과하기'],
+  sagaHero: ['🌳', '말 영웅', '이야기 모험 끝내기'],
   chat1:    ['💌', '영어 쪽지 친구', '친구 코드에 영어 쪽지 달기'],
   runGoal:  ['🏁', '말랑 러너', '말랑 달리기 60초 끝까지 달리기'],
   duo:      ['🎮', '같이 놀기', '한 화면에서 친구와 한 판 끝내기'],
@@ -5663,6 +5676,8 @@ function openStand() {
 function goStand() { World.area() === 'village' ? World.goVillage('garden', true, openStand) : openStand(); }
 
 const NEWS = [
+  { v: '3.9', date: '11월 6일', items: ['📖 이야기 모험 "말 나무를 살려요" 시작! 8장 동안 친구들과 날아간 말을 찾아요', '🌳 이야기를 듣고, 단어를 익히고, 게임에서 쓰면 말 나무가 자라요'] },
+  { v: '3.8', date: '11월 6일', items: ['☕ 펫 카페: 손님의 영어 주문을 받아요', '🌴 영어 정글 탐험: 길 안내를 듣고 보물을 찾아요', '🎭 이야기 극장: 고른 말에 따라 달라지는 이야기 3편', '🎤 발음 별 수집: 듣고 따라 말하며 별을 모아요 (마이크 없음)'] },
   { v: '3.7', date: '11월 6일', items: ['🎵 새 배경음악: 집, 마을, 점프 코스, 영어 공부, 게임, 잠자는 시간마다 다른 밝은 곡이 나와요', '🔔 효과음을 새로 만들고, 영어를 읽을 때는 음악이 작아져요', '🎚️ 설정에서 음악과 효과음 크기를 고를 수 있어요'] },
   { v: '3.6', date: '11월 6일', items: ['🚂 문장 기차: 단어를 연결하면 기차가 출발해요', '🗺️ 단어 보물찾기: 영어로 부탁한 물건을 마을에서 찾아요', '🌟 오늘의 영어에 오늘의 단어와 게임 미션 추가 (쉬어도 잃는 것 없어요)'] },
   { v: '3.5', date: '11월 6일', items: ['🎮 영어 게임 3종: ✨ 알파벳 마법, 🎧 영어 듣고 잡기, 🃏 단어 카드 매칭', '🚌 탈것과 🏠 집안 물건 레슨 추가'] },
@@ -6451,7 +6466,9 @@ const ENG = [
     { id: 'transport', t: '탈것', e: '🚌', w: [['bus', '버스', '🚌'], ['car', '자동차', '🚗'], ['train', '기차', '🚆'], ['airplane', '비행기', '✈️'], ['bike', '자전거', '🚲'], ['boat', '배', '⛵']],
       s: [['I go to school by bus.', '나는 버스로 학교에 가요.'], ['The train is very long.', '기차는 아주 길어요.'], ['I can ride a bike.', '나는 자전거를 탈 수 있어요.']] },
     { id: 'home', t: '우리 집 물건', e: '🏠', w: [['bed', '침대', '🛏️'], ['sofa', '소파', '🛋️'], ['door', '문', '🚪'], ['window', '창문', '🪟'], ['lamp', '전등', '💡'], ['clock', '시계', '🕰️']],
-      s: [['Please open the door.', '문을 열어 주세요.'], ['The clock is on the wall.', '시계는 벽에 있어요.'], ['My cat is on the sofa.', '내 고양이는 소파 위에 있어요.']] }
+      s: [['Please open the door.', '문을 열어 주세요.'], ['The clock is on the wall.', '시계는 벽에 있어요.'], ['My cat is on the sofa.', '내 고양이는 소파 위에 있어요.']] },
+    { id: 'dir', t: '방향과 위치', e: '🧭', noPic: true, w: [['left', '왼쪽'], ['right', '오른쪽'], ['up', '위로'], ['down', '아래로'], ['behind', '~ 뒤에']],
+      s: [['Turn left at the park.', '공원에서 왼쪽으로 돌아요.'], ['The cat is behind the door.', '고양이가 문 뒤에 있어요.'], ['Go up the stairs.', '계단을 올라가요.']] }
   ] },
   { id: 's2', name: '3~4학년', age: '9~11세', icon: '🌳', pick: 4, desc: '문장을 듣고 만들어요', units: [
     { id: 'me', noPic: true, t: '나를 소개해요', e: '🙋', w: [['name', '이름', '📛'], ['age', '나이', '🎂'], ['student', '학생', '🧑‍🎓'], ['Korea', '한국', '🇰🇷']],
@@ -6803,6 +6820,7 @@ const ENG_GOALS = [
   ...[[1, 20], [5, 40], [10, 70], [20, 150]].map(([n, c]) => ({ id: 'c' + n, e: '🎤', t: `회화 상황 ${n}개 끝내기`, n, v: engConvDone, c })),
   ...[[5, 20], [10, 40], [20, 70], [30, 100], [50, 150], [100, 300]].map(([n, c]) => ({ id: 'v' + n, e: '🏅', t: `영어 Lv.${n} 되기`, n, v: () => engState().level, c })),
   ...[[1, 10], [5, 30], [20, 70]].map(([n, c]) => ({ id: 't' + n, e: '💌', t: `친구 코드에 영어 쪽지 ${n}번 달기`, n, v: () => engState().chatN || 0, c })),
+  { id: 'saga', e: '📖', t: '이야기 모험 끝내기', n: 1, v: () => (sagaState().done >= SAGA.length ? 1 : 0), c: 100 },
   { id: 'grad', e: '🎓', t: '회화 졸업 시험 통과하기', n: 1, v: () => engState().grad ? 1 : 0, c: 300 }
 ];
 function engCheckGoals() {
@@ -7071,7 +7089,7 @@ function engLesson(stageIdx, unit, reviewList) {
       ${unit.exam && !review ? `<p class="e-ko">${passed ? `${score}점! 회화 과정을 모두 마쳤어요.` : '80점이면 통과예요. 틀려도 불이익이 없으니 복습하고 다시 도전해요.'}</p>` : ''}
       ${ups.map(u => `<div class="e-gift">🎉 <b>Lv.${u.lv} 달성!</b> 선물: ${u.won.map(escapeHTML).join(', ')}</div>`).join('')}
       <p class="e-pet-xp">🐾 ${escapeHTML(pet.name)} 경험치 +${petXP} · <b>${FORMS[form].name} 모습</b>${form > formBefore ? ' 🎉 변신!' : nextForm ? ` · Lv.${nextForm.lv}에 ${nextForm.name} 모습으로 변신` : ''}</p>
-      ${firstMission ? '<div class="e-gift">🎉 <b>첫 영어 미션 완료!</b> 선물 50코인을 받았어요. 상점에서 펫을 꾸미고, 마을에도 놀러 가 봐요!</div>' : ''}
+      ${firstMission ? '<div class="e-gift">🎉 <b>첫 영어 미션 완료!</b> 선물 50코인을 받았어요. 이제 📖 이야기 모험에서 친구들을 도와주러 가 봐요!</div>' : ''}
       ${dayDone ? `<div class="e-gift">🌟 <b>오늘의 영어 완료!</b> ${DAY_COIN}코인</div>` : ''}
       ${newAreas.map(k => `<div class="e-gift">🗺️ <b>새 지역이 열렸어요!</b> ${AREA_NAME[k]}</div>`).join('')}
       ${goals.map(g => `<div class="e-gift">🏆 <b>도전 목표 달성!</b> ${g.e} ${escapeHTML(g.t)} · ${g.c}코인</div>`).join('')}
@@ -7107,11 +7125,11 @@ const egUnit = id => { for (const g of ENG) { const u = g.units.find(x => x.id =
 const egWords = id => engWords(egUnit(id)).filter(x => x.e);
 const EG_CATS = { animal: '🐾 동물', food: '🍱 음식', color: '🎨 색깔', number: '🔢 숫자', transport: '🚌 탈것', home: '🏠 집안 물건' };
 const egLetters = () => ENG[0].units.filter(u => u.abc).flatMap(engWords);
-function egShell(title) {
+function egShell(title, music = 'game') {
   closeSheet(); if (talking) closeTalk();
   gameOn = true;
   const backFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-  const wrap = document.createElement('div'); wrap.id = 'game'; wrap.className = 'eng';
+  const wrap = document.createElement('div'); wrap.id = 'game'; wrap.className = 'eng'; wrap.dataset.music = music;
   wrap.setAttribute('role', 'dialog'); wrap.setAttribute('aria-modal', 'true'); wrap.setAttribute('aria-label', title);
   wrap.innerHTML = `<div class="g-top gut"><span class="ttl">${escapeHTML(title)}</span><button class="icon-btn" id="gClose" aria-label="그만하기">✕</button></div><div class="e-prog gut"><i id="eBar"></i></div><div class="e-main gut" id="eMain" aria-live="polite"></div><div class="e-foot gut" id="eFoot"></div>`;
   $('#app').appendChild(wrap); pushBack();
@@ -7135,6 +7153,12 @@ function egFinish(sh, { key, right, total, again }) {
     ${ups.map(u => `<div class="e-gift">🎉 <b>Lv.${u.lv} 달성!</b> 선물: ${u.won.map(escapeHTML).join(', ')}</div>`).join('')}
     ${dayDone ? `<div class="e-gift">🌟 <b>오늘의 영어 완료!</b> ${DAY_COIN}코인</div>` : ''}
     ${goals.map(g => `<div class="e-gift">🏆 <b>도전 목표 달성!</b> ${g.e} ${escapeHTML(g.t)} · ${g.c}코인</div>`).join('')}</div>`;
+  if (sagaAfter) {
+    sh.foot.innerHTML = '<button class="candy primary e-next" id="gHome">이야기 계속하기 ▶</button>';
+    sh.bind('gHome', () => { const f = sagaAfter; sagaAfter = null; sh.close(); f(); });
+    sh.wrap.querySelector('#gHome').focus({ preventScroll: true });
+    return;
+  }
   sh.foot.innerHTML = '<div class="e-row"><button class="candy" id="eAgain">다시 하기</button><button class="candy primary" id="gHome">게임 목록</button></div>';
   sh.bind('eAgain', () => { sh.close(); again(); });
   sh.bind('gHome', () => { sh.close(); openEngGames(); });
@@ -7338,12 +7362,341 @@ function startWordHunt() {
   tip.textContent = '🐉 꼬미의 부탁을 듣고 그 그림으로 달려가요!';
   ask(); renderHUD();
 }
+// 게임 F: 펫 카페. 손님의 주문을 듣고 메뉴와 수량을 고른 뒤, 영어로 인사를 주고받는다
+const CAFE_MENU = [
+  { w: 'apple', e: '🍎', k: '사과', one: 'an apple', many: 'apples' }, { w: 'banana', e: '🍌', k: '바나나', one: 'a banana', many: 'bananas' }, { w: 'cookie', e: '🍪', k: '쿠키', one: 'a cookie', many: 'cookies' },
+  { w: 'donut', e: '🍩', k: '도넛', one: 'a donut', many: 'donuts' }, { w: 'sandwich', e: '🥪', k: '샌드위치', one: 'a sandwich', many: 'sandwiches' },
+  { w: 'milk', e: '🥛', k: '우유', some: 'some milk' }, { w: 'juice', e: '🧃', k: '주스', some: 'some juice' }, { w: 'water', e: '💧', k: '물', some: 'some water' }
+];
+const CAFE_NUM = [null, ['one', '1개'], ['two', '2개'], ['three', '3개']];
+const CAFE_TALK = [
+  { q: '주문한 것을 건네줄 때는?', a: 'Here you are.', k: '여기 있어요.', o: ['How old are you?', 'Good night.'], them: 'Thank you!' },
+  { q: '"Thank you!"라는 말을 들으면?', a: "You're welcome!", k: '천만에요!', o: ['See you tomorrow.', 'I am ten.'], them: 'Bye-bye!' }
+];
+function cafeOrder(it, n) {
+  if (it.some) return { en: `Can I have ${it.some}, please?`, ko: `${it.k} 좀 주세요.` };
+  return { en: `Can I have ${n === 1 ? it.one : `${CAFE_NUM[n][0]} ${it.many}`}, please?`, ko: `${it.k} ${CAFE_NUM[n][1]} 주세요.` };
+}
+function egCafe() {
+  const sh = egShell('☕ 펫 카페'), guests = shuffle(['kitten', 'puppy', 'otter', 'hamster', 'penguin', 'squirrel', 'turtle', 'sheep']).slice(0, 4), orders = shuffle(CAFE_MENU).slice(0, 4);
+  let i = 0, right = 0;
+  const guestHTML = (sp, mood, en, ko) => `<div class="cafe-guest"><span class="e-pet" aria-hidden="true">${petSVG(sp, { mood, stage: 'kid' })}</span><div class="e-chat"><div class="b them">${escapeHTML(en)}${ko ? `<small>${escapeHTML(ko)}</small>` : ''}</div></div></div>`;
+  function guest() {
+    if (i >= orders.length) return egFinish(sh, { key: 'cafe', right, total: orders.length, again: egCafe });
+    const it = orders[i], n = it.some ? 0 : 1 + Math.floor(Math.random() * 3), od = cafeOrder(it, n), sp = guests[i];
+    let first = true, pick = null; sh.bar.style.width = i / orders.length * 100 + '%';
+    const hello = `Hello! ${od.en}`;
+    sh.main.innerHTML = `${guestHTML(sp, 'happy', hello, '')}<button class="e-say" id="eSay" aria-label="다시 듣기">🔊</button><p class="e-prompt"><span>메뉴를 골라요</span></p><div class="cafe-menu" id="cafeMenu">${CAFE_MENU.map((m, k) => `<button class="e-opt" data-m="${k}"><span class="em">${m.e}</span><small>${m.w}</small></button>`).join('')}</div><div class="cafe-qty" id="cafeQty" hidden>${[1, 2, 3].map(q => `<button class="candy" data-q="${q}">${q}<small> ${CAFE_NUM[q][0]}</small></button>`).join('')}</div><p class="e-why" id="egHint" role="status"></p>`;
+    sh.foot.innerHTML = '';
+    sh.bind('eSay', () => engSay(hello)); engSay(hello);
+    const hint = t => { sh.main.querySelector('#egHint').textContent = t; };
+    const miss = () => { first = false; egMiss(null); hint(`손님 말: ${od.ko}`); engSay(od.en); };
+    const served = () => { if (first) right++; egRight(CAFE_MENU.includes(it) ? it.w : null); sfx('coin'); talk(0); };
+    sh.main.querySelector('#cafeMenu').addEventListener('click', ev => {
+      const b = ev.target.closest('[data-m]'); if (!b || b.disabled) return;
+      if (CAFE_MENU[+b.dataset.m] !== it) { b.disabled = true; b.classList.add('wrong'); return miss(); }
+      sfx('pop'); b.classList.add('right'); sh.main.querySelectorAll('[data-m]').forEach(x => { x.disabled = true; });
+      if (it.some) return served();
+      pick = it; sh.main.querySelector('#cafeQty').hidden = false; sh.main.querySelector('.e-prompt span').textContent = '몇 개인지 골라요'; engSay(od.en);
+    });
+    sh.main.querySelector('#cafeQty').addEventListener('click', ev => {
+      const b = ev.target.closest('[data-q]'); if (!b || b.disabled || !pick) return;
+      if (+b.dataset.q !== n) { b.disabled = true; return miss(); }
+      served();
+    });
+    function talk(k) {
+      if (k >= CAFE_TALK.length) { i++; return guest(); }
+      const T = CAFE_TALK[k], opts = shuffle([T.a, ...T.o]);
+      const shown = k === 0 ? `${'🛎️'} ${it.e.repeat(Math.max(1, n))}` : '';
+      sh.main.innerHTML = `${guestHTML(sp, 'happy', k === 0 ? od.en : 'Thank you!', k === 0 ? od.ko : '고마워요!')}${shown ? `<p class="cafe-tray" aria-hidden="true">${shown}</p>` : ''}<p class="e-prompt"><span>${escapeHTML(T.q)}</span></p><div class="e-opts" id="eOpts">${opts.map((o, j) => `<button class="e-opt" data-o="${j}">${escapeHTML(o)}</button>`).join('')}</div><p class="e-why" id="egHint" role="status"></p>`;
+      if (k === 1) engSay('Thank you!');
+      sh.main.querySelector('#eOpts').addEventListener('click', ev => {
+        const b = ev.target.closest('[data-o]'); if (!b || b.disabled) return;
+        if (opts[+b.dataset.o] !== T.a) { b.disabled = true; b.classList.add('wrong'); sfx('bad'); hint(`힌트: "${T.a}"는 "${T.k}"라는 뜻이에요.`); return; }
+        sfx('correct'); engSay(T.a); if (k === 1) engSay(T.them, { queue: true });
+        sh.main.querySelectorAll('.e-opt').forEach(x => { x.disabled = true; }); b.classList.add('right');
+        sh.foot.innerHTML = `<p class="e-fb ok"><span class="e-star-pop" aria-hidden="true">⭐</span> ${escapeHTML(T.k)}</p><button class="candy primary e-next" id="eNext">다음 ▶</button>`;
+        sh.bind('eNext', () => { sh.foot.innerHTML = ''; talk(k + 1); }); sh.wrap.querySelector('#eNext').focus({ preventScroll: true });
+      });
+      const hint = t => { sh.main.querySelector('#egHint').textContent = t; };
+    }
+  }
+  guest();
+}
+// 게임 G: 영어 정글 탐험. 영어 길 안내를 듣고 방향을 고르고, 위치를 나타내는 말도 익힌다
+const JUNGLE_DIR = { left: ['⬅️', -1, 0, '왼쪽'], right: ['➡️', 1, 0, '오른쪽'], up: ['⬆️', 0, -1, '위'], down: ['⬇️', 0, 1, '아래'] };
+const JUNGLE_W = 5, JUNGLE_H = 4;
+const JUNGLE_POS = { 'next to': ['옆에', (a, o) => `<span>${a}</span><span>${o}</span>`], behind: ['뒤에', (a, o) => `<span class="jg-behind">${a}</span><span class="jg-front">${o}</span>`], on: ['위에', (a, o) => `<span class="jg-stack"><span>${a}</span><span>${o}</span></span>`] };
+const JUNGLE_THINGS = [['monkey', '🐵', '원숭이'], ['frog', '🐸', '개구리'], ['cat', '🐱', '고양이']], JUNGLE_OBJ = [['box', '📦', '상자'], ['chair', '🪑', '의자'], ['bed', '🛏️', '침대']];
+function junglePath(len) {
+  for (let t = 0; t < 40; t++) {
+    let x = 0, y = JUNGLE_H - 1, last = null; const seen = new Set([x + ',' + y]), moves = [];
+    while (moves.length < len) {
+      const opts = Object.keys(JUNGLE_DIR).filter(d => { const nx = x + JUNGLE_DIR[d][1], ny = y + JUNGLE_DIR[d][2]; return nx >= 0 && ny >= 0 && nx < JUNGLE_W && ny < JUNGLE_H && !seen.has(nx + ',' + ny); });
+      if (!opts.length) break;
+      const d = pick(opts); moves.push(d); x += JUNGLE_DIR[d][1]; y += JUNGLE_DIR[d][2]; seen.add(x + ',' + y);
+    }
+    if (moves.length === len) return { moves, end: [x, y] };
+  }
+  return { moves: ['up', 'right', 'right', 'up'], end: [2, 1] };
+}
+function egJungle() {
+  const sh = egShell('🌴 영어 정글 탐험'), pet = P(), path = junglePath(6);
+  const dec = Array.from({ length: JUNGLE_W * JUNGLE_H }, () => pick(['🌿', '🌴', '🌳', '🍃', '🌱', '🍄']));
+  let x = 0, y = JUNGLE_H - 1, mv = 0, right = 0, first = true, qi = 0;
+  const posQs = shuffle(Object.keys(JUNGLE_POS)).slice(0, 2), total = path.moves.length + posQs.length;
+  const grid = () => { let h = ''; for (let j = 0; j < JUNGLE_H; j++) for (let i = 0; i < JUNGLE_W; i++) { const me = i === x && j === y, end = i === path.end[0] && j === path.end[1]; h += `<span class="jg-cell${me ? ' me' : ''}">${me ? `<span class="jg-pet">${petSVG(pet.sp, { mood: 'happy', stage: 'kid' })}</span>` : end ? '💎' : dec[i + j * JUNGLE_W]}</span>`; } return h; };
+  function move() {
+    if (mv >= path.moves.length) { sfx('treasure'); return posQ(); }
+    const d = path.moves[mv], line = `Go ${d}.`; first = true; sh.bar.style.width = mv / total * 100 + '%';
+    sh.main.innerHTML = `<p class="e-prompt"><span class="e-pet" aria-hidden="true">${petSVG('dragon', { mood: 'talk', stage: 'kid' })}</span><span>${escapeHTML(line)}</span><button class="e-say" id="eSay" aria-label="다시 듣기">🔊</button></p><div class="jg-grid" id="jgGrid">${grid()}</div><div class="jg-pad" id="jgPad">${Object.entries(JUNGLE_DIR).map(([k, v]) => `<button class="candy" data-d="${k}" aria-label="${v[3]}">${v[0]}<small>${k}</small></button>`).join('')}</div><p class="e-why" id="egHint" role="status"></p>`;
+    sh.foot.innerHTML = '';
+    sh.bind('eSay', () => engSay(line)); engSay(line);
+    sh.main.querySelector('#jgPad').addEventListener('click', ev => {
+      const b = ev.target.closest('[data-d]'); if (!b) return;
+      if (b.dataset.d !== d) { if (first) { first = false; egMiss(d); } sfx('bad'); sh.main.querySelector('#egHint').textContent = `${d}는 ${JUNGLE_DIR[d][3]}이에요. ${JUNGLE_DIR[d][0]}`; engSay(line); return; }
+      if (first) right++;
+      egRight(d); x += JUNGLE_DIR[d][1]; y += JUNGLE_DIR[d][2]; mv++; engSay(d);
+      sh.timer = setTimeout(move, 450);
+      sh.main.querySelector('#jgGrid').innerHTML = grid(); sh.main.querySelector('#jgPad').style.pointerEvents = 'none';
+    });
+  }
+  function posQ() {
+    if (qi >= posQs.length) return egFinish(sh, { key: 'jungle', right, total, again: egJungle });
+    const pos = posQs[qi], a = pick(JUNGLE_THINGS), o = pick(JUNGLE_OBJ), line = `The ${a[0]} is ${pos} the ${o[0]}.`, ko = `${a[2]}가 ${o[2]} ${JUNGLE_POS[pos][0]} 있어요.`.replace('고양이가', '고양이가').replace('원숭이가', '원숭이가');
+    const keys = shuffle(Object.keys(JUNGLE_POS)); first = true; sh.bar.style.width = (path.moves.length + qi) / total * 100 + '%';
+    sh.main.innerHTML = `<p class="e-prompt"><span class="e-pet" aria-hidden="true">${petSVG('dragon', { mood: 'talk', stage: 'kid' })}</span><span>맞는 그림을 찾아요</span></p><div class="e-card q"><div class="e-word long">${escapeHTML(line)}</div><button class="e-say" id="eSay" aria-label="다시 듣기">🔊</button></div><div class="jg-scenes" id="jgSc">${keys.map(k => `<button class="e-opt" data-k="${k}" aria-label="그림"><span class="jg-scene">${JUNGLE_POS[k][1](a[1], o[1])}</span></button>`).join('')}</div><p class="e-why" id="egHint" role="status"></p>`;
+    sh.foot.innerHTML = '';
+    sh.bind('eSay', () => engSay(line)); engSay(line);
+    sh.main.querySelector('#jgSc').addEventListener('click', ev => {
+      const b = ev.target.closest('[data-k]'); if (!b || b.disabled) return;
+      if (b.dataset.k !== pos) { first = false; b.disabled = true; b.classList.add('wrong'); egMiss(pos); sh.main.querySelector('#egHint').textContent = `힌트: ${ko}`; engSay(line); return; }
+      if (first) right++;
+      egRight(pos); engSay(line); b.classList.add('right'); sh.main.querySelectorAll('.e-opt').forEach(z => { z.disabled = true; });
+      sh.foot.innerHTML = `<p class="e-fb ok"><span class="e-star-pop" aria-hidden="true">⭐</span> ${escapeHTML(ko)}</p><button class="candy primary e-next" id="eNext">다음 ▶</button>`;
+      sh.bind('eNext', () => { qi++; posQ(); });
+    });
+  }
+  move();
+}
+// 게임 H: 이야기 극장. 고른 말에 따라 다음 장면이 달라지고, 끝나면 주요 단어를 복습한다
+const STORIES = {
+  kitten: { t: '길 잃은 아기 고양이', e: '🐱', review: ['cat', 'dog', 'milk'], start: 'start', scenes: {
+    start: { p: '🐱🌳', en: 'A little cat is lost in the park.', k: '아기 고양이가 공원에서 길을 잃었어요.', c: [['Look behind the tree.', '나무 뒤를 봐요.', 'tree'], ['Look under the bench.', '벤치 아래를 봐요.', 'bench']] },
+    tree: { p: '🌳🐦', en: 'There is a bird behind the tree. The bird says, "The cat is by the pond!"', k: '나무 뒤에 새가 있어요. 새가 말해요. "고양이는 연못 옆에 있어!"', c: [['Go to the pond.', '연못으로 가요.', 'pond']] },
+    bench: { p: '🪑🐶', en: 'There is a dog under the bench. The dog says, "The cat is by the pond!"', k: '벤치 아래에 강아지가 있어요. 강아지가 말해요. "고양이는 연못 옆에 있어!"', c: [['Go to the pond.', '연못으로 가요.', 'pond']] },
+    pond: { p: '🌊🐱', en: 'The cat is by the pond. It looks scared.', k: '고양이가 연못 옆에 있어요. 무서워 보여요.', c: [['Give it some milk.', '우유를 줘요.', 'milk'], ['Sing a song.', '노래를 불러요.', 'song']] },
+    milk: { p: '🥛🐱', en: 'The cat drinks the milk. Now it is happy!', k: '고양이가 우유를 마셔요. 이제 행복해요!', c: [['Go home together.', '같이 집에 가요.', 'end']] },
+    song: { p: '🎵🐱', en: 'The cat likes your song. Now it is happy!', k: '고양이는 네 노래가 좋아요. 이제 행복해요!', c: [['Go home together.', '같이 집에 가요.', 'end']] },
+    end: { p: '🏠🐱💖', en: 'You and the cat go home together. The end!', k: '너와 고양이는 함께 집에 가요. 끝!', c: [] } } },
+  party: { t: '꼬미의 생일 파티', e: '🐉', review: ['cake', 'happy', 'friend'], start: 'start', scenes: {
+    start: { p: '🐉🎂', en: "Today is Komi's birthday. What should we make?", k: '오늘은 꼬미의 생일이에요. 무엇을 만들까요?', c: [['Bake a cake.', '케이크를 구워요.', 'cake'], ['Make a card.', '카드를 만들어요.', 'card']] },
+    cake: { p: '🍰✨', en: 'You bake a big cake. It smells so good!', k: '큰 케이크를 구웠어요. 냄새가 정말 좋아요!', c: [['Invite your friends.', '친구들을 초대해요.', 'party']] },
+    card: { p: '💌⭐', en: 'You draw a star on the card. It looks beautiful!', k: '카드에 별을 그렸어요. 정말 예뻐요!', c: [['Invite your friends.', '친구들을 초대해요.', 'party']] },
+    party: { p: '🎉🐉', en: 'Komi comes to the party and smiles.', k: '꼬미가 파티에 와서 웃어요.', c: [['Sing together.', '함께 노래해요.', 'sing'], ['Give Komi a hug.', '꼬미를 안아 줘요.', 'hug']] },
+    sing: { p: '🎵🎂', en: 'Everyone sings "Happy Birthday." Komi is very happy.', k: '모두 생일 축하 노래를 불러요. 꼬미는 정말 행복해요.', c: [['Say, "Happy birthday!"', '"생일 축하해!"라고 말해요.', 'end']] },
+    hug: { p: '🤗🐉', en: 'Komi gives you a big hug, too. Komi is very happy.', k: '꼬미도 너를 꼭 안아 줘요. 꼬미는 정말 행복해요.', c: [['Say, "Happy birthday!"', '"생일 축하해!"라고 말해요.', 'end']] },
+    end: { p: '🎂🎈💖', en: 'It is the best birthday ever. The end!', k: '최고의 생일이에요. 끝!', c: [] } } },
+  rain: { t: '비 오는 날', e: '🌈', review: ['book', 'umbrella', 'friend'], start: 'start', scenes: {
+    start: { p: '🌧️🏠', en: 'It is raining outside. Mina is at home.', k: '밖에 비가 와요. 미나는 집에 있어요.', c: [['Read a book.', '책을 읽어요.', 'book'], ['Go out with an umbrella.', '우산을 들고 나가요.', 'out']] },
+    book: { p: '📕🐋', en: 'Mina reads a book about the sea. She learns about whales.', k: '미나는 바다에 관한 책을 읽어요. 고래에 대해 배워요.', c: [['Look out the window.', '창밖을 봐요.', 'rainbow']] },
+    out: { p: '☂️💧', en: 'Mina jumps in the puddles. Splash!', k: '미나가 물웅덩이에서 폴짝 뛰어요. 첨벙!', c: [['Look up at the sky.', '하늘을 올려다봐요.', 'rainbow']] },
+    rainbow: { p: '🌈☀️', en: 'The rain stops. There is a rainbow in the sky!', k: '비가 그쳐요. 하늘에 무지개가 떴어요!', c: [['Draw the rainbow.', '무지개를 그려요.', 'draw'], ['Call a friend.', '친구에게 전화해요.', 'call']] },
+    draw: { p: '🖍️🌈', en: 'Mina draws the rainbow with seven colors.', k: '미나는 일곱 가지 색으로 무지개를 그려요.', c: [['Show it to Mom.', '엄마에게 보여 줘요.', 'end']] },
+    call: { p: '📞🌈', en: 'Mina and her friend look at the rainbow together.', k: '미나와 친구는 함께 무지개를 봐요.', c: [['Smile and wave.', '웃으며 손을 흔들어요.', 'end']] },
+    end: { p: '🌈💖', en: 'What a wonderful day! The end!', k: '정말 멋진 날이에요! 끝!', c: [] } } }
+};
+function egStory(id) {
+  const e = engState();
+  if (!id) return openSheet('🎭 이야기 극장', `<p class="msub">영어 이야기를 듣고 다음에 할 일을 골라요. 고른 말에 따라 이야기가 달라져요.</p><div class="dex">${Object.entries(STORIES).map(([k, st]) => `<button class="dex-card" data-st="${k}"><span class="emo day">${st.e}</span><span class="txt"><span class="t1">${escapeHTML(st.t)}</span><br><span class="t2">${e.stories && e.stories[k] ? '✅ 봤어요. 다른 길도 골라 봐요' : '새 이야기'}</span></span><span class="go">보기 ▶</span></button>`).join('')}</div><button class="candy" id="eBack" style="width:100%;margin-top:10px">‹ 게임 목록</button>`,
+    body => body.addEventListener('click', ev => { const b = ev.target.closest('[data-st]'); if (b) return egStory(b.dataset.st); if (ev.target.closest('#eBack')) openEngGames(); }));
+  const st = STORIES[id], sh = egShell('🎭 ' + st.t, 'learn');
+  let steps = 0;
+  function scene(k) {
+    const sc = st.scenes[k]; steps++; sh.bar.style.width = Math.min(90, steps * 18) + '%';
+    sh.main.innerHTML = `<div class="e-card story"><div class="story-pic" aria-hidden="true">${sc.p}</div><p class="story-en">${escapeHTML(sc.en)}</p><p class="e-ko">${escapeHTML(sc.k)}</p><button class="e-say" id="eSay" aria-label="다시 듣기">🔊</button></div>${sc.c.length ? `<p class="e-prompt"><span class="e-pet" aria-hidden="true">${petSVG('bear', { mood: 'talk', stage: 'kid' })}</span><span>${sc.c.length > 1 ? '어떻게 할까요?' : '다음으로 가요'}</span></p><div class="e-opts" id="eOpts">${sc.c.map((c, i) => `<button class="e-opt" data-c="${i}">${escapeHTML(c[0])}<small class="opt-ko">${escapeHTML(c[1])}</small></button>`).join('')}</div>` : ''}`;
+    sh.foot.innerHTML = sc.c.length ? '' : '<button class="candy primary e-next" id="eNext">단어 복습하기 ▶</button>';
+    sh.bind('eSay', () => engSay(sc.en)); engSay(sc.en);
+    if (!sc.c.length) { sfx('up'); e.stories = e.stories || {}; e.stories[id] = 1; persist(); sh.bind('eNext', () => review(0, 0)); return; }
+    sh.main.querySelector('#eOpts').addEventListener('click', ev => {
+      const b = ev.target.closest('[data-c]'); if (!b) return;
+      const c = sc.c[+b.dataset.c]; sfx('flip'); engSay(c[0]);
+      sh.main.querySelectorAll('.e-opt').forEach(x => { x.disabled = true; }); b.classList.add('right');
+      sh.timer = setTimeout(() => scene(c[2]), 700);
+    });
+  }
+  function review(i, right) {
+    if (i >= st.review.length) return egFinish(sh, { key: 'story', right, total: st.review.length, again: () => egStory(id) });
+    const x = engAllWords.get(st.review[i]), others = shuffle([...engAllWords.values()].filter(y => y.e && !y.noPic && y.e !== x.e)).slice(0, 2), opts = shuffle([x, ...others]);
+    let first = true;
+    sh.main.innerHTML = `<p class="e-prompt"><span class="e-pet" aria-hidden="true">${petSVG('bear', { mood: 'talk', stage: 'kid' })}</span><span>이야기에 나온 단어예요. 맞는 그림은?</span></p><div class="e-card q"><div class="e-word">${escapeHTML(x.w)}</div><button class="e-say" id="eSay" aria-label="다시 듣기">🔊</button></div><div class="e-opts three pic" id="eOpts">${opts.map((y, k) => `<button class="e-opt" data-k="${k}">${y.e}</button>`).join('')}</div><p class="e-why" id="egHint" role="status"></p>`;
+    sh.foot.innerHTML = '';
+    sh.bind('eSay', () => engSay(x.w)); engSay(x.w);
+    sh.main.querySelector('#eOpts').addEventListener('click', ev => {
+      const b = ev.target.closest('[data-k]'); if (!b || b.disabled) return;
+      if (opts[+b.dataset.k] !== x) { first = false; b.disabled = true; b.classList.add('wrong'); egMiss(x.w); sh.main.querySelector('#egHint').textContent = `${x.w}: ${x.k}`; return; }
+      egRight(x.w); engSay(x.w); sh.main.querySelectorAll('.e-opt').forEach(z => { z.disabled = true; }); b.classList.add('right');
+      const nr = right + (first ? 1 : 0);
+      sh.foot.innerHTML = '<button class="candy primary e-next" id="eNext">다음 ▶</button>';
+      sh.bind('eNext', () => review(i + 1, nr));
+    });
+  }
+  scene(st.start);
+}
+// 게임 I: 발음 별 수집. 마이크와 녹음을 쓰지 않는다: 듣고 소리 내어 따라 한 뒤, 들은 말을 고른다. 발음을 평가하거나 점수를 깎지 않는다
+function egSpeak() {
+  const sh = egShell('🎤 발음 별 수집', 'learn'), e = engState();
+  const words = [...engAllWords.values()].filter(x => x.e && !x.noPic && /^[a-z]+$/.test(x.w));
+  const known = shuffle(words.filter(x => (e.w[x.w] || {}).b >= 1)), rest = shuffle(words.filter(x => !((e.w[x.w] || {}).b >= 1)));
+  const picks = [...known, ...rest].slice(0, 4).map(x => ({ say: x.w, k: x.k, e: x.e, word: x.w, pool: words.map(y => y.w) }));
+  const sent = EG_TRAIN.easy.map(x => x[0]), sens = shuffle(EG_TRAIN.easy).slice(0, 2).map(x => ({ say: x[0], k: x[1], pool: sent }));
+  const list = [...picks, ...sens]; let i = 0, stars = 0;
+  function show() {
+    if (i >= list.length) return egFinish(sh, { key: 'speak', right: stars, total: list.length, again: egSpeak });
+    const it = list[i]; sh.bar.style.width = i / list.length * 100 + '%';
+    sh.main.innerHTML = `<p class="e-prompt"><span class="e-pet" aria-hidden="true">${petSVG('fox', { mood: 'talk', stage: 'kid' })}</span><span>잘 듣고 소리 내어 따라 해 봐요</span></p><div class="e-card q">${it.e ? `<div class="e-pic">${it.e}</div>` : ''}<div class="e-word${it.say.length > 14 ? ' long' : ''}">${escapeHTML(it.say)}</div><div class="e-ko">${escapeHTML(it.k)}</div><div class="e-row" style="width:100%"><button class="candy" id="eSay">🔊 듣기</button><button class="candy" id="eSlow">🐢 천천히</button></div></div><p class="speak-star" aria-hidden="true">${'⭐'.repeat(stars)}${'☆'.repeat(list.length - stars)}</p><p class="e-why">마이크는 쓰지 않아요. 내 목소리로 또박또박 말해 봐요.</p>`;
+    sh.foot.innerHTML = '<button class="candy primary e-next" id="eNext">🎤 말해 봤어요!</button>';
+    sh.bind('eSay', () => engSay(it.say)); sh.bind('eSlow', () => engSay(it.say, { rate: .55 })); engSay(it.say);
+    sh.bind('eNext', () => check(it));
+  }
+  function check(it) {
+    const opts = shuffle([it.say, ...shuffle(it.pool.filter(x => x !== it.say)).slice(0, 2)]);
+    let first = true;
+    sh.main.innerHTML = `<p class="e-prompt"><span class="e-pet" aria-hidden="true">${petSVG('fox', { mood: 'happy', stage: 'kid' })}</span><span>잘했어요! 방금 들은 말은 무엇일까요?</span></p><div class="e-card q"><button class="e-say big" id="eSay" aria-label="다시 듣기">🔊</button></div><div class="e-opts" id="eOpts">${opts.map((o, k) => `<button class="e-opt" data-k="${k}">${escapeHTML(o)}</button>`).join('')}</div><p class="e-why" id="egHint" role="status"></p>`;
+    sh.foot.innerHTML = '';
+    sh.bind('eSay', () => engSay(it.say)); engSay(it.say);
+    sh.main.querySelector('#eOpts').addEventListener('click', ev => {
+      const b = ev.target.closest('[data-k]'); if (!b || b.disabled) return;
+      if (opts[+b.dataset.k] !== it.say) { first = false; b.disabled = true; b.classList.add('wrong'); sfx('bad'); sh.main.querySelector('#egHint').textContent = '괜찮아요! 한 번 더 들어 봐요.'; engSay(it.say); return; }
+      if (first) stars++;
+      egRight(it.word || null); sfx('star'); engSay(it.say); sh.main.querySelectorAll('.e-opt').forEach(z => { z.disabled = true; }); b.classList.add('right');
+      sh.foot.innerHTML = `<p class="e-fb ok"><span class="e-star-pop" aria-hidden="true">⭐</span> 별을 모았어요!</p><button class="candy primary e-next" id="eNext">다음 ▶</button>`;
+      sh.bind('eNext', () => { i++; show(); }); sh.wrap.querySelector('#eNext').focus({ preventScroll: true });
+    });
+  }
+  show();
+}
+/* ---------- 스토리 모험 "말 나무를 살려요": 이야기로 만나고 → 단어를 익히고 → 게임에서 쓰고 → 이야기로 마무리한다 ----------
+   레슨과 게임의 단어 데이터, 복습 기록을 그대로 쓴다. 저장: S.eng.saga = { done: 끝낸 장 수 }. 보상은 장마다 처음 한 번 */
+const SAGA_WHO = { bear: '곰 선생님', bunny: '몽글이', dragon: '꼬미', fox: '노을이' };
+const SAGA = [
+  { t: '바람이 불어온 날', e: '🍃', words: null,
+    before: [['bear', 'Hello! I am Teacher Bear.', '안녕! 나는 곰 선생님이야.'], ['bear', 'Look! The Word Tree has no leaves.', '봐! 말 나무에 잎이 하나도 없어.'], ['bunny', 'The wind took all our words!', '바람이 우리 말을 전부 가져갔어!'], ['bear', 'First, we need to find the letters.', '먼저 글자들을 찾아야 해.']],
+    ask: { q: 'Will you help us?', k: '우리를 도와줄래?', a: 'Yes, I will!', ak: '응, 도와줄게!', o: ['It is a banana.', 'Good night.'] }, game: () => egAlphabet(),
+    after: [['bear', 'Great job! You found the letters.', '잘했어! 글자들을 찾았구나.'], ['bunny', 'Look! A new leaf!', '봐! 새 잎이 났어!']] },
+  { t: '이름을 잃은 동물들', e: '🐾', words: 'animal', gift: { decor: 'blocks' },
+    before: [['bunny', 'Oh no! The animals lost their names.', '이런! 동물들이 이름을 잃어버렸어.'], ['bunny', 'This is a cat. That is a dog.', '이건 고양이야. 저건 강아지야.'], ['bunny', 'Listen and find each animal.', '잘 듣고 동물을 찾아 줘.']],
+    ask: { q: 'Can you help the animals?', k: '동물들을 도와줄 수 있어?', a: 'Yes, I can!', ak: '응, 할 수 있어!', o: ['I am a table.', 'It is Monday.'] }, game: () => egCatch('animal'),
+    after: [['bunny', 'Thank you! The animals are happy now.', '고마워! 이제 동물들이 행복해.'], ['bear', 'The tree has more leaves.', '나무에 잎이 더 났어.']] },
+  { t: '색을 잃은 꽃밭', e: '🎨', words: 'color',
+    before: [['fox', 'Look at the flowers. They have no color!', '꽃들을 봐. 색이 하나도 없어!'], ['fox', 'I like red. What about you?', '나는 빨강이 좋아. 너는?'], ['fox', 'Let us bring the colors back!', '색을 다시 찾아오자!']],
+    ask: { q: 'What color do you like?', k: '어떤 색을 좋아해?', a: 'I like blue.', ak: '나는 파랑을 좋아해.', o: ['I am ten.', 'It is under the bed.'] }, game: () => egCatch('color'),
+    after: [['fox', 'Wow! The flowers are red and yellow.', '와! 꽃들이 빨갛고 노래졌어.'], ['fox', 'They are so pretty!', '정말 예뻐!']] },
+  { t: '배고픈 꼬미', e: '🍰', words: 'food', gift: { top: 'sailor' },
+    before: [['dragon', 'I am so hungry!', '나 너무 배고파!'], ['bunny', 'Let us open a cafe for our friends.', '친구들을 위해 카페를 열자.'], ['dragon', 'I want some milk and a cookie, please.', '우유랑 쿠키 주세요.']],
+    ask: { q: 'Are you ready to work?', k: '일할 준비 됐어?', a: 'Yes, I am ready!', ak: '응, 준비됐어!', o: ['No, it is blue.', 'I have two ears.'] }, game: () => egCafe(),
+    after: [['dragon', 'Yum! That was delicious.', '냠! 정말 맛있었어.'], ['dragon', 'Thank you for the food!', '음식 고마워!']] },
+  { t: '부서진 다리', e: '🌉', words: 'number',
+    before: [['bear', 'The bridge is broken.', '다리가 부서졌어.'], ['bear', 'We need ten stones.', '돌이 열 개 필요해.'], ['bunny', 'Let us count them together!', '같이 세어 보자!']],
+    ask: { q: 'How many stones do we need?', k: '돌이 몇 개 필요해?', a: 'We need ten stones.', ak: '돌 열 개가 필요해.', o: ['We need a red hat.', 'We are at school.'] }, game: () => egCatch('number'),
+    after: [['bunny', 'One, two, three... ten!', '하나, 둘, 셋... 열!'], ['bear', 'Now we can cross the bridge.', '이제 다리를 건널 수 있어.']] },
+  { t: '정글의 황금 잎', e: '🌴', words: 'dir', gift: { decor: 'globe' },
+    before: [['dragon', 'I have a treasure map!', '나한테 보물 지도가 있어!'], ['dragon', 'A golden leaf is in the jungle.', '황금 잎이 정글에 있대.'], ['fox', 'Listen carefully. Go left or go right?', '잘 들어. 왼쪽일까, 오른쪽일까?']],
+    ask: { q: 'Do you want to go to the jungle?', k: '정글에 갈래?', a: "Yes, let's go!", ak: '응, 가자!', o: ['I am a cookie.', 'It is my nose.'] }, game: () => egJungle(),
+    after: [['dragon', 'We found the golden leaf!', '황금 잎을 찾았어!'], ['fox', 'You are a great explorer!', '넌 정말 멋진 탐험가야!']] },
+  { t: '문장 기차를 타요', e: '🚂', words: null,
+    before: [['fox', 'The train can take us to the Word Tree.', '기차를 타면 말 나무까지 갈 수 있어.'], ['bear', 'But the words on the train are mixed up.', '그런데 기차의 단어들이 뒤섞였어.'], ['bear', 'Put the words in order.', '단어들을 순서대로 놓아 줘.']],
+    ask: { q: 'Can you fix the train?', k: '기차를 고칠 수 있어?', a: 'Yes, I can do it!', ak: '응, 내가 할 수 있어!', o: ['It is very sunny.', 'My pen is blue.'] }, game: () => egTrain('easy'),
+    after: [['fox', 'Choo choo! The train is moving!', '칙칙폭폭! 기차가 움직여!'], ['bear', 'We are almost there.', '거의 다 왔어.']] },
+  { t: '말 나무의 노래', e: '🌳', words: null, gift: { hat: 'gradcap', badge: 'sagaHero' },
+    before: [['bear', 'Here we are. This is the Word Tree.', '다 왔어. 여기가 말 나무야.'], ['bunny', 'The tree needs one more thing.', '나무에 필요한 게 하나 더 있어.'], ['bear', 'It needs your voice. Say the words with us!', '네 목소리가 필요해. 우리와 함께 말해 줘!']],
+    ask: { q: 'Are you ready to say the words?', k: '말할 준비 됐어?', a: 'Yes, I am ready!', ak: '응, 준비됐어!', o: ['No, I am a bus.', 'It is on the box.'] }, game: () => egSpeak(),
+    after: [['bunny', 'Look! The Word Tree is full of leaves!', '봐! 말 나무에 잎이 가득해!'], ['dragon', 'Our words came back!', '우리 말이 돌아왔어!'], ['bear', 'Thank you. You are our Word Hero!', '고마워. 너는 우리의 말 영웅이야!']] }
+];
+const SAGA_TREE = ['🪵', '🌱', '🌿', '🌿', '🌳', '🌳', '🌲', '🌳', '🌸'];
+let sagaAfter = null;
+const sagaState = () => { const e = engState(); return e.saga || (e.saga = { done: 0 }); };
+function sagaGift(g) {
+  const won = [], has = (l, id) => (l || []).includes(id);
+  if (g.hat) { if (has(S.hats, g.hat)) S.coins += 40; else { S.hats.push(g.hat); won.push(`🎩 ${HATS[g.hat].name}`); } }
+  if (g.top) { S.wear = S.wear || []; if (has(S.wear, g.top)) S.coins += 40; else { S.wear.push(g.top); won.push(`${WEAR[g.top].e} ${WEAR[g.top].name}`); } }
+  if (g.decor) { const d = decorState(); if (has(d.owned, g.decor)) S.coins += 40; else { d.owned.push(g.decor); won.push(`${DECOR[g.decor].e} ${DECOR[g.decor].name}`); } }
+  if (g.badge) { badge(g.badge); won.push('🏷️ 새 칭호'); }
+  return won;
+}
+function openSaga() {
+  sagaAfter = null;
+  const st = sagaState();
+  openSheet('📖 말 나무를 살려요', `<div class="saga-tree"><span class="pic" aria-hidden="true">${SAGA_TREE[st.done]}</span><div><b>말 나무 ${st.done} / ${SAGA.length}</b><br><small>${st.done >= SAGA.length ? '말 나무가 다시 살아났어요! 언제든 다시 볼 수 있어요.' : '바람에 날아간 말을 찾으면 나무가 자라요.'}</small></div></div><div class="dex">${SAGA.map((c, i) => { const open = i <= st.done, done = i < st.done; return `<button class="dex-card" data-ch="${i}"${open ? '' : ' disabled style="opacity:.55"'}><span class="emo day">${open ? c.e : '🔒'}</span><span class="txt"><span class="t1">${i + 1}장. ${escapeHTML(c.t)}</span><br><span class="t2">${done ? '✅ 끝냈어요' : open ? '다음 이야기' : '앞 이야기를 끝내면 열려요'}</span></span><span class="go">${done ? '다시' : open ? '시작 ▶' : '잠김'}</span></button>`; }).join('')}</div><button class="candy" id="eBack" style="width:100%;margin-top:10px">‹ 영어 지도로</button>`,
+    body => body.addEventListener('click', ev => { const b = ev.target.closest('[data-ch]'); if (b && !b.disabled) { if (engCanSpeak()) { try { engSay(' '); } catch (err) {} } return sagaPlay(+b.dataset.ch); } if (ev.target.closest('#eBack')) openEnglish(); }));
+}
+function sagaLines(sh, lines, done) {
+  let i = 0, total = lines.length;
+  const show = () => {
+    if (i >= total) return done();
+    const [who, en, ko] = lines[i]; sh.bar.style.width = (i / total) * 100 + '%';
+    sh.main.innerHTML = `<div class="saga-scene"><span class="saga-who">${petSVG(who, { mood: 'talk', stage: 'kid' })}<b>${escapeHTML(SAGA_WHO[who])}</b></span><div class="e-chat"><div class="b them">${escapeHTML(en)}<small>${escapeHTML(ko)}</small></div></div><button class="e-say big" id="eSay" aria-label="다시 듣기">🔊</button></div>`;
+    sh.foot.innerHTML = '<button class="candy primary e-next" id="eNext">다음 ▶</button>';
+    sh.bind('eSay', () => engSay(en)); engSay(en);
+    sh.bind('eNext', () => { sfx('tap'); i++; show(); }); sh.wrap.querySelector('#eNext').focus({ preventScroll: true });
+  };
+  show();
+}
+function sagaPlay(i) {
+  const c = SAGA[i], sh = egShell(`📖 ${i + 1}장. ${c.t}`, 'learn');
+  const startGame = () => { sagaAfter = () => sagaEnd(i); sh.close(); c.game(); };
+  const learn = () => {
+    const list = c.words ? engWords(egUnit(c.words)) : [];
+    if (!list.length) return startGame();
+    let k = 0;
+    const card = () => {
+      if (k >= list.length) return startGame();
+      const x = list[k], pic = x.e && !egUnit(c.words).noPic; sh.bar.style.width = (k / list.length) * 100 + '%';
+      sh.main.innerHTML = `<div class="e-card"><p class="e-tag">이야기에 나오는 말 ${k + 1}/${list.length}</p>${pic ? `<div class="e-pic">${x.e}</div>` : ''}<div class="e-word">${escapeHTML(x.w)}</div><div class="e-ko">${escapeHTML(x.k)}</div><button class="e-say big" id="eSay" aria-label="다시 듣기">🔊</button><p class="e-tip">🎤 소리 내어 따라 말해 봐요</p></div>`;
+      sh.foot.innerHTML = '<button class="candy primary e-next" id="eNext">다음 ▶</button>';
+      sh.bind('eSay', () => engSay(x.w)); engSay(x.w);
+      sh.bind('eNext', () => { k++; card(); });
+    };
+    card();
+  };
+  const ask = () => {
+    const a = c.ask, opts = shuffle([a.a, ...a.o]);
+    sh.main.innerHTML = `<div class="saga-scene"><span class="saga-who">${petSVG(c.before[c.before.length - 1][0], { mood: 'talk', stage: 'kid' })}</span><div class="e-chat"><div class="b them">${escapeHTML(a.q)}<small>${escapeHTML(a.k)}</small></div></div></div><p class="e-prompt"><span>뭐라고 대답할까요?</span></p><div class="e-opts" id="eOpts">${opts.map((o, j) => `<button class="e-opt" data-o="${j}">${escapeHTML(o)}</button>`).join('')}</div><p class="e-why" id="egHint" role="status"></p>`;
+    sh.foot.innerHTML = '';
+    engSay(a.q);
+    sh.main.querySelector('#eOpts').addEventListener('click', ev => {
+      const b = ev.target.closest('[data-o]'); if (!b || b.disabled) return;
+      if (opts[+b.dataset.o] !== a.a) { b.disabled = true; b.classList.add('wrong'); sfx('bad'); sh.main.querySelector('#egHint').textContent = `힌트: "${a.a}"는 "${a.ak}"라는 뜻이에요.`; return; }
+      sfx('correct'); engSay(a.a); sh.main.querySelectorAll('.e-opt').forEach(x => { x.disabled = true; }); b.classList.add('right');
+      sh.foot.innerHTML = `<p class="e-fb ok">⭐ ${escapeHTML(a.ak)}</p><button class="candy primary e-next" id="eNext">다음 ▶</button>`;
+      sh.bind('eNext', learn);
+    });
+  };
+  sagaLines(sh, c.before, ask);
+}
+function sagaEnd(i) {
+  const c = SAGA[i], sh = egShell(`📖 ${i + 1}장. ${c.t}`, 'learn');
+  sagaLines(sh, c.after, () => {
+    const st = sagaState(), first = st.done === i; let won = [], coins = 0;
+    if (first) { st.done = i + 1; coins = 30; S.coins += coins; addXP(15); change({ fun: 12 }); if (c.gift) won = sagaGift(c.gift); }
+    const goals = engCheckGoals(); persist();
+    sfx(first ? 'fanfare' : 'up'); if (first) confetti(60); if (World.ok) World.trick('cheer');
+    sh.bar.style.width = '100%';
+    const last = i === SAGA.length - 1;
+    sh.main.innerHTML = `<div class="e-card done"><div class="saga-big" aria-hidden="true">${SAGA_TREE[st.done]}</div><h3>${last ? '🎉 말 나무가 살아났어요!' : `${i + 1}장 완료!`}</h3><p class="e-ko">말 나무 ${st.done} / ${SAGA.length}</p>${first ? `<p class="e-gain"><i class="coin"></i> ${coins}코인 · 🐾 펫 경험치 +15</p>` : '<p class="e-ko">이야기를 다시 봤어요.</p>'}${won.map(w => `<div class="e-gift">🎁 <b>선물!</b> ${escapeHTML(w)}</div>`).join('')}${goals.map(g => `<div class="e-gift">🏆 <b>도전 목표 달성!</b> ${g.e} ${escapeHTML(g.t)} · ${g.c}코인</div>`).join('')}</div>`;
+    const nx = !last && i + 1 <= st.done;
+    sh.foot.innerHTML = `${nx ? '<button class="candy primary e-next" id="eGo">다음 이야기 ▶</button>' : ''}<div class="e-row"><button class="candy${nx ? '' : ' primary'}" id="gHome">모험 지도로</button></div>`;
+    sh.bind('eGo', () => { sh.close(); sagaPlay(i + 1); });
+    sh.bind('gHome', () => { sh.close(); openSaga(); });
+  });
+}
 function openEngGames() {
+  sagaAfter = null;
   const row = (id, e, t, d) => `<button class="dex-card" data-eg="${id}"><span class="emo day">${e}</span><span class="txt"><span class="t1">${t}</span><br><span class="t2">${d}</span></span><span class="go">시작 ▶</span></button>`;
-  openSheet('🎮 영어 게임', `<p class="msub">놀면서 영어를 익혀요. 맞힌 단어는 복습에 기록되고, 펫도 함께 자라요. 틀려도 잃는 것은 없어요.</p><div class="dex">${row('abc', '✨', '알파벳 마법', '대문자와 소문자, 첫소리를 찾아요')}${row('catch', '🎧', '영어 듣고 잡기', '듣고 맞는 그림을 잡아요')}${row('match', '🃏', '단어 카드 매칭', '그림과 단어를 연결해요')}${row('train', '🚂', '문장 기차', '단어를 순서대로 놓아 기차를 출발시켜요')}${row('hunt', '🗺️', '단어 보물찾기', '영어로 부탁한 물건을 마을에서 찾아요')}</div><button class="candy" id="eBack" style="width:100%;margin-top:10px">‹ 영어 지도로</button>`,
+  openSheet('🎮 영어 게임', `<p class="msub">놀면서 영어를 익혀요. 맞힌 단어는 복습에 기록되고, 펫도 함께 자라요. 틀려도 잃는 것은 없어요.</p><div class="dex">${row('abc', '✨', '알파벳 마법', '대문자와 소문자, 첫소리를 찾아요')}${row('catch', '🎧', '영어 듣고 잡기', '듣고 맞는 그림을 잡아요')}${row('match', '🃏', '단어 카드 매칭', '그림과 단어를 연결해요')}${row('train', '🚂', '문장 기차', '단어를 순서대로 놓아 기차를 출발시켜요')}${row('hunt', '🗺️', '단어 보물찾기', '영어로 부탁한 물건을 마을에서 찾아요')}${row('cafe', '☕', '펫 카페', '손님의 영어 주문을 듣고 메뉴와 수량을 골라요')}${row('jungle', '🌴', '영어 정글 탐험', '길 안내를 듣고 보물까지 가요')}${row('story', '🎭', '이야기 극장', '고른 말에 따라 이야기가 달라져요')}${row('speak', '🎤', '발음 별 수집', '듣고 따라 말하며 별을 모아요 (마이크 없음)')}</div><button class="candy" id="eBack" style="width:100%;margin-top:10px">‹ 영어 지도로</button>`,
     body => body.addEventListener('click', ev => {
       const b = ev.target.closest('[data-eg]');
-      if (b) { if (engCanSpeak()) { try { engSay(' '); } catch (err) {} } return ({ abc: egAlphabet, catch: egCatch, match: egMatch, train: egTrain, hunt: startWordHunt })[b.dataset.eg](); }
+      if (b) { if (engCanSpeak()) { try { engSay(' '); } catch (err) {} } return ({ abc: egAlphabet, catch: egCatch, match: egMatch, train: egTrain, hunt: startWordHunt, cafe: egCafe, jungle: egJungle, story: egStory, speak: egSpeak })[b.dataset.eg](); }
       if (ev.target.closest('#eBack')) openEnglish();
     }));
 }
@@ -7367,13 +7720,14 @@ function openEnglish(tab) {
     <div class="tabs" role="tablist">${ENG.map((g, i) => `<button role="tab" aria-selected="${i === si}" data-st="${i}">${g.icon} ${g.name}</button>`).join('')}</div>
     <div class="e-actions"><button class="candy" id="eReview">🔁 복습${due ? ` ${due}` : ''}</button><button class="candy primary" id="eGames">🎮 영어 게임</button><button class="candy" id="eAlbum">📒 단어 도감</button><button class="candy" id="eVoice">🔊 목소리</button><button class="candy" id="eGoals">🏆 도전 목표</button><button class="candy" id="eChat">💌 친구 쪽지</button>${e.grad ? '<button class="candy" id="eCert">🎓 수료증</button>' : ''}<button class="candy" id="eAge">나이 바꾸기</button></div>
     ${engCanSpeak() && !noEngVoice() ? '' : '<p class="warn">이 기기에서는 영어 소리가 나오지 않아요. 🔊 목소리를 눌러 방법을 확인해 주세요.</p>'}
-    <div class="e-guides"><span class="row" aria-hidden="true">${['bear', 'bunny', 'dragon', 'fox'].map(sp => petSVG(sp, { mood: 'happy', stage: 'kid' })).join('')}</span><span>곰 선생님과 친구들이 같이 배워 줄 거예요!</span></div>
+    <button class="saga-card" id="eSaga"><span class="row" aria-hidden="true">${['bear', 'bunny', 'dragon', 'fox'].map(sp => petSVG(sp, { mood: 'happy', stage: 'kid' })).join('')}</span><span class="tx"><b>📖 이야기 모험</b><small>${sagaState().done >= SAGA.length ? '말 나무를 살렸어요! 다시 보기' : `${sagaState().done + 1}장. ${escapeHTML(SAGA[sagaState().done].t)}`}</small></span><span class="go">▶</span></button>
     ${dayEngHTML()}<p class="msub">${st.desc}</p><div class="dex">${rows}</div>`,
     body => body.addEventListener('click', ev => {
       const t = ev.target.closest('[data-st]'); if (t) { persist(); return openEnglish(+t.dataset.st); }
       const u = ev.target.closest('[data-unit]'); if (u && !u.disabled) { if (engCanSpeak()) { try { engSay(' '); } catch (err) {} } return engLesson(si, st.units[+u.dataset.unit]); }
       if (ev.target.closest('#eReview')) { const q = engReviewQuiz(); if (!q) return toast('먼저 레슨을 하나 끝내면 복습할 수 있어요'); return engLesson(si, st.units[0], q); }
       if (ev.target.closest('#eAlbum')) return openEngAlbum();
+      if (ev.target.closest('#eSaga')) return openSaga();
       if (ev.target.closest('#eGames')) return openEngGames();
       if (ev.target.closest('#eDayWords')) { const q = dayWordsQuiz(); return engLesson(0, ENG[0].units[0], q); }
       if (ev.target.closest('#eVoice')) return openEngVoice();
@@ -7585,7 +7939,8 @@ function openPlayMenu() {
   openSheet('뭐 하고 놀까?', `<div class="dex">
     <p class="arcade-head" style="margin-top:0">영어 배우기 <span class="arcade-tag">레벨 올리고 선물 받기</span></p>
     <button class="dex-card" data-game="english"><span class="emo day">📚</span><span class="txt"><span class="t1">말랑 영어</span><br><span class="t2">듣고, 고르고, 써 보며 배워요</span></span><span class="go">시작 ▶</span></button>
-    <button class="dex-card" data-game="enggames"><span class="emo day">🎮</span><span class="txt"><span class="t1">영어 게임</span><br><span class="t2">알파벳 마법, 듣고 잡기, 카드 매칭, 문장 기차, 보물찾기</span></span><span class="go">시작 ▶</span></button>
+    <button class="dex-card" data-game="saga"><span class="emo day">📖</span><span class="txt"><span class="t1">이야기 모험</span><br><span class="t2">친구들과 말 나무를 살려요 (8장)</span></span><span class="go">시작 ▶</span></button>
+    <button class="dex-card" data-game="enggames"><span class="emo day">🎮</span><span class="txt"><span class="t1">영어 게임</span><br><span class="t2">알파벳, 카드, 문장 기차, 펫 카페, 정글, 이야기 극장 등 9종</span></span><span class="go">시작 ▶</span></button>
     <p class="arcade-head">새 놀이 <span class="arcade-tag">휴대폰으로 슥슥</span></p>
     ${card('runner', '🏃', '말랑 달리기', '좌우로 밀어 피하고, 위로 밀어 점프! 60초 달리기', 'day')}
     <p class="arcade-head">친구랑 같이 <span class="arcade-tag">한 화면에서 둘이</span></p>
@@ -7604,6 +7959,7 @@ function openPlayMenu() {
     closeSheet();
     if (b.dataset.game === 'english') return openEnglish();
     if (b.dataset.game === 'enggames') return openEngGames();
+    if (b.dataset.game === 'saga') return openSaga();
     if (b.dataset.game === 'runner') return openRunner();
     if (b.dataset.game === 'duoTag' || b.dataset.game === 'duoTreasure') return openDuoSetup(b.dataset.game);
     if (b.dataset.game === 'pals') return openPals();
