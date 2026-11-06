@@ -8,12 +8,13 @@ ROOT = Path(__file__).resolve().parent.parent
 html = (ROOT / "www" / "index.html").read_text(encoding="utf-8")
 start = html.index("const ENG = [")
 end = html.index("/* ---------- 단계별 해금", start)
-out = subprocess.run(["node", "-"], input=html[start:end] + "\nprocess.stdout.write(JSON.stringify(ENG));",
+out = subprocess.run(["node", "-"], input=html[start:end] + "\nprocess.stdout.write(JSON.stringify(ENG.map(g => Object.assign(g, { units: g.units.map(u => Object.assign(u, { meta: engMeta(u) })) }))));",
                      capture_output=True, check=True, encoding="utf-8").stdout
-rows = []
+rows, meta = [], {}
 for st in json.loads(out):
     for u in st["units"]:
         base = [st["name"], u["t"]]
+        meta[u["t"]] = u["meta"]
         for w in u.get("w", []):
             rows.append(base + ["단어", w[0], w[1], "", ""])
         for x in u.get("s", []):
@@ -49,6 +50,8 @@ for i, ch in enumerate(chunk("const SAGA_WHO = {", "const SAGA_TREE", "SAGA", st
 path = ROOT / "docs" / "content_review.csv"
 with path.open("w", encoding="utf-8-sig", newline="") as f:
     w = csv.writer(f)
-    w.writerow(["단계", "레슨", "유형", "영어", "뜻", "정답", "오답", "검수 결과", "수정 제안"])
-    w.writerows(rows)
+    w.writerow(["단계", "레슨", "카테고리", "권장 나이", "학습 목표", "유형", "영어", "뜻", "정답", "오답", "검수 결과", "수정 제안"])
+    for r in rows:
+        m = meta.get(r[1], ["", "", ""])
+        w.writerow(r[:2] + list(m) + r[2:])
 print(path, len(rows))

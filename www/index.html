@@ -456,6 +456,7 @@ body{-webkit-touch-callout:none}
 .backup input[type=password]{width:100%;font-size:18px;padding:10px 12px;border:0;border-radius:12px;margin-bottom:8px;box-shadow:inset 0 0 0 2px var(--ink)}
 
 /* ---------- 2.0: 큰 버튼과 태블릿 ---------- */
+.e-goal{margin:0;font-size:15px;background:#FFF1B8;border-radius:10px;padding:4px 10px}
 .saga-card{display:flex;align-items:center;gap:10px;width:100%;border:0;border-radius:18px;background:linear-gradient(120deg,#FFE9A8,#CFF3E3);padding:10px 12px;margin-bottom:10px;color:var(--ink);box-shadow:0 0 0 2.5px var(--ink) inset,0 4px 0 rgba(53,67,90,.18);text-align:left;font-family:var(--display)}.saga-card .row{display:flex;flex:none}.saga-card svg{width:34px;height:34px;margin-right:-8px;display:block}.saga-card .tx{flex:1;min-width:0;padding-left:8px}.saga-card b{font-weight:400;font-size:19px;display:block}.saga-card small{font-family:var(--body);font-size:14px}.saga-card .go{font-size:20px}
 .saga-tree{display:flex;align-items:center;gap:12px;background:#EAF7FF;border-radius:18px;padding:10px 14px;margin-bottom:10px}.saga-tree .pic{font-size:52px;line-height:1}.saga-tree b{font-family:var(--display);font-weight:400;font-size:19px}.saga-tree small{font-size:14px}
 .saga-scene{display:flex;flex-direction:column;align-items:center;gap:12px;padding-top:8px}.saga-who{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:15px}.saga-who svg{width:128px;height:128px;display:block}.saga-who b{font-family:var(--display);font-weight:400;font-size:18px}.saga-scene .e-chat .b{max-width:100%;font-size:22px;text-align:center;align-self:stretch}.saga-big{font-size:84px;line-height:1.1}
@@ -5676,6 +5677,7 @@ function openStand() {
 function goStand() { World.area() === 'village' ? World.goVillage('garden', true, openStand) : openStand(); }
 
 const NEWS = [
+  { v: '4.0', date: '11월 6일', items: ['🧸 새 레슨 5개: 장난감, 옷, 자연, 우리 동네, 나의 하루', '🎯 레슨마다 오늘의 목표를 보여 줘요', '✏️ 틀린 뜻과 맞지 않는 그림을 고쳤어요'] },
   { v: '3.9', date: '11월 6일', items: ['📖 이야기 모험 "말 나무를 살려요" 시작! 8장 동안 친구들과 날아간 말을 찾아요', '🌳 이야기를 듣고, 단어를 익히고, 게임에서 쓰면 말 나무가 자라요'] },
   { v: '3.8', date: '11월 6일', items: ['☕ 펫 카페: 손님의 영어 주문을 받아요', '🌴 영어 정글 탐험: 길 안내를 듣고 보물을 찾아요', '🎭 이야기 극장: 고른 말에 따라 달라지는 이야기 3편', '🎤 발음 별 수집: 듣고 따라 말하며 별을 모아요 (마이크 없음)'] },
   { v: '3.7', date: '11월 6일', items: ['🎵 새 배경음악: 집, 마을, 점프 코스, 영어 공부, 게임, 잠자는 시간마다 다른 밝은 곡이 나와요', '🔔 효과음을 새로 만들고, 영어를 읽을 때는 음악이 작아져요', '🎚️ 설정에서 음악과 효과음 크기를 고를 수 있어요'] },
@@ -6457,18 +6459,28 @@ const ENG = [
     { id: 'hello', t: '인사하기', e: '👋', w: [['hello', '안녕', '👋'], ['goodbye', '잘 가', '🙋'], ['thanks', '고마워', '🙏'], ['sorry', '미안해', '😢'], ['yes', '응', '👍'], ['no', '아니', '👎']], s: [['Good morning.', '좋은 아침이에요.'], ['Nice to meet you.', '만나서 반가워요.'], ['See you later.', '나중에 또 봐요.']] },
     { id: 'family', t: '우리 가족', e: '👨‍👩‍👧', w: [['mom', '엄마', '👩'], ['dad', '아빠', '👨'], ['sister', '여자 형제', '👧'], ['brother', '남자 형제', '👦'], ['baby', '아기', '👶'], ['grandma', '할머니', '👵'], ['grandpa', '할아버지', '👴']] },
     { id: 'food', t: '맛있는 음식', e: '🍱', w: [['bread', '빵', '🍞'], ['milk', '우유', '🥛'], ['rice', '밥', '🍚'], ['cake', '케이크', '🍰'], ['water', '물', '💧'], ['banana', '바나나', '🍌'], ['pizza', '피자', '🍕'], ['cookie', '쿠키', '🍪']] },
-    { id: 'school', t: '학교 물건', e: '🏫', w: [['book', '책', '📕'], ['pen', '펜', '🖊️'], ['pencil', '연필', '✏️'], ['bag', '가방', '🎒'], ['chair', '의자', '🪑'], ['ruler', '자', '📏'], ['scissors', '가위', '✂️'], ['friend', '친구', '🧑‍🤝‍🧑']] },
-    { id: 'action', t: '움직여 봐요', e: '🏃', w: [['run', '달리다', '🏃'], ['jump', '뛰어오르다', '🦘'], ['sing', '노래하다', '🎤'], ['dance', '춤추다', '💃'], ['eat', '먹다', '🍽️'], ['sleep', '자다', '😴'], ['swim', '수영하다', '🏊'], ['read', '읽다', '📖']] },
+    { id: 'school', t: '학교에서', e: '🏫', w: [['book', '책', '📕'], ['pen', '펜', '🖊️'], ['pencil', '연필', '✏️'], ['bag', '가방', '🎒'], ['chair', '의자', '🪑'], ['ruler', '자', '📏'], ['scissors', '가위', '✂️'], ['friend', '친구', '🧑‍🤝‍🧑']] },
+    { id: 'action', t: '움직여 봐요', e: '🏃', w: [['run', '달리다', '🏃'], ['jump', '뛰어오르다'], ['sing', '노래하다', '🎤'], ['dance', '춤추다', '💃'], ['eat', '먹다', '🍽️'], ['sleep', '자다', '😴'], ['swim', '수영하다', '🏊'], ['read', '읽다', '📖']] },
     { id: 'weather', t: '날씨', e: '🌦️', w: [['sunny', '화창한', '☀️'], ['rainy', '비 오는', '🌧️'], ['cloudy', '흐린', '☁️'], ['snowy', '눈 오는', '❄️'], ['windy', '바람 부는', '🌬️'], ['hot', '더운', '🥵'], ['cold', '추운', '🥶']] },
-    { id: 'feel', t: '내 기분', e: '😊', w: [['happy', '행복한', '😄'], ['sad', '슬픈', '😭'], ['angry', '화난', '😠'], ['tired', '피곤한', '🥱'], ['hungry', '배고픈', '🤤'], ['scared', '무서운', '😱']], s: [['I am happy.', '나는 행복해요.'], ['I am hungry.', '나는 배고파요.'], ['Are you tired?', '너는 피곤하니?']] },
+    { id: 'feel', t: '내 기분', e: '😊', w: [['happy', '행복한', '😄'], ['sad', '슬픈', '😭'], ['angry', '화난', '😠'], ['tired', '피곤한', '🥱'], ['hungry', '배고픈', '🤤'], ['scared', '무서워하는', '😱']], s: [['I am happy.', '나는 행복해요.'], ['I am hungry.', '나는 배고파요.'], ['Are you tired?', '너는 피곤하니?']] },
     { id: 'ph_vowel', t: '짧은 모음 a e i o u', e: '🔡', w: [['map', '지도', '🗺️'], ['bed', '침대', '🛏️'], ['pig', '돼지', '🐷'], ['dog', '강아지', '🐶'], ['sun', '해', '☀️'], ['cup', '컵', '🥤']],
       s: [['The cat has a hat.', '고양이는 모자가 있어요.'], ['The dog is on the bed.', '강아지가 침대 위에 있어요.'], ['The sun is hot.', '해는 뜨거워요.']] },
     { id: 'transport', t: '탈것', e: '🚌', w: [['bus', '버스', '🚌'], ['car', '자동차', '🚗'], ['train', '기차', '🚆'], ['airplane', '비행기', '✈️'], ['bike', '자전거', '🚲'], ['boat', '배', '⛵']],
-      s: [['I go to school by bus.', '나는 버스로 학교에 가요.'], ['The train is very long.', '기차는 아주 길어요.'], ['I can ride a bike.', '나는 자전거를 탈 수 있어요.']] },
+      s: [['I ride the bus.', '나는 버스를 타요.'], ['The train is long.', '기차는 길어요.'], ['I can ride a bike.', '나는 자전거를 탈 수 있어요.']] },
     { id: 'home', t: '우리 집 물건', e: '🏠', w: [['bed', '침대', '🛏️'], ['sofa', '소파', '🛋️'], ['door', '문', '🚪'], ['window', '창문', '🪟'], ['lamp', '전등', '💡'], ['clock', '시계', '🕰️']],
-      s: [['Please open the door.', '문을 열어 주세요.'], ['The clock is on the wall.', '시계는 벽에 있어요.'], ['My cat is on the sofa.', '내 고양이는 소파 위에 있어요.']] },
+      s: [['Please open the door.', '문을 열어 주세요.'], ['I see a clock.', '시계가 보여요.'], ['My cat is on the sofa.', '내 고양이는 소파 위에 있어요.']] },
     { id: 'dir', t: '방향과 위치', e: '🧭', noPic: true, w: [['left', '왼쪽'], ['right', '오른쪽'], ['up', '위로'], ['down', '아래로'], ['behind', '~ 뒤에']],
-      s: [['Turn left at the park.', '공원에서 왼쪽으로 돌아요.'], ['The cat is behind the door.', '고양이가 문 뒤에 있어요.'], ['Go up the stairs.', '계단을 올라가요.']] }
+      s: [['Turn left.', '왼쪽으로 돌아요.'], ['The cat is behind the door.', '고양이가 문 뒤에 있어요.'], ['Go up the stairs.', '계단을 올라가요.']] },
+    { id: 'toys', t: '내 장난감', e: '🧸', w: [['teddy bear', '곰 인형', '🧸'], ['robot', '로봇', '🤖'], ['kite', '연', '🪁'], ['puzzle', '퍼즐', '🧩'], ['balloon', '풍선', '🎈'], ['ball', '공', '⚽']],
+      s: [['I have a robot.', '나는 로봇이 있어요.'], ['This is my teddy bear.', '이것은 내 곰 인형이에요.'], ['I see a kite.', '연이 보여요.']] },
+    { id: 'clothes', t: '옷 입기', e: '👕', w: [['shirt', '셔츠', '👕'], ['pants', '바지', '👖'], ['dress', '원피스', '👗'], ['socks', '양말', '🧦'], ['shoes', '신발', '👟'], ['coat', '외투', '🧥']],
+      s: [['I like your shirt.', '네 셔츠 마음에 들어.'], ['Put on your shoes.', '신발을 신어요.'], ['Wear a coat.', '외투를 입어요.']] },
+    { id: 'outdoor', t: '자연 속으로', e: '🌳', w: [['tree', '나무', '🌳'], ['flower', '꽃', '🌸'], ['mountain', '산', '⛰️'], ['star', '별', '⭐'], ['rainbow', '무지개', '🌈'], ['leaf', '잎', '🍃']],
+      s: [['The tree is tall.', '나무는 키가 커요.'], ['I see a rainbow.', '무지개가 보여요.'], ['The stars are bright.', '별들이 밝아요.']] },
+    { id: 'places', t: '우리 동네', e: '🏘️', w: [['park', '공원', '🏞️'], ['school', '학교', '🏫'], ['hospital', '병원', '🏥'], ['library', '도서관', '📚'], ['store', '가게', '🏪'], ['beach', '해변', '🏖️']],
+      s: [['I play in the park.', '나는 공원에서 놀아요.'], ['The library is quiet.', '도서관은 조용해요.'], ['I like the beach.', '나는 해변을 좋아해요.']] },
+    { id: 'routine', t: '나의 하루', e: '⏰', w: [['wake up', '일어나다', '⏰'], ['brush my teeth', '이를 닦다', '🪥'], ['eat breakfast', '아침을 먹다', '🍳'], ['go to school', '학교에 가다', '🏫'], ['do my homework', '숙제를 하다', '📝'], ['go to bed', '잠자리에 들다', '🛌']],
+      s: [['I wake up at seven.', '나는 일곱 시에 일어나요.'], ['I brush my teeth.', '나는 이를 닦아요.'], ['I go to bed at nine.', '나는 아홉 시에 잠자리에 들어요.']] }
   ] },
   { id: 's2', name: '3~4학년', age: '9~11세', icon: '🌳', pick: 4, desc: '문장을 듣고 만들어요', units: [
     { id: 'me', noPic: true, t: '나를 소개해요', e: '🙋', w: [['name', '이름', '📛'], ['age', '나이', '🎂'], ['student', '학생', '🧑‍🎓'], ['Korea', '한국', '🇰🇷']],
@@ -6503,7 +6515,7 @@ const ENG = [
       talk: [['What will you do tomorrow?', 'I will play baduk with my dad.', ['I played baduk yesterday.', 'It is tomorrow.'], '내일 뭐 할 거니?']],
       r: [{ p: 'Next week is summer vacation. Minho is going to visit Jeju Island. He will ride a horse and take many pictures.', k: '다음 주는 여름 방학이에요. 민호는 제주도에 갈 거예요. 말을 타고 사진을 많이 찍을 거예요.', q: 'What will Minho ride?', a: 'A horse', o: ['A bike', 'A bus'] }] },
     { id: 'compare', noPic: true, t: '비교하기', e: '⚖️', w: [['taller', '더 키가 큰', '🦒'], ['bigger', '더 큰', '🐘'], ['faster', '더 빠른', '🐆'], ['smaller', '더 작은', '🐭'], ['heavier', '더 무거운', '🏋️'], ['the biggest', '가장 큰', '🐳']],
-      s: [['An elephant is bigger than a dog.', '코끼리는 개보다 더 커요.'], ['A cheetah is faster than a lion.', '치타는 사자보다 더 빨라요.'], ['Tom is taller than me.', '톰은 나보다 키가 더 커요.'], ['The whale is the biggest animal.', '고래는 가장 큰 동물이에요.']],
+      s: [['An elephant is bigger than a dog.', '코끼리는 개보다 더 커요.'], ['A cheetah is faster than a lion.', '치타는 사자보다 더 빨라요.'], ['Tom is taller than me.', '톰은 나보다 키가 더 커요.'], ['The blue whale is the biggest animal.', '대왕고래는 가장 큰 동물이에요.']],
       b: [['A mouse is ___ than a cat.', 'smaller', ['small', 'smallest'], '쥐는 고양이보다 더 작아요.'], ['My bag is heavier ___ yours.', 'than', ['that', 'then'], '내 가방은 네 것보다 더 무거워요.']] },
     { id: 'should', noPic: true, t: '충고와 규칙', e: '📏', w: [['should', '~하는 게 좋다', '👉'], ['must', '~해야 한다', '❗'], ['rule', '규칙', '📜'], ['wash', '씻다', '🧼'], ['helmet', '헬멧', '⛑️']],
       s: [['You should wash your hands.', '너는 손을 씻는 게 좋아.'], ['You must wear a helmet.', '너는 헬멧을 써야 해.'], ['You should not run here.', '여기서 뛰면 안 돼.']],
@@ -6573,7 +6585,7 @@ const ENG = [
         ['Can you play today?', '오늘 놀 수 있어?', "Sorry, I can't. How about tomorrow?", '미안, 못 놀아. 내일은 어때?', ['Sorry, it is my toy.', 'Yes, it was yesterday.']],
         ['What time should we meet?', '몇 시에 만날까?', "Let's meet at three.", '3시에 만나자.', ["Let's meet at the park.", 'I met him last week.']],
         ['Where should we meet?', '어디에서 만날까?', "Let's meet at the park.", '공원에서 만나자.', ["Let's meet at three.", 'I am from the park.']],
-        ['Sorry I am late.', '늦어서 미안해.', "That's okay. Let's go.", '괜찮아. 가자.', ["You're welcome. Good night.", 'I am very tall.']]] },
+        ["Sorry I'm late.", '늦어서 미안해.', "That's okay. Let's go.", '괜찮아. 가자.', ["You're welcome. Good night.", 'I am very tall.']]] },
     { id: 'c_food', t: '식당에서 주문하기', e: '🍔', noPic: true, w: [['Can I have a hamburger, please?', '햄버거 하나 주세요.'], ['Anything to drink?', '마실 것은요?'], ['For here or to go?', '여기서 드세요, 가져가세요?'], ['It smells delicious.', '맛있는 냄새가 나요.']],
       d: [['Hello. What would you like?', '안녕하세요. 무엇을 드릴까요?', 'Can I have a hamburger, please?', '햄버거 하나 주세요.', ['I would like to go home yesterday.', 'I am a hamburger.']],
         ['Anything to drink?', '마실 것은요?', 'Orange juice, please.', '오렌지 주스 주세요.', ['Yes, I can swim.', 'A big hamburger, please.']],
@@ -6661,6 +6673,18 @@ const ENG = [
     { id: 'c_exam', t: '졸업 시험', e: '🎓', noPic: true, exam: true }
   ] }
 ];
+
+// 레슨별 학습 정보: [카테고리, 권장 나이, 학습 목표]
+const ENG_META = {
+  abc1: ['Alphabet & Phonics', '5~7세', 'A부터 F까지 글자와 소리를 알아요'], abc2: ['Alphabet & Phonics', '5~7세', 'G부터 L까지 글자와 소리를 알아요'], abc3: ['Alphabet & Phonics', '5~7세', 'M부터 R까지 글자와 소리를 알아요'], abc4: ['Alphabet & Phonics', '5~7세', 'S부터 Z까지 글자와 소리를 알아요'],
+  color: ['Colors', '5~7세', '색깔 이름을 듣고 찾아요'], animal: ['Animals', '5~7세', '동물 이름을 듣고 찾아요'], number: ['Numbers', '5~7세', '1부터 10까지 수를 말해요'], body: ['Body', '5~7세', '몸의 이름을 알아요'], ph_rhyme: ['Alphabet & Phonics', '5~7세', '끝소리가 같은 단어를 익혀요'],
+  hello: ['Greetings', '6~8세', '인사를 주고받아요'], family: ['Family', '6~8세', '가족을 영어로 불러요'], food: ['Food', '6~8세', '음식 이름을 말해요'], school: ['School', '6~8세', '학교에서 쓰는 말을 익혀요'], action: ['Action Words', '6~8세', '움직임을 나타내는 말을 익혀요'], weather: ['Weather', '6~8세', '날씨를 말해요'], feel: ['Feelings', '6~8세', '내 기분을 말해요'], ph_vowel: ['Alphabet & Phonics', '6~8세', '짧은 모음이 든 단어를 읽어요'],
+  transport: ['Transportation', '6~8세', '탈것 이름을 말해요'], home: ['Home', '6~8세', '집안 물건 이름을 말해요'], dir: ['Places', '6~8세', '방향과 위치를 나타내요'], toys: ['Toys', '6~8세', '장난감 이름을 말해요'], clothes: ['Clothes', '6~8세', '옷 이름을 말해요'], outdoor: ['Nature', '6~8세', '자연에 있는 것을 말해요'], places: ['Places', '6~8세', '동네의 장소를 말해요'], routine: ['Daily Routines', '6~8세', '하루 일과를 말해요'],
+  me: ['Simple Sentences', '8~10세', '나를 소개하는 문장을 말해요'], like: ['Simple Sentences', '8~10세', '좋아하는 것을 말해요'], can: ['Simple Sentences', '8~10세', '할 수 있는 일을 말해요'], where: ['Places', '8~10세', '어디에 있는지 말해요'], time: ['Simple Sentences', '8~10세', '시간과 요일을 말해요'], job: ['Simple Sentences', '8~10세', '직업과 꿈을 말해요'],
+  past: ['Simple Sentences', '10~12세', '어제 한 일을 말해요'], future: ['Simple Sentences', '10~12세', '앞으로 할 일을 말해요'], compare: ['Simple Sentences', '10~12세', '둘을 비교해서 말해요'], should: ['Simple Sentences', '10~12세', '충고와 규칙을 말해요'], travel: ['Places', '10~12세', '여행할 때 쓰는 말을 익혀요'], nature: ['Nature', '10~12세', '환경에 관한 글을 읽어요'],
+  c_hello: ['Greetings', '8세 이상', '처음 만난 사람과 인사해요'], c_me: ['Simple Sentences', '8세 이상', '나에 대해 말해요'], c_family: ['Family', '8세 이상', '가족을 소개해요'], c_school: ['School', '8세 이상', '학교에서 묻고 답해요'], c_likes: ['Simple Sentences', '8세 이상', '좋아하는 것을 묻고 답해요'], c_day: ['Daily Routines', '8세 이상', '하루 일과를 묻고 답해요'], c_time: ['Weather', '8세 이상', '날씨와 시간을 묻고 답해요'], c_play: ['Simple Sentences', '8세 이상', '친구와 약속을 잡아요'], c_food: ['Food', '8세 이상', '식당에서 주문해요'], c_shop: ['Places', '8세 이상', '가게에서 물건을 사요'], c_way: ['Places', '8세 이상', '길을 묻고 알려 줘요'], c_sick: ['Body', '8세 이상', '아픈 곳을 말해요'], c_help: ['Simple Sentences', '8세 이상', '못 알아들었을 때 다시 물어요'], c_past: ['Simple Sentences', '8세 이상', '지난 일을 이야기해요'], c_plan: ['Simple Sentences', '8세 이상', '계획을 이야기해요'], c_why: ['Simple Sentences', '8세 이상', '내 생각과 이유를 말해요'], c_feel: ['Feelings', '8세 이상', '기분을 나누고 위로해요'], c_online: ['Greetings', '8세 이상', '온라인에서 안전하게 말해요'], c_travel: ['Places', '8세 이상', '여행 상황에서 말해요'], c_keep: ['Simple Sentences', '8세 이상', '대화를 이어 가요'], c_exam: ['Simple Sentences', '8세 이상', '배운 대화를 확인해요']
+};
+const engMeta = u => ENG_META[u.id] || ['Simple Sentences', '', ''];
 
 /* ---------- 단계별 해금: 영어 레슨을 끝낼수록 갈 수 있는 곳이 늘어난다. 이미 하던 저장은 닫지 않는다 ---------- */
 const AREA_NEED = { village: 1, garden: 2, portal: 2, camp: 4, beach: 6, meadow: 8 }, AREA_NAME = { village: '🏘️ 마을', garden: '🥕 텃밭', portal: '🌀 점프 코스', camp: '⛺ 캠핑장', beach: '🏖️ 해변', meadow: '🌼 꽃언덕' };
@@ -6847,7 +6871,7 @@ function engQuiz(stageIdx, unit, count = 8) {
   const hard = list => list.slice().sort((a, b) => ((e.w[a.w] || {}).b || 0) - ((e.w[b.w] || {}).b || 0) || Math.random() - .5);
   const wordQ = (x, kind) => {
     if (kind === 'listenPic') return { type: kind, key: x.w, say: x.w, a: x.e, o: wrongs(x, 'e'), pic: true, x };
-    if (kind === 'letter') return { type: kind, key: x.w, say: engLetterSay(x), l: x.l, a: x.e, o: wrongs(x, 'e'), pic: true, x };
+    if (kind === 'letter') return { type: kind, key: x.w, say: engLetterSay(x), l: x.l, inWord: x.l === 'X', a: x.e, o: wrongs(x, 'e'), pic: true, x };
     if (kind === 'picWord') return { type: kind, key: x.w, say: null, e: x.e, a: x.w, o: wrongs(x, 'w'), x };
     if (kind === 'wordKo') return { type: kind, key: x.w, say: x.w, w: x.w, a: x.k, o: wrongs(x, 'k'), x };
     if (kind === 'koWord') return { type: kind, key: x.w, say: null, k: x.k, a: x.w, o: wrongs(x, 'w'), x };
@@ -6966,7 +6990,7 @@ function engLesson(stageIdx, unit, reviewList) {
       wrap.querySelector('#eNext').focus({ preventScroll: true });
       return;
     }
-    main.innerHTML = `<div class="e-card"><p class="e-tag">새로 배워요 ${ci + 1}/${cards.length}</p>${c.l ? `<div class="e-letter">${c.l}<small>${c.l.toLowerCase()}</small></div>` : ''}${c.e && !unit.noPic ? `<div class="e-pic">${c.e}</div>` : ''}<div class="e-word${c.en.length > 14 ? ' long' : ''}">${escapeHTML(c.en)}</div><div class="e-ko">${escapeHTML(c.k)}</div>${sayBtn('eSay', true)}</div>`;
+    main.innerHTML = `<div class="e-card"><p class="e-tag">새로 배워요 ${ci + 1}/${cards.length}</p>${ci === 0 && engMeta(unit)[2] ? `<p class="e-goal">🎯 오늘의 목표: ${escapeHTML(engMeta(unit)[2])}</p>` : ''}${c.l ? `<div class="e-letter">${c.l}<small>${c.l.toLowerCase()}</small></div>` : ''}${c.e && !unit.noPic ? `<div class="e-pic">${c.e}</div>` : ''}<div class="e-word${c.en.length > 14 ? ' long' : ''}">${escapeHTML(c.en)}</div><div class="e-ko">${escapeHTML(c.k)}</div>${sayBtn('eSay', true)}</div>`;
     foot.innerHTML = '<button class="candy primary e-next" id="eNext">다음 ▶</button>';
     bind('eSay', () => engSay(c.say)); bind('eNext', () => { ci++; showCard(); });
     if (kid && ci === 0) { engSay('잘 듣고 따라 말해 봐요', { lang: 'ko-KR', rate: 1 }); engSay(c.say, { queue: true }); } else engSay(c.say);
@@ -6992,7 +7016,7 @@ function engLesson(stageIdx, unit, reviewList) {
     const tile = q.type === 'spell' || q.type === 'order';
     const typing = q.type === 'type', hint = typing ? q.a.split(' ').map((w, i) => i ? w.replace(/[A-Za-z]/g, '_') : w).join(' ') : '';
     const opts = tile || typing ? '' : shuffle([q.a, ...q.o]);
-    main.innerHTML = `<p class="e-prompt">${mascot('talk', engGuide(q.type))}<span>${PROMPT[q.type]}</span></p><div class="e-card q">${head}</div>${typing
+    main.innerHTML = `<p class="e-prompt">${mascot('talk', engGuide(q.type))}<span>${q.inWord ? '이 글자가 들어 있는 그림은?' : PROMPT[q.type]}</span></p><div class="e-card q">${head}</div>${typing
       ? `<form class="e-type" id="eForm"><input id="eIn" maxlength="80" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" lang="en" aria-label="영어로 대답 쓰기" placeholder="영어로 써 보세요"><button class="candy primary">확인</button></form><p class="e-hint">힌트: ${escapeHTML(hint)}</p>`
       : tile
       ? `<div class="e-ans${q.type === 'spell' ? ' sp' : ''}" id="eAns" aria-label="내가 만든 답"></div><div class="e-tiles" id="eTiles">${q.parts.map((t, i) => `<button class="e-tile" data-t="${i}">${escapeHTML(t)}</button>`).join('')}</div>`
@@ -7174,7 +7198,7 @@ function egAlphabet() {
   let i = 0, right = 0;
   function show() {
     if (i >= picks.length) return egFinish(sh, { key: 'abc', right, total: picks.length, again: egAlphabet });
-    const x = picks[i], mode = ['case', 'sound', 'pic'][i % 3], others = shuffle(all.filter(y => y.l !== x.l)).slice(0, 2);
+    const x = picks[i], isX = x.l === 'X', mode = isX ? 'case' : ['case', 'sound', 'pic'][i % 3], others = shuffle(all.filter(y => y.l !== x.l)).slice(0, 2);
     let first = true; sh.bar.style.width = i / picks.length * 100 + '%';
     const opts = shuffle([x, ...others]);
     const label = y => (mode === 'case' ? y.l.toLowerCase() : mode === 'sound' ? y.l : y.e);
@@ -7187,7 +7211,7 @@ function egAlphabet() {
     if (mode === 'case') engSay(x.l); else engSay(sound);
     sh.main.querySelector('#eOpts').addEventListener('click', ev => {
       const b = ev.target.closest('[data-k]'); if (!b || b.disabled) return;
-      if (opts[+b.dataset.k] !== x) { first = false; b.disabled = true; b.classList.add('wrong'); egMiss(x.w); sh.main.querySelector('#egHint').textContent = `힌트: ${x.l}${x.l.toLowerCase()}는 ${x.w}의 첫 글자예요. 다시 골라 봐요!`; engSay(sound); return; }
+      if (opts[+b.dataset.k] !== x) { first = false; b.disabled = true; b.classList.add('wrong'); egMiss(x.w); sh.main.querySelector('#egHint').textContent = isX ? '힌트: X의 소문자는 x예요. box에 들어 있어요. 다시 골라 봐요!' : `힌트: ${x.l}${x.l.toLowerCase()}는 ${x.w}의 첫 글자예요. 다시 골라 봐요!`; engSay(sound); return; }
       if (first) right++;
       egRight(x.w); sfx('magic');
       sh.main.querySelectorAll('.e-opt').forEach(o => { o.disabled = true; });
@@ -7714,7 +7738,7 @@ function openEnglish(tab) {
   const nextGift = Object.keys(ENG_GIFTS).map(Number).find(l => l > e.level);
   const rows = st.units.map((u, i) => {
     const open = engOpen(st, i), stars = (e.units[u.id] || {}).stars || 0;
-    return `<button class="dex-card" data-unit="${i}"${open ? '' : ' disabled style="opacity:.55"'}><span class="emo day">${open ? u.e : '🔒'}</span><span class="txt"><span class="t1">${i + 1}. ${escapeHTML(u.t)}</span><br><span class="t2">${open ? (stars ? '⭐'.repeat(stars) + '☆'.repeat(3 - stars) : '새 레슨') : '앞 레슨을 끝내면 열려요'}</span></span><span class="go">${stars ? '다시' : open ? '시작 ▶' : '잠김'}</span></button>`;
+    return `<button class="dex-card" data-unit="${i}"${open ? '' : ' disabled style="opacity:.55"'}><span class="emo day">${open ? u.e : '🔒'}</span><span class="txt"><span class="t1">${i + 1}. ${escapeHTML(u.t)}</span><br><span class="t2">${open ? (stars ? '⭐'.repeat(stars) + '☆'.repeat(3 - stars) : '🎯 ' + engMeta(u)[2]) : '앞 레슨을 끝내면 열려요'}</span></span><span class="go">${stars ? '다시' : open ? '시작 ▶' : '잠김'}</span></button>`;
   }).join('');
   openSheet('📚 말랑 영어', `<div class="mission" style="margin-bottom:10px"><span class="mi">${rk.cur[1]}</span><span class="mt"><b>영어 Lv.${e.level} ${rk.cur[2]} · 배운 단어 ${learned}개</b><span class="mbar"><i style="width:${e.xp / need * 100}%"></i></span><small>${e.xp} / ${need}${nextGift ? ` · Lv.${nextGift}에 특별 선물 🎁` : ''}${rk.nx ? ` · Lv.${rk.nx[0]} ${rk.nx[1]} ${rk.nx[2]}` : ''}<br>전체 여정 ${Math.round(lessons / lessonAll * 100)}% (레슨 ${lessons}/${lessonAll})</small></span></div>
     <div class="tabs" role="tablist">${ENG.map((g, i) => `<button role="tab" aria-selected="${i === si}" data-st="${i}">${g.icon} ${g.name}</button>`).join('')}</div>

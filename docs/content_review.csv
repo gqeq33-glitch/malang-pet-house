@@ -1,613 +1,658 @@
-﻿단계,레슨,유형,영어,뜻,정답,오답,검수 결과,수정 제안
-유아,알파벳 A~F,단어,apple,사과,,
-유아,알파벳 A~F,단어,ball,공,,
-유아,알파벳 A~F,단어,cat,고양이,,
-유아,알파벳 A~F,단어,dog,강아지,,
-유아,알파벳 A~F,단어,egg,달걀,,
-유아,알파벳 A~F,단어,fish,물고기,,
-유아,알파벳 G~L,단어,grapes,포도,,
-유아,알파벳 G~L,단어,hat,모자,,
-유아,알파벳 G~L,단어,ice cream,아이스크림,,
-유아,알파벳 G~L,단어,juice,주스,,
-유아,알파벳 G~L,단어,key,열쇠,,
-유아,알파벳 G~L,단어,lion,사자,,
-유아,알파벳 M~R,단어,moon,달,,
-유아,알파벳 M~R,단어,nose,코,,
-유아,알파벳 M~R,단어,orange,오렌지,,
-유아,알파벳 M~R,단어,pig,돼지,,
-유아,알파벳 M~R,단어,queen,여왕,,
-유아,알파벳 M~R,단어,rabbit,토끼,,
-유아,알파벳 S~Z,단어,sun,해,,
-유아,알파벳 S~Z,단어,tiger,호랑이,,
-유아,알파벳 S~Z,단어,umbrella,우산,,
-유아,알파벳 S~Z,단어,van,승합차,,
-유아,알파벳 S~Z,단어,watch,손목시계,,
-유아,알파벳 S~Z,단어,box,상자,,
-유아,알파벳 S~Z,단어,yo-yo,요요,,
-유아,알파벳 S~Z,단어,zebra,얼룩말,,
-유아,색깔,단어,red,빨강,,
-유아,색깔,단어,blue,파랑,,
-유아,색깔,단어,yellow,노랑,,
-유아,색깔,단어,green,초록,,
-유아,색깔,단어,orange,주황,,
-유아,색깔,단어,purple,보라,,
-유아,색깔,단어,black,검정,,
-유아,색깔,단어,white,하양,,
-유아,동물 친구,단어,cat,고양이,,
-유아,동물 친구,단어,dog,강아지,,
-유아,동물 친구,단어,pig,돼지,,
-유아,동물 친구,단어,cow,소,,
-유아,동물 친구,단어,duck,오리,,
-유아,동물 친구,단어,bear,곰,,
-유아,동물 친구,단어,monkey,원숭이,,
-유아,동물 친구,단어,frog,개구리,,
-유아,숫자 1~10,단어,one,하나,,
-유아,숫자 1~10,단어,two,둘,,
-유아,숫자 1~10,단어,three,셋,,
-유아,숫자 1~10,단어,four,넷,,
-유아,숫자 1~10,단어,five,다섯,,
-유아,숫자 1~10,단어,six,여섯,,
-유아,숫자 1~10,단어,seven,일곱,,
-유아,숫자 1~10,단어,eight,여덟,,
-유아,숫자 1~10,단어,nine,아홉,,
-유아,숫자 1~10,단어,ten,열,,
-유아,내 몸,단어,eye,눈,,
-유아,내 몸,단어,ear,귀,,
-유아,내 몸,단어,nose,코,,
-유아,내 몸,단어,mouth,입,,
-유아,내 몸,단어,hand,손,,
-유아,내 몸,단어,foot,발,,
-유아,"소리 친구 -at, -en",단어,cat,고양이,,
-유아,"소리 친구 -at, -en",단어,hat,모자,,
-유아,"소리 친구 -at, -en",단어,bat,박쥐,,
-유아,"소리 친구 -at, -en",단어,pen,펜,,
-유아,"소리 친구 -at, -en",단어,hen,암탉,,
-유아,"소리 친구 -at, -en",단어,ten,열,,
-1~2학년,인사하기,단어,hello,안녕,,
-1~2학년,인사하기,단어,goodbye,잘 가,,
-1~2학년,인사하기,단어,thanks,고마워,,
-1~2학년,인사하기,단어,sorry,미안해,,
-1~2학년,인사하기,단어,yes,응,,
-1~2학년,인사하기,단어,no,아니,,
-1~2학년,인사하기,문장,Good morning.,좋은 아침이에요.,,
-1~2학년,인사하기,문장,Nice to meet you.,만나서 반가워요.,,
-1~2학년,인사하기,문장,See you later.,나중에 또 봐요.,,
-1~2학년,우리 가족,단어,mom,엄마,,
-1~2학년,우리 가족,단어,dad,아빠,,
-1~2학년,우리 가족,단어,sister,여자 형제,,
-1~2학년,우리 가족,단어,brother,남자 형제,,
-1~2학년,우리 가족,단어,baby,아기,,
-1~2학년,우리 가족,단어,grandma,할머니,,
-1~2학년,우리 가족,단어,grandpa,할아버지,,
-1~2학년,맛있는 음식,단어,bread,빵,,
-1~2학년,맛있는 음식,단어,milk,우유,,
-1~2학년,맛있는 음식,단어,rice,밥,,
-1~2학년,맛있는 음식,단어,cake,케이크,,
-1~2학년,맛있는 음식,단어,water,물,,
-1~2학년,맛있는 음식,단어,banana,바나나,,
-1~2학년,맛있는 음식,단어,pizza,피자,,
-1~2학년,맛있는 음식,단어,cookie,쿠키,,
-1~2학년,학교 물건,단어,book,책,,
-1~2학년,학교 물건,단어,pen,펜,,
-1~2학년,학교 물건,단어,pencil,연필,,
-1~2학년,학교 물건,단어,bag,가방,,
-1~2학년,학교 물건,단어,chair,의자,,
-1~2학년,학교 물건,단어,ruler,자,,
-1~2학년,학교 물건,단어,scissors,가위,,
-1~2학년,학교 물건,단어,friend,친구,,
-1~2학년,움직여 봐요,단어,run,달리다,,
-1~2학년,움직여 봐요,단어,jump,뛰어오르다,,
-1~2학년,움직여 봐요,단어,sing,노래하다,,
-1~2학년,움직여 봐요,단어,dance,춤추다,,
-1~2학년,움직여 봐요,단어,eat,먹다,,
-1~2학년,움직여 봐요,단어,sleep,자다,,
-1~2학년,움직여 봐요,단어,swim,수영하다,,
-1~2학년,움직여 봐요,단어,read,읽다,,
-1~2학년,날씨,단어,sunny,화창한,,
-1~2학년,날씨,단어,rainy,비 오는,,
-1~2학년,날씨,단어,cloudy,흐린,,
-1~2학년,날씨,단어,snowy,눈 오는,,
-1~2학년,날씨,단어,windy,바람 부는,,
-1~2학년,날씨,단어,hot,더운,,
-1~2학년,날씨,단어,cold,추운,,
-1~2학년,내 기분,단어,happy,행복한,,
-1~2학년,내 기분,단어,sad,슬픈,,
-1~2학년,내 기분,단어,angry,화난,,
-1~2학년,내 기분,단어,tired,피곤한,,
-1~2학년,내 기분,단어,hungry,배고픈,,
-1~2학년,내 기분,단어,scared,무서운,,
-1~2학년,내 기분,문장,I am happy.,나는 행복해요.,,
-1~2학년,내 기분,문장,I am hungry.,나는 배고파요.,,
-1~2학년,내 기분,문장,Are you tired?,너는 피곤하니?,,
-1~2학년,짧은 모음 a e i o u,단어,map,지도,,
-1~2학년,짧은 모음 a e i o u,단어,bed,침대,,
-1~2학년,짧은 모음 a e i o u,단어,pig,돼지,,
-1~2학년,짧은 모음 a e i o u,단어,dog,강아지,,
-1~2학년,짧은 모음 a e i o u,단어,sun,해,,
-1~2학년,짧은 모음 a e i o u,단어,cup,컵,,
-1~2학년,짧은 모음 a e i o u,문장,The cat has a hat.,고양이는 모자가 있어요.,,
-1~2학년,짧은 모음 a e i o u,문장,The dog is on the bed.,강아지가 침대 위에 있어요.,,
-1~2학년,짧은 모음 a e i o u,문장,The sun is hot.,해는 뜨거워요.,,
-1~2학년,탈것,단어,bus,버스,,
-1~2학년,탈것,단어,car,자동차,,
-1~2학년,탈것,단어,train,기차,,
-1~2학년,탈것,단어,airplane,비행기,,
-1~2학년,탈것,단어,bike,자전거,,
-1~2학년,탈것,단어,boat,배,,
-1~2학년,탈것,문장,I go to school by bus.,나는 버스로 학교에 가요.,,
-1~2학년,탈것,문장,The train is very long.,기차는 아주 길어요.,,
-1~2학년,탈것,문장,I can ride a bike.,나는 자전거를 탈 수 있어요.,,
-1~2학년,우리 집 물건,단어,bed,침대,,
-1~2학년,우리 집 물건,단어,sofa,소파,,
-1~2학년,우리 집 물건,단어,door,문,,
-1~2학년,우리 집 물건,단어,window,창문,,
-1~2학년,우리 집 물건,단어,lamp,전등,,
-1~2학년,우리 집 물건,단어,clock,시계,,
-1~2학년,우리 집 물건,문장,Please open the door.,문을 열어 주세요.,,
-1~2학년,우리 집 물건,문장,The clock is on the wall.,시계는 벽에 있어요.,,
-1~2학년,우리 집 물건,문장,My cat is on the sofa.,내 고양이는 소파 위에 있어요.,,
-1~2학년,방향과 위치,단어,left,왼쪽,,
-1~2학년,방향과 위치,단어,right,오른쪽,,
-1~2학년,방향과 위치,단어,up,위로,,
-1~2학년,방향과 위치,단어,down,아래로,,
-1~2학년,방향과 위치,단어,behind,~ 뒤에,,
-1~2학년,방향과 위치,문장,Turn left at the park.,공원에서 왼쪽으로 돌아요.,,
-1~2학년,방향과 위치,문장,The cat is behind the door.,고양이가 문 뒤에 있어요.,,
-1~2학년,방향과 위치,문장,Go up the stairs.,계단을 올라가요.,,
-3~4학년,나를 소개해요,단어,name,이름,,
-3~4학년,나를 소개해요,단어,age,나이,,
-3~4학년,나를 소개해요,단어,student,학생,,
-3~4학년,나를 소개해요,단어,Korea,한국,,
-3~4학년,나를 소개해요,문장,My name is Mina.,내 이름은 미나예요.,,
-3~4학년,나를 소개해요,문장,I am ten years old.,나는 열 살이에요.,,
-3~4학년,나를 소개해요,문장,I am from Korea.,나는 한국에서 왔어요.,,
-3~4학년,나를 소개해요,문장,I am a student.,나는 학생이에요.,,
-3~4학년,나를 소개해요,대화,What's your name?,이름이 뭐니?,My name is Tom.,I am fine. / It is a book.
-3~4학년,나를 소개해요,대화,How old are you?,몇 살이니?,I am nine years old.,"I like pizza. / Yes, I can."
-3~4학년,나를 소개해요,대화,How are you?,어떻게 지내니?,"I'm fine, thank you.",My name is Tom. / It is red.
-3~4학년,좋아해요,단어,like,좋아하다,,
-3~4학년,좋아해요,단어,soccer,축구,,
-3~4학년,좋아해요,단어,music,음악,,
-3~4학년,좋아해요,단어,chicken,닭고기,,
-3~4학년,좋아해요,단어,grape,포도,,
-3~4학년,좋아해요,문장,I like apples.,나는 사과를 좋아해요.,,
-3~4학년,좋아해요,문장,I like soccer.,나는 축구를 좋아해요.,,
-3~4학년,좋아해요,문장,I don't like carrots.,나는 당근을 좋아하지 않아요.,,
-3~4학년,좋아해요,문장,Do you like music?,너는 음악을 좋아하니?,,
-3~4학년,좋아해요,빈칸,I ___ bananas.,나는 바나나를 좋아해요.,like,likes / am
-3~4학년,좋아해요,빈칸,Do you ___ cats?,너는 고양이를 좋아하니?,like,is / are
-3~4학년,좋아해요,대화,Do you like pizza?,피자 좋아하니?,"Yes, I do.","Yes, I am. / It is pizza."
-3~4학년,좋아해요,대화,Do you like snakes?,뱀 좋아하니?,"No, I don't.","No, I am not. / I am ten."
-3~4학년,할 수 있어요,단어,can,할 수 있다,,
-3~4학년,할 수 있어요,단어,fly,날다,,
-3~4학년,할 수 있어요,단어,ride,타다,,
-3~4학년,할 수 있어요,단어,cook,요리하다,,
-3~4학년,할 수 있어요,단어,climb,오르다,,
-3~4학년,할 수 있어요,문장,I can swim.,나는 수영할 수 있어요.,,
-3~4학년,할 수 있어요,문장,I can't fly.,나는 날 수 없어요.,,
-3~4학년,할 수 있어요,문장,Can you dance?,너는 춤출 수 있니?,,
-3~4학년,할 수 있어요,문장,She can ride a bike.,그녀는 자전거를 탈 수 있어요.,,
-3~4학년,할 수 있어요,빈칸,A bird ___ fly.,새는 날 수 있어요.,can,is / do
-3~4학년,할 수 있어요,빈칸,Fish can ___.,물고기는 수영할 수 있어요.,swim,swims / swimming
-3~4학년,할 수 있어요,대화,Can you swim?,수영할 수 있니?,"Yes, I can.","Yes, I do. / I am a swimmer."
-3~4학년,할 수 있어요,대화,Can you fly?,날 수 있니?,"No, I can't.","No, I don't. / It is a bird."
-3~4학년,어디에 있나요,단어,in,~ 안에,,
-3~4학년,어디에 있나요,단어,on,~ 위에,,
-3~4학년,어디에 있나요,단어,under,~ 아래에,,
-3~4학년,어디에 있나요,단어,next to,~ 옆에,,
-3~4학년,어디에 있나요,단어,room,방,,
-3~4학년,어디에 있나요,단어,box,상자,,
-3~4학년,어디에 있나요,문장,The cat is on the desk.,고양이는 책상 위에 있어요.,,
-3~4학년,어디에 있나요,문장,The ball is under the chair.,공은 의자 아래에 있어요.,,
-3~4학년,어디에 있나요,문장,My bag is in my room.,내 가방은 내 방 안에 있어요.,,
-3~4학년,어디에 있나요,문장,Where is my pen?,내 펜은 어디에 있니?,,
-3~4학년,어디에 있나요,빈칸,The book is ___ the table.,책은 탁자 위에 있어요.,on,am / is
-3~4학년,어디에 있나요,빈칸,___ is my cat?,내 고양이는 어디에 있니?,Where,What / Who
-3~4학년,시간과 요일,단어,Monday,월요일,,
-3~4학년,시간과 요일,단어,Tuesday,화요일,,
-3~4학년,시간과 요일,단어,Wednesday,수요일,,
-3~4학년,시간과 요일,단어,Thursday,목요일,,
-3~4학년,시간과 요일,단어,Friday,금요일,,
-3~4학년,시간과 요일,단어,Saturday,토요일,,
-3~4학년,시간과 요일,단어,Sunday,일요일,,
-3~4학년,시간과 요일,문장,What time is it?,몇 시예요?,,
-3~4학년,시간과 요일,문장,It's seven o'clock.,일곱 시예요.,,
-3~4학년,시간과 요일,문장,What day is it today?,오늘은 무슨 요일이에요?,,
-3~4학년,시간과 요일,문장,It's Friday.,금요일이에요.,,
-3~4학년,시간과 요일,대화,What time is it?,몇 시니?,It's ten o'clock.,It's Monday. / It's a clock.
-3~4학년,시간과 요일,대화,What day is it?,무슨 요일이니?,It's Sunday.,It's two o'clock. / It's sunny.
-3~4학년,꿈과 직업,단어,doctor,의사,,
-3~4학년,꿈과 직업,단어,cook,요리사,,
-3~4학년,꿈과 직업,단어,farmer,농부,,
-3~4학년,꿈과 직업,단어,singer,가수,,
-3~4학년,꿈과 직업,단어,teacher,선생님,,
-3~4학년,꿈과 직업,단어,pilot,조종사,,
-3~4학년,꿈과 직업,단어,firefighter,소방관,,
-3~4학년,꿈과 직업,문장,I want to be a doctor.,나는 의사가 되고 싶어요.,,
-3~4학년,꿈과 직업,문장,What do you want to be?,너는 무엇이 되고 싶니?,,
-3~4학년,꿈과 직업,문장,My mom is a teacher.,우리 엄마는 선생님이에요.,,
-3~4학년,꿈과 직업,빈칸,I want to ___ a singer.,나는 가수가 되고 싶어요.,be,am / is
-5~6학년,어제 한 일 (과거),단어,yesterday,어제,,
-5~6학년,어제 한 일 (과거),단어,went,갔다,,
-5~6학년,어제 한 일 (과거),단어,saw,보았다,,
-5~6학년,어제 한 일 (과거),단어,ate,먹었다,,
-5~6학년,어제 한 일 (과거),단어,played,놀았다,,
-5~6학년,어제 한 일 (과거),단어,visited,방문했다,,
-5~6학년,어제 한 일 (과거),문장,I went to the park yesterday.,나는 어제 공원에 갔어요.,,
-5~6학년,어제 한 일 (과거),문장,We played soccer after school.,우리는 방과 후에 축구를 했어요.,,
-5~6학년,어제 한 일 (과거),문장,Did you see the movie?,너는 그 영화를 봤니?,,
-5~6학년,어제 한 일 (과거),문장,She visited her uncle last week.,그녀는 지난주에 삼촌을 방문했어요.,,
-5~6학년,어제 한 일 (과거),빈칸,I ___ a sandwich yesterday.,나는 어제 샌드위치를 먹었어요.,ate,eat / eats
-5~6학년,어제 한 일 (과거),빈칸,We ___ to the zoo last Sunday.,우리는 지난 일요일에 동물원에 갔어요.,went,go / goes
-5~6학년,어제 한 일 (과거),빈칸,___ you play outside yesterday?,너는 어제 밖에서 놀았니?,Did,Do / Are
-5~6학년,어제 한 일 (과거),읽기,"Yesterday, Jina went to the beach with her family. She swam in the sea and ate ice cream. It was a great day. Q: Where did Jina go?",어제 지나는 가족과 해변에 갔어요. 바다에서 수영하고 아이스크림을 먹었어요. 정말 좋은 날이었어요.,To the beach,To the school / To the library
-5~6학년,앞으로 할 일 (미래),단어,tomorrow,내일,,
-5~6학년,앞으로 할 일 (미래),단어,will,~할 것이다,,
-5~6학년,앞으로 할 일 (미래),단어,plan,계획,,
-5~6학년,앞으로 할 일 (미래),단어,vacation,방학,,
-5~6학년,앞으로 할 일 (미래),단어,weekend,주말,,
-5~6학년,앞으로 할 일 (미래),문장,I will visit my grandma tomorrow.,나는 내일 할머니를 찾아뵐 거예요.,,
-5~6학년,앞으로 할 일 (미래),문장,We are going to go camping.,우리는 캠핑을 갈 거예요.,,
-5~6학년,앞으로 할 일 (미래),문장,What will you do this weekend?,너는 이번 주말에 무엇을 할 거니?,,
-5~6학년,앞으로 할 일 (미래),빈칸,I ___ help my mom tomorrow.,나는 내일 엄마를 도울 거예요.,will,am / did
-5~6학년,앞으로 할 일 (미래),빈칸,She is going to ___ a book.,그녀는 책을 읽을 거예요.,read,reads / reading
-5~6학년,앞으로 할 일 (미래),대화,What will you do tomorrow?,내일 뭐 할 거니?,I will play baduk with my dad.,I played baduk yesterday. / It is tomorrow.
-5~6학년,앞으로 할 일 (미래),읽기,Next week is summer vacation. Minho is going to visit Jeju Island. He will ride a horse and take many pictures. Q: What will Minho ride?,다음 주는 여름 방학이에요. 민호는 제주도에 갈 거예요. 말을 타고 사진을 많이 찍을 거예요.,A horse,A bike / A bus
-5~6학년,비교하기,단어,taller,더 키가 큰,,
-5~6학년,비교하기,단어,bigger,더 큰,,
-5~6학년,비교하기,단어,faster,더 빠른,,
-5~6학년,비교하기,단어,smaller,더 작은,,
-5~6학년,비교하기,단어,heavier,더 무거운,,
-5~6학년,비교하기,단어,the biggest,가장 큰,,
-5~6학년,비교하기,문장,An elephant is bigger than a dog.,코끼리는 개보다 더 커요.,,
-5~6학년,비교하기,문장,A cheetah is faster than a lion.,치타는 사자보다 더 빨라요.,,
-5~6학년,비교하기,문장,Tom is taller than me.,톰은 나보다 키가 더 커요.,,
-5~6학년,비교하기,문장,The whale is the biggest animal.,고래는 가장 큰 동물이에요.,,
-5~6학년,비교하기,빈칸,A mouse is ___ than a cat.,쥐는 고양이보다 더 작아요.,smaller,small / smallest
-5~6학년,비교하기,빈칸,My bag is heavier ___ yours.,내 가방은 네 것보다 더 무거워요.,than,that / then
-5~6학년,충고와 규칙,단어,should,~하는 게 좋다,,
-5~6학년,충고와 규칙,단어,must,~해야 한다,,
-5~6학년,충고와 규칙,단어,rule,규칙,,
-5~6학년,충고와 규칙,단어,wash,씻다,,
-5~6학년,충고와 규칙,단어,helmet,헬멧,,
-5~6학년,충고와 규칙,문장,You should wash your hands.,너는 손을 씻는 게 좋아.,,
-5~6학년,충고와 규칙,문장,You must wear a helmet.,너는 헬멧을 써야 해.,,
-5~6학년,충고와 규칙,문장,You should not run here.,여기서 뛰면 안 돼.,,
-5~6학년,충고와 규칙,빈칸,You ___ see a doctor.,너는 의사에게 가 보는 게 좋아.,should,are / is
-5~6학년,충고와 규칙,빈칸,We must ___ the rules.,우리는 규칙을 따라야 해요.,follow,follows / following
-5~6학년,충고와 규칙,대화,I have a headache.,나 머리가 아파.,You should get some rest.,You should run fast. / I like headaches.
-5~6학년,여행 영어,단어,airport,공항,,
-5~6학년,여행 영어,단어,passport,여권,,
-5~6학년,여행 영어,단어,ticket,표,,
-5~6학년,여행 영어,단어,hotel,호텔,,
-5~6학년,여행 영어,단어,map,지도,,
-5~6학년,여행 영어,단어,station,역,,
-5~6학년,여행 영어,문장,Where is the station?,역은 어디에 있나요?,,
-5~6학년,여행 영어,문장,Go straight and turn left.,곧장 가서 왼쪽으로 도세요.,,
-5~6학년,여행 영어,문장,How much is this ticket?,이 표는 얼마예요?,,
-5~6학년,여행 영어,문장,"Can I have some water, please?",물 좀 주시겠어요?,,
-5~6학년,여행 영어,대화,Where is the hotel?,호텔은 어디에 있나요?,It's next to the bank.,It's ten dollars. / I am a hotel.
-5~6학년,여행 영어,대화,How much is it?,그것은 얼마예요?,It's five dollars.,It's over there. / It's Monday.
-5~6학년,여행 영어,읽기,Sora is at the airport with her parents. She shows her passport and ticket. Then she waits for the plane to London. Q: Where is Sora going?,소라는 부모님과 공항에 있어요. 여권과 표를 보여 줘요. 그리고 런던행 비행기를 기다려요.,To London,To Seoul / To Paris
-5~6학년,지구와 환경,단어,earth,지구,,
-5~6학년,지구와 환경,단어,forest,숲,,
-5~6학년,지구와 환경,단어,ocean,바다,,
-5~6학년,지구와 환경,단어,recycle,재활용하다,,
-5~6학년,지구와 환경,단어,trash,쓰레기,,
-5~6학년,지구와 환경,단어,energy,에너지,,
-5~6학년,지구와 환경,문장,We should save energy.,우리는 에너지를 아껴야 해요.,,
-5~6학년,지구와 환경,문장,Please do not throw trash in the ocean.,바다에 쓰레기를 버리지 마세요.,,
-5~6학년,지구와 환경,문장,Trees give us clean air.,나무는 우리에게 깨끗한 공기를 줘요.,,
-5~6학년,지구와 환경,읽기,"Many animals live in the forest. Trees give them food and homes. If we cut down too many trees, the animals lose their homes. Q: What do trees give animals?",많은 동물이 숲에 살아요. 나무는 동물에게 먹이와 집을 줘요. 나무를 너무 많이 베면 동물들은 집을 잃어요.,Food and homes,Cars and toys / Money and books
-5~6학년,지구와 환경,읽기,Plastic can stay in the ocean for hundreds of years. Sea animals sometimes eat it. So we should use less plastic and recycle more. Q: What should we do?,플라스틱은 바다에 수백 년 동안 남을 수 있어요. 바다 동물이 먹기도 해요. 그래서 플라스틱을 덜 쓰고 더 많이 재활용해야 해요.,Use less plastic,Eat more plastic / Throw plastic in the sea
-회화 마스터,처음 만났을 때,단어,Nice to meet you.,만나서 반가워요.,,
-회화 마스터,처음 만났을 때,단어,How are you?,어떻게 지내요?,,
-회화 마스터,처음 만났을 때,단어,See you later.,나중에 봐요.,,
-회화 마스터,처음 만났을 때,단어,What's your name?,이름이 뭐예요?,,
-회화 마스터,처음 만났을 때,회화,Hi! How are you?,안녕! 잘 지내?,"I'm good, thanks. And you? (잘 지내, 고마워. 너는?)",I'm ten years old. / It's on the table.
-회화 마스터,처음 만났을 때,회화,What's your name?,이름이 뭐야?,My name is Mina. (내 이름은 미나야.),I like pizza. / It's very big.
-회화 마스터,처음 만났을 때,회화,"Nice to meet you, Mina.","만나서 반가워, 미나야.","Nice to meet you, too. (나도 만나서 반가워.)",See you yesterday. / I am a table.
-회화 마스터,처음 만났을 때,회화,Where are you from?,어디에서 왔어?,I'm from Korea. (나는 한국에서 왔어.),I go by bus. / I'm very hungry.
-회화 마스터,처음 만났을 때,회화,How old are you?,몇 살이야?,I'm twelve years old. (나는 열두 살이야.),I have two cats. / It's twelve o'clock.
-회화 마스터,처음 만났을 때,회화,I have to go now. Bye!,이제 가야 해. 안녕!,Okay. See you later! (그래. 나중에 봐!),"Yes, I am a student. / I like blue."
-회화 마스터,나를 소개해요,단어,I live in Seoul.,나는 서울에 살아요.,,
-회화 마스터,나를 소개해요,단어,I am good at drawing.,나는 그림을 잘 그려요.,,
-회화 마스터,나를 소개해요,단어,I have a sister.,나는 언니(여동생)가 있어요.,,
-회화 마스터,나를 소개해요,단어,My favorite color is blue.,내가 가장 좋아하는 색은 파랑이에요.,,
-회화 마스터,나를 소개해요,회화,Where do you live?,어디에 살아?,I live in Seoul. (서울에 살아.),I like Seoul food. / It's on Monday.
-회화 마스터,나를 소개해요,회화,What grade are you in?,몇 학년이야?,I'm in the fifth grade. (5학년이야.),I got a good grade yesterday. / It's five dollars.
-회화 마스터,나를 소개해요,회화,What are you good at?,무엇을 잘해?,I'm good at drawing. (나는 그림을 잘 그려.),"I'm good, thank you. / I have a good pen."
-회화 마스터,나를 소개해요,회화,What is your favorite color?,가장 좋아하는 색은 뭐야?,My favorite color is blue. (가장 좋아하는 색은 파랑이야.),My favorite food is pizza. / I have a blue bag on Monday.
-회화 마스터,나를 소개해요,회화,Do you have any pets?,반려동물 있어?,"Yes, I have a small dog. (응, 작은 강아지가 있어.)","Yes, I am a pet. / No, I do not like school."
-회화 마스터,나를 소개해요,회화,Tell me about yourself.,너에 대해 말해 줘.,"I am Mina, and I love music. (나는 미나이고 음악을 정말 좋아해.)",You are very tall. / Tell me about it tomorrow.
-회화 마스터,가족 이야기,단어,How many people are in your family?,가족이 몇 명이에요?,,
-회화 마스터,가족 이야기,단어,My dad is a cook.,우리 아빠는 요리사예요.,,
-회화 마스터,가족 이야기,단어,She is older than me.,그녀는 나보다 나이가 많아요.,,
-회화 마스터,가족 이야기,단어,We look alike.,우리는 닮았어요.,,
-회화 마스터,가족 이야기,회화,How many people are in your family?,가족이 몇 명이야?,There are four people in my family. (우리 가족은 네 명이야.),I have four pencils in my bag. / My family is very late.
-회화 마스터,가족 이야기,회화,Do you have any brothers or sisters?,형제나 자매가 있어?,"Yes, I have one little brother. (응, 남동생이 한 명 있어.)","Yes, my mother is a teacher. / No, I do not like apples."
-회화 마스터,가족 이야기,회화,What does your dad do?,아빠는 무슨 일을 하셔?,He is a cook. (요리사셔.),He is very tall. / He does not like cats.
-회화 마스터,가족 이야기,회화,Is your sister older than you?,언니가 너보다 나이가 많아?,"Yes, she is two years older. (응, 두 살 많아.)","Yes, she is in the kitchen. / No, she is my teacher."
-회화 마스터,가족 이야기,회화,Who do you look like?,너는 누구를 닮았어?,I look like my mom. (나는 엄마를 닮았어.),I like my mom. / I am looking at my book.
-회화 마스터,가족 이야기,회화,What do you do with your family on weekends?,주말에 가족과 뭘 해?,We go hiking together. (같이 등산을 가.),We were at school yesterday. / There are four of us.
-회화 마스터,학교에서,단어,What is your favorite subject?,가장 좋아하는 과목이 뭐예요?,,
-회화 마스터,학교에서,단어,May I borrow your pen?,펜 좀 빌려도 될까요?,,
-회화 마스터,학교에서,단어,I forgot my homework.,숙제를 깜빡했어요.,,
-회화 마스터,학교에서,단어,Can I go to the bathroom?,화장실에 가도 될까요?,,
-회화 마스터,학교에서,회화,What is your favorite subject?,가장 좋아하는 과목이 뭐야?,I like science the most. (과학을 제일 좋아해.),I go to school by bus. / My teacher is very tall.
-회화 마스터,학교에서,회화,May I borrow your pen?,펜 좀 빌려도 돼?,Sure. Here you are. (그럼. 여기 있어.),"No, I am a pen. / Yes, I am fine, thanks."
-회화 마스터,학교에서,회화,Did you finish your homework?,숙제 다 했어?,"No, I forgot my homework. (아니, 숙제를 깜빡했어.)","Yes, I am going home now. / No, it is on Friday."
-회화 마스터,학교에서,회화,How do you go to school?,학교에 어떻게 가?,I walk to school. (걸어서 가.),I like my school. / I go at eight.
-회화 마스터,학교에서,회화,What time does school start?,학교는 몇 시에 시작해?,It starts at nine. (9시에 시작해.),It is next to the park. / I start with math homework.
-회화 마스터,학교에서,회화,"Teacher, can I go to the bathroom?","선생님, 화장실에 가도 될까요?","Yes, you may. Come back soon. (그래, 다녀오렴. 빨리 돌아와.)","Yes, it is my bathroom. / No, I cannot swim."
-회화 마스터,좋아하는 것,단어,What do you like to do?,무엇을 하는 것을 좋아해요?,,
-회화 마스터,좋아하는 것,단어,I really like soccer.,나는 축구를 정말 좋아해요.,,
-회화 마스터,좋아하는 것,단어,I don't like spiders.,나는 거미를 좋아하지 않아요.,,
-회화 마스터,좋아하는 것,단어,Me too!,나도요!,,
-회화 마스터,좋아하는 것,회화,What do you like to do after school?,방과 후에 뭘 하는 걸 좋아해?,I like to play soccer. (축구하는 걸 좋아해.),I was at school. / I have soccer shoes in my bag.
-회화 마스터,좋아하는 것,회화,I love ice cream!,나 아이스크림 정말 좋아해!,Me too! It is so good. (나도! 정말 맛있어.),Me too! I am a cream. / It is under the chair.
-회화 마스터,좋아하는 것,회화,What kind of music do you like?,어떤 음악을 좋아해?,I like K-pop. (케이팝을 좋아해.),I like my music teacher tall. / I can play at three.
-회화 마스터,좋아하는 것,회화,Do you like spiders?,거미 좋아해?,"No, I don't. They are scary. (아니. 무서워.)","No, I am not a spider. / Yes, they are in my lunch."
-회화 마스터,좋아하는 것,회화,Who is your favorite singer?,가장 좋아하는 가수는 누구야?,My favorite singer is IU. (가장 좋아하는 가수는 아이유야.),I sing in the morning. / My favorite song is short.
-회화 마스터,좋아하는 것,회화,"Which do you like better, cats or dogs?",고양이와 강아지 중 어느 쪽이 더 좋아?,I like dogs better. (강아지가 더 좋아.),"I have better shoes. / Yes, I do."
-회화 마스터,나의 하루,단어,What time do you get up?,몇 시에 일어나요?,,
-회화 마스터,나의 하루,단어,I usually eat breakfast at seven.,나는 보통 7시에 아침을 먹어요.,,
-회화 마스터,나의 하루,단어,I go to bed at ten.,나는 10시에 자요.,,
-회화 마스터,나의 하루,단어,I am busy today.,나는 오늘 바빠요.,,
-회화 마스터,나의 하루,회화,What time do you get up?,몇 시에 일어나?,I get up at seven. (7시에 일어나.),I get on the bus. / It is Tuesday today.
-회화 마스터,나의 하루,회화,What do you eat for breakfast?,아침으로 뭘 먹어?,I usually eat rice and soup. (보통 밥과 국을 먹어.),I usually eat at seven. / I eat with my brother.
-회화 마스터,나의 하루,회화,What do you do after school?,방과 후에 뭐 해?,I go to my piano class. (피아노 수업에 가.),I went to school yesterday. / It is after lunch.
-회화 마스터,나의 하루,회화,Are you free today?,오늘 시간 있어?,"Sorry, I'm busy today. (미안, 오늘은 바빠.)","Yes, it is free food. / Sorry, I am twelve."
-회화 마스터,나의 하루,회화,How often do you read books?,책을 얼마나 자주 읽어?,I read books every day. (매일 읽어.),I read about animals. / I read in my room.
-회화 마스터,나의 하루,회화,When do you go to bed?,언제 자?,I go to bed at ten. (10시에 자.),My bed is very soft. / I go by bike.
-회화 마스터,날씨와 시간,단어,What's the weather like?,날씨가 어때요?,,
-회화 마스터,날씨와 시간,단어,What time is it?,지금 몇 시예요?,,
-회화 마스터,날씨와 시간,단어,It's raining outside.,밖에 비가 와요.,,
-회화 마스터,날씨와 시간,단어,What day is it today?,오늘 무슨 요일이에요?,,
-회화 마스터,날씨와 시간,회화,What's the weather like today?,오늘 날씨 어때?,It's sunny and warm. (화창하고 따뜻해.),It's three o'clock. / I like my new coat.
-회화 마스터,날씨와 시간,회화,What time is it now?,지금 몇 시야?,It's half past two. (2시 반이야.),It's cloudy today. / It's on Sunday.
-회화 마스터,날씨와 시간,회화,What day is it today?,오늘 무슨 요일이야?,It's Wednesday. (수요일이야.),It's windy. / It's four o'clock.
-회화 마스터,날씨와 시간,회화,When is your birthday?,생일이 언제야?,It's on May tenth. (5월 10일이야.),It's ten years old. / It's in my room.
-회화 마스터,날씨와 시간,회화,Do I need an umbrella?,우산이 필요할까?,Yes. It's raining outside. (응. 밖에 비가 와.),Yes. It is very sunny and dry. / No. I am an umbrella.
-회화 마스터,날씨와 시간,회화,Which season do you like?,어느 계절을 좋아해?,I like spring because it is warm. (따뜻해서 봄을 좋아해.),I like my coat because it is red. / It is on the second floor.
-회화 마스터,친구와 약속,단어,Let's play together!,같이 놀자!,,
-회화 마스터,친구와 약속,단어,Do you want to come?,너도 올래?,,
-회화 마스터,친구와 약속,단어,That sounds great.,그거 정말 좋다.,,
-회화 마스터,친구와 약속,단어,How about tomorrow?,내일은 어때?,,
-회화 마스터,친구와 약속,회화,Let's play soccer after school.,방과 후에 축구하자.,That sounds great! (그거 좋다!),It is a soccer shoe. / I played it last year.
-회화 마스터,친구와 약속,회화,Do you want to come to my birthday party?,내 생일 파티에 올래?,"Yes, I'd love to! (응, 정말 가고 싶어!)","Yes, it is a big cake. / No, I'm twelve."
-회화 마스터,친구와 약속,회화,Can you play today?,오늘 놀 수 있어?,"Sorry, I can't. How about tomorrow? (미안, 못 놀아. 내일은 어때?)","Sorry, it is my toy. / Yes, it was yesterday."
-회화 마스터,친구와 약속,회화,What time should we meet?,몇 시에 만날까?,Let's meet at three. (3시에 만나자.),Let's meet at the park. / I met him last week.
-회화 마스터,친구와 약속,회화,Where should we meet?,어디에서 만날까?,Let's meet at the park. (공원에서 만나자.),Let's meet at three. / I am from the park.
-회화 마스터,친구와 약속,회화,Sorry I am late.,늦어서 미안해.,That's okay. Let's go. (괜찮아. 가자.),You're welcome. Good night. / I am very tall.
-회화 마스터,식당에서 주문하기,단어,"Can I have a hamburger, please?",햄버거 하나 주세요.,,
-회화 마스터,식당에서 주문하기,단어,Anything to drink?,마실 것은요?,,
-회화 마스터,식당에서 주문하기,단어,For here or to go?,"여기서 드세요, 가져가세요?",,
-회화 마스터,식당에서 주문하기,단어,It smells delicious.,맛있는 냄새가 나요.,,
-회화 마스터,식당에서 주문하기,회화,Hello. What would you like?,안녕하세요. 무엇을 드릴까요?,"Can I have a hamburger, please? (햄버거 하나 주세요.)",I would like to go home yesterday. / I am a hamburger.
-회화 마스터,식당에서 주문하기,회화,Anything to drink?,마실 것은요?,"Orange juice, please. (오렌지 주스 주세요.)","Yes, I can swim. / A big hamburger, please."
-회화 마스터,식당에서 주문하기,회화,For here or to go?,"여기서 드세요, 가져가세요?","For here, please. (여기서 먹을게요.)",I go by bus. / It is over there.
-회화 마스터,식당에서 주문하기,회화,That will be seven dollars.,7달러입니다.,Here you are. (여기 있어요.),I am seven years old. / It is seven o'clock.
-회화 마스터,식당에서 주문하기,회화,How is your food?,음식은 어때요?,It's really delicious. (정말 맛있어요.),"It's on the second floor. / I'm fine, thank you."
-회화 마스터,식당에서 주문하기,회화,Do you want some more?,더 먹을래?,"No, thanks. I'm full. (아니, 괜찮아. 배불러.)","No, I am a student. / Yes, I was at home."
-회화 마스터,가게에서 물건 사기,단어,How much is this?,이거 얼마예요?,,
-회화 마스터,가게에서 물건 사기,단어,Can I try it on?,입어 봐도 될까요?,,
-회화 마스터,가게에서 물건 사기,단어,It's too big for me.,저한테 너무 커요.,,
-회화 마스터,가게에서 물건 사기,단어,I'll take it.,이걸로 살게요.,,
-회화 마스터,가게에서 물건 사기,회화,Can I help you?,도와드릴까요?,"Yes, I'm looking for a cap. (네, 모자를 찾고 있어요.)","Yes, I can help my mom. / No, I am not a cap."
-회화 마스터,가게에서 물건 사기,회화,How much is this T-shirt?,이 티셔츠 얼마예요?,It's twelve dollars. (12달러예요.),It's very soft and blue. / It's twelve o'clock.
-회화 마스터,가게에서 물건 사기,회화,Can I try it on?,입어 봐도 될까요?,Sure. The fitting room is over there. (그럼요. 탈의실은 저쪽이에요.),"Sure. It is on Tuesday. / No, I like apples."
-회화 마스터,가게에서 물건 사기,회화,How does it fit?,잘 맞아요?,It's too big for me. (저한테 너무 커요.),I fit in the bus. / It's too late for dinner.
-회화 마스터,가게에서 물건 사기,회화,Do you have a smaller one?,더 작은 것 있어요?,"Yes, here is a small one. (네, 작은 것 여기 있어요.)","Yes, I have a small dog at home. / No, I am very small."
-회화 마스터,가게에서 물건 사기,회화,Do you want this one?,이걸로 하시겠어요?,"Yes, I'll take it. (네, 이걸로 살게요.)","Yes, I took a bus. / No, it is yesterday."
-회화 마스터,길 찾기,단어,Excuse me.,실례합니다.,,
-회화 마스터,길 찾기,단어,Where is the library?,도서관이 어디에 있어요?,,
-회화 마스터,길 찾기,단어,Go straight and turn left.,곧장 가서 왼쪽으로 도세요.,,
-회화 마스터,길 찾기,단어,It's across from the bank.,은행 맞은편에 있어요.,,
-회화 마스터,길 찾기,회화,Excuse me. Where is the library?,실례합니다. 도서관이 어디에 있어요?,Go straight and turn left. (곧장 가서 왼쪽으로 도세요.),I read books at night. / It's a very big book.
-회화 마스터,길 찾기,회화,Is it far from here?,여기서 멀어요?,"No, it's a five-minute walk. (아니요, 걸어서 5분이에요.)","No, it is five dollars. / Yes, I'm five years old."
-회화 마스터,길 찾기,회화,Where is the bus stop?,버스 정류장이 어디예요?,It's across from the bank. (은행 맞은편에 있어요.),I go there by bus. / It's at two o'clock.
-회화 마스터,길 찾기,회화,How can I get to the museum?,박물관에 어떻게 가요?,You can take the subway. (지하철을 타면 돼요.),You can eat the museum. / I got a museum ticket yesterday.
-회화 마스터,길 찾기,회화,Is there a bathroom near here?,이 근처에 화장실이 있어요?,"Yes, it's right over there. (네, 바로 저기 있어요.)","Yes, I washed my hands. / No, it's very delicious."
-회화 마스터,길 찾기,회화,Thank you for your help.,도와주셔서 고마워요.,You're welcome. (천만에요.),"Yes, please. / I'm sorry to hear that."
-회화 마스터,아플 때,단어,What's wrong?,무슨 일이에요?,,
-회화 마스터,아플 때,단어,I have a headache.,머리가 아파요.,,
-회화 마스터,아플 때,단어,You should get some rest.,좀 쉬는 게 좋겠어요.,,
-회화 마스터,아플 때,단어,I hope you feel better.,빨리 나으면 좋겠어요.,,
-회화 마스터,아플 때,회화,You look sick. What's wrong?,아파 보여. 무슨 일이야?,I have a headache. (머리가 아파.),I have a new bag. / I'm good at math.
-회화 마스터,아플 때,회화,Do you have a fever?,열이 있어?,"Yes, I feel very hot. (응, 몸이 아주 뜨거워.)","Yes, I like hot dogs. / No, it's a nice day."
-회화 마스터,아플 때,회화,What should I do?,어떻게 해야 할까?,You should get some rest. (좀 쉬는 게 좋겠어.),You should eat more candy. / You were at home.
-회화 마스터,아플 때,회화,Where does it hurt?,어디가 아파요?,My stomach hurts. (배가 아파요.),I hurt it yesterday at noon. / It is in my school bag.
-회화 마스터,아플 때,회화,Take this medicine after meals.,식사 후에 이 약을 먹으렴.,"Okay. Thank you, doctor. (네. 고맙습니다, 의사 선생님.)","Okay. I will take the bus. / No, it is my lunch box."
-회화 마스터,아플 때,회화,I have a bad cold.,나 감기가 심하게 걸렸어.,Oh no! I hope you feel better. (저런! 빨리 나으면 좋겠다.),Great! Good for you. / Me too! That is so fun.
-회화 마스터,못 알아들었을 때,단어,Can you say that again?,다시 말해 줄래요?,,
-회화 마스터,못 알아들었을 때,단어,Please speak slowly.,천천히 말해 주세요.,,
-회화 마스터,못 알아들었을 때,단어,What does it mean?,그게 무슨 뜻이에요?,,
-회화 마스터,못 알아들었을 때,단어,How do you say this in English?,이걸 영어로 뭐라고 해요?,,
-회화 마스터,못 알아들었을 때,회화,Did you understand me?,내 말 이해했어?,Sorry. Can you say that again? (미안해. 다시 말해 줄래?),"Yes, I am under the table. / Sorry, I am twelve."
-회화 마스터,못 알아들었을 때,회화,"I was talking too fast, right?",내가 너무 빨리 말했지?,Yes. Please speak slowly. (응. 천천히 말해 줘.),Yes. Please eat quickly. / No. I walk to school.
-회화 마스터,못 알아들었을 때,회화,"This word is ""huge"".","이 단어는 ""huge""야.",What does it mean? (그게 무슨 뜻이야?),Where does it live? / How old is it?
-회화 마스터,못 알아들었을 때,회화,"""Huge"" means very big.","""huge""는 아주 크다는 뜻이야.","Oh, I see. Thank you. (아, 알겠어. 고마워.)","Oh, it is my birthday. / No, I can't swim."
-회화 마스터,못 알아들었을 때,회화,Is this your first time speaking English?,영어로 말하는 게 처음이야?,"Yes, but I am learning. (응, 하지만 배우고 있어.)","Yes, I am speaking Tuesday. / No, it is my first pizza."
-회화 마스터,못 알아들었을 때,회화,How can I help you?,어떻게 도와줄까?,How do you say this in English? (이걸 영어로 뭐라고 해?),How old is your English teacher today? / Where did you go last weekend?
-회화 마스터,어제 있었던 일,단어,What did you do yesterday?,어제 뭐 했어요?,,
-회화 마스터,어제 있었던 일,단어,I went to the zoo.,동물원에 갔어요.,,
-회화 마스터,어제 있었던 일,단어,It was so much fun.,정말 재미있었어요.,,
-회화 마스터,어제 있었던 일,단어,Did you have a good weekend?,주말 잘 보냈어요?,,
-회화 마스터,어제 있었던 일,회화,What did you do yesterday?,어제 뭐 했어?,I went to the zoo. (동물원에 갔어.),I will go to the zoo. / I am at the zoo now.
-회화 마스터,어제 있었던 일,회화,Who did you go with?,누구랑 갔어?,I went with my cousin. (사촌이랑 갔어.),I went there by car. / I went at ten.
-회화 마스터,어제 있었던 일,회화,What did you see there?,거기서 뭘 봤어?,I saw a baby elephant. (아기 코끼리를 봤어.),I see you tomorrow. / I ate there.
-회화 마스터,어제 있었던 일,회화,How was it?,어땠어?,It was so much fun. (정말 재미있었어.),It is two dollars. / It was at home yesterday night.
-회화 마스터,어제 있었던 일,회화,Did you have a good weekend?,주말 잘 보냈어?,"Yes, I did. I visited my grandma. (응. 할머니 댁에 갔어.)","Yes, I will visit my grandma. / No, I am not a weekend."
-회화 마스터,어제 있었던 일,회화,What did you eat for lunch?,점심으로 뭘 먹었어?,I ate kimbap at school. (학교에서 김밥을 먹었어.),I eat at noon. / I will eat lunch soon.
-회화 마스터,앞으로의 계획,단어,What are you going to do?,무엇을 할 거예요?,,
-회화 마스터,앞으로의 계획,단어,I am going to visit Jeju.,제주도에 갈 거예요.,,
-회화 마스터,앞으로의 계획,단어,I want to be a doctor.,의사가 되고 싶어요.,,
-회화 마스터,앞으로의 계획,단어,That sounds exciting.,신나겠어요.,,
-회화 마스터,앞으로의 계획,회화,What are you going to do this weekend?,이번 주말에 뭐 할 거야?,I'm going to see a movie. (영화를 볼 거야.),I saw a movie last week. / I go to school on weekdays.
-회화 마스터,앞으로의 계획,회화,Where will you go this summer?,이번 여름에 어디에 갈 거야?,I will go to Jeju Island. (제주도에 갈 거야.),I went to Jeju last year. / I go swimming in summer.
-회화 마스터,앞으로의 계획,회화,What do you want to be in the future?,나중에 뭐가 되고 싶어?,I want to be a doctor. (의사가 되고 싶어.),I want to eat a sandwich. / I was a good student.
-회화 마스터,앞으로의 계획,회화,Why do you want to be a doctor?,왜 의사가 되고 싶어?,Because I want to help sick people. (아픈 사람들을 돕고 싶어서야.),"Because I am at the hospital now. / Yes, I want to."
-회화 마스터,앞으로의 계획,회화,Are you going to join the art club?,미술 동아리에 들어갈 거야?,"Yes, I am. I love painting. (응. 그림 그리기를 정말 좋아하거든.)","Yes, it was a nice painting. / No, it is on the wall."
-회화 마스터,앞으로의 계획,회화,I am going to Japan next month.,다음 달에 일본에 가.,"Wow, that sounds exciting! (와, 신나겠다!)","Oh, I am sorry to hear that. / You went there last year."
-회화 마스터,내 생각 말하기,단어,What do you think?,어떻게 생각해요?,,
-회화 마스터,내 생각 말하기,단어,"I think so, too.",나도 그렇게 생각해요.,,
-회화 마스터,내 생각 말하기,단어,I don't think so.,나는 그렇게 생각하지 않아요.,,
-회화 마스터,내 생각 말하기,단어,Because it is fun.,재미있기 때문이에요.,,
-회화 마스터,내 생각 말하기,회화,This movie is really good. What do you think?,이 영화 정말 좋다. 어떻게 생각해?,"I think so, too. (나도 그렇게 생각해.)","I go there, too. / It is my movie ticket."
-회화 마스터,내 생각 말하기,회화,Math is the easiest subject.,수학이 제일 쉬운 과목이야.,I don't think so. It's hard for me. (난 그렇게 생각 안 해. 나한텐 어려워.),"I don't have it. It is on the desk. / Yes, I go to math at nine."
-회화 마스터,내 생각 말하기,회화,Why do you like summer?,왜 여름을 좋아해?,Because I can swim in the sea. (바다에서 수영할 수 있으니까.),"Yes, I like it. / I swam on Monday morning."
-회화 마스터,내 생각 말하기,회화,"Which is better, this one or that one?",이것과 저것 중 어느 게 더 좋아?,I think this one is better. (이게 더 좋은 것 같아.),"This one is yesterday. / I am better now, thanks."
-회화 마스터,내 생각 말하기,회화,We should save water. Do you agree?,우리는 물을 아껴야 해. 동의해?,"Yes, I agree with you. (응, 네 말에 동의해.)","Yes, I am very thirsty. / No, I am in the water."
-회화 마스터,내 생각 말하기,회화,Is it a good idea to read every day?,매일 책을 읽는 게 좋은 생각일까?,"Yes, because we can learn a lot. (응, 많이 배울 수 있으니까.)","Yes, because it is on the table. / No, because I have a red pen."
-회화 마스터,기분을 나누고 위로하기,단어,Are you okay?,괜찮아요?,,
-회화 마스터,기분을 나누고 위로하기,단어,Don't worry.,걱정하지 마요.,,
-회화 마스터,기분을 나누고 위로하기,단어,I'm sorry to hear that.,그 말을 들으니 안타까워요.,,
-회화 마스터,기분을 나누고 위로하기,단어,Congratulations!,축하해요!,,
-회화 마스터,기분을 나누고 위로하기,회화,You look sad. Are you okay?,슬퍼 보여. 괜찮아?,I lost my favorite toy. (제일 좋아하는 장난감을 잃어버렸어.),I got a new toy. I am so happy. / I look like my dad.
-회화 마스터,기분을 나누고 위로하기,회화,I lost my favorite toy.,제일 좋아하는 장난감을 잃어버렸어.,I'm sorry to hear that. (그 말을 들으니 안타까워.),Congratulations! / That sounds great!
-회화 마스터,기분을 나누고 위로하기,회화,I am nervous about the test.,시험 때문에 긴장돼.,Don't worry. You can do it! (걱정 마. 넌 할 수 있어!),Great. I am a test. / It was fun yesterday.
-회화 마스터,기분을 나누고 위로하기,회화,I won first prize!,나 일등 상 받았어!,"Wow, congratulations! (와, 축하해!)",I'm sorry to hear that. / Don't worry about it.
-회화 마스터,기분을 나누고 위로하기,회화,How do you feel today?,오늘 기분이 어때?,I feel great today. (오늘 기분이 정말 좋아.),I feel the table today. / I am good at soccer.
-회화 마스터,기분을 나누고 위로하기,회화,Thank you for helping me.,도와줘서 고마워.,No problem. That's what friends are for. (별거 아니야. 친구 좋다는 게 그런 거지.),"Sorry, I am not your book. / Oh no, that is too bad."
-회화 마스터,친구와 온라인 대화,단어,"Hi, everyone!",모두 안녕!,,
-회화 마스터,친구와 온라인 대화,단어,What are you doing?,뭐 하고 있어?,,
-회화 마스터,친구와 온라인 대화,단어,Good game!,잘했어! (좋은 경기였어!),,
-회화 마스터,친구와 온라인 대화,단어,I have to go now.,이제 가야 해.,,
-회화 마스터,친구와 온라인 대화,회화,"Hi, everyone! What are you doing?",모두 안녕! 뭐 하고 있어?,I'm playing with my pet. (내 펫이랑 놀고 있어.),I played yesterday. / I'm twelve years old.
-회화 마스터,친구와 온라인 대화,회화,Can you help me with this level?,이 레벨 좀 도와줄래?,Sure! Follow me. (그럼! 나를 따라와.),"Sure! It is Monday. / No, I am a level."
-회화 마스터,친구와 온라인 대화,회화,You played very well!,너 정말 잘했어!,Thanks! Good game! (고마워! 좋은 경기였어!),"Sorry, I am full. / It is under my bed."
-회화 마스터,친구와 온라인 대화,회화,What is your pet's name?,네 펫 이름이 뭐야?,My pet's name is Nabi. (내 펫 이름은 나비야.),My pet is three years old. / I have a pet on Sunday.
-회화 마스터,친구와 온라인 대화,회화,What is your phone number?,전화번호가 뭐야?,"Sorry, I can't share that online. (미안, 그건 온라인에서 알려 줄 수 없어.)","Sure, it is my home address. / Sure, come to my house."
-회화 마스터,친구와 온라인 대화,회화,I have to go now. See you!,이제 가야 해. 또 봐!,Okay. Bye! Have a good day! (그래. 안녕! 좋은 하루 보내!),"Yes, I went to the zoo. / Okay, I am playing now."
-회화 마스터,여행 영어,단어,May I see your passport?,여권을 보여 주시겠어요?,,
-회화 마스터,여행 영어,단어,How long will you stay?,얼마나 머무를 건가요?,,
-회화 마스터,여행 영어,단어,I have a reservation.,예약을 했어요.,,
-회화 마스터,여행 영어,단어,Could you take a picture of us?,우리 사진 좀 찍어 주시겠어요?,,
-회화 마스터,여행 영어,회화,May I see your passport?,여권을 보여 주시겠어요?,"Yes, here it is. (네, 여기 있어요.)","Yes, I passed the test. / No, I am a passport."
-회화 마스터,여행 영어,회화,What is the purpose of your visit?,방문 목적이 무엇인가요?,I'm here on vacation. (휴가로 왔어요.),I'm here at three. / I visited a bank.
-회화 마스터,여행 영어,회화,How long will you stay?,얼마나 머무를 건가요?,I'll stay for five days. (5일 동안 있을 거예요.),I'll stay at the hotel. / I stayed in Seoul last year.
-회화 마스터,여행 영어,회화,Welcome to our hotel. How can I help you?,저희 호텔에 오신 것을 환영합니다. 무엇을 도와드릴까요?,Hello. I have a reservation. (안녕하세요. 예약을 했어요.),Hello. I have a headache. / Hello. I am the hotel.
-회화 마스터,여행 영어,회화,Excuse me. Could you take a picture of us?,실례합니다. 우리 사진 좀 찍어 주시겠어요?,Of course. Say cheese! (물론이죠. 치즈 하세요!),Of course. It is too big. / I took a bus to the picture.
-회화 마스터,여행 영어,회화,Where is the nearest subway station?,가장 가까운 지하철역이 어디예요?,It's two blocks from here. (여기서 두 블록 가면 있어요.),It's two dollars for a ticket. / It's two o'clock.
-회화 마스터,대화 이어 가기,단어,Really? Tell me more.,정말? 더 말해 줘.,,
-회화 마스터,대화 이어 가기,단어,What about you?,너는 어때?,,
-회화 마스터,대화 이어 가기,단어,That is interesting.,그거 흥미롭다.,,
-회화 마스터,대화 이어 가기,단어,"By the way,","그런데,",,
-회화 마스터,대화 이어 가기,회화,I got a new puppy yesterday!,어제 새 강아지가 생겼어!,Really? Tell me more. (정말? 더 말해 줘.),"Yes, I am a puppy. / No, I got it tomorrow."
-회화 마스터,대화 이어 가기,회화,I like reading comics. What about you?,나는 만화 읽는 걸 좋아해. 너는?,I like playing the guitar. (나는 기타 치는 걸 좋아해.),I am reading on Friday. / Comics are on the desk.
-회화 마스터,대화 이어 가기,회화,Bees can dance to talk to each other.,벌은 춤으로 서로 이야기할 수 있어.,That is interesting! (그거 흥미롭다!),That is my bag. / I was a bee.
-회화 마스터,대화 이어 가기,회화,So that is my story.,이게 내 이야기야.,"Wow! By the way, how was your test? (와! 그런데 시험은 어땠어?)","Wow! My story is on Friday night. / Oh, I am twelve."
-회화 마스터,대화 이어 가기,회화,Can I ask you a question?,질문 하나 해도 돼?,Sure. Go ahead. (그럼. 말해 봐.),Sure. Go to bed. / No. I am a question.
-회화 마스터,대화 이어 가기,회화,It was nice talking to you.,이야기 나눠서 즐거웠어.,You too. Let's talk again soon. (나도. 곧 또 이야기하자.),You too. It is on the chair. / I talked to him last year.
-게임,문장 기차 easy,문장,I like apples.,나는 사과를 좋아해요.,,
-게임,문장 기차 easy,문장,The cat is sleeping.,고양이가 자고 있어요.,,
-게임,문장 기차 easy,문장,I see a dog.,나는 강아지가 보여요.,,
-게임,문장 기차 easy,문장,It is a ball.,그것은 공이에요.,,
-게임,문장 기차 easy,문장,My friend is happy.,내 친구는 행복해요.,,
-게임,문장 기차 easy,문장,We can swim.,우리는 수영할 수 있어요.,,
-게임,문장 기차 easy,문장,I have a pen.,나는 펜이 있어요.,,
-게임,문장 기차 easy,문장,The bus is big.,그 버스는 커요.,,
-게임,문장 기차 normal,문장,I want a red balloon.,나는 빨간 풍선을 갖고 싶어요.,,
-게임,문장 기차 normal,문장,The bird is in the tree.,새가 나무에 있어요.,,
-게임,문장 기차 normal,문장,I go to school by bike.,나는 자전거로 학교에 가요.,,
-게임,문장 기차 normal,문장,Can I have some milk?,우유 좀 주시겠어요?,,
-게임,문장 기차 normal,문장,We play soccer after school.,우리는 방과 후에 축구를 해요.,,
-게임,문장 기차 normal,문장,The dog is under the table.,강아지가 탁자 아래에 있어요.,,
-게임,문장 기차 normal,문장,I brush my teeth every morning.,나는 매일 아침 이를 닦아요.,,
-게임,문장 기차 normal,문장,My friend likes green apples.,내 친구는 초록 사과를 좋아해요.,,
-게임,이야기 극장 길 잃은 아기 고양이,이야기,A little cat is lost in the park.,아기 고양이가 공원에서 길을 잃었어요.,,
-게임,이야기 극장 길 잃은 아기 고양이,선택지,Look behind the tree.,나무 뒤를 봐요.,,
-게임,이야기 극장 길 잃은 아기 고양이,선택지,Look under the bench.,벤치 아래를 봐요.,,
-게임,이야기 극장 길 잃은 아기 고양이,이야기,"There is a bird behind the tree. The bird says, ""The cat is by the pond!""","나무 뒤에 새가 있어요. 새가 말해요. ""고양이는 연못 옆에 있어!""",,
-게임,이야기 극장 길 잃은 아기 고양이,선택지,Go to the pond.,연못으로 가요.,,
-게임,이야기 극장 길 잃은 아기 고양이,이야기,"There is a dog under the bench. The dog says, ""The cat is by the pond!""","벤치 아래에 강아지가 있어요. 강아지가 말해요. ""고양이는 연못 옆에 있어!""",,
-게임,이야기 극장 길 잃은 아기 고양이,선택지,Go to the pond.,연못으로 가요.,,
-게임,이야기 극장 길 잃은 아기 고양이,이야기,The cat is by the pond. It looks scared.,고양이가 연못 옆에 있어요. 무서워 보여요.,,
-게임,이야기 극장 길 잃은 아기 고양이,선택지,Give it some milk.,우유를 줘요.,,
-게임,이야기 극장 길 잃은 아기 고양이,선택지,Sing a song.,노래를 불러요.,,
-게임,이야기 극장 길 잃은 아기 고양이,이야기,The cat drinks the milk. Now it is happy!,고양이가 우유를 마셔요. 이제 행복해요!,,
-게임,이야기 극장 길 잃은 아기 고양이,선택지,Go home together.,같이 집에 가요.,,
-게임,이야기 극장 길 잃은 아기 고양이,이야기,The cat likes your song. Now it is happy!,고양이는 네 노래가 좋아요. 이제 행복해요!,,
-게임,이야기 극장 길 잃은 아기 고양이,선택지,Go home together.,같이 집에 가요.,,
-게임,이야기 극장 길 잃은 아기 고양이,이야기,You and the cat go home together. The end!,너와 고양이는 함께 집에 가요. 끝!,,
-게임,이야기 극장 꼬미의 생일 파티,이야기,Today is Komi's birthday. What should we make?,오늘은 꼬미의 생일이에요. 무엇을 만들까요?,,
-게임,이야기 극장 꼬미의 생일 파티,선택지,Bake a cake.,케이크를 구워요.,,
-게임,이야기 극장 꼬미의 생일 파티,선택지,Make a card.,카드를 만들어요.,,
-게임,이야기 극장 꼬미의 생일 파티,이야기,You bake a big cake. It smells so good!,큰 케이크를 구웠어요. 냄새가 정말 좋아요!,,
-게임,이야기 극장 꼬미의 생일 파티,선택지,Invite your friends.,친구들을 초대해요.,,
-게임,이야기 극장 꼬미의 생일 파티,이야기,You draw a star on the card. It looks beautiful!,카드에 별을 그렸어요. 정말 예뻐요!,,
-게임,이야기 극장 꼬미의 생일 파티,선택지,Invite your friends.,친구들을 초대해요.,,
-게임,이야기 극장 꼬미의 생일 파티,이야기,Komi comes to the party and smiles.,꼬미가 파티에 와서 웃어요.,,
-게임,이야기 극장 꼬미의 생일 파티,선택지,Sing together.,함께 노래해요.,,
-게임,이야기 극장 꼬미의 생일 파티,선택지,Give Komi a hug.,꼬미를 안아 줘요.,,
-게임,이야기 극장 꼬미의 생일 파티,이야기,"Everyone sings ""Happy Birthday."" Komi is very happy.",모두 생일 축하 노래를 불러요. 꼬미는 정말 행복해요.,,
-게임,이야기 극장 꼬미의 생일 파티,선택지,"Say, ""Happy birthday!""","""생일 축하해!""라고 말해요.",,
-게임,이야기 극장 꼬미의 생일 파티,이야기,"Komi gives you a big hug, too. Komi is very happy.",꼬미도 너를 꼭 안아 줘요. 꼬미는 정말 행복해요.,,
-게임,이야기 극장 꼬미의 생일 파티,선택지,"Say, ""Happy birthday!""","""생일 축하해!""라고 말해요.",,
-게임,이야기 극장 꼬미의 생일 파티,이야기,It is the best birthday ever. The end!,최고의 생일이에요. 끝!,,
-게임,이야기 극장 비 오는 날,이야기,It is raining outside. Mina is at home.,밖에 비가 와요. 미나는 집에 있어요.,,
-게임,이야기 극장 비 오는 날,선택지,Read a book.,책을 읽어요.,,
-게임,이야기 극장 비 오는 날,선택지,Go out with an umbrella.,우산을 들고 나가요.,,
-게임,이야기 극장 비 오는 날,이야기,Mina reads a book about the sea. She learns about whales.,미나는 바다에 관한 책을 읽어요. 고래에 대해 배워요.,,
-게임,이야기 극장 비 오는 날,선택지,Look out the window.,창밖을 봐요.,,
-게임,이야기 극장 비 오는 날,이야기,Mina jumps in the puddles. Splash!,미나가 물웅덩이에서 폴짝 뛰어요. 첨벙!,,
-게임,이야기 극장 비 오는 날,선택지,Look up at the sky.,하늘을 올려다봐요.,,
-게임,이야기 극장 비 오는 날,이야기,The rain stops. There is a rainbow in the sky!,비가 그쳐요. 하늘에 무지개가 떴어요!,,
-게임,이야기 극장 비 오는 날,선택지,Draw the rainbow.,무지개를 그려요.,,
-게임,이야기 극장 비 오는 날,선택지,Call a friend.,친구에게 전화해요.,,
-게임,이야기 극장 비 오는 날,이야기,Mina draws the rainbow with seven colors.,미나는 일곱 가지 색으로 무지개를 그려요.,,
-게임,이야기 극장 비 오는 날,선택지,Show it to Mom.,엄마에게 보여 줘요.,,
-게임,이야기 극장 비 오는 날,이야기,Mina and her friend look at the rainbow together.,미나와 친구는 함께 무지개를 봐요.,,
-게임,이야기 극장 비 오는 날,선택지,Smile and wave.,웃으며 손을 흔들어요.,,
-게임,이야기 극장 비 오는 날,이야기,What a wonderful day! The end!,정말 멋진 날이에요! 끝!,,
-이야기 모험,1장 바람이 불어온 날,대사,Hello! I am Teacher Bear.,안녕! 나는 곰 선생님이야.,,
-이야기 모험,1장 바람이 불어온 날,대사,Look! The Word Tree has no leaves.,봐! 말 나무에 잎이 하나도 없어.,,
-이야기 모험,1장 바람이 불어온 날,대사,The wind took all our words!,바람이 우리 말을 전부 가져갔어!,,
-이야기 모험,1장 바람이 불어온 날,대사,"First, we need to find the letters.",먼저 글자들을 찾아야 해.,,
-이야기 모험,1장 바람이 불어온 날,대사,Great job! You found the letters.,잘했어! 글자들을 찾았구나.,,
-이야기 모험,1장 바람이 불어온 날,대사,Look! A new leaf!,봐! 새 잎이 났어!,,
-이야기 모험,1장 바람이 불어온 날,대답,Will you help us?,우리를 도와줄래?,"Yes, I will!",It is a banana. / Good night.
-이야기 모험,2장 이름을 잃은 동물들,대사,Oh no! The animals lost their names.,이런! 동물들이 이름을 잃어버렸어.,,
-이야기 모험,2장 이름을 잃은 동물들,대사,This is a cat. That is a dog.,이건 고양이야. 저건 강아지야.,,
-이야기 모험,2장 이름을 잃은 동물들,대사,Listen and find each animal.,잘 듣고 동물을 찾아 줘.,,
-이야기 모험,2장 이름을 잃은 동물들,대사,Thank you! The animals are happy now.,고마워! 이제 동물들이 행복해.,,
-이야기 모험,2장 이름을 잃은 동물들,대사,The tree has more leaves.,나무에 잎이 더 났어.,,
-이야기 모험,2장 이름을 잃은 동물들,대답,Can you help the animals?,동물들을 도와줄 수 있어?,"Yes, I can!",I am a table. / It is Monday.
-이야기 모험,3장 색을 잃은 꽃밭,대사,Look at the flowers. They have no color!,꽃들을 봐. 색이 하나도 없어!,,
-이야기 모험,3장 색을 잃은 꽃밭,대사,I like red. What about you?,나는 빨강이 좋아. 너는?,,
-이야기 모험,3장 색을 잃은 꽃밭,대사,Let us bring the colors back!,색을 다시 찾아오자!,,
-이야기 모험,3장 색을 잃은 꽃밭,대사,Wow! The flowers are red and yellow.,와! 꽃들이 빨갛고 노래졌어.,,
-이야기 모험,3장 색을 잃은 꽃밭,대사,They are so pretty!,정말 예뻐!,,
-이야기 모험,3장 색을 잃은 꽃밭,대답,What color do you like?,어떤 색을 좋아해?,I like blue.,I am ten. / It is under the bed.
-이야기 모험,4장 배고픈 꼬미,대사,I am so hungry!,나 너무 배고파!,,
-이야기 모험,4장 배고픈 꼬미,대사,Let us open a cafe for our friends.,친구들을 위해 카페를 열자.,,
-이야기 모험,4장 배고픈 꼬미,대사,"I want some milk and a cookie, please.",우유랑 쿠키 주세요.,,
-이야기 모험,4장 배고픈 꼬미,대사,Yum! That was delicious.,냠! 정말 맛있었어.,,
-이야기 모험,4장 배고픈 꼬미,대사,Thank you for the food!,음식 고마워!,,
-이야기 모험,4장 배고픈 꼬미,대답,Are you ready to work?,일할 준비 됐어?,"Yes, I am ready!","No, it is blue. / I have two ears."
-이야기 모험,5장 부서진 다리,대사,The bridge is broken.,다리가 부서졌어.,,
-이야기 모험,5장 부서진 다리,대사,We need ten stones.,돌이 열 개 필요해.,,
-이야기 모험,5장 부서진 다리,대사,Let us count them together!,같이 세어 보자!,,
-이야기 모험,5장 부서진 다리,대사,"One, two, three... ten!","하나, 둘, 셋... 열!",,
-이야기 모험,5장 부서진 다리,대사,Now we can cross the bridge.,이제 다리를 건널 수 있어.,,
-이야기 모험,5장 부서진 다리,대답,How many stones do we need?,돌이 몇 개 필요해?,We need ten stones.,We need a red hat. / We are at school.
-이야기 모험,6장 정글의 황금 잎,대사,I have a treasure map!,나한테 보물 지도가 있어!,,
-이야기 모험,6장 정글의 황금 잎,대사,A golden leaf is in the jungle.,황금 잎이 정글에 있대.,,
-이야기 모험,6장 정글의 황금 잎,대사,Listen carefully. Go left or go right?,"잘 들어. 왼쪽일까, 오른쪽일까?",,
-이야기 모험,6장 정글의 황금 잎,대사,We found the golden leaf!,황금 잎을 찾았어!,,
-이야기 모험,6장 정글의 황금 잎,대사,You are a great explorer!,넌 정말 멋진 탐험가야!,,
-이야기 모험,6장 정글의 황금 잎,대답,Do you want to go to the jungle?,정글에 갈래?,"Yes, let's go!",I am a cookie. / It is my nose.
-이야기 모험,7장 문장 기차를 타요,대사,The train can take us to the Word Tree.,기차를 타면 말 나무까지 갈 수 있어.,,
-이야기 모험,7장 문장 기차를 타요,대사,But the words on the train are mixed up.,그런데 기차의 단어들이 뒤섞였어.,,
-이야기 모험,7장 문장 기차를 타요,대사,Put the words in order.,단어들을 순서대로 놓아 줘.,,
-이야기 모험,7장 문장 기차를 타요,대사,Choo choo! The train is moving!,칙칙폭폭! 기차가 움직여!,,
-이야기 모험,7장 문장 기차를 타요,대사,We are almost there.,거의 다 왔어.,,
-이야기 모험,7장 문장 기차를 타요,대답,Can you fix the train?,기차를 고칠 수 있어?,"Yes, I can do it!",It is very sunny. / My pen is blue.
-이야기 모험,8장 말 나무의 노래,대사,Here we are. This is the Word Tree.,다 왔어. 여기가 말 나무야.,,
-이야기 모험,8장 말 나무의 노래,대사,The tree needs one more thing.,나무에 필요한 게 하나 더 있어.,,
-이야기 모험,8장 말 나무의 노래,대사,It needs your voice. Say the words with us!,네 목소리가 필요해. 우리와 함께 말해 줘!,,
-이야기 모험,8장 말 나무의 노래,대사,Look! The Word Tree is full of leaves!,봐! 말 나무에 잎이 가득해!,,
-이야기 모험,8장 말 나무의 노래,대사,Our words came back!,우리 말이 돌아왔어!,,
-이야기 모험,8장 말 나무의 노래,대사,Thank you. You are our Word Hero!,고마워. 너는 우리의 말 영웅이야!,,
-이야기 모험,8장 말 나무의 노래,대답,Are you ready to say the words?,말할 준비 됐어?,"Yes, I am ready!","No, I am a bus. / It is on the box."
+﻿단계,레슨,카테고리,권장 나이,학습 목표,유형,영어,뜻,정답,오답,검수 결과,수정 제안
+유아,알파벳 A~F,Alphabet & Phonics,5~7세,A부터 F까지 글자와 소리를 알아요,단어,apple,사과,,
+유아,알파벳 A~F,Alphabet & Phonics,5~7세,A부터 F까지 글자와 소리를 알아요,단어,ball,공,,
+유아,알파벳 A~F,Alphabet & Phonics,5~7세,A부터 F까지 글자와 소리를 알아요,단어,cat,고양이,,
+유아,알파벳 A~F,Alphabet & Phonics,5~7세,A부터 F까지 글자와 소리를 알아요,단어,dog,강아지,,
+유아,알파벳 A~F,Alphabet & Phonics,5~7세,A부터 F까지 글자와 소리를 알아요,단어,egg,달걀,,
+유아,알파벳 A~F,Alphabet & Phonics,5~7세,A부터 F까지 글자와 소리를 알아요,단어,fish,물고기,,
+유아,알파벳 G~L,Alphabet & Phonics,5~7세,G부터 L까지 글자와 소리를 알아요,단어,grapes,포도,,
+유아,알파벳 G~L,Alphabet & Phonics,5~7세,G부터 L까지 글자와 소리를 알아요,단어,hat,모자,,
+유아,알파벳 G~L,Alphabet & Phonics,5~7세,G부터 L까지 글자와 소리를 알아요,단어,ice cream,아이스크림,,
+유아,알파벳 G~L,Alphabet & Phonics,5~7세,G부터 L까지 글자와 소리를 알아요,단어,juice,주스,,
+유아,알파벳 G~L,Alphabet & Phonics,5~7세,G부터 L까지 글자와 소리를 알아요,단어,key,열쇠,,
+유아,알파벳 G~L,Alphabet & Phonics,5~7세,G부터 L까지 글자와 소리를 알아요,단어,lion,사자,,
+유아,알파벳 M~R,Alphabet & Phonics,5~7세,M부터 R까지 글자와 소리를 알아요,단어,moon,달,,
+유아,알파벳 M~R,Alphabet & Phonics,5~7세,M부터 R까지 글자와 소리를 알아요,단어,nose,코,,
+유아,알파벳 M~R,Alphabet & Phonics,5~7세,M부터 R까지 글자와 소리를 알아요,단어,orange,오렌지,,
+유아,알파벳 M~R,Alphabet & Phonics,5~7세,M부터 R까지 글자와 소리를 알아요,단어,pig,돼지,,
+유아,알파벳 M~R,Alphabet & Phonics,5~7세,M부터 R까지 글자와 소리를 알아요,단어,queen,여왕,,
+유아,알파벳 M~R,Alphabet & Phonics,5~7세,M부터 R까지 글자와 소리를 알아요,단어,rabbit,토끼,,
+유아,알파벳 S~Z,Alphabet & Phonics,5~7세,S부터 Z까지 글자와 소리를 알아요,단어,sun,해,,
+유아,알파벳 S~Z,Alphabet & Phonics,5~7세,S부터 Z까지 글자와 소리를 알아요,단어,tiger,호랑이,,
+유아,알파벳 S~Z,Alphabet & Phonics,5~7세,S부터 Z까지 글자와 소리를 알아요,단어,umbrella,우산,,
+유아,알파벳 S~Z,Alphabet & Phonics,5~7세,S부터 Z까지 글자와 소리를 알아요,단어,van,승합차,,
+유아,알파벳 S~Z,Alphabet & Phonics,5~7세,S부터 Z까지 글자와 소리를 알아요,단어,watch,손목시계,,
+유아,알파벳 S~Z,Alphabet & Phonics,5~7세,S부터 Z까지 글자와 소리를 알아요,단어,box,상자,,
+유아,알파벳 S~Z,Alphabet & Phonics,5~7세,S부터 Z까지 글자와 소리를 알아요,단어,yo-yo,요요,,
+유아,알파벳 S~Z,Alphabet & Phonics,5~7세,S부터 Z까지 글자와 소리를 알아요,단어,zebra,얼룩말,,
+유아,색깔,Colors,5~7세,색깔 이름을 듣고 찾아요,단어,red,빨강,,
+유아,색깔,Colors,5~7세,색깔 이름을 듣고 찾아요,단어,blue,파랑,,
+유아,색깔,Colors,5~7세,색깔 이름을 듣고 찾아요,단어,yellow,노랑,,
+유아,색깔,Colors,5~7세,색깔 이름을 듣고 찾아요,단어,green,초록,,
+유아,색깔,Colors,5~7세,색깔 이름을 듣고 찾아요,단어,orange,주황,,
+유아,색깔,Colors,5~7세,색깔 이름을 듣고 찾아요,단어,purple,보라,,
+유아,색깔,Colors,5~7세,색깔 이름을 듣고 찾아요,단어,black,검정,,
+유아,색깔,Colors,5~7세,색깔 이름을 듣고 찾아요,단어,white,하양,,
+유아,동물 친구,Animals,5~7세,동물 이름을 듣고 찾아요,단어,cat,고양이,,
+유아,동물 친구,Animals,5~7세,동물 이름을 듣고 찾아요,단어,dog,강아지,,
+유아,동물 친구,Animals,5~7세,동물 이름을 듣고 찾아요,단어,pig,돼지,,
+유아,동물 친구,Animals,5~7세,동물 이름을 듣고 찾아요,단어,cow,소,,
+유아,동물 친구,Animals,5~7세,동물 이름을 듣고 찾아요,단어,duck,오리,,
+유아,동물 친구,Animals,5~7세,동물 이름을 듣고 찾아요,단어,bear,곰,,
+유아,동물 친구,Animals,5~7세,동물 이름을 듣고 찾아요,단어,monkey,원숭이,,
+유아,동물 친구,Animals,5~7세,동물 이름을 듣고 찾아요,단어,frog,개구리,,
+유아,숫자 1~10,Numbers,5~7세,1부터 10까지 수를 말해요,단어,one,하나,,
+유아,숫자 1~10,Numbers,5~7세,1부터 10까지 수를 말해요,단어,two,둘,,
+유아,숫자 1~10,Numbers,5~7세,1부터 10까지 수를 말해요,단어,three,셋,,
+유아,숫자 1~10,Numbers,5~7세,1부터 10까지 수를 말해요,단어,four,넷,,
+유아,숫자 1~10,Numbers,5~7세,1부터 10까지 수를 말해요,단어,five,다섯,,
+유아,숫자 1~10,Numbers,5~7세,1부터 10까지 수를 말해요,단어,six,여섯,,
+유아,숫자 1~10,Numbers,5~7세,1부터 10까지 수를 말해요,단어,seven,일곱,,
+유아,숫자 1~10,Numbers,5~7세,1부터 10까지 수를 말해요,단어,eight,여덟,,
+유아,숫자 1~10,Numbers,5~7세,1부터 10까지 수를 말해요,단어,nine,아홉,,
+유아,숫자 1~10,Numbers,5~7세,1부터 10까지 수를 말해요,단어,ten,열,,
+유아,내 몸,Body,5~7세,몸의 이름을 알아요,단어,eye,눈,,
+유아,내 몸,Body,5~7세,몸의 이름을 알아요,단어,ear,귀,,
+유아,내 몸,Body,5~7세,몸의 이름을 알아요,단어,nose,코,,
+유아,내 몸,Body,5~7세,몸의 이름을 알아요,단어,mouth,입,,
+유아,내 몸,Body,5~7세,몸의 이름을 알아요,단어,hand,손,,
+유아,내 몸,Body,5~7세,몸의 이름을 알아요,단어,foot,발,,
+유아,"소리 친구 -at, -en",Alphabet & Phonics,5~7세,끝소리가 같은 단어를 익혀요,단어,cat,고양이,,
+유아,"소리 친구 -at, -en",Alphabet & Phonics,5~7세,끝소리가 같은 단어를 익혀요,단어,hat,모자,,
+유아,"소리 친구 -at, -en",Alphabet & Phonics,5~7세,끝소리가 같은 단어를 익혀요,단어,bat,박쥐,,
+유아,"소리 친구 -at, -en",Alphabet & Phonics,5~7세,끝소리가 같은 단어를 익혀요,단어,pen,펜,,
+유아,"소리 친구 -at, -en",Alphabet & Phonics,5~7세,끝소리가 같은 단어를 익혀요,단어,hen,암탉,,
+유아,"소리 친구 -at, -en",Alphabet & Phonics,5~7세,끝소리가 같은 단어를 익혀요,단어,ten,열,,
+1~2학년,인사하기,Greetings,6~8세,인사를 주고받아요,단어,hello,안녕,,
+1~2학년,인사하기,Greetings,6~8세,인사를 주고받아요,단어,goodbye,잘 가,,
+1~2학년,인사하기,Greetings,6~8세,인사를 주고받아요,단어,thanks,고마워,,
+1~2학년,인사하기,Greetings,6~8세,인사를 주고받아요,단어,sorry,미안해,,
+1~2학년,인사하기,Greetings,6~8세,인사를 주고받아요,단어,yes,응,,
+1~2학년,인사하기,Greetings,6~8세,인사를 주고받아요,단어,no,아니,,
+1~2학년,인사하기,Greetings,6~8세,인사를 주고받아요,문장,Good morning.,좋은 아침이에요.,,
+1~2학년,인사하기,Greetings,6~8세,인사를 주고받아요,문장,Nice to meet you.,만나서 반가워요.,,
+1~2학년,인사하기,Greetings,6~8세,인사를 주고받아요,문장,See you later.,나중에 또 봐요.,,
+1~2학년,우리 가족,Family,6~8세,가족을 영어로 불러요,단어,mom,엄마,,
+1~2학년,우리 가족,Family,6~8세,가족을 영어로 불러요,단어,dad,아빠,,
+1~2학년,우리 가족,Family,6~8세,가족을 영어로 불러요,단어,sister,여자 형제,,
+1~2학년,우리 가족,Family,6~8세,가족을 영어로 불러요,단어,brother,남자 형제,,
+1~2학년,우리 가족,Family,6~8세,가족을 영어로 불러요,단어,baby,아기,,
+1~2학년,우리 가족,Family,6~8세,가족을 영어로 불러요,단어,grandma,할머니,,
+1~2학년,우리 가족,Family,6~8세,가족을 영어로 불러요,단어,grandpa,할아버지,,
+1~2학년,맛있는 음식,Food,6~8세,음식 이름을 말해요,단어,bread,빵,,
+1~2학년,맛있는 음식,Food,6~8세,음식 이름을 말해요,단어,milk,우유,,
+1~2학년,맛있는 음식,Food,6~8세,음식 이름을 말해요,단어,rice,밥,,
+1~2학년,맛있는 음식,Food,6~8세,음식 이름을 말해요,단어,cake,케이크,,
+1~2학년,맛있는 음식,Food,6~8세,음식 이름을 말해요,단어,water,물,,
+1~2학년,맛있는 음식,Food,6~8세,음식 이름을 말해요,단어,banana,바나나,,
+1~2학년,맛있는 음식,Food,6~8세,음식 이름을 말해요,단어,pizza,피자,,
+1~2학년,맛있는 음식,Food,6~8세,음식 이름을 말해요,단어,cookie,쿠키,,
+1~2학년,학교에서,School,8세 이상,학교에서 묻고 답해요,단어,book,책,,
+1~2학년,학교에서,School,8세 이상,학교에서 묻고 답해요,단어,pen,펜,,
+1~2학년,학교에서,School,8세 이상,학교에서 묻고 답해요,단어,pencil,연필,,
+1~2학년,학교에서,School,8세 이상,학교에서 묻고 답해요,단어,bag,가방,,
+1~2학년,학교에서,School,8세 이상,학교에서 묻고 답해요,단어,chair,의자,,
+1~2학년,학교에서,School,8세 이상,학교에서 묻고 답해요,단어,ruler,자,,
+1~2학년,학교에서,School,8세 이상,학교에서 묻고 답해요,단어,scissors,가위,,
+1~2학년,학교에서,School,8세 이상,학교에서 묻고 답해요,단어,friend,친구,,
+1~2학년,움직여 봐요,Action Words,6~8세,움직임을 나타내는 말을 익혀요,단어,run,달리다,,
+1~2학년,움직여 봐요,Action Words,6~8세,움직임을 나타내는 말을 익혀요,단어,jump,뛰어오르다,,
+1~2학년,움직여 봐요,Action Words,6~8세,움직임을 나타내는 말을 익혀요,단어,sing,노래하다,,
+1~2학년,움직여 봐요,Action Words,6~8세,움직임을 나타내는 말을 익혀요,단어,dance,춤추다,,
+1~2학년,움직여 봐요,Action Words,6~8세,움직임을 나타내는 말을 익혀요,단어,eat,먹다,,
+1~2학년,움직여 봐요,Action Words,6~8세,움직임을 나타내는 말을 익혀요,단어,sleep,자다,,
+1~2학년,움직여 봐요,Action Words,6~8세,움직임을 나타내는 말을 익혀요,단어,swim,수영하다,,
+1~2학년,움직여 봐요,Action Words,6~8세,움직임을 나타내는 말을 익혀요,단어,read,읽다,,
+1~2학년,날씨,Weather,6~8세,날씨를 말해요,단어,sunny,화창한,,
+1~2학년,날씨,Weather,6~8세,날씨를 말해요,단어,rainy,비 오는,,
+1~2학년,날씨,Weather,6~8세,날씨를 말해요,단어,cloudy,흐린,,
+1~2학년,날씨,Weather,6~8세,날씨를 말해요,단어,snowy,눈 오는,,
+1~2학년,날씨,Weather,6~8세,날씨를 말해요,단어,windy,바람 부는,,
+1~2학년,날씨,Weather,6~8세,날씨를 말해요,단어,hot,더운,,
+1~2학년,날씨,Weather,6~8세,날씨를 말해요,단어,cold,추운,,
+1~2학년,내 기분,Feelings,6~8세,내 기분을 말해요,단어,happy,행복한,,
+1~2학년,내 기분,Feelings,6~8세,내 기분을 말해요,단어,sad,슬픈,,
+1~2학년,내 기분,Feelings,6~8세,내 기분을 말해요,단어,angry,화난,,
+1~2학년,내 기분,Feelings,6~8세,내 기분을 말해요,단어,tired,피곤한,,
+1~2학년,내 기분,Feelings,6~8세,내 기분을 말해요,단어,hungry,배고픈,,
+1~2학년,내 기분,Feelings,6~8세,내 기분을 말해요,단어,scared,무서워하는,,
+1~2학년,내 기분,Feelings,6~8세,내 기분을 말해요,문장,I am happy.,나는 행복해요.,,
+1~2학년,내 기분,Feelings,6~8세,내 기분을 말해요,문장,I am hungry.,나는 배고파요.,,
+1~2학년,내 기분,Feelings,6~8세,내 기분을 말해요,문장,Are you tired?,너는 피곤하니?,,
+1~2학년,짧은 모음 a e i o u,Alphabet & Phonics,6~8세,짧은 모음이 든 단어를 읽어요,단어,map,지도,,
+1~2학년,짧은 모음 a e i o u,Alphabet & Phonics,6~8세,짧은 모음이 든 단어를 읽어요,단어,bed,침대,,
+1~2학년,짧은 모음 a e i o u,Alphabet & Phonics,6~8세,짧은 모음이 든 단어를 읽어요,단어,pig,돼지,,
+1~2학년,짧은 모음 a e i o u,Alphabet & Phonics,6~8세,짧은 모음이 든 단어를 읽어요,단어,dog,강아지,,
+1~2학년,짧은 모음 a e i o u,Alphabet & Phonics,6~8세,짧은 모음이 든 단어를 읽어요,단어,sun,해,,
+1~2학년,짧은 모음 a e i o u,Alphabet & Phonics,6~8세,짧은 모음이 든 단어를 읽어요,단어,cup,컵,,
+1~2학년,짧은 모음 a e i o u,Alphabet & Phonics,6~8세,짧은 모음이 든 단어를 읽어요,문장,The cat has a hat.,고양이는 모자가 있어요.,,
+1~2학년,짧은 모음 a e i o u,Alphabet & Phonics,6~8세,짧은 모음이 든 단어를 읽어요,문장,The dog is on the bed.,강아지가 침대 위에 있어요.,,
+1~2학년,짧은 모음 a e i o u,Alphabet & Phonics,6~8세,짧은 모음이 든 단어를 읽어요,문장,The sun is hot.,해는 뜨거워요.,,
+1~2학년,탈것,Transportation,6~8세,탈것 이름을 말해요,단어,bus,버스,,
+1~2학년,탈것,Transportation,6~8세,탈것 이름을 말해요,단어,car,자동차,,
+1~2학년,탈것,Transportation,6~8세,탈것 이름을 말해요,단어,train,기차,,
+1~2학년,탈것,Transportation,6~8세,탈것 이름을 말해요,단어,airplane,비행기,,
+1~2학년,탈것,Transportation,6~8세,탈것 이름을 말해요,단어,bike,자전거,,
+1~2학년,탈것,Transportation,6~8세,탈것 이름을 말해요,단어,boat,배,,
+1~2학년,탈것,Transportation,6~8세,탈것 이름을 말해요,문장,I ride the bus.,나는 버스를 타요.,,
+1~2학년,탈것,Transportation,6~8세,탈것 이름을 말해요,문장,The train is long.,기차는 길어요.,,
+1~2학년,탈것,Transportation,6~8세,탈것 이름을 말해요,문장,I can ride a bike.,나는 자전거를 탈 수 있어요.,,
+1~2학년,우리 집 물건,Home,6~8세,집안 물건 이름을 말해요,단어,bed,침대,,
+1~2학년,우리 집 물건,Home,6~8세,집안 물건 이름을 말해요,단어,sofa,소파,,
+1~2학년,우리 집 물건,Home,6~8세,집안 물건 이름을 말해요,단어,door,문,,
+1~2학년,우리 집 물건,Home,6~8세,집안 물건 이름을 말해요,단어,window,창문,,
+1~2학년,우리 집 물건,Home,6~8세,집안 물건 이름을 말해요,단어,lamp,전등,,
+1~2학년,우리 집 물건,Home,6~8세,집안 물건 이름을 말해요,단어,clock,시계,,
+1~2학년,우리 집 물건,Home,6~8세,집안 물건 이름을 말해요,문장,Please open the door.,문을 열어 주세요.,,
+1~2학년,우리 집 물건,Home,6~8세,집안 물건 이름을 말해요,문장,I see a clock.,시계가 보여요.,,
+1~2학년,우리 집 물건,Home,6~8세,집안 물건 이름을 말해요,문장,My cat is on the sofa.,내 고양이는 소파 위에 있어요.,,
+1~2학년,방향과 위치,Places,6~8세,방향과 위치를 나타내요,단어,left,왼쪽,,
+1~2학년,방향과 위치,Places,6~8세,방향과 위치를 나타내요,단어,right,오른쪽,,
+1~2학년,방향과 위치,Places,6~8세,방향과 위치를 나타내요,단어,up,위로,,
+1~2학년,방향과 위치,Places,6~8세,방향과 위치를 나타내요,단어,down,아래로,,
+1~2학년,방향과 위치,Places,6~8세,방향과 위치를 나타내요,단어,behind,~ 뒤에,,
+1~2학년,방향과 위치,Places,6~8세,방향과 위치를 나타내요,문장,Turn left.,왼쪽으로 돌아요.,,
+1~2학년,방향과 위치,Places,6~8세,방향과 위치를 나타내요,문장,The cat is behind the door.,고양이가 문 뒤에 있어요.,,
+1~2학년,방향과 위치,Places,6~8세,방향과 위치를 나타내요,문장,Go up the stairs.,계단을 올라가요.,,
+1~2학년,내 장난감,Toys,6~8세,장난감 이름을 말해요,단어,teddy bear,곰 인형,,
+1~2학년,내 장난감,Toys,6~8세,장난감 이름을 말해요,단어,robot,로봇,,
+1~2학년,내 장난감,Toys,6~8세,장난감 이름을 말해요,단어,kite,연,,
+1~2학년,내 장난감,Toys,6~8세,장난감 이름을 말해요,단어,puzzle,퍼즐,,
+1~2학년,내 장난감,Toys,6~8세,장난감 이름을 말해요,단어,balloon,풍선,,
+1~2학년,내 장난감,Toys,6~8세,장난감 이름을 말해요,단어,ball,공,,
+1~2학년,내 장난감,Toys,6~8세,장난감 이름을 말해요,문장,I have a robot.,나는 로봇이 있어요.,,
+1~2학년,내 장난감,Toys,6~8세,장난감 이름을 말해요,문장,This is my teddy bear.,이것은 내 곰 인형이에요.,,
+1~2학년,내 장난감,Toys,6~8세,장난감 이름을 말해요,문장,I see a kite.,연이 보여요.,,
+1~2학년,옷 입기,Clothes,6~8세,옷 이름을 말해요,단어,shirt,셔츠,,
+1~2학년,옷 입기,Clothes,6~8세,옷 이름을 말해요,단어,pants,바지,,
+1~2학년,옷 입기,Clothes,6~8세,옷 이름을 말해요,단어,dress,원피스,,
+1~2학년,옷 입기,Clothes,6~8세,옷 이름을 말해요,단어,socks,양말,,
+1~2학년,옷 입기,Clothes,6~8세,옷 이름을 말해요,단어,shoes,신발,,
+1~2학년,옷 입기,Clothes,6~8세,옷 이름을 말해요,단어,coat,외투,,
+1~2학년,옷 입기,Clothes,6~8세,옷 이름을 말해요,문장,I like your shirt.,네 셔츠 마음에 들어.,,
+1~2학년,옷 입기,Clothes,6~8세,옷 이름을 말해요,문장,Put on your shoes.,신발을 신어요.,,
+1~2학년,옷 입기,Clothes,6~8세,옷 이름을 말해요,문장,Wear a coat.,외투를 입어요.,,
+1~2학년,자연 속으로,Nature,6~8세,자연에 있는 것을 말해요,단어,tree,나무,,
+1~2학년,자연 속으로,Nature,6~8세,자연에 있는 것을 말해요,단어,flower,꽃,,
+1~2학년,자연 속으로,Nature,6~8세,자연에 있는 것을 말해요,단어,mountain,산,,
+1~2학년,자연 속으로,Nature,6~8세,자연에 있는 것을 말해요,단어,star,별,,
+1~2학년,자연 속으로,Nature,6~8세,자연에 있는 것을 말해요,단어,rainbow,무지개,,
+1~2학년,자연 속으로,Nature,6~8세,자연에 있는 것을 말해요,단어,leaf,잎,,
+1~2학년,자연 속으로,Nature,6~8세,자연에 있는 것을 말해요,문장,The tree is tall.,나무는 키가 커요.,,
+1~2학년,자연 속으로,Nature,6~8세,자연에 있는 것을 말해요,문장,I see a rainbow.,무지개가 보여요.,,
+1~2학년,자연 속으로,Nature,6~8세,자연에 있는 것을 말해요,문장,The stars are bright.,별들이 밝아요.,,
+1~2학년,우리 동네,Places,6~8세,동네의 장소를 말해요,단어,park,공원,,
+1~2학년,우리 동네,Places,6~8세,동네의 장소를 말해요,단어,school,학교,,
+1~2학년,우리 동네,Places,6~8세,동네의 장소를 말해요,단어,hospital,병원,,
+1~2학년,우리 동네,Places,6~8세,동네의 장소를 말해요,단어,library,도서관,,
+1~2학년,우리 동네,Places,6~8세,동네의 장소를 말해요,단어,store,가게,,
+1~2학년,우리 동네,Places,6~8세,동네의 장소를 말해요,단어,beach,해변,,
+1~2학년,우리 동네,Places,6~8세,동네의 장소를 말해요,문장,I play in the park.,나는 공원에서 놀아요.,,
+1~2학년,우리 동네,Places,6~8세,동네의 장소를 말해요,문장,The library is quiet.,도서관은 조용해요.,,
+1~2학년,우리 동네,Places,6~8세,동네의 장소를 말해요,문장,I like the beach.,나는 해변을 좋아해요.,,
+1~2학년,나의 하루,Daily Routines,8세 이상,하루 일과를 묻고 답해요,단어,wake up,일어나다,,
+1~2학년,나의 하루,Daily Routines,8세 이상,하루 일과를 묻고 답해요,단어,brush my teeth,이를 닦다,,
+1~2학년,나의 하루,Daily Routines,8세 이상,하루 일과를 묻고 답해요,단어,eat breakfast,아침을 먹다,,
+1~2학년,나의 하루,Daily Routines,8세 이상,하루 일과를 묻고 답해요,단어,go to school,학교에 가다,,
+1~2학년,나의 하루,Daily Routines,8세 이상,하루 일과를 묻고 답해요,단어,do my homework,숙제를 하다,,
+1~2학년,나의 하루,Daily Routines,8세 이상,하루 일과를 묻고 답해요,단어,go to bed,잠자리에 들다,,
+1~2학년,나의 하루,Daily Routines,8세 이상,하루 일과를 묻고 답해요,문장,I wake up at seven.,나는 일곱 시에 일어나요.,,
+1~2학년,나의 하루,Daily Routines,8세 이상,하루 일과를 묻고 답해요,문장,I brush my teeth.,나는 이를 닦아요.,,
+1~2학년,나의 하루,Daily Routines,8세 이상,하루 일과를 묻고 답해요,문장,I go to bed at nine.,나는 아홉 시에 잠자리에 들어요.,,
+3~4학년,나를 소개해요,Simple Sentences,8세 이상,나에 대해 말해요,단어,name,이름,,
+3~4학년,나를 소개해요,Simple Sentences,8세 이상,나에 대해 말해요,단어,age,나이,,
+3~4학년,나를 소개해요,Simple Sentences,8세 이상,나에 대해 말해요,단어,student,학생,,
+3~4학년,나를 소개해요,Simple Sentences,8세 이상,나에 대해 말해요,단어,Korea,한국,,
+3~4학년,나를 소개해요,Simple Sentences,8세 이상,나에 대해 말해요,문장,My name is Mina.,내 이름은 미나예요.,,
+3~4학년,나를 소개해요,Simple Sentences,8세 이상,나에 대해 말해요,문장,I am ten years old.,나는 열 살이에요.,,
+3~4학년,나를 소개해요,Simple Sentences,8세 이상,나에 대해 말해요,문장,I am from Korea.,나는 한국에서 왔어요.,,
+3~4학년,나를 소개해요,Simple Sentences,8세 이상,나에 대해 말해요,문장,I am a student.,나는 학생이에요.,,
+3~4학년,나를 소개해요,Simple Sentences,8세 이상,나에 대해 말해요,대화,What's your name?,이름이 뭐니?,My name is Tom.,I am fine. / It is a book.
+3~4학년,나를 소개해요,Simple Sentences,8세 이상,나에 대해 말해요,대화,How old are you?,몇 살이니?,I am nine years old.,"I like pizza. / Yes, I can."
+3~4학년,나를 소개해요,Simple Sentences,8세 이상,나에 대해 말해요,대화,How are you?,어떻게 지내니?,"I'm fine, thank you.",My name is Tom. / It is red.
+3~4학년,좋아해요,Simple Sentences,8~10세,좋아하는 것을 말해요,단어,like,좋아하다,,
+3~4학년,좋아해요,Simple Sentences,8~10세,좋아하는 것을 말해요,단어,soccer,축구,,
+3~4학년,좋아해요,Simple Sentences,8~10세,좋아하는 것을 말해요,단어,music,음악,,
+3~4학년,좋아해요,Simple Sentences,8~10세,좋아하는 것을 말해요,단어,chicken,닭고기,,
+3~4학년,좋아해요,Simple Sentences,8~10세,좋아하는 것을 말해요,단어,grape,포도,,
+3~4학년,좋아해요,Simple Sentences,8~10세,좋아하는 것을 말해요,문장,I like apples.,나는 사과를 좋아해요.,,
+3~4학년,좋아해요,Simple Sentences,8~10세,좋아하는 것을 말해요,문장,I like soccer.,나는 축구를 좋아해요.,,
+3~4학년,좋아해요,Simple Sentences,8~10세,좋아하는 것을 말해요,문장,I don't like carrots.,나는 당근을 좋아하지 않아요.,,
+3~4학년,좋아해요,Simple Sentences,8~10세,좋아하는 것을 말해요,문장,Do you like music?,너는 음악을 좋아하니?,,
+3~4학년,좋아해요,Simple Sentences,8~10세,좋아하는 것을 말해요,빈칸,I ___ bananas.,나는 바나나를 좋아해요.,like,likes / am
+3~4학년,좋아해요,Simple Sentences,8~10세,좋아하는 것을 말해요,빈칸,Do you ___ cats?,너는 고양이를 좋아하니?,like,is / are
+3~4학년,좋아해요,Simple Sentences,8~10세,좋아하는 것을 말해요,대화,Do you like pizza?,피자 좋아하니?,"Yes, I do.","Yes, I am. / It is pizza."
+3~4학년,좋아해요,Simple Sentences,8~10세,좋아하는 것을 말해요,대화,Do you like snakes?,뱀 좋아하니?,"No, I don't.","No, I am not. / I am ten."
+3~4학년,할 수 있어요,Simple Sentences,8~10세,할 수 있는 일을 말해요,단어,can,할 수 있다,,
+3~4학년,할 수 있어요,Simple Sentences,8~10세,할 수 있는 일을 말해요,단어,fly,날다,,
+3~4학년,할 수 있어요,Simple Sentences,8~10세,할 수 있는 일을 말해요,단어,ride,타다,,
+3~4학년,할 수 있어요,Simple Sentences,8~10세,할 수 있는 일을 말해요,단어,cook,요리하다,,
+3~4학년,할 수 있어요,Simple Sentences,8~10세,할 수 있는 일을 말해요,단어,climb,오르다,,
+3~4학년,할 수 있어요,Simple Sentences,8~10세,할 수 있는 일을 말해요,문장,I can swim.,나는 수영할 수 있어요.,,
+3~4학년,할 수 있어요,Simple Sentences,8~10세,할 수 있는 일을 말해요,문장,I can't fly.,나는 날 수 없어요.,,
+3~4학년,할 수 있어요,Simple Sentences,8~10세,할 수 있는 일을 말해요,문장,Can you dance?,너는 춤출 수 있니?,,
+3~4학년,할 수 있어요,Simple Sentences,8~10세,할 수 있는 일을 말해요,문장,She can ride a bike.,그녀는 자전거를 탈 수 있어요.,,
+3~4학년,할 수 있어요,Simple Sentences,8~10세,할 수 있는 일을 말해요,빈칸,A bird ___ fly.,새는 날 수 있어요.,can,is / do
+3~4학년,할 수 있어요,Simple Sentences,8~10세,할 수 있는 일을 말해요,빈칸,Fish can ___.,물고기는 수영할 수 있어요.,swim,swims / swimming
+3~4학년,할 수 있어요,Simple Sentences,8~10세,할 수 있는 일을 말해요,대화,Can you swim?,수영할 수 있니?,"Yes, I can.","Yes, I do. / I am a swimmer."
+3~4학년,할 수 있어요,Simple Sentences,8~10세,할 수 있는 일을 말해요,대화,Can you fly?,날 수 있니?,"No, I can't.","No, I don't. / It is a bird."
+3~4학년,어디에 있나요,Places,8~10세,어디에 있는지 말해요,단어,in,~ 안에,,
+3~4학년,어디에 있나요,Places,8~10세,어디에 있는지 말해요,단어,on,~ 위에,,
+3~4학년,어디에 있나요,Places,8~10세,어디에 있는지 말해요,단어,under,~ 아래에,,
+3~4학년,어디에 있나요,Places,8~10세,어디에 있는지 말해요,단어,next to,~ 옆에,,
+3~4학년,어디에 있나요,Places,8~10세,어디에 있는지 말해요,단어,room,방,,
+3~4학년,어디에 있나요,Places,8~10세,어디에 있는지 말해요,단어,box,상자,,
+3~4학년,어디에 있나요,Places,8~10세,어디에 있는지 말해요,문장,The cat is on the desk.,고양이는 책상 위에 있어요.,,
+3~4학년,어디에 있나요,Places,8~10세,어디에 있는지 말해요,문장,The ball is under the chair.,공은 의자 아래에 있어요.,,
+3~4학년,어디에 있나요,Places,8~10세,어디에 있는지 말해요,문장,My bag is in my room.,내 가방은 내 방 안에 있어요.,,
+3~4학년,어디에 있나요,Places,8~10세,어디에 있는지 말해요,문장,Where is my pen?,내 펜은 어디에 있니?,,
+3~4학년,어디에 있나요,Places,8~10세,어디에 있는지 말해요,빈칸,The book is ___ the table.,책은 탁자 위에 있어요.,on,am / is
+3~4학년,어디에 있나요,Places,8~10세,어디에 있는지 말해요,빈칸,___ is my cat?,내 고양이는 어디에 있니?,Where,What / Who
+3~4학년,시간과 요일,Simple Sentences,8~10세,시간과 요일을 말해요,단어,Monday,월요일,,
+3~4학년,시간과 요일,Simple Sentences,8~10세,시간과 요일을 말해요,단어,Tuesday,화요일,,
+3~4학년,시간과 요일,Simple Sentences,8~10세,시간과 요일을 말해요,단어,Wednesday,수요일,,
+3~4학년,시간과 요일,Simple Sentences,8~10세,시간과 요일을 말해요,단어,Thursday,목요일,,
+3~4학년,시간과 요일,Simple Sentences,8~10세,시간과 요일을 말해요,단어,Friday,금요일,,
+3~4학년,시간과 요일,Simple Sentences,8~10세,시간과 요일을 말해요,단어,Saturday,토요일,,
+3~4학년,시간과 요일,Simple Sentences,8~10세,시간과 요일을 말해요,단어,Sunday,일요일,,
+3~4학년,시간과 요일,Simple Sentences,8~10세,시간과 요일을 말해요,문장,What time is it?,몇 시예요?,,
+3~4학년,시간과 요일,Simple Sentences,8~10세,시간과 요일을 말해요,문장,It's seven o'clock.,일곱 시예요.,,
+3~4학년,시간과 요일,Simple Sentences,8~10세,시간과 요일을 말해요,문장,What day is it today?,오늘은 무슨 요일이에요?,,
+3~4학년,시간과 요일,Simple Sentences,8~10세,시간과 요일을 말해요,문장,It's Friday.,금요일이에요.,,
+3~4학년,시간과 요일,Simple Sentences,8~10세,시간과 요일을 말해요,대화,What time is it?,몇 시니?,It's ten o'clock.,It's Monday. / It's a clock.
+3~4학년,시간과 요일,Simple Sentences,8~10세,시간과 요일을 말해요,대화,What day is it?,무슨 요일이니?,It's Sunday.,It's two o'clock. / It's sunny.
+3~4학년,꿈과 직업,Simple Sentences,8~10세,직업과 꿈을 말해요,단어,doctor,의사,,
+3~4학년,꿈과 직업,Simple Sentences,8~10세,직업과 꿈을 말해요,단어,cook,요리사,,
+3~4학년,꿈과 직업,Simple Sentences,8~10세,직업과 꿈을 말해요,단어,farmer,농부,,
+3~4학년,꿈과 직업,Simple Sentences,8~10세,직업과 꿈을 말해요,단어,singer,가수,,
+3~4학년,꿈과 직업,Simple Sentences,8~10세,직업과 꿈을 말해요,단어,teacher,선생님,,
+3~4학년,꿈과 직업,Simple Sentences,8~10세,직업과 꿈을 말해요,단어,pilot,조종사,,
+3~4학년,꿈과 직업,Simple Sentences,8~10세,직업과 꿈을 말해요,단어,firefighter,소방관,,
+3~4학년,꿈과 직업,Simple Sentences,8~10세,직업과 꿈을 말해요,문장,I want to be a doctor.,나는 의사가 되고 싶어요.,,
+3~4학년,꿈과 직업,Simple Sentences,8~10세,직업과 꿈을 말해요,문장,What do you want to be?,너는 무엇이 되고 싶니?,,
+3~4학년,꿈과 직업,Simple Sentences,8~10세,직업과 꿈을 말해요,문장,My mom is a teacher.,우리 엄마는 선생님이에요.,,
+3~4학년,꿈과 직업,Simple Sentences,8~10세,직업과 꿈을 말해요,빈칸,I want to ___ a singer.,나는 가수가 되고 싶어요.,be,am / is
+5~6학년,어제 한 일 (과거),Simple Sentences,10~12세,어제 한 일을 말해요,단어,yesterday,어제,,
+5~6학년,어제 한 일 (과거),Simple Sentences,10~12세,어제 한 일을 말해요,단어,went,갔다,,
+5~6학년,어제 한 일 (과거),Simple Sentences,10~12세,어제 한 일을 말해요,단어,saw,보았다,,
+5~6학년,어제 한 일 (과거),Simple Sentences,10~12세,어제 한 일을 말해요,단어,ate,먹었다,,
+5~6학년,어제 한 일 (과거),Simple Sentences,10~12세,어제 한 일을 말해요,단어,played,놀았다,,
+5~6학년,어제 한 일 (과거),Simple Sentences,10~12세,어제 한 일을 말해요,단어,visited,방문했다,,
+5~6학년,어제 한 일 (과거),Simple Sentences,10~12세,어제 한 일을 말해요,문장,I went to the park yesterday.,나는 어제 공원에 갔어요.,,
+5~6학년,어제 한 일 (과거),Simple Sentences,10~12세,어제 한 일을 말해요,문장,We played soccer after school.,우리는 방과 후에 축구를 했어요.,,
+5~6학년,어제 한 일 (과거),Simple Sentences,10~12세,어제 한 일을 말해요,문장,Did you see the movie?,너는 그 영화를 봤니?,,
+5~6학년,어제 한 일 (과거),Simple Sentences,10~12세,어제 한 일을 말해요,문장,She visited her uncle last week.,그녀는 지난주에 삼촌을 방문했어요.,,
+5~6학년,어제 한 일 (과거),Simple Sentences,10~12세,어제 한 일을 말해요,빈칸,I ___ a sandwich yesterday.,나는 어제 샌드위치를 먹었어요.,ate,eat / eats
+5~6학년,어제 한 일 (과거),Simple Sentences,10~12세,어제 한 일을 말해요,빈칸,We ___ to the zoo last Sunday.,우리는 지난 일요일에 동물원에 갔어요.,went,go / goes
+5~6학년,어제 한 일 (과거),Simple Sentences,10~12세,어제 한 일을 말해요,빈칸,___ you play outside yesterday?,너는 어제 밖에서 놀았니?,Did,Do / Are
+5~6학년,어제 한 일 (과거),Simple Sentences,10~12세,어제 한 일을 말해요,읽기,"Yesterday, Jina went to the beach with her family. She swam in the sea and ate ice cream. It was a great day. Q: Where did Jina go?",어제 지나는 가족과 해변에 갔어요. 바다에서 수영하고 아이스크림을 먹었어요. 정말 좋은 날이었어요.,To the beach,To the school / To the library
+5~6학년,앞으로 할 일 (미래),Simple Sentences,10~12세,앞으로 할 일을 말해요,단어,tomorrow,내일,,
+5~6학년,앞으로 할 일 (미래),Simple Sentences,10~12세,앞으로 할 일을 말해요,단어,will,~할 것이다,,
+5~6학년,앞으로 할 일 (미래),Simple Sentences,10~12세,앞으로 할 일을 말해요,단어,plan,계획,,
+5~6학년,앞으로 할 일 (미래),Simple Sentences,10~12세,앞으로 할 일을 말해요,단어,vacation,방학,,
+5~6학년,앞으로 할 일 (미래),Simple Sentences,10~12세,앞으로 할 일을 말해요,단어,weekend,주말,,
+5~6학년,앞으로 할 일 (미래),Simple Sentences,10~12세,앞으로 할 일을 말해요,문장,I will visit my grandma tomorrow.,나는 내일 할머니를 찾아뵐 거예요.,,
+5~6학년,앞으로 할 일 (미래),Simple Sentences,10~12세,앞으로 할 일을 말해요,문장,We are going to go camping.,우리는 캠핑을 갈 거예요.,,
+5~6학년,앞으로 할 일 (미래),Simple Sentences,10~12세,앞으로 할 일을 말해요,문장,What will you do this weekend?,너는 이번 주말에 무엇을 할 거니?,,
+5~6학년,앞으로 할 일 (미래),Simple Sentences,10~12세,앞으로 할 일을 말해요,빈칸,I ___ help my mom tomorrow.,나는 내일 엄마를 도울 거예요.,will,am / did
+5~6학년,앞으로 할 일 (미래),Simple Sentences,10~12세,앞으로 할 일을 말해요,빈칸,She is going to ___ a book.,그녀는 책을 읽을 거예요.,read,reads / reading
+5~6학년,앞으로 할 일 (미래),Simple Sentences,10~12세,앞으로 할 일을 말해요,대화,What will you do tomorrow?,내일 뭐 할 거니?,I will play baduk with my dad.,I played baduk yesterday. / It is tomorrow.
+5~6학년,앞으로 할 일 (미래),Simple Sentences,10~12세,앞으로 할 일을 말해요,읽기,Next week is summer vacation. Minho is going to visit Jeju Island. He will ride a horse and take many pictures. Q: What will Minho ride?,다음 주는 여름 방학이에요. 민호는 제주도에 갈 거예요. 말을 타고 사진을 많이 찍을 거예요.,A horse,A bike / A bus
+5~6학년,비교하기,Simple Sentences,10~12세,둘을 비교해서 말해요,단어,taller,더 키가 큰,,
+5~6학년,비교하기,Simple Sentences,10~12세,둘을 비교해서 말해요,단어,bigger,더 큰,,
+5~6학년,비교하기,Simple Sentences,10~12세,둘을 비교해서 말해요,단어,faster,더 빠른,,
+5~6학년,비교하기,Simple Sentences,10~12세,둘을 비교해서 말해요,단어,smaller,더 작은,,
+5~6학년,비교하기,Simple Sentences,10~12세,둘을 비교해서 말해요,단어,heavier,더 무거운,,
+5~6학년,비교하기,Simple Sentences,10~12세,둘을 비교해서 말해요,단어,the biggest,가장 큰,,
+5~6학년,비교하기,Simple Sentences,10~12세,둘을 비교해서 말해요,문장,An elephant is bigger than a dog.,코끼리는 개보다 더 커요.,,
+5~6학년,비교하기,Simple Sentences,10~12세,둘을 비교해서 말해요,문장,A cheetah is faster than a lion.,치타는 사자보다 더 빨라요.,,
+5~6학년,비교하기,Simple Sentences,10~12세,둘을 비교해서 말해요,문장,Tom is taller than me.,톰은 나보다 키가 더 커요.,,
+5~6학년,비교하기,Simple Sentences,10~12세,둘을 비교해서 말해요,문장,The blue whale is the biggest animal.,대왕고래는 가장 큰 동물이에요.,,
+5~6학년,비교하기,Simple Sentences,10~12세,둘을 비교해서 말해요,빈칸,A mouse is ___ than a cat.,쥐는 고양이보다 더 작아요.,smaller,small / smallest
+5~6학년,비교하기,Simple Sentences,10~12세,둘을 비교해서 말해요,빈칸,My bag is heavier ___ yours.,내 가방은 네 것보다 더 무거워요.,than,that / then
+5~6학년,충고와 규칙,Simple Sentences,10~12세,충고와 규칙을 말해요,단어,should,~하는 게 좋다,,
+5~6학년,충고와 규칙,Simple Sentences,10~12세,충고와 규칙을 말해요,단어,must,~해야 한다,,
+5~6학년,충고와 규칙,Simple Sentences,10~12세,충고와 규칙을 말해요,단어,rule,규칙,,
+5~6학년,충고와 규칙,Simple Sentences,10~12세,충고와 규칙을 말해요,단어,wash,씻다,,
+5~6학년,충고와 규칙,Simple Sentences,10~12세,충고와 규칙을 말해요,단어,helmet,헬멧,,
+5~6학년,충고와 규칙,Simple Sentences,10~12세,충고와 규칙을 말해요,문장,You should wash your hands.,너는 손을 씻는 게 좋아.,,
+5~6학년,충고와 규칙,Simple Sentences,10~12세,충고와 규칙을 말해요,문장,You must wear a helmet.,너는 헬멧을 써야 해.,,
+5~6학년,충고와 규칙,Simple Sentences,10~12세,충고와 규칙을 말해요,문장,You should not run here.,여기서 뛰면 안 돼.,,
+5~6학년,충고와 규칙,Simple Sentences,10~12세,충고와 규칙을 말해요,빈칸,You ___ see a doctor.,너는 의사에게 가 보는 게 좋아.,should,are / is
+5~6학년,충고와 규칙,Simple Sentences,10~12세,충고와 규칙을 말해요,빈칸,We must ___ the rules.,우리는 규칙을 따라야 해요.,follow,follows / following
+5~6학년,충고와 규칙,Simple Sentences,10~12세,충고와 규칙을 말해요,대화,I have a headache.,나 머리가 아파.,You should get some rest.,You should run fast. / I like headaches.
+5~6학년,여행 영어,Places,8세 이상,여행 상황에서 말해요,단어,airport,공항,,
+5~6학년,여행 영어,Places,8세 이상,여행 상황에서 말해요,단어,passport,여권,,
+5~6학년,여행 영어,Places,8세 이상,여행 상황에서 말해요,단어,ticket,표,,
+5~6학년,여행 영어,Places,8세 이상,여행 상황에서 말해요,단어,hotel,호텔,,
+5~6학년,여행 영어,Places,8세 이상,여행 상황에서 말해요,단어,map,지도,,
+5~6학년,여행 영어,Places,8세 이상,여행 상황에서 말해요,단어,station,역,,
+5~6학년,여행 영어,Places,8세 이상,여행 상황에서 말해요,문장,Where is the station?,역은 어디에 있나요?,,
+5~6학년,여행 영어,Places,8세 이상,여행 상황에서 말해요,문장,Go straight and turn left.,곧장 가서 왼쪽으로 도세요.,,
+5~6학년,여행 영어,Places,8세 이상,여행 상황에서 말해요,문장,How much is this ticket?,이 표는 얼마예요?,,
+5~6학년,여행 영어,Places,8세 이상,여행 상황에서 말해요,문장,"Can I have some water, please?",물 좀 주시겠어요?,,
+5~6학년,여행 영어,Places,8세 이상,여행 상황에서 말해요,대화,Where is the hotel?,호텔은 어디에 있나요?,It's next to the bank.,It's ten dollars. / I am a hotel.
+5~6학년,여행 영어,Places,8세 이상,여행 상황에서 말해요,대화,How much is it?,그것은 얼마예요?,It's five dollars.,It's over there. / It's Monday.
+5~6학년,여행 영어,Places,8세 이상,여행 상황에서 말해요,읽기,Sora is at the airport with her parents. She shows her passport and ticket. Then she waits for the plane to London. Q: Where is Sora going?,소라는 부모님과 공항에 있어요. 여권과 표를 보여 줘요. 그리고 런던행 비행기를 기다려요.,To London,To Seoul / To Paris
+5~6학년,지구와 환경,Nature,10~12세,환경에 관한 글을 읽어요,단어,earth,지구,,
+5~6학년,지구와 환경,Nature,10~12세,환경에 관한 글을 읽어요,단어,forest,숲,,
+5~6학년,지구와 환경,Nature,10~12세,환경에 관한 글을 읽어요,단어,ocean,바다,,
+5~6학년,지구와 환경,Nature,10~12세,환경에 관한 글을 읽어요,단어,recycle,재활용하다,,
+5~6학년,지구와 환경,Nature,10~12세,환경에 관한 글을 읽어요,단어,trash,쓰레기,,
+5~6학년,지구와 환경,Nature,10~12세,환경에 관한 글을 읽어요,단어,energy,에너지,,
+5~6학년,지구와 환경,Nature,10~12세,환경에 관한 글을 읽어요,문장,We should save energy.,우리는 에너지를 아껴야 해요.,,
+5~6학년,지구와 환경,Nature,10~12세,환경에 관한 글을 읽어요,문장,Please do not throw trash in the ocean.,바다에 쓰레기를 버리지 마세요.,,
+5~6학년,지구와 환경,Nature,10~12세,환경에 관한 글을 읽어요,문장,Trees give us clean air.,나무는 우리에게 깨끗한 공기를 줘요.,,
+5~6학년,지구와 환경,Nature,10~12세,환경에 관한 글을 읽어요,읽기,"Many animals live in the forest. Trees give them food and homes. If we cut down too many trees, the animals lose their homes. Q: What do trees give animals?",많은 동물이 숲에 살아요. 나무는 동물에게 먹이와 집을 줘요. 나무를 너무 많이 베면 동물들은 집을 잃어요.,Food and homes,Cars and toys / Money and books
+5~6학년,지구와 환경,Nature,10~12세,환경에 관한 글을 읽어요,읽기,Plastic can stay in the ocean for hundreds of years. Sea animals sometimes eat it. So we should use less plastic and recycle more. Q: What should we do?,플라스틱은 바다에 수백 년 동안 남을 수 있어요. 바다 동물이 먹기도 해요. 그래서 플라스틱을 덜 쓰고 더 많이 재활용해야 해요.,Use less plastic,Eat more plastic / Throw plastic in the sea
+회화 마스터,처음 만났을 때,Greetings,8세 이상,처음 만난 사람과 인사해요,단어,Nice to meet you.,만나서 반가워요.,,
+회화 마스터,처음 만났을 때,Greetings,8세 이상,처음 만난 사람과 인사해요,단어,How are you?,어떻게 지내요?,,
+회화 마스터,처음 만났을 때,Greetings,8세 이상,처음 만난 사람과 인사해요,단어,See you later.,나중에 봐요.,,
+회화 마스터,처음 만났을 때,Greetings,8세 이상,처음 만난 사람과 인사해요,단어,What's your name?,이름이 뭐예요?,,
+회화 마스터,처음 만났을 때,Greetings,8세 이상,처음 만난 사람과 인사해요,회화,Hi! How are you?,안녕! 잘 지내?,"I'm good, thanks. And you? (잘 지내, 고마워. 너는?)",I'm ten years old. / It's on the table.
+회화 마스터,처음 만났을 때,Greetings,8세 이상,처음 만난 사람과 인사해요,회화,What's your name?,이름이 뭐야?,My name is Mina. (내 이름은 미나야.),I like pizza. / It's very big.
+회화 마스터,처음 만났을 때,Greetings,8세 이상,처음 만난 사람과 인사해요,회화,"Nice to meet you, Mina.","만나서 반가워, 미나야.","Nice to meet you, too. (나도 만나서 반가워.)",See you yesterday. / I am a table.
+회화 마스터,처음 만났을 때,Greetings,8세 이상,처음 만난 사람과 인사해요,회화,Where are you from?,어디에서 왔어?,I'm from Korea. (나는 한국에서 왔어.),I go by bus. / I'm very hungry.
+회화 마스터,처음 만났을 때,Greetings,8세 이상,처음 만난 사람과 인사해요,회화,How old are you?,몇 살이야?,I'm twelve years old. (나는 열두 살이야.),I have two cats. / It's twelve o'clock.
+회화 마스터,처음 만났을 때,Greetings,8세 이상,처음 만난 사람과 인사해요,회화,I have to go now. Bye!,이제 가야 해. 안녕!,Okay. See you later! (그래. 나중에 봐!),"Yes, I am a student. / I like blue."
+회화 마스터,나를 소개해요,Simple Sentences,8세 이상,나에 대해 말해요,단어,I live in Seoul.,나는 서울에 살아요.,,
+회화 마스터,나를 소개해요,Simple Sentences,8세 이상,나에 대해 말해요,단어,I am good at drawing.,나는 그림을 잘 그려요.,,
+회화 마스터,나를 소개해요,Simple Sentences,8세 이상,나에 대해 말해요,단어,I have a sister.,나는 언니(여동생)가 있어요.,,
+회화 마스터,나를 소개해요,Simple Sentences,8세 이상,나에 대해 말해요,단어,My favorite color is blue.,내가 가장 좋아하는 색은 파랑이에요.,,
+회화 마스터,나를 소개해요,Simple Sentences,8세 이상,나에 대해 말해요,회화,Where do you live?,어디에 살아?,I live in Seoul. (서울에 살아.),I like Seoul food. / It's on Monday.
+회화 마스터,나를 소개해요,Simple Sentences,8세 이상,나에 대해 말해요,회화,What grade are you in?,몇 학년이야?,I'm in the fifth grade. (5학년이야.),I got a good grade yesterday. / It's five dollars.
+회화 마스터,나를 소개해요,Simple Sentences,8세 이상,나에 대해 말해요,회화,What are you good at?,무엇을 잘해?,I'm good at drawing. (나는 그림을 잘 그려.),"I'm good, thank you. / I have a good pen."
+회화 마스터,나를 소개해요,Simple Sentences,8세 이상,나에 대해 말해요,회화,What is your favorite color?,가장 좋아하는 색은 뭐야?,My favorite color is blue. (가장 좋아하는 색은 파랑이야.),My favorite food is pizza. / I have a blue bag on Monday.
+회화 마스터,나를 소개해요,Simple Sentences,8세 이상,나에 대해 말해요,회화,Do you have any pets?,반려동물 있어?,"Yes, I have a small dog. (응, 작은 강아지가 있어.)","Yes, I am a pet. / No, I do not like school."
+회화 마스터,나를 소개해요,Simple Sentences,8세 이상,나에 대해 말해요,회화,Tell me about yourself.,너에 대해 말해 줘.,"I am Mina, and I love music. (나는 미나이고 음악을 정말 좋아해.)",You are very tall. / Tell me about it tomorrow.
+회화 마스터,가족 이야기,Family,8세 이상,가족을 소개해요,단어,How many people are in your family?,가족이 몇 명이에요?,,
+회화 마스터,가족 이야기,Family,8세 이상,가족을 소개해요,단어,My dad is a cook.,우리 아빠는 요리사예요.,,
+회화 마스터,가족 이야기,Family,8세 이상,가족을 소개해요,단어,She is older than me.,그녀는 나보다 나이가 많아요.,,
+회화 마스터,가족 이야기,Family,8세 이상,가족을 소개해요,단어,We look alike.,우리는 닮았어요.,,
+회화 마스터,가족 이야기,Family,8세 이상,가족을 소개해요,회화,How many people are in your family?,가족이 몇 명이야?,There are four people in my family. (우리 가족은 네 명이야.),I have four pencils in my bag. / My family is very late.
+회화 마스터,가족 이야기,Family,8세 이상,가족을 소개해요,회화,Do you have any brothers or sisters?,형제나 자매가 있어?,"Yes, I have one little brother. (응, 남동생이 한 명 있어.)","Yes, my mother is a teacher. / No, I do not like apples."
+회화 마스터,가족 이야기,Family,8세 이상,가족을 소개해요,회화,What does your dad do?,아빠는 무슨 일을 하셔?,He is a cook. (요리사셔.),He is very tall. / He does not like cats.
+회화 마스터,가족 이야기,Family,8세 이상,가족을 소개해요,회화,Is your sister older than you?,언니가 너보다 나이가 많아?,"Yes, she is two years older. (응, 두 살 많아.)","Yes, she is in the kitchen. / No, she is my teacher."
+회화 마스터,가족 이야기,Family,8세 이상,가족을 소개해요,회화,Who do you look like?,너는 누구를 닮았어?,I look like my mom. (나는 엄마를 닮았어.),I like my mom. / I am looking at my book.
+회화 마스터,가족 이야기,Family,8세 이상,가족을 소개해요,회화,What do you do with your family on weekends?,주말에 가족과 뭘 해?,We go hiking together. (같이 등산을 가.),We were at school yesterday. / There are four of us.
+회화 마스터,학교에서,School,8세 이상,학교에서 묻고 답해요,단어,What is your favorite subject?,가장 좋아하는 과목이 뭐예요?,,
+회화 마스터,학교에서,School,8세 이상,학교에서 묻고 답해요,단어,May I borrow your pen?,펜 좀 빌려도 될까요?,,
+회화 마스터,학교에서,School,8세 이상,학교에서 묻고 답해요,단어,I forgot my homework.,숙제를 깜빡했어요.,,
+회화 마스터,학교에서,School,8세 이상,학교에서 묻고 답해요,단어,Can I go to the bathroom?,화장실에 가도 될까요?,,
+회화 마스터,학교에서,School,8세 이상,학교에서 묻고 답해요,회화,What is your favorite subject?,가장 좋아하는 과목이 뭐야?,I like science the most. (과학을 제일 좋아해.),I go to school by bus. / My teacher is very tall.
+회화 마스터,학교에서,School,8세 이상,학교에서 묻고 답해요,회화,May I borrow your pen?,펜 좀 빌려도 돼?,Sure. Here you are. (그럼. 여기 있어.),"No, I am a pen. / Yes, I am fine, thanks."
+회화 마스터,학교에서,School,8세 이상,학교에서 묻고 답해요,회화,Did you finish your homework?,숙제 다 했어?,"No, I forgot my homework. (아니, 숙제를 깜빡했어.)","Yes, I am going home now. / No, it is on Friday."
+회화 마스터,학교에서,School,8세 이상,학교에서 묻고 답해요,회화,How do you go to school?,학교에 어떻게 가?,I walk to school. (걸어서 가.),I like my school. / I go at eight.
+회화 마스터,학교에서,School,8세 이상,학교에서 묻고 답해요,회화,What time does school start?,학교는 몇 시에 시작해?,It starts at nine. (9시에 시작해.),It is next to the park. / I start with math homework.
+회화 마스터,학교에서,School,8세 이상,학교에서 묻고 답해요,회화,"Teacher, can I go to the bathroom?","선생님, 화장실에 가도 될까요?","Yes, you may. Come back soon. (그래, 다녀오렴. 빨리 돌아와.)","Yes, it is my bathroom. / No, I cannot swim."
+회화 마스터,좋아하는 것,Simple Sentences,8세 이상,좋아하는 것을 묻고 답해요,단어,What do you like to do?,무엇을 하는 것을 좋아해요?,,
+회화 마스터,좋아하는 것,Simple Sentences,8세 이상,좋아하는 것을 묻고 답해요,단어,I really like soccer.,나는 축구를 정말 좋아해요.,,
+회화 마스터,좋아하는 것,Simple Sentences,8세 이상,좋아하는 것을 묻고 답해요,단어,I don't like spiders.,나는 거미를 좋아하지 않아요.,,
+회화 마스터,좋아하는 것,Simple Sentences,8세 이상,좋아하는 것을 묻고 답해요,단어,Me too!,나도요!,,
+회화 마스터,좋아하는 것,Simple Sentences,8세 이상,좋아하는 것을 묻고 답해요,회화,What do you like to do after school?,방과 후에 뭘 하는 걸 좋아해?,I like to play soccer. (축구하는 걸 좋아해.),I was at school. / I have soccer shoes in my bag.
+회화 마스터,좋아하는 것,Simple Sentences,8세 이상,좋아하는 것을 묻고 답해요,회화,I love ice cream!,나 아이스크림 정말 좋아해!,Me too! It is so good. (나도! 정말 맛있어.),Me too! I am a cream. / It is under the chair.
+회화 마스터,좋아하는 것,Simple Sentences,8세 이상,좋아하는 것을 묻고 답해요,회화,What kind of music do you like?,어떤 음악을 좋아해?,I like K-pop. (케이팝을 좋아해.),I like my music teacher tall. / I can play at three.
+회화 마스터,좋아하는 것,Simple Sentences,8세 이상,좋아하는 것을 묻고 답해요,회화,Do you like spiders?,거미 좋아해?,"No, I don't. They are scary. (아니. 무서워.)","No, I am not a spider. / Yes, they are in my lunch."
+회화 마스터,좋아하는 것,Simple Sentences,8세 이상,좋아하는 것을 묻고 답해요,회화,Who is your favorite singer?,가장 좋아하는 가수는 누구야?,My favorite singer is IU. (가장 좋아하는 가수는 아이유야.),I sing in the morning. / My favorite song is short.
+회화 마스터,좋아하는 것,Simple Sentences,8세 이상,좋아하는 것을 묻고 답해요,회화,"Which do you like better, cats or dogs?",고양이와 강아지 중 어느 쪽이 더 좋아?,I like dogs better. (강아지가 더 좋아.),"I have better shoes. / Yes, I do."
+회화 마스터,나의 하루,Daily Routines,8세 이상,하루 일과를 묻고 답해요,단어,What time do you get up?,몇 시에 일어나요?,,
+회화 마스터,나의 하루,Daily Routines,8세 이상,하루 일과를 묻고 답해요,단어,I usually eat breakfast at seven.,나는 보통 7시에 아침을 먹어요.,,
+회화 마스터,나의 하루,Daily Routines,8세 이상,하루 일과를 묻고 답해요,단어,I go to bed at ten.,나는 10시에 자요.,,
+회화 마스터,나의 하루,Daily Routines,8세 이상,하루 일과를 묻고 답해요,단어,I am busy today.,나는 오늘 바빠요.,,
+회화 마스터,나의 하루,Daily Routines,8세 이상,하루 일과를 묻고 답해요,회화,What time do you get up?,몇 시에 일어나?,I get up at seven. (7시에 일어나.),I get on the bus. / It is Tuesday today.
+회화 마스터,나의 하루,Daily Routines,8세 이상,하루 일과를 묻고 답해요,회화,What do you eat for breakfast?,아침으로 뭘 먹어?,I usually eat rice and soup. (보통 밥과 국을 먹어.),I usually eat at seven. / I eat with my brother.
+회화 마스터,나의 하루,Daily Routines,8세 이상,하루 일과를 묻고 답해요,회화,What do you do after school?,방과 후에 뭐 해?,I go to my piano class. (피아노 수업에 가.),I went to school yesterday. / It is after lunch.
+회화 마스터,나의 하루,Daily Routines,8세 이상,하루 일과를 묻고 답해요,회화,Are you free today?,오늘 시간 있어?,"Sorry, I'm busy today. (미안, 오늘은 바빠.)","Yes, it is free food. / Sorry, I am twelve."
+회화 마스터,나의 하루,Daily Routines,8세 이상,하루 일과를 묻고 답해요,회화,How often do you read books?,책을 얼마나 자주 읽어?,I read books every day. (매일 읽어.),I read about animals. / I read in my room.
+회화 마스터,나의 하루,Daily Routines,8세 이상,하루 일과를 묻고 답해요,회화,When do you go to bed?,언제 자?,I go to bed at ten. (10시에 자.),My bed is very soft. / I go by bike.
+회화 마스터,날씨와 시간,Weather,8세 이상,날씨와 시간을 묻고 답해요,단어,What's the weather like?,날씨가 어때요?,,
+회화 마스터,날씨와 시간,Weather,8세 이상,날씨와 시간을 묻고 답해요,단어,What time is it?,지금 몇 시예요?,,
+회화 마스터,날씨와 시간,Weather,8세 이상,날씨와 시간을 묻고 답해요,단어,It's raining outside.,밖에 비가 와요.,,
+회화 마스터,날씨와 시간,Weather,8세 이상,날씨와 시간을 묻고 답해요,단어,What day is it today?,오늘 무슨 요일이에요?,,
+회화 마스터,날씨와 시간,Weather,8세 이상,날씨와 시간을 묻고 답해요,회화,What's the weather like today?,오늘 날씨 어때?,It's sunny and warm. (화창하고 따뜻해.),It's three o'clock. / I like my new coat.
+회화 마스터,날씨와 시간,Weather,8세 이상,날씨와 시간을 묻고 답해요,회화,What time is it now?,지금 몇 시야?,It's half past two. (2시 반이야.),It's cloudy today. / It's on Sunday.
+회화 마스터,날씨와 시간,Weather,8세 이상,날씨와 시간을 묻고 답해요,회화,What day is it today?,오늘 무슨 요일이야?,It's Wednesday. (수요일이야.),It's windy. / It's four o'clock.
+회화 마스터,날씨와 시간,Weather,8세 이상,날씨와 시간을 묻고 답해요,회화,When is your birthday?,생일이 언제야?,It's on May tenth. (5월 10일이야.),It's ten years old. / It's in my room.
+회화 마스터,날씨와 시간,Weather,8세 이상,날씨와 시간을 묻고 답해요,회화,Do I need an umbrella?,우산이 필요할까?,Yes. It's raining outside. (응. 밖에 비가 와.),Yes. It is very sunny and dry. / No. I am an umbrella.
+회화 마스터,날씨와 시간,Weather,8세 이상,날씨와 시간을 묻고 답해요,회화,Which season do you like?,어느 계절을 좋아해?,I like spring because it is warm. (따뜻해서 봄을 좋아해.),I like my coat because it is red. / It is on the second floor.
+회화 마스터,친구와 약속,Simple Sentences,8세 이상,친구와 약속을 잡아요,단어,Let's play together!,같이 놀자!,,
+회화 마스터,친구와 약속,Simple Sentences,8세 이상,친구와 약속을 잡아요,단어,Do you want to come?,너도 올래?,,
+회화 마스터,친구와 약속,Simple Sentences,8세 이상,친구와 약속을 잡아요,단어,That sounds great.,그거 정말 좋다.,,
+회화 마스터,친구와 약속,Simple Sentences,8세 이상,친구와 약속을 잡아요,단어,How about tomorrow?,내일은 어때?,,
+회화 마스터,친구와 약속,Simple Sentences,8세 이상,친구와 약속을 잡아요,회화,Let's play soccer after school.,방과 후에 축구하자.,That sounds great! (그거 좋다!),It is a soccer shoe. / I played it last year.
+회화 마스터,친구와 약속,Simple Sentences,8세 이상,친구와 약속을 잡아요,회화,Do you want to come to my birthday party?,내 생일 파티에 올래?,"Yes, I'd love to! (응, 정말 가고 싶어!)","Yes, it is a big cake. / No, I'm twelve."
+회화 마스터,친구와 약속,Simple Sentences,8세 이상,친구와 약속을 잡아요,회화,Can you play today?,오늘 놀 수 있어?,"Sorry, I can't. How about tomorrow? (미안, 못 놀아. 내일은 어때?)","Sorry, it is my toy. / Yes, it was yesterday."
+회화 마스터,친구와 약속,Simple Sentences,8세 이상,친구와 약속을 잡아요,회화,What time should we meet?,몇 시에 만날까?,Let's meet at three. (3시에 만나자.),Let's meet at the park. / I met him last week.
+회화 마스터,친구와 약속,Simple Sentences,8세 이상,친구와 약속을 잡아요,회화,Where should we meet?,어디에서 만날까?,Let's meet at the park. (공원에서 만나자.),Let's meet at three. / I am from the park.
+회화 마스터,친구와 약속,Simple Sentences,8세 이상,친구와 약속을 잡아요,회화,Sorry I'm late.,늦어서 미안해.,That's okay. Let's go. (괜찮아. 가자.),You're welcome. Good night. / I am very tall.
+회화 마스터,식당에서 주문하기,Food,8세 이상,식당에서 주문해요,단어,"Can I have a hamburger, please?",햄버거 하나 주세요.,,
+회화 마스터,식당에서 주문하기,Food,8세 이상,식당에서 주문해요,단어,Anything to drink?,마실 것은요?,,
+회화 마스터,식당에서 주문하기,Food,8세 이상,식당에서 주문해요,단어,For here or to go?,"여기서 드세요, 가져가세요?",,
+회화 마스터,식당에서 주문하기,Food,8세 이상,식당에서 주문해요,단어,It smells delicious.,맛있는 냄새가 나요.,,
+회화 마스터,식당에서 주문하기,Food,8세 이상,식당에서 주문해요,회화,Hello. What would you like?,안녕하세요. 무엇을 드릴까요?,"Can I have a hamburger, please? (햄버거 하나 주세요.)",I would like to go home yesterday. / I am a hamburger.
+회화 마스터,식당에서 주문하기,Food,8세 이상,식당에서 주문해요,회화,Anything to drink?,마실 것은요?,"Orange juice, please. (오렌지 주스 주세요.)","Yes, I can swim. / A big hamburger, please."
+회화 마스터,식당에서 주문하기,Food,8세 이상,식당에서 주문해요,회화,For here or to go?,"여기서 드세요, 가져가세요?","For here, please. (여기서 먹을게요.)",I go by bus. / It is over there.
+회화 마스터,식당에서 주문하기,Food,8세 이상,식당에서 주문해요,회화,That will be seven dollars.,7달러입니다.,Here you are. (여기 있어요.),I am seven years old. / It is seven o'clock.
+회화 마스터,식당에서 주문하기,Food,8세 이상,식당에서 주문해요,회화,How is your food?,음식은 어때요?,It's really delicious. (정말 맛있어요.),"It's on the second floor. / I'm fine, thank you."
+회화 마스터,식당에서 주문하기,Food,8세 이상,식당에서 주문해요,회화,Do you want some more?,더 먹을래?,"No, thanks. I'm full. (아니, 괜찮아. 배불러.)","No, I am a student. / Yes, I was at home."
+회화 마스터,가게에서 물건 사기,Places,8세 이상,가게에서 물건을 사요,단어,How much is this?,이거 얼마예요?,,
+회화 마스터,가게에서 물건 사기,Places,8세 이상,가게에서 물건을 사요,단어,Can I try it on?,입어 봐도 될까요?,,
+회화 마스터,가게에서 물건 사기,Places,8세 이상,가게에서 물건을 사요,단어,It's too big for me.,저한테 너무 커요.,,
+회화 마스터,가게에서 물건 사기,Places,8세 이상,가게에서 물건을 사요,단어,I'll take it.,이걸로 살게요.,,
+회화 마스터,가게에서 물건 사기,Places,8세 이상,가게에서 물건을 사요,회화,Can I help you?,도와드릴까요?,"Yes, I'm looking for a cap. (네, 모자를 찾고 있어요.)","Yes, I can help my mom. / No, I am not a cap."
+회화 마스터,가게에서 물건 사기,Places,8세 이상,가게에서 물건을 사요,회화,How much is this T-shirt?,이 티셔츠 얼마예요?,It's twelve dollars. (12달러예요.),It's very soft and blue. / It's twelve o'clock.
+회화 마스터,가게에서 물건 사기,Places,8세 이상,가게에서 물건을 사요,회화,Can I try it on?,입어 봐도 될까요?,Sure. The fitting room is over there. (그럼요. 탈의실은 저쪽이에요.),"Sure. It is on Tuesday. / No, I like apples."
+회화 마스터,가게에서 물건 사기,Places,8세 이상,가게에서 물건을 사요,회화,How does it fit?,잘 맞아요?,It's too big for me. (저한테 너무 커요.),I fit in the bus. / It's too late for dinner.
+회화 마스터,가게에서 물건 사기,Places,8세 이상,가게에서 물건을 사요,회화,Do you have a smaller one?,더 작은 것 있어요?,"Yes, here is a small one. (네, 작은 것 여기 있어요.)","Yes, I have a small dog at home. / No, I am very small."
+회화 마스터,가게에서 물건 사기,Places,8세 이상,가게에서 물건을 사요,회화,Do you want this one?,이걸로 하시겠어요?,"Yes, I'll take it. (네, 이걸로 살게요.)","Yes, I took a bus. / No, it is yesterday."
+회화 마스터,길 찾기,Places,8세 이상,길을 묻고 알려 줘요,단어,Excuse me.,실례합니다.,,
+회화 마스터,길 찾기,Places,8세 이상,길을 묻고 알려 줘요,단어,Where is the library?,도서관이 어디에 있어요?,,
+회화 마스터,길 찾기,Places,8세 이상,길을 묻고 알려 줘요,단어,Go straight and turn left.,곧장 가서 왼쪽으로 도세요.,,
+회화 마스터,길 찾기,Places,8세 이상,길을 묻고 알려 줘요,단어,It's across from the bank.,은행 맞은편에 있어요.,,
+회화 마스터,길 찾기,Places,8세 이상,길을 묻고 알려 줘요,회화,Excuse me. Where is the library?,실례합니다. 도서관이 어디에 있어요?,Go straight and turn left. (곧장 가서 왼쪽으로 도세요.),I read books at night. / It's a very big book.
+회화 마스터,길 찾기,Places,8세 이상,길을 묻고 알려 줘요,회화,Is it far from here?,여기서 멀어요?,"No, it's a five-minute walk. (아니요, 걸어서 5분이에요.)","No, it is five dollars. / Yes, I'm five years old."
+회화 마스터,길 찾기,Places,8세 이상,길을 묻고 알려 줘요,회화,Where is the bus stop?,버스 정류장이 어디예요?,It's across from the bank. (은행 맞은편에 있어요.),I go there by bus. / It's at two o'clock.
+회화 마스터,길 찾기,Places,8세 이상,길을 묻고 알려 줘요,회화,How can I get to the museum?,박물관에 어떻게 가요?,You can take the subway. (지하철을 타면 돼요.),You can eat the museum. / I got a museum ticket yesterday.
+회화 마스터,길 찾기,Places,8세 이상,길을 묻고 알려 줘요,회화,Is there a bathroom near here?,이 근처에 화장실이 있어요?,"Yes, it's right over there. (네, 바로 저기 있어요.)","Yes, I washed my hands. / No, it's very delicious."
+회화 마스터,길 찾기,Places,8세 이상,길을 묻고 알려 줘요,회화,Thank you for your help.,도와주셔서 고마워요.,You're welcome. (천만에요.),"Yes, please. / I'm sorry to hear that."
+회화 마스터,아플 때,Body,8세 이상,아픈 곳을 말해요,단어,What's wrong?,무슨 일이에요?,,
+회화 마스터,아플 때,Body,8세 이상,아픈 곳을 말해요,단어,I have a headache.,머리가 아파요.,,
+회화 마스터,아플 때,Body,8세 이상,아픈 곳을 말해요,단어,You should get some rest.,좀 쉬는 게 좋겠어요.,,
+회화 마스터,아플 때,Body,8세 이상,아픈 곳을 말해요,단어,I hope you feel better.,빨리 나으면 좋겠어요.,,
+회화 마스터,아플 때,Body,8세 이상,아픈 곳을 말해요,회화,You look sick. What's wrong?,아파 보여. 무슨 일이야?,I have a headache. (머리가 아파.),I have a new bag. / I'm good at math.
+회화 마스터,아플 때,Body,8세 이상,아픈 곳을 말해요,회화,Do you have a fever?,열이 있어?,"Yes, I feel very hot. (응, 몸이 아주 뜨거워.)","Yes, I like hot dogs. / No, it's a nice day."
+회화 마스터,아플 때,Body,8세 이상,아픈 곳을 말해요,회화,What should I do?,어떻게 해야 할까?,You should get some rest. (좀 쉬는 게 좋겠어.),You should eat more candy. / You were at home.
+회화 마스터,아플 때,Body,8세 이상,아픈 곳을 말해요,회화,Where does it hurt?,어디가 아파요?,My stomach hurts. (배가 아파요.),I hurt it yesterday at noon. / It is in my school bag.
+회화 마스터,아플 때,Body,8세 이상,아픈 곳을 말해요,회화,Take this medicine after meals.,식사 후에 이 약을 먹으렴.,"Okay. Thank you, doctor. (네. 고맙습니다, 의사 선생님.)","Okay. I will take the bus. / No, it is my lunch box."
+회화 마스터,아플 때,Body,8세 이상,아픈 곳을 말해요,회화,I have a bad cold.,나 감기가 심하게 걸렸어.,Oh no! I hope you feel better. (저런! 빨리 나으면 좋겠다.),Great! Good for you. / Me too! That is so fun.
+회화 마스터,못 알아들었을 때,Simple Sentences,8세 이상,못 알아들었을 때 다시 물어요,단어,Can you say that again?,다시 말해 줄래요?,,
+회화 마스터,못 알아들었을 때,Simple Sentences,8세 이상,못 알아들었을 때 다시 물어요,단어,Please speak slowly.,천천히 말해 주세요.,,
+회화 마스터,못 알아들었을 때,Simple Sentences,8세 이상,못 알아들었을 때 다시 물어요,단어,What does it mean?,그게 무슨 뜻이에요?,,
+회화 마스터,못 알아들었을 때,Simple Sentences,8세 이상,못 알아들었을 때 다시 물어요,단어,How do you say this in English?,이걸 영어로 뭐라고 해요?,,
+회화 마스터,못 알아들었을 때,Simple Sentences,8세 이상,못 알아들었을 때 다시 물어요,회화,Did you understand me?,내 말 이해했어?,Sorry. Can you say that again? (미안해. 다시 말해 줄래?),"Yes, I am under the table. / Sorry, I am twelve."
+회화 마스터,못 알아들었을 때,Simple Sentences,8세 이상,못 알아들었을 때 다시 물어요,회화,"I was talking too fast, right?",내가 너무 빨리 말했지?,Yes. Please speak slowly. (응. 천천히 말해 줘.),Yes. Please eat quickly. / No. I walk to school.
+회화 마스터,못 알아들었을 때,Simple Sentences,8세 이상,못 알아들었을 때 다시 물어요,회화,"This word is ""huge"".","이 단어는 ""huge""야.",What does it mean? (그게 무슨 뜻이야?),Where does it live? / How old is it?
+회화 마스터,못 알아들었을 때,Simple Sentences,8세 이상,못 알아들었을 때 다시 물어요,회화,"""Huge"" means very big.","""huge""는 아주 크다는 뜻이야.","Oh, I see. Thank you. (아, 알겠어. 고마워.)","Oh, it is my birthday. / No, I can't swim."
+회화 마스터,못 알아들었을 때,Simple Sentences,8세 이상,못 알아들었을 때 다시 물어요,회화,Is this your first time speaking English?,영어로 말하는 게 처음이야?,"Yes, but I am learning. (응, 하지만 배우고 있어.)","Yes, I am speaking Tuesday. / No, it is my first pizza."
+회화 마스터,못 알아들었을 때,Simple Sentences,8세 이상,못 알아들었을 때 다시 물어요,회화,How can I help you?,어떻게 도와줄까?,How do you say this in English? (이걸 영어로 뭐라고 해?),How old is your English teacher today? / Where did you go last weekend?
+회화 마스터,어제 있었던 일,Simple Sentences,8세 이상,지난 일을 이야기해요,단어,What did you do yesterday?,어제 뭐 했어요?,,
+회화 마스터,어제 있었던 일,Simple Sentences,8세 이상,지난 일을 이야기해요,단어,I went to the zoo.,동물원에 갔어요.,,
+회화 마스터,어제 있었던 일,Simple Sentences,8세 이상,지난 일을 이야기해요,단어,It was so much fun.,정말 재미있었어요.,,
+회화 마스터,어제 있었던 일,Simple Sentences,8세 이상,지난 일을 이야기해요,단어,Did you have a good weekend?,주말 잘 보냈어요?,,
+회화 마스터,어제 있었던 일,Simple Sentences,8세 이상,지난 일을 이야기해요,회화,What did you do yesterday?,어제 뭐 했어?,I went to the zoo. (동물원에 갔어.),I will go to the zoo. / I am at the zoo now.
+회화 마스터,어제 있었던 일,Simple Sentences,8세 이상,지난 일을 이야기해요,회화,Who did you go with?,누구랑 갔어?,I went with my cousin. (사촌이랑 갔어.),I went there by car. / I went at ten.
+회화 마스터,어제 있었던 일,Simple Sentences,8세 이상,지난 일을 이야기해요,회화,What did you see there?,거기서 뭘 봤어?,I saw a baby elephant. (아기 코끼리를 봤어.),I see you tomorrow. / I ate there.
+회화 마스터,어제 있었던 일,Simple Sentences,8세 이상,지난 일을 이야기해요,회화,How was it?,어땠어?,It was so much fun. (정말 재미있었어.),It is two dollars. / It was at home yesterday night.
+회화 마스터,어제 있었던 일,Simple Sentences,8세 이상,지난 일을 이야기해요,회화,Did you have a good weekend?,주말 잘 보냈어?,"Yes, I did. I visited my grandma. (응. 할머니 댁에 갔어.)","Yes, I will visit my grandma. / No, I am not a weekend."
+회화 마스터,어제 있었던 일,Simple Sentences,8세 이상,지난 일을 이야기해요,회화,What did you eat for lunch?,점심으로 뭘 먹었어?,I ate kimbap at school. (학교에서 김밥을 먹었어.),I eat at noon. / I will eat lunch soon.
+회화 마스터,앞으로의 계획,Simple Sentences,8세 이상,계획을 이야기해요,단어,What are you going to do?,무엇을 할 거예요?,,
+회화 마스터,앞으로의 계획,Simple Sentences,8세 이상,계획을 이야기해요,단어,I am going to visit Jeju.,제주도에 갈 거예요.,,
+회화 마스터,앞으로의 계획,Simple Sentences,8세 이상,계획을 이야기해요,단어,I want to be a doctor.,의사가 되고 싶어요.,,
+회화 마스터,앞으로의 계획,Simple Sentences,8세 이상,계획을 이야기해요,단어,That sounds exciting.,신나겠어요.,,
+회화 마스터,앞으로의 계획,Simple Sentences,8세 이상,계획을 이야기해요,회화,What are you going to do this weekend?,이번 주말에 뭐 할 거야?,I'm going to see a movie. (영화를 볼 거야.),I saw a movie last week. / I go to school on weekdays.
+회화 마스터,앞으로의 계획,Simple Sentences,8세 이상,계획을 이야기해요,회화,Where will you go this summer?,이번 여름에 어디에 갈 거야?,I will go to Jeju Island. (제주도에 갈 거야.),I went to Jeju last year. / I go swimming in summer.
+회화 마스터,앞으로의 계획,Simple Sentences,8세 이상,계획을 이야기해요,회화,What do you want to be in the future?,나중에 뭐가 되고 싶어?,I want to be a doctor. (의사가 되고 싶어.),I want to eat a sandwich. / I was a good student.
+회화 마스터,앞으로의 계획,Simple Sentences,8세 이상,계획을 이야기해요,회화,Why do you want to be a doctor?,왜 의사가 되고 싶어?,Because I want to help sick people. (아픈 사람들을 돕고 싶어서야.),"Because I am at the hospital now. / Yes, I want to."
+회화 마스터,앞으로의 계획,Simple Sentences,8세 이상,계획을 이야기해요,회화,Are you going to join the art club?,미술 동아리에 들어갈 거야?,"Yes, I am. I love painting. (응. 그림 그리기를 정말 좋아하거든.)","Yes, it was a nice painting. / No, it is on the wall."
+회화 마스터,앞으로의 계획,Simple Sentences,8세 이상,계획을 이야기해요,회화,I am going to Japan next month.,다음 달에 일본에 가.,"Wow, that sounds exciting! (와, 신나겠다!)","Oh, I am sorry to hear that. / You went there last year."
+회화 마스터,내 생각 말하기,Simple Sentences,8세 이상,내 생각과 이유를 말해요,단어,What do you think?,어떻게 생각해요?,,
+회화 마스터,내 생각 말하기,Simple Sentences,8세 이상,내 생각과 이유를 말해요,단어,"I think so, too.",나도 그렇게 생각해요.,,
+회화 마스터,내 생각 말하기,Simple Sentences,8세 이상,내 생각과 이유를 말해요,단어,I don't think so.,나는 그렇게 생각하지 않아요.,,
+회화 마스터,내 생각 말하기,Simple Sentences,8세 이상,내 생각과 이유를 말해요,단어,Because it is fun.,재미있기 때문이에요.,,
+회화 마스터,내 생각 말하기,Simple Sentences,8세 이상,내 생각과 이유를 말해요,회화,This movie is really good. What do you think?,이 영화 정말 좋다. 어떻게 생각해?,"I think so, too. (나도 그렇게 생각해.)","I go there, too. / It is my movie ticket."
+회화 마스터,내 생각 말하기,Simple Sentences,8세 이상,내 생각과 이유를 말해요,회화,Math is the easiest subject.,수학이 제일 쉬운 과목이야.,I don't think so. It's hard for me. (난 그렇게 생각 안 해. 나한텐 어려워.),"I don't have it. It is on the desk. / Yes, I go to math at nine."
+회화 마스터,내 생각 말하기,Simple Sentences,8세 이상,내 생각과 이유를 말해요,회화,Why do you like summer?,왜 여름을 좋아해?,Because I can swim in the sea. (바다에서 수영할 수 있으니까.),"Yes, I like it. / I swam on Monday morning."
+회화 마스터,내 생각 말하기,Simple Sentences,8세 이상,내 생각과 이유를 말해요,회화,"Which is better, this one or that one?",이것과 저것 중 어느 게 더 좋아?,I think this one is better. (이게 더 좋은 것 같아.),"This one is yesterday. / I am better now, thanks."
+회화 마스터,내 생각 말하기,Simple Sentences,8세 이상,내 생각과 이유를 말해요,회화,We should save water. Do you agree?,우리는 물을 아껴야 해. 동의해?,"Yes, I agree with you. (응, 네 말에 동의해.)","Yes, I am very thirsty. / No, I am in the water."
+회화 마스터,내 생각 말하기,Simple Sentences,8세 이상,내 생각과 이유를 말해요,회화,Is it a good idea to read every day?,매일 책을 읽는 게 좋은 생각일까?,"Yes, because we can learn a lot. (응, 많이 배울 수 있으니까.)","Yes, because it is on the table. / No, because I have a red pen."
+회화 마스터,기분을 나누고 위로하기,Feelings,8세 이상,기분을 나누고 위로해요,단어,Are you okay?,괜찮아요?,,
+회화 마스터,기분을 나누고 위로하기,Feelings,8세 이상,기분을 나누고 위로해요,단어,Don't worry.,걱정하지 마요.,,
+회화 마스터,기분을 나누고 위로하기,Feelings,8세 이상,기분을 나누고 위로해요,단어,I'm sorry to hear that.,그 말을 들으니 안타까워요.,,
+회화 마스터,기분을 나누고 위로하기,Feelings,8세 이상,기분을 나누고 위로해요,단어,Congratulations!,축하해요!,,
+회화 마스터,기분을 나누고 위로하기,Feelings,8세 이상,기분을 나누고 위로해요,회화,You look sad. Are you okay?,슬퍼 보여. 괜찮아?,I lost my favorite toy. (제일 좋아하는 장난감을 잃어버렸어.),I got a new toy. I am so happy. / I look like my dad.
+회화 마스터,기분을 나누고 위로하기,Feelings,8세 이상,기분을 나누고 위로해요,회화,I lost my favorite toy.,제일 좋아하는 장난감을 잃어버렸어.,I'm sorry to hear that. (그 말을 들으니 안타까워.),Congratulations! / That sounds great!
+회화 마스터,기분을 나누고 위로하기,Feelings,8세 이상,기분을 나누고 위로해요,회화,I am nervous about the test.,시험 때문에 긴장돼.,Don't worry. You can do it! (걱정 마. 넌 할 수 있어!),Great. I am a test. / It was fun yesterday.
+회화 마스터,기분을 나누고 위로하기,Feelings,8세 이상,기분을 나누고 위로해요,회화,I won first prize!,나 일등 상 받았어!,"Wow, congratulations! (와, 축하해!)",I'm sorry to hear that. / Don't worry about it.
+회화 마스터,기분을 나누고 위로하기,Feelings,8세 이상,기분을 나누고 위로해요,회화,How do you feel today?,오늘 기분이 어때?,I feel great today. (오늘 기분이 정말 좋아.),I feel the table today. / I am good at soccer.
+회화 마스터,기분을 나누고 위로하기,Feelings,8세 이상,기분을 나누고 위로해요,회화,Thank you for helping me.,도와줘서 고마워.,No problem. That's what friends are for. (별거 아니야. 친구 좋다는 게 그런 거지.),"Sorry, I am not your book. / Oh no, that is too bad."
+회화 마스터,친구와 온라인 대화,Greetings,8세 이상,온라인에서 안전하게 말해요,단어,"Hi, everyone!",모두 안녕!,,
+회화 마스터,친구와 온라인 대화,Greetings,8세 이상,온라인에서 안전하게 말해요,단어,What are you doing?,뭐 하고 있어?,,
+회화 마스터,친구와 온라인 대화,Greetings,8세 이상,온라인에서 안전하게 말해요,단어,Good game!,잘했어! (좋은 경기였어!),,
+회화 마스터,친구와 온라인 대화,Greetings,8세 이상,온라인에서 안전하게 말해요,단어,I have to go now.,이제 가야 해.,,
+회화 마스터,친구와 온라인 대화,Greetings,8세 이상,온라인에서 안전하게 말해요,회화,"Hi, everyone! What are you doing?",모두 안녕! 뭐 하고 있어?,I'm playing with my pet. (내 펫이랑 놀고 있어.),I played yesterday. / I'm twelve years old.
+회화 마스터,친구와 온라인 대화,Greetings,8세 이상,온라인에서 안전하게 말해요,회화,Can you help me with this level?,이 레벨 좀 도와줄래?,Sure! Follow me. (그럼! 나를 따라와.),"Sure! It is Monday. / No, I am a level."
+회화 마스터,친구와 온라인 대화,Greetings,8세 이상,온라인에서 안전하게 말해요,회화,You played very well!,너 정말 잘했어!,Thanks! Good game! (고마워! 좋은 경기였어!),"Sorry, I am full. / It is under my bed."
+회화 마스터,친구와 온라인 대화,Greetings,8세 이상,온라인에서 안전하게 말해요,회화,What is your pet's name?,네 펫 이름이 뭐야?,My pet's name is Nabi. (내 펫 이름은 나비야.),My pet is three years old. / I have a pet on Sunday.
+회화 마스터,친구와 온라인 대화,Greetings,8세 이상,온라인에서 안전하게 말해요,회화,What is your phone number?,전화번호가 뭐야?,"Sorry, I can't share that online. (미안, 그건 온라인에서 알려 줄 수 없어.)","Sure, it is my home address. / Sure, come to my house."
+회화 마스터,친구와 온라인 대화,Greetings,8세 이상,온라인에서 안전하게 말해요,회화,I have to go now. See you!,이제 가야 해. 또 봐!,Okay. Bye! Have a good day! (그래. 안녕! 좋은 하루 보내!),"Yes, I went to the zoo. / Okay, I am playing now."
+회화 마스터,여행 영어,Places,8세 이상,여행 상황에서 말해요,단어,May I see your passport?,여권을 보여 주시겠어요?,,
+회화 마스터,여행 영어,Places,8세 이상,여행 상황에서 말해요,단어,How long will you stay?,얼마나 머무를 건가요?,,
+회화 마스터,여행 영어,Places,8세 이상,여행 상황에서 말해요,단어,I have a reservation.,예약을 했어요.,,
+회화 마스터,여행 영어,Places,8세 이상,여행 상황에서 말해요,단어,Could you take a picture of us?,우리 사진 좀 찍어 주시겠어요?,,
+회화 마스터,여행 영어,Places,8세 이상,여행 상황에서 말해요,회화,May I see your passport?,여권을 보여 주시겠어요?,"Yes, here it is. (네, 여기 있어요.)","Yes, I passed the test. / No, I am a passport."
+회화 마스터,여행 영어,Places,8세 이상,여행 상황에서 말해요,회화,What is the purpose of your visit?,방문 목적이 무엇인가요?,I'm here on vacation. (휴가로 왔어요.),I'm here at three. / I visited a bank.
+회화 마스터,여행 영어,Places,8세 이상,여행 상황에서 말해요,회화,How long will you stay?,얼마나 머무를 건가요?,I'll stay for five days. (5일 동안 있을 거예요.),I'll stay at the hotel. / I stayed in Seoul last year.
+회화 마스터,여행 영어,Places,8세 이상,여행 상황에서 말해요,회화,Welcome to our hotel. How can I help you?,저희 호텔에 오신 것을 환영합니다. 무엇을 도와드릴까요?,Hello. I have a reservation. (안녕하세요. 예약을 했어요.),Hello. I have a headache. / Hello. I am the hotel.
+회화 마스터,여행 영어,Places,8세 이상,여행 상황에서 말해요,회화,Excuse me. Could you take a picture of us?,실례합니다. 우리 사진 좀 찍어 주시겠어요?,Of course. Say cheese! (물론이죠. 치즈 하세요!),Of course. It is too big. / I took a bus to the picture.
+회화 마스터,여행 영어,Places,8세 이상,여행 상황에서 말해요,회화,Where is the nearest subway station?,가장 가까운 지하철역이 어디예요?,It's two blocks from here. (여기서 두 블록 가면 있어요.),It's two dollars for a ticket. / It's two o'clock.
+회화 마스터,대화 이어 가기,Simple Sentences,8세 이상,대화를 이어 가요,단어,Really? Tell me more.,정말? 더 말해 줘.,,
+회화 마스터,대화 이어 가기,Simple Sentences,8세 이상,대화를 이어 가요,단어,What about you?,너는 어때?,,
+회화 마스터,대화 이어 가기,Simple Sentences,8세 이상,대화를 이어 가요,단어,That is interesting.,그거 흥미롭다.,,
+회화 마스터,대화 이어 가기,Simple Sentences,8세 이상,대화를 이어 가요,단어,"By the way,","그런데,",,
+회화 마스터,대화 이어 가기,Simple Sentences,8세 이상,대화를 이어 가요,회화,I got a new puppy yesterday!,어제 새 강아지가 생겼어!,Really? Tell me more. (정말? 더 말해 줘.),"Yes, I am a puppy. / No, I got it tomorrow."
+회화 마스터,대화 이어 가기,Simple Sentences,8세 이상,대화를 이어 가요,회화,I like reading comics. What about you?,나는 만화 읽는 걸 좋아해. 너는?,I like playing the guitar. (나는 기타 치는 걸 좋아해.),I am reading on Friday. / Comics are on the desk.
+회화 마스터,대화 이어 가기,Simple Sentences,8세 이상,대화를 이어 가요,회화,Bees can dance to talk to each other.,벌은 춤으로 서로 이야기할 수 있어.,That is interesting! (그거 흥미롭다!),That is my bag. / I was a bee.
+회화 마스터,대화 이어 가기,Simple Sentences,8세 이상,대화를 이어 가요,회화,So that is my story.,이게 내 이야기야.,"Wow! By the way, how was your test? (와! 그런데 시험은 어땠어?)","Wow! My story is on Friday night. / Oh, I am twelve."
+회화 마스터,대화 이어 가기,Simple Sentences,8세 이상,대화를 이어 가요,회화,Can I ask you a question?,질문 하나 해도 돼?,Sure. Go ahead. (그럼. 말해 봐.),Sure. Go to bed. / No. I am a question.
+회화 마스터,대화 이어 가기,Simple Sentences,8세 이상,대화를 이어 가요,회화,It was nice talking to you.,이야기 나눠서 즐거웠어.,You too. Let's talk again soon. (나도. 곧 또 이야기하자.),You too. It is on the chair. / I talked to him last year.
+게임,문장 기차 easy,,,,문장,I like apples.,나는 사과를 좋아해요.,,
+게임,문장 기차 easy,,,,문장,The cat is sleeping.,고양이가 자고 있어요.,,
+게임,문장 기차 easy,,,,문장,I see a dog.,나는 강아지가 보여요.,,
+게임,문장 기차 easy,,,,문장,It is a ball.,그것은 공이에요.,,
+게임,문장 기차 easy,,,,문장,My friend is happy.,내 친구는 행복해요.,,
+게임,문장 기차 easy,,,,문장,We can swim.,우리는 수영할 수 있어요.,,
+게임,문장 기차 easy,,,,문장,I have a pen.,나는 펜이 있어요.,,
+게임,문장 기차 easy,,,,문장,The bus is big.,그 버스는 커요.,,
+게임,문장 기차 normal,,,,문장,I want a red balloon.,나는 빨간 풍선을 갖고 싶어요.,,
+게임,문장 기차 normal,,,,문장,The bird is in the tree.,새가 나무에 있어요.,,
+게임,문장 기차 normal,,,,문장,I go to school by bike.,나는 자전거로 학교에 가요.,,
+게임,문장 기차 normal,,,,문장,Can I have some milk?,우유 좀 주시겠어요?,,
+게임,문장 기차 normal,,,,문장,We play soccer after school.,우리는 방과 후에 축구를 해요.,,
+게임,문장 기차 normal,,,,문장,The dog is under the table.,강아지가 탁자 아래에 있어요.,,
+게임,문장 기차 normal,,,,문장,I brush my teeth every morning.,나는 매일 아침 이를 닦아요.,,
+게임,문장 기차 normal,,,,문장,My friend likes green apples.,내 친구는 초록 사과를 좋아해요.,,
+게임,이야기 극장 길 잃은 아기 고양이,,,,이야기,A little cat is lost in the park.,아기 고양이가 공원에서 길을 잃었어요.,,
+게임,이야기 극장 길 잃은 아기 고양이,,,,선택지,Look behind the tree.,나무 뒤를 봐요.,,
+게임,이야기 극장 길 잃은 아기 고양이,,,,선택지,Look under the bench.,벤치 아래를 봐요.,,
+게임,이야기 극장 길 잃은 아기 고양이,,,,이야기,"There is a bird behind the tree. The bird says, ""The cat is by the pond!""","나무 뒤에 새가 있어요. 새가 말해요. ""고양이는 연못 옆에 있어!""",,
+게임,이야기 극장 길 잃은 아기 고양이,,,,선택지,Go to the pond.,연못으로 가요.,,
+게임,이야기 극장 길 잃은 아기 고양이,,,,이야기,"There is a dog under the bench. The dog says, ""The cat is by the pond!""","벤치 아래에 강아지가 있어요. 강아지가 말해요. ""고양이는 연못 옆에 있어!""",,
+게임,이야기 극장 길 잃은 아기 고양이,,,,선택지,Go to the pond.,연못으로 가요.,,
+게임,이야기 극장 길 잃은 아기 고양이,,,,이야기,The cat is by the pond. It looks scared.,고양이가 연못 옆에 있어요. 무서워 보여요.,,
+게임,이야기 극장 길 잃은 아기 고양이,,,,선택지,Give it some milk.,우유를 줘요.,,
+게임,이야기 극장 길 잃은 아기 고양이,,,,선택지,Sing a song.,노래를 불러요.,,
+게임,이야기 극장 길 잃은 아기 고양이,,,,이야기,The cat drinks the milk. Now it is happy!,고양이가 우유를 마셔요. 이제 행복해요!,,
+게임,이야기 극장 길 잃은 아기 고양이,,,,선택지,Go home together.,같이 집에 가요.,,
+게임,이야기 극장 길 잃은 아기 고양이,,,,이야기,The cat likes your song. Now it is happy!,고양이는 네 노래가 좋아요. 이제 행복해요!,,
+게임,이야기 극장 길 잃은 아기 고양이,,,,선택지,Go home together.,같이 집에 가요.,,
+게임,이야기 극장 길 잃은 아기 고양이,,,,이야기,You and the cat go home together. The end!,너와 고양이는 함께 집에 가요. 끝!,,
+게임,이야기 극장 꼬미의 생일 파티,,,,이야기,Today is Komi's birthday. What should we make?,오늘은 꼬미의 생일이에요. 무엇을 만들까요?,,
+게임,이야기 극장 꼬미의 생일 파티,,,,선택지,Bake a cake.,케이크를 구워요.,,
+게임,이야기 극장 꼬미의 생일 파티,,,,선택지,Make a card.,카드를 만들어요.,,
+게임,이야기 극장 꼬미의 생일 파티,,,,이야기,You bake a big cake. It smells so good!,큰 케이크를 구웠어요. 냄새가 정말 좋아요!,,
+게임,이야기 극장 꼬미의 생일 파티,,,,선택지,Invite your friends.,친구들을 초대해요.,,
+게임,이야기 극장 꼬미의 생일 파티,,,,이야기,You draw a star on the card. It looks beautiful!,카드에 별을 그렸어요. 정말 예뻐요!,,
+게임,이야기 극장 꼬미의 생일 파티,,,,선택지,Invite your friends.,친구들을 초대해요.,,
+게임,이야기 극장 꼬미의 생일 파티,,,,이야기,Komi comes to the party and smiles.,꼬미가 파티에 와서 웃어요.,,
+게임,이야기 극장 꼬미의 생일 파티,,,,선택지,Sing together.,함께 노래해요.,,
+게임,이야기 극장 꼬미의 생일 파티,,,,선택지,Give Komi a hug.,꼬미를 안아 줘요.,,
+게임,이야기 극장 꼬미의 생일 파티,,,,이야기,"Everyone sings ""Happy Birthday."" Komi is very happy.",모두 생일 축하 노래를 불러요. 꼬미는 정말 행복해요.,,
+게임,이야기 극장 꼬미의 생일 파티,,,,선택지,"Say, ""Happy birthday!""","""생일 축하해!""라고 말해요.",,
+게임,이야기 극장 꼬미의 생일 파티,,,,이야기,"Komi gives you a big hug, too. Komi is very happy.",꼬미도 너를 꼭 안아 줘요. 꼬미는 정말 행복해요.,,
+게임,이야기 극장 꼬미의 생일 파티,,,,선택지,"Say, ""Happy birthday!""","""생일 축하해!""라고 말해요.",,
+게임,이야기 극장 꼬미의 생일 파티,,,,이야기,It is the best birthday ever. The end!,최고의 생일이에요. 끝!,,
+게임,이야기 극장 비 오는 날,,,,이야기,It is raining outside. Mina is at home.,밖에 비가 와요. 미나는 집에 있어요.,,
+게임,이야기 극장 비 오는 날,,,,선택지,Read a book.,책을 읽어요.,,
+게임,이야기 극장 비 오는 날,,,,선택지,Go out with an umbrella.,우산을 들고 나가요.,,
+게임,이야기 극장 비 오는 날,,,,이야기,Mina reads a book about the sea. She learns about whales.,미나는 바다에 관한 책을 읽어요. 고래에 대해 배워요.,,
+게임,이야기 극장 비 오는 날,,,,선택지,Look out the window.,창밖을 봐요.,,
+게임,이야기 극장 비 오는 날,,,,이야기,Mina jumps in the puddles. Splash!,미나가 물웅덩이에서 폴짝 뛰어요. 첨벙!,,
+게임,이야기 극장 비 오는 날,,,,선택지,Look up at the sky.,하늘을 올려다봐요.,,
+게임,이야기 극장 비 오는 날,,,,이야기,The rain stops. There is a rainbow in the sky!,비가 그쳐요. 하늘에 무지개가 떴어요!,,
+게임,이야기 극장 비 오는 날,,,,선택지,Draw the rainbow.,무지개를 그려요.,,
+게임,이야기 극장 비 오는 날,,,,선택지,Call a friend.,친구에게 전화해요.,,
+게임,이야기 극장 비 오는 날,,,,이야기,Mina draws the rainbow with seven colors.,미나는 일곱 가지 색으로 무지개를 그려요.,,
+게임,이야기 극장 비 오는 날,,,,선택지,Show it to Mom.,엄마에게 보여 줘요.,,
+게임,이야기 극장 비 오는 날,,,,이야기,Mina and her friend look at the rainbow together.,미나와 친구는 함께 무지개를 봐요.,,
+게임,이야기 극장 비 오는 날,,,,선택지,Smile and wave.,웃으며 손을 흔들어요.,,
+게임,이야기 극장 비 오는 날,,,,이야기,What a wonderful day! The end!,정말 멋진 날이에요! 끝!,,
+이야기 모험,1장 바람이 불어온 날,,,,대사,Hello! I am Teacher Bear.,안녕! 나는 곰 선생님이야.,,
+이야기 모험,1장 바람이 불어온 날,,,,대사,Look! The Word Tree has no leaves.,봐! 말 나무에 잎이 하나도 없어.,,
+이야기 모험,1장 바람이 불어온 날,,,,대사,The wind took all our words!,바람이 우리 말을 전부 가져갔어!,,
+이야기 모험,1장 바람이 불어온 날,,,,대사,"First, we need to find the letters.",먼저 글자들을 찾아야 해.,,
+이야기 모험,1장 바람이 불어온 날,,,,대사,Great job! You found the letters.,잘했어! 글자들을 찾았구나.,,
+이야기 모험,1장 바람이 불어온 날,,,,대사,Look! A new leaf!,봐! 새 잎이 났어!,,
+이야기 모험,1장 바람이 불어온 날,,,,대답,Will you help us?,우리를 도와줄래?,"Yes, I will!",It is a banana. / Good night.
+이야기 모험,2장 이름을 잃은 동물들,,,,대사,Oh no! The animals lost their names.,이런! 동물들이 이름을 잃어버렸어.,,
+이야기 모험,2장 이름을 잃은 동물들,,,,대사,This is a cat. That is a dog.,이건 고양이야. 저건 강아지야.,,
+이야기 모험,2장 이름을 잃은 동물들,,,,대사,Listen and find each animal.,잘 듣고 동물을 찾아 줘.,,
+이야기 모험,2장 이름을 잃은 동물들,,,,대사,Thank you! The animals are happy now.,고마워! 이제 동물들이 행복해.,,
+이야기 모험,2장 이름을 잃은 동물들,,,,대사,The tree has more leaves.,나무에 잎이 더 났어.,,
+이야기 모험,2장 이름을 잃은 동물들,,,,대답,Can you help the animals?,동물들을 도와줄 수 있어?,"Yes, I can!",I am a table. / It is Monday.
+이야기 모험,3장 색을 잃은 꽃밭,,,,대사,Look at the flowers. They have no color!,꽃들을 봐. 색이 하나도 없어!,,
+이야기 모험,3장 색을 잃은 꽃밭,,,,대사,I like red. What about you?,나는 빨강이 좋아. 너는?,,
+이야기 모험,3장 색을 잃은 꽃밭,,,,대사,Let us bring the colors back!,색을 다시 찾아오자!,,
+이야기 모험,3장 색을 잃은 꽃밭,,,,대사,Wow! The flowers are red and yellow.,와! 꽃들이 빨갛고 노래졌어.,,
+이야기 모험,3장 색을 잃은 꽃밭,,,,대사,They are so pretty!,정말 예뻐!,,
+이야기 모험,3장 색을 잃은 꽃밭,,,,대답,What color do you like?,어떤 색을 좋아해?,I like blue.,I am ten. / It is under the bed.
+이야기 모험,4장 배고픈 꼬미,,,,대사,I am so hungry!,나 너무 배고파!,,
+이야기 모험,4장 배고픈 꼬미,,,,대사,Let us open a cafe for our friends.,친구들을 위해 카페를 열자.,,
+이야기 모험,4장 배고픈 꼬미,,,,대사,"I want some milk and a cookie, please.",우유랑 쿠키 주세요.,,
+이야기 모험,4장 배고픈 꼬미,,,,대사,Yum! That was delicious.,냠! 정말 맛있었어.,,
+이야기 모험,4장 배고픈 꼬미,,,,대사,Thank you for the food!,음식 고마워!,,
+이야기 모험,4장 배고픈 꼬미,,,,대답,Are you ready to work?,일할 준비 됐어?,"Yes, I am ready!","No, it is blue. / I have two ears."
+이야기 모험,5장 부서진 다리,,,,대사,The bridge is broken.,다리가 부서졌어.,,
+이야기 모험,5장 부서진 다리,,,,대사,We need ten stones.,돌이 열 개 필요해.,,
+이야기 모험,5장 부서진 다리,,,,대사,Let us count them together!,같이 세어 보자!,,
+이야기 모험,5장 부서진 다리,,,,대사,"One, two, three... ten!","하나, 둘, 셋... 열!",,
+이야기 모험,5장 부서진 다리,,,,대사,Now we can cross the bridge.,이제 다리를 건널 수 있어.,,
+이야기 모험,5장 부서진 다리,,,,대답,How many stones do we need?,돌이 몇 개 필요해?,We need ten stones.,We need a red hat. / We are at school.
+이야기 모험,6장 정글의 황금 잎,,,,대사,I have a treasure map!,나한테 보물 지도가 있어!,,
+이야기 모험,6장 정글의 황금 잎,,,,대사,A golden leaf is in the jungle.,황금 잎이 정글에 있대.,,
+이야기 모험,6장 정글의 황금 잎,,,,대사,Listen carefully. Go left or go right?,"잘 들어. 왼쪽일까, 오른쪽일까?",,
+이야기 모험,6장 정글의 황금 잎,,,,대사,We found the golden leaf!,황금 잎을 찾았어!,,
+이야기 모험,6장 정글의 황금 잎,,,,대사,You are a great explorer!,넌 정말 멋진 탐험가야!,,
+이야기 모험,6장 정글의 황금 잎,,,,대답,Do you want to go to the jungle?,정글에 갈래?,"Yes, let's go!",I am a cookie. / It is my nose.
+이야기 모험,7장 문장 기차를 타요,,,,대사,The train can take us to the Word Tree.,기차를 타면 말 나무까지 갈 수 있어.,,
+이야기 모험,7장 문장 기차를 타요,,,,대사,But the words on the train are mixed up.,그런데 기차의 단어들이 뒤섞였어.,,
+이야기 모험,7장 문장 기차를 타요,,,,대사,Put the words in order.,단어들을 순서대로 놓아 줘.,,
+이야기 모험,7장 문장 기차를 타요,,,,대사,Choo choo! The train is moving!,칙칙폭폭! 기차가 움직여!,,
+이야기 모험,7장 문장 기차를 타요,,,,대사,We are almost there.,거의 다 왔어.,,
+이야기 모험,7장 문장 기차를 타요,,,,대답,Can you fix the train?,기차를 고칠 수 있어?,"Yes, I can do it!",It is very sunny. / My pen is blue.
+이야기 모험,8장 말 나무의 노래,,,,대사,Here we are. This is the Word Tree.,다 왔어. 여기가 말 나무야.,,
+이야기 모험,8장 말 나무의 노래,,,,대사,The tree needs one more thing.,나무에 필요한 게 하나 더 있어.,,
+이야기 모험,8장 말 나무의 노래,,,,대사,It needs your voice. Say the words with us!,네 목소리가 필요해. 우리와 함께 말해 줘!,,
+이야기 모험,8장 말 나무의 노래,,,,대사,Look! The Word Tree is full of leaves!,봐! 말 나무에 잎이 가득해!,,
+이야기 모험,8장 말 나무의 노래,,,,대사,Our words came back!,우리 말이 돌아왔어!,,
+이야기 모험,8장 말 나무의 노래,,,,대사,Thank you. You are our Word Hero!,고마워. 너는 우리의 말 영웅이야!,,
+이야기 모험,8장 말 나무의 노래,,,,대답,Are you ready to say the words?,말할 준비 됐어?,"Yes, I am ready!","No, I am a bus. / It is on the box."

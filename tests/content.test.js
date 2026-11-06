@@ -8,7 +8,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const html = fs.readFileSync(path.join(__dirname, '..', 'www', 'index.html'), 'utf8');
-const a = html.indexOf('const ENG = ['), b = html.indexOf('/* ---------- 단계별 해금', a);
+const a = html.indexOf('const ENG = ['), b = html.indexOf('// 레슨별 학습 정보', a);
 const ctx = {};
 vm.createContext(ctx);
 vm.runInContext(html.slice(a, b) + '\nthis.ENG = ENG;', ctx);
@@ -156,4 +156,52 @@ test('이야기 모험: 8장 구성과 대사, 답, 단어 연결이 맞다', ()
     assert.ok(EN.test(ch.ask.q) && /\?$/.test(ch.ask.q), ch.ask.q);
   }
   assert.ok(c5.S.filter(x => x.gift).length >= 3);
+});
+// 게임과 이야기까지 모은 영어 문장 전체
+function allEnglish() {
+  const out = [];
+  for (const u of units) {
+    for (const x of u.s || []) out.push(x[0]);
+    for (const x of u.b || []) { out.push(x[0].replace('___', x[1])); }
+    for (const x of u.talk || []) out.push(x[0], x[1]);
+    for (const x of u.r || []) out.push(x.p, x.q);
+    for (const x of u.d || []) out.push(x[0], x[2], ...x[4]);
+  }
+  const train = chunk('const EG_TRAIN = {', 'function egTrain', 'EG_TRAIN'); out.push(...train.easy.map(x => x[0]), ...train.normal.map(x => x[0]));
+  for (const st of Object.values(chunk('const STORIES = {', 'function egStory', 'STORIES'))) for (const sc of Object.values(st.scenes)) { out.push(sc.en); sc.c.forEach(c => out.push(c[0])); }
+  return out;
+}
+test('레슨마다 카테고리, 나이, 목표가 있고 지시서의 20개 카테고리가 모두 있다', () => {
+  const m = chunk('const ENG_META = {', 'const engMeta', 'ENG_META');
+  const need = ['Alphabet & Phonics', 'Animals', 'Colors', 'Numbers', 'Food', 'Family', 'Body', 'School', 'Toys', 'Clothes', 'Weather', 'Nature', 'Transportation', 'Home', 'Feelings', 'Daily Routines', 'Greetings', 'Places', 'Action Words', 'Simple Sentences'];
+  for (const u of units) { assert.ok(m[u.id], '정보 없음: ' + u.id); assert.ok(need.includes(m[u.id][0]), u.id); assert.ok(m[u.id][1] && KO.test(m[u.id][2]), u.id); }
+  const have = new Set(Object.values(m).map(x => x[0]));
+  for (const c of need) assert.ok(have.has(c), '카테고리 없음: ' + c);
+  for (const k of Object.keys(m)) assert.ok(units.some(u => u.id === k), '없는 레슨: ' + k);
+});
+test('알파벳: 대표 단어가 그 글자로 시작한다 (X는 예외로 따로 표시)', () => {
+  for (const u of units.filter(x => x.abc)) for (const [w, , , l] of u.w) { if (l === 'X') assert.ok(w.includes('x')); else assert.equal(w[0].toUpperCase(), l, w); }
+  assert.ok(html.includes("inWord: x.l === 'X'") && html.includes("이 글자가 들어 있는 그림은?"));
+  assert.ok(html.includes("mode = isX ? 'case'"), 'X는 첫소리 문제를 내지 않는다');
+});
+test('영어 문장 기계 검사: a/an, 대문자 I, 띄어쓰기, 미국식 표기', () => {
+  const uk = /\b(colour|favourite|centre|grey|neighbour|metre|autumn|holiday|football|biscuit|mum|lorry|rubbish|flat)\b/i;
+  const exceptAn = /\ban (hour|honest)\b/i, bad = [];
+  for (const t of allEnglish()) {
+    if (/\ba [aeiou]/i.test(t) && !/\ba (uni|one|use)/i.test(t)) bad.push(['a→an', t]);
+    if (/\ban [^aeiou\s]/i.test(t) && !exceptAn.test(t)) bad.push(['an→a', t]);
+    if (/(^|[ "])i( |'|\b[.,!?])/.test(t)) bad.push(['소문자 i', t]);
+    if (/ {2}| [.,!?]|\.\.[^.]/.test(t)) bad.push(['띄어쓰기', t]);
+    if (uk.test(t)) bad.push(['영국식', t]);
+    if (/\b(\w+) \1\b/i.test(t) && !/\b(that that|had had|bye bye|choo choo)\b/i.test(t)) bad.push(['같은 단어 반복', t]);
+  }
+  assert.deepEqual(bad, []);
+});
+test('그림 검사: 뜻과 맞지 않는 것으로 확인한 그림을 다시 쓰지 않는다', () => {
+  const words = units.flatMap(u => u.w || []);
+  assert.ok(!words.some(w => w[0] === 'jump' && w[2]));
+  assert.equal(words.find(w => w[0] === 'scared')[1], '무서워하는');
+});
+test('새 레슨과 보기: 같은 뜻의 단어가 한 레슨에 겹쳐 답이 둘이 되지 않는다', () => {
+  for (const u of units) { const ks = (u.w || []).map(w => w[1]); assert.equal(new Set(ks).size, ks.length, u.id); }
 });
