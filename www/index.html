@@ -456,6 +456,7 @@ body{-webkit-touch-callout:none}
 .backup input[type=password]{width:100%;font-size:18px;padding:10px 12px;border:0;border-radius:12px;margin-bottom:8px;box-shadow:inset 0 0 0 2px var(--ink)}
 
 /* ---------- 2.0: 큰 버튼과 태블릿 ---------- */
+.snd-fx{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.snd-fx .candy{padding:6px 2px;font-size:15px}
 .eg-rail{position:relative;overflow:hidden;min-height:64px;padding:6px 0 12px;border-bottom:5px solid var(--ink)}
 .eg-train{display:flex;align-items:center;gap:4px;transition:transform 1.8s ease-in}.eg-train.go{transform:translateX(115%)}
 .eg-loco{font-size:42px;flex:none;transform:scaleX(-1)}.eg-cars{display:flex;flex-wrap:wrap;gap:4px;min-height:44px;align-items:center}
@@ -1000,10 +1001,10 @@ function saveGuard(raw, cat, opt = {}) {
     const numMap = (o, k, max, re = ID) => { const m = sub(o, k); if (!m) return; for (const x of Object.keys(m)) { if (!re.test(x)) { fail(k); delete m[x]; continue; } num(m, x, 0, max, {}, k + '.' + x); } };
     const clean = scan(d, 0, 'save');
     Object.keys(d).forEach(k => delete d[k]); Object.assign(d, clean);
-    const TOP = ['v', 'sv', 'coins', 'sound', 'music', 'haptic', 'active', 'hats', 'rooms', 'room', 'lastTick', 'lastGift', 'best', 'story', 'parent', 'play', 'farm', 'missions', 'daily', 'rewardClaims', 'badges', 'friends', 'decor', 'dyes', 'wear', 'rides', 'rideSel', 'stickers', 'palId', 'palNote', 'pass', 'season', 'eng', 'duoSp', 'newsSeen', 'tut', 'dayEng', 'qa'];
+    const TOP = ['v', 'sv', 'coins', 'sound', 'music', 'haptic', 'active', 'hats', 'rooms', 'room', 'lastTick', 'lastGift', 'best', 'story', 'parent', 'play', 'farm', 'missions', 'daily', 'rewardClaims', 'badges', 'friends', 'decor', 'dyes', 'wear', 'rides', 'rideSel', 'stickers', 'palId', 'palNote', 'pass', 'season', 'eng', 'duoSp', 'newsSeen', 'tut', 'dayEng', 'qa', 'musicVol', 'sfxVol'];
     for (const k of Object.keys(d)) if (!TOP.includes(k)) { fail(k); delete d[k]; }
     num(d, 'coins', 0, 100000000, { req: true, def: 0 });
-    bool(d, 'sound'); bool(d, 'music'); bool(d, 'haptic'); if (d.sound === undefined) d.sound = true;
+    bool(d, 'sound'); bool(d, 'music'); bool(d, 'haptic'); num(d, 'musicVol', 0, 2, { int: true }); num(d, 'sfxVol', 0, 2, { int: true }); if (d.sound === undefined) d.sound = true;
     if (d.lastTick !== undefined && (typeof d.lastTick !== 'number' || !Number.isFinite(d.lastTick) || d.lastTick < 0)) { fail('lastTick'); delete d.lastTick; }
     if (d.lastTick === undefined || d.lastTick > now) d.lastTick = now;   // 기기 시계가 달라도 복원은 막지 않는다
     list(d, 'hats', cat.HATS, 200); if (!d.hats) d.hats = [];
@@ -1112,34 +1113,89 @@ const P = () => S.pets[S.active];
    5. 소리 (WebAudio로 짧은 효과음 합성, 파일 없음)
    ========================================================= */
 let AC = null;
-const SFX = {
-  tap: [[740, .05]], pop: [[660, .06], [880, .08]], coin: [[988, .07], [1319, .14]],
-  eat: [[330, .06], [262, .06], [349, .07]], hatch: [[523, .1], [659, .1], [784, .1], [1047, .28]],
-  up: [[523, .08], [659, .08], [784, .08], [1047, .08], [1319, .22]], bad: [[247, .12], [196, .18]],
-  bub: [[1000, .035]], night: [[523, .18], [392, .3]], buy: [[784, .06], [1047, .06], [1568, .12]], jump: [[620, .05], [880, .06]]
-};
 const BUZZ = { jump: 12, coin: 20, up: 45, bad: 90, pop: 10, hatch: 70, buy: 25 };
+/* 소리 엔진: 파일 없이 WebAudio로 악기와 잔향을 합성한다 (유료 에셋과 인터넷이 필요 없다).
+   sndBus는 실시간과 시험용 오프라인 렌더링에 함께 쓴다 */
+function sndBus(ctx) {
+  const comp = ctx.createDynamicsCompressor();
+  comp.threshold.value = -16; comp.ratio.value = 4; comp.attack.value = .005; comp.release.value = .22;
+  comp.connect(ctx.destination);
+  const mk = v => { const g = ctx.createGain(); g.gain.value = v; return g; };
+  const music = mk(.5), fx = mk(.75), revIn = mk(1), revOut = mk(.32), rev = ctx.createConvolver();
+  // 짧은 방 울림: 뒤로 갈수록 어둡게 사라지는 잡음
+  const len = Math.floor(ctx.sampleRate * 1.3), ir = ctx.createBuffer(2, len, ctx.sampleRate);
+  for (let c = 0; c < 2; c++) { const d = ir.getChannelData(c); let last = 0; for (let i = 0; i < len; i++) { const k = i / len; last += (Math.random() * 2 - 1 - last) * (.5 - .42 * k); d[i] = last * Math.pow(1 - k, 2.6); } }
+  rev.buffer = ir;
+  music.connect(comp); fx.connect(comp); revIn.connect(rev); rev.connect(revOut); revOut.connect(comp);
+  const noise = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate), nd = noise.getChannelData(0);
+  for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+  return { ctx, comp, music, fx, revIn, noise };
+}
+function sndTone(b, { type = 'sine', f, f2 = 0, t, d, vol = .2, a = .008, to, rev = 0, lp = 0, det = 0 }) {
+  const ctx = b.ctx, o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = type; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d); if (det) o.detune.value = det;
+  g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + a); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+  let out = o;
+  if (lp) { const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = lp; o.connect(fl); out = fl; }
+  out.connect(g); g.connect(to || b.fx);
+  if (rev) { const sd = ctx.createGain(); sd.gain.value = rev; g.connect(sd); sd.connect(b.revIn); }
+  o.start(t); o.stop(t + d + .03);
+}
+function sndNoise(b, { t, d, vol = .1, hp = 0, lp = 0, to, f2 = 0 }) {
+  const ctx = b.ctx, n = ctx.createBufferSource(), g = ctx.createGain(); n.buffer = b.noise;
+  let out = n;
+  if (hp) { const fl = ctx.createBiquadFilter(); fl.type = 'highpass'; fl.frequency.value = hp; out.connect(fl); out = fl; }
+  if (lp) { const fl = ctx.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.setValueAtTime(lp, t); if (f2) fl.frequency.exponentialRampToValueAtTime(f2, t + d); out.connect(fl); out = fl; }
+  g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + Math.min(.01, d / 3)); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+  out.connect(g); g.connect(to || b.fx); n.start(t, Math.random() * .7); n.stop(t + d + .02);
+}
+const sndFreq = n => 440 * Math.pow(2, (n - 69) / 12);   // 미디 음 번호 → 주파수
+// 악기
+const SND_INST = {
+  mallet(b, m, t, d, v, to) { const f = sndFreq(m); sndTone(b, { f, t, d: Math.min(1.4, d + .5), vol: v, a: .004, to, rev: .35 }); sndTone(b, { f: f * 4, t, d: .16, vol: v * .16, a: .002, to }); },
+  pluck(b, m, t, d, v, to) { const f = sndFreq(m); sndTone(b, { type: 'triangle', f, t, d: Math.min(.7, d + .2), vol: v, a: .003, to, rev: .2 }); sndTone(b, { type: 'sawtooth', f, t, d: .16, vol: v * .4, a: .002, to, lp: f * 4.5 }); },
+  bell(b, m, t, d, v, to) { const f = sndFreq(m); sndTone(b, { f, t, d: Math.min(2, d + 1), vol: v, a: .003, to, rev: .5 }); sndTone(b, { f: f * 2.01, t, d: .7, vol: v * .3, a: .002, to, rev: .4 }); sndTone(b, { f: f * 3.02, t, d: .25, vol: v * .12, a: .002, to }); },
+  // 장난감 피아노처럼 또렷하고 밝은 소리
+  toy(b, m, t, d, v, to) { const f = sndFreq(m); sndTone(b, { type: 'square', f, t, d: Math.min(.55, d + .12), vol: v * .55, a: .003, to, lp: f * 3.2 }); sndTone(b, { f: f * 2, t, d: .22, vol: v * .4, a: .002, to, rev: .2 }); },
+  soft(b, m, t, d, v, to) { const f = sndFreq(m); sndTone(b, { f, t, d: d + .4, vol: v, a: .05, to, rev: .5 }); sndTone(b, { type: 'triangle', f, t, d: d + .2, vol: v * .25, a: .06, to, lp: 1400 }); }
+};
+function sndPad(b, ms, t, d, v, to) { for (const m of ms) for (const det of [-6, 6]) sndTone(b, { type: 'triangle', f: sndFreq(m), t, d, vol: v / 2, a: Math.min(.5, d / 3), to, rev: .4, lp: 1300, det }); }
+// 효과음: 아이가 놀라지 않도록 부드럽게. 틀렸을 때도 거슬리는 소리를 내지 않는다
+const SND_FX = {
+  tap(b, t) { sndTone(b, { f: 880, f2: 660, t, d: .07, vol: .24, a: .002 }); },
+  pop(b, t) { sndTone(b, { f: 420, f2: 900, t, d: .1, vol: .34, a: .004 }); },
+  flip(b, t) { sndNoise(b, { t, d: .08, vol: .22, lp: 3500, f2: 900 }); sndTone(b, { f: 620, f2: 760, t, d: .08, vol: .16 }); },
+  bub(b, t) { const f = 500 + Math.random() * 500; sndTone(b, { f, f2: f * 1.9, t, d: .09, vol: .18, a: .004 }); },
+  coin(b, t) { SND_INST.bell(b, 88, t, .07, .14, b.fx); SND_INST.bell(b, 95, t + .07, .25, .17, b.fx); },
+  correct(b, t) { [79, 84, 88, 91].forEach((m, i) => SND_INST.toy(b, m, t + i * .07, .12, .2, b.fx)); [96, 100].forEach((m, i) => SND_INST.bell(b, m, t + .26 + i * .07, .2, .07, b.fx)); },
+  star(b, t) { [84, 88, 91, 96].forEach((m, i) => SND_INST.bell(b, m, t + i * .06, .15, .08, b.fx)); },
+  bad(b, t) { sndTone(b, { type: 'triangle', f: 330, f2: 262, t, d: .3, vol: .3, a: .012, lp: 1100, rev: .15 }); },
+  jump(b, t) { sndTone(b, { f: 300, f2: 820, t, d: .17, vol: .28, a: .005 }); sndNoise(b, { t, d: .1, vol: .05, hp: 1500 }); },
+  eat(b, t) { for (const k of [0, .12]) sndNoise(b, { t: t + k, d: .09, vol: .24, lp: 1400, f2: 500 }); sndTone(b, { f: 700, f2: 950, t: t + .24, d: .09, vol: .15 }); },
+  buy(b, t) { [79, 84, 88, 91].forEach((m, i) => SND_INST.bell(b, m, t + i * .07, .15, .09, b.fx)); },
+  up(b, t) { [72, 76, 79, 84, 88].forEach((m, i) => SND_INST.toy(b, m, t + i * .08, .14, .18, b.fx)); SND_INST.bell(b, 96, t + .4, .3, .1, b.fx); },
+  magic(b, t) { for (let i = 0; i < 7; i++) SND_INST.bell(b, 79 + [0, 4, 7, 12, 16, 19, 24][i], t + i * .055, .12, .055, b.fx); },
+  treasure(b, t) { [72, 79, 84, 88, 91].forEach((m, i) => SND_INST.bell(b, m, t + i * .08, .2, .1, b.fx)); sndPad(b, [60, 64, 67], t, .7, .05, b.fx); },
+  train(b, t) { for (let i = 0; i < 6; i++) sndNoise(b, { t: t + i * .15, d: .09, vol: .08 + i * .012, hp: 400, lp: 2600 }); for (const m of [76, 79]) sndTone(b, { f: sndFreq(m), t: t + .95, d: .55, vol: .07, a: .05, rev: .3 }); },
+  hatch(b, t) { sndTone(b, { f: 400, f2: 1300, t, d: .3, vol: .1, a: .03, rev: .3 }); [72, 76, 79, 84, 88, 91].forEach((m, i) => SND_INST.bell(b, m, t + .12 + i * .07, .2, .09, b.fx)); },
+  fanfare(b, t) { const ms = [[72, .0], [76, .11], [79, .22], [84, .33], [79, .48], [84, .6]]; ms.forEach(([m, k], i) => { SND_INST.toy(b, m, t + k, i === 5 ? .6 : .1, .2, b.fx); SND_INST.bell(b, m + 12, t + k, .1, .05, b.fx); }); sndPad(b, [60, 64, 67, 72], t + .6, 1, .08, b.fx); for (let i = 0; i < 4; i++) SND_INST.bell(b, 91 + i * 2, t + .75 + i * .07, .1, .05, b.fx); },
+  night(b, t) { SND_INST.soft(b, 72, t, .3, .1, b.fx); SND_INST.soft(b, 67, t + .28, .6, .1, b.fx); },
+  chirp(b, t) { const f = 2400 + Math.random() * 900; for (let i = 0; i < 2 + Math.floor(Math.random() * 2); i++) sndTone(b, { f, f2: f * 1.28, t: t + i * .11, d: .07, vol: .035, a: .006, rev: .4 }); }
+};
+const SFX_GAIN = 1.7, MUSIC_GAIN = 1.35, SND_VOL = [.45, .75, 1];   // 작게, 보통, 크게
+let sndB = null;
+function sndReady() {
+  AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+  if (AC.state === 'suspended') AC.resume();
+  if (!sndB) sndB = sndBus(AC);
+  sndB.fx.gain.value = SFX_GAIN * SND_VOL[S && Number.isInteger(S.sfxVol) ? S.sfxVol : 1];
+  return sndB;
+}
 function sfx(kind) {
   // 안드로이드 휴대폰은 살짝 떨린다 (아이폰은 브라우저가 지원하지 않는다)
   if (S && S.haptic !== false && BUZZ[kind] && navigator.vibrate) { try { navigator.vibrate(BUZZ[kind]); } catch (e) {} }
-  if (!S || !S.sound) return;
-  try {
-    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
-    if (AC.state === 'suspended') AC.resume();
-    let t = AC.currentTime;
-    for (const [f0, d] of SFX[kind]) {
-      const f = kind === 'bub' ? f0 + Math.random() * 500 : f0;
-      const o = AC.createOscillator(), g = AC.createGain();
-      o.type = kind === 'bad' ? 'triangle' : 'sine';
-      o.frequency.setValueAtTime(f, t);
-      g.gain.setValueAtTime(.0001, t);
-      g.gain.exponentialRampToValueAtTime(.16, t + .012);
-      g.gain.exponentialRampToValueAtTime(.0001, t + d);
-      o.connect(g).connect(AC.destination);
-      o.start(t); o.stop(t + d + .03);
-      t += d * .85;
-    }
-  } catch (e) {}
+  if (!S || !S.sound || !SND_FX[kind]) return;
+  try { const b = sndReady(); SND_FX[kind](b, AC.currentTime + .005); } catch (e) {}
 }
 
 /* =========================================================
@@ -4570,6 +4626,9 @@ function openSettings() {
   openSheet('설정', `<div class="set-list">
     <button class="set-row" id="setSound"><span>${S.sound ? '🔊' : '🔈'} 효과음</span><b>${S.sound ? '켜짐' : '꺼짐'}</b></button>
     <button class="set-row" id="setMusic"><span>${S.music !== false ? '🎵' : '🔇'} 배경음악</span><b>${S.music !== false ? '켜짐' : '꺼짐'}</b></button>
+    <button class="set-row" id="setMusicVol"><span>🎚️ 음악 크기</span><b>${['작게', '보통', '크게'][Number.isInteger(S.musicVol) ? S.musicVol : 1]}</b></button>
+    <button class="set-row" id="setSfxVol"><span>🎚️ 효과음 크기</span><b>${['작게', '보통', '크게'][Number.isInteger(S.sfxVol) ? S.sfxVol : 1]}</b></button>
+    <button class="set-row" id="setSoundTest"><span>🎵 소리 들어 보기</span><b>열기 ›</b></button>
     <button class="set-row" id="setHaptic"><span>📳 진동</span><b>${S.haptic !== false ? '켜짐' : '꺼짐'}</b></button>
     <button class="set-row" id="setAlbum"><span>📷 사진 앨범</span><b>${loadPhotos().length} / ${PHOTO_MAX}장 ›</b></button>
     <div class="set-row"><span>⏱️ 오늘 논 시간</span><b>${Math.floor(playSec() / 60)}분</b></div>
@@ -4577,6 +4636,8 @@ function openSettings() {
   </div>`, body => {
     body.querySelector('#setSound').addEventListener('click', () => { S.sound = !S.sound; persist(); sfx('pop'); openSettings(); });
     body.querySelector('#setMusic').addEventListener('click', () => { S.music = S.music === false; persist(); Music.sync(); openSettings(); });
+    for (const [id, key] of [['#setMusicVol', 'musicVol'], ['#setSfxVol', 'sfxVol']]) body.querySelector(id).addEventListener('click', () => { S[key] = ((Number.isInteger(S[key]) ? S[key] : 1) + 1) % 3; persist(); sfx('correct'); openSettings(); });
+    body.querySelector('#setSoundTest').addEventListener('click', openSoundTest);
     body.querySelector('#setHaptic').addEventListener('click', () => { S.haptic = S.haptic === false; persist(); sfx('pop'); openSettings(); });
     body.querySelector('#setAlbum').addEventListener('click', () => openAlbum());
     body.querySelector('#setParent').addEventListener('click', () => { closeSheet(); parentGate(openParent); });
@@ -4796,47 +4857,117 @@ function openPhoto(i) {
   });
 }
 
-/* ---------- 배경음악: 파일 없이 WebAudio로 짓는 짧은 노래. 집·마을·점프 코스마다 곡이 다르다 ----------
-   음 = C5 기준 반음 수, null = 쉼. 첫 터치 뒤에만 소리를 낼 수 있어서 그때 시작한다 */
-const Music = (() => {
-  const TUNES = {
-    house:   { bpm: 84,  chords: [0, -3, -7, -5], mel: [0, null, 4, null, 7, null, 4, 2, 0, null, 2, 4, 2, null, null, null, 9, null, 7, null, 4, null, 2, 4, 0, null, null, null, null, null, null, null] },
-    village: { bpm: 104, chords: [0, -5, -3, -7], mel: [7, 9, 7, 4, 2, 4, 7, null, 12, null, 9, 7, 4, null, null, null, 7, 9, 12, 9, 7, 4, 2, 4, 0, null, 4, null, 0, null, null, null] },
-    obby:    { bpm: 126, chords: [0, 2, 4, -5],  mel: [0, 4, 7, 12, 7, 4, 0, 4, 2, 5, 9, 14, 9, 5, 2, 5, 4, 7, 11, 16, 11, 7, 4, 7, 12, null, 12, null, 7, null, null, null] }
-  };
-  let gain = null, timer = 0, step = 0, next = 0, tuneKey = '', started = false;
-  const freq = n => 523.25 * Math.pow(2, n / 12);
-  function note(f, t, d, type, vol) {
-    const o = AC.createOscillator(), g = AC.createGain();
-    o.type = type; o.frequency.setValueAtTime(f, t);
-    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .02); g.gain.exponentialRampToValueAtTime(.0001, t + d);
-    o.connect(g).connect(gain); o.start(t); o.stop(t + d + .05);
+/* ---------- 배경음악: 이 게임을 위해 쓴 곡을 WebAudio 악기로 연주한다. 장면마다 곡이 다르다 ----------
+   tonic = 으뜸음 미디 번호. chords = 마디별 [근음, 'M'|'m']. mel = 8분음표 칸마다 으뜸음 기준 반음 수, null = 이어서 또는 쉼 */
+const MAJOR = [0, 2, 4, 5, 7, 9, 11];
+const MUSIC_TUNES = {
+  house: { name: '🏠 우리 집', bpm: 100, tonic: 65, lead: 'mallet', comp: 'arp', bass: 'walk', perc: 1, sparkle: true, level: .75, scale: MAJOR,
+    chords: [[0, 'M'], [7, 'M'], [9, 'm'], [5, 'M'], [0, 'M'], [7, 'M'], [5, 'M'], [7, 'M'], [5, 'M'], [0, 'M'], [2, 'm'], [7, 'M'], [0, 'M'], [9, 'm'], [5, 'M'], [7, 'M']],
+    mel: [12, null, 7, 9, 12, null, 16, null, 14, null, 11, 12, 14, null, null, 7, 9, null, 12, 14, 16, null, 12, null, 17, 16, 14, 12, 9, null, null, null, 12, null, 7, 9, 12, null, 16, 19, 19, null, 17, 16, 14, null, 11, null, 12, null, 14, 16, 17, null, 16, 14, 14, null, null, null, 7, 9, 11, null,
+      9, 9, null, 12, 17, null, 16, null, 16, 16, null, 12, 19, null, 16, null, 14, 14, null, 17, 21, null, 17, null, 19, null, 17, null, 14, null, 11, null, 12, null, 7, 9, 12, null, 16, null, 16, null, 12, 16, 21, null, 19, null, 17, null, 21, null, 12, null, 14, 16, 14, null, 19, null, 14, null, null, null] },
+  village: { name: '🏘️ 말랑 마을', bpm: 122, tonic: 67, lead: 'pluck', comp: 'strum', bass: 'walk', perc: 2, swing: .12, sparkle: true, level: .72, scale: MAJOR,
+    chords: [[0, 'M'], [0, 'M'], [5, 'M'], [0, 'M'], [7, 'M'], [5, 'M'], [0, 'M'], [7, 'M'], [9, 'm'], [5, 'M'], [0, 'M'], [7, 'M'], [9, 'm'], [5, 'M'], [7, 'M'], [0, 'M']],
+    mel: [0, null, 4, 7, 12, null, 7, null, 7, 9, 7, 4, 0, null, null, null, 5, null, 9, 12, 17, null, 12, null, 16, 14, 12, null, 7, null, null, null, 7, null, 11, 14, 19, null, 14, null, 17, 16, 14, 12, 9, null, 12, null, 12, null, 16, null, 19, null, 16, 12, 14, null, 11, null, 7, 9, 11, 14,
+      16, null, 16, 14, 12, null, 9, null, 12, null, 12, 14, 17, null, 14, null, 16, null, 16, 14, 12, null, 7, null, 11, null, 14, null, 19, null, null, null, 9, 12, 16, null, 21, null, 16, null, 21, null, 17, null, 12, null, 9, null, 19, null, 14, null, 11, null, 14, 16, 12, null, 7, null, 12, null, null, null] },
+  obby: { name: '🌀 점프 코스', bpm: 140, tonic: 60, lead: 'toy', comp: 'arp', bass: 'octave', perc: 3, sparkle: true, level: .62, scale: MAJOR,
+    chords: [[0, 'M'], [5, 'M'], [7, 'M'], [0, 'M'], [9, 'm'], [5, 'M'], [7, 'M'], [7, 'M'], [0, 'M'], [5, 'M'], [7, 'M'], [9, 'm'], [5, 'M'], [7, 'M'], [0, 'M'], [7, 'M']],
+    mel: [12, 16, 19, 16, 12, 16, 19, 24, 17, 21, 24, 21, 17, 21, 24, 29, 19, 23, 26, 23, 19, 23, 26, 23, 24, null, 19, null, 16, null, 12, null, 21, 24, 28, 24, 21, 24, 28, 24, 17, 21, 24, 21, 17, 21, 24, 21, 19, null, 23, null, 26, null, 23, null, 19, 21, 23, 24, 26, null, null, null,
+      24, null, 24, 19, 16, null, 19, null, 21, null, 21, 17, 12, null, 17, null, 23, null, 23, 19, 14, null, 19, null, 24, null, 21, 16, 12, null, 16, null, 17, 19, 21, 24, 21, null, 17, null, 19, 21, 23, 26, 23, null, 19, null, 24, 26, 28, 24, 19, null, 16, null, 14, null, 19, null, 23, null, 26, null] },
+  learn: { name: '📚 영어 공부', bpm: 88, tonic: 67, lead: 'mallet', comp: 'pad', bass: 'soft', perc: 0, sparkle: false, level: .5, scale: MAJOR,
+    chords: [[0, 'M'], [5, 'M'], [9, 'm'], [7, 'M'], [0, 'M'], [5, 'M'], [7, 'M'], [0, 'M']],
+    mel: [12, null, null, 9, 7, null, 9, null, 9, null, null, 12, 9, null, 5, null, 12, null, null, 16, 12, null, 9, null, 11, null, 14, null, 7, null, null, null, 12, null, 16, null, 19, null, 16, null, 17, null, null, 16, 12, null, 9, null, 14, null, 11, null, 7, null, null, null, 12, null, null, null, 7, null, null, null] },
+  game: { name: '🎮 영어 게임', bpm: 126, tonic: 62, lead: 'toy', comp: 'strum', bass: 'walk', perc: 2, sparkle: true, level: .66, scale: MAJOR,
+    chords: [[0, 'M'], [0, 'M'], [5, 'M'], [7, 'M'], [0, 'M'], [0, 'M'], [5, 'M'], [7, 'M'], [9, 'm'], [9, 'm'], [5, 'M'], [7, 'M'], [5, 'M'], [7, 'M'], [0, 'M'], [0, 'M']],
+    mel: [7, null, 7, 9, 12, null, 7, null, 16, null, 14, 12, 7, null, null, null, 9, null, 9, 12, 17, null, 12, null, 14, null, 11, 14, 19, null, null, null, 7, null, 7, 9, 12, null, 16, null, 19, null, 16, 12, 16, null, null, null, 17, null, 16, 14, 12, null, 9, null, 14, null, null, null, 11, 12, 14, null,
+      16, null, 16, null, 12, null, 16, null, 21, null, 19, null, 16, null, null, null, 17, null, 17, null, 12, null, 17, null, 19, null, 17, null, 14, null, null, null, 12, 14, 17, null, 21, null, 17, null, 14, 16, 19, null, 23, null, 19, null, 24, null, 19, null, 16, null, 12, null, 12, null, 7, null, 12, null, null, null] },
+  sleep: { name: '🌙 잠자는 시간', bpm: 56, tonic: 60, lead: 'soft', comp: 'pad', bass: 'none', perc: 0, sparkle: false, noLift: true, level: .4, scale: MAJOR,
+    chords: [[0, 'M'], [5, 'M'], [0, 'M'], [7, 'M']],
+    mel: [7, null, null, null, 4, null, null, null, 9, null, null, null, 5, null, null, null, 7, null, null, null, 12, null, null, null, 7, null, 5, null, 2, null, null, null] }
+};
+// 음계에서 3도 위 화음 음
+function musicThird(tune, m) { const sc = tune.scale, o = Math.floor(m / 12), d = ((m % 12) + 12) % 12, i = sc.indexOf(d); return i < 0 ? null : (i + 2 >= sc.length ? o + 1 : o) * 12 + sc[(i + 2) % sc.length]; }
+const MUSIC_LITE = (navigator.hardwareConcurrency || 8) <= 4;   // 저사양 기기에서는 장식 음을 줄인다
+// 한 칸(8분음표)을 연주한다. 실시간과 시험용 렌더링이 같은 코드를 쓴다
+function musicStep(b, tune, step, t, dur, human = true, lite = MUSIC_LITE) {
+  const n = tune.mel.length, s8 = step % 8, bar = Math.floor(step / 8), [root, kind] = tune.chords[bar % tune.chords.length], cycle = Math.floor(step / n);
+  const base = tune.tonic + (!tune.noLift && cycle % 2 ? 2 : 0);   // 한 바퀴 돌면 조를 올려 더 밝게
+  const triad = [root, root + (kind === 'm' ? 3 : 4), root + 7], out = b.music, lv = tune.level;
+  const jit = () => (human ? Math.random() * .006 : 0), vel = x => x * lv * (human ? .92 + Math.random() * .12 : 1);
+  const swing = step % 2 && tune.swing ? dur * tune.swing : 0, at = t + swing + jit();
+  const barIn = bar % tune.chords.length, partB = tune.chords.length >= 16 && barIn >= 8, endOf = (barIn + 1) % 8 === 0;
+  const m = tune.mel[step % n];
+  if (m !== null) {
+    let len = 1; while (len < 6 && tune.mel[(step + len) % n] === null) len++;
+    const accent = s8 % 4 === 0 ? 1 : s8 % 2 === 0 ? .85 : .75;
+    SND_INST[tune.lead](b, base + m, at, dur * len * (tune.lead === 'soft' ? .95 : .7), vel(.22 * accent), out);
+    if (tune.sparkle) SND_INST.bell(b, base + m + 12, at, dur * .6, vel(.05 * accent), out);   // 실로폰을 겹쳐 또렷하게
+    if (partB && !lite) { const h = musicThird(tune, m); if (h !== null) SND_INST[tune.lead](b, base + h, at + .004, dur * len * .6, vel(.1), out); }
   }
-  const quiet = () => !S || S.music === false || document.hidden || restOpen || gameOn || $('#home').hidden;
+  const arpUp = [0, 1, 2, 1], tr = i => triad[i];
+  if (tune.comp === 'pad') { if (s8 === 0) sndPad(b, triad.map(x => base + x - 12), t, dur * 8.3, vel(.07), out); if (tune.bass === 'soft' && s8 % 2 === 1) SND_INST.mallet(b, base + tr(s8 === 1 ? 1 : 2), at, dur, vel(.045), out); }
+  else if (tune.comp === 'arp') SND_INST.mallet(b, base + tr(arpUp[s8 % 4]) - (s8 % 4 === 2 ? 0 : 12) + 0, at, dur, vel(.085), out);
+  else if (tune.comp === 'strum' && s8 % 2 === 1) triad.forEach((x, i) => SND_INST.pluck(b, base + x - 12, at + i * .01, dur * .7, vel(.055), out));
+  // 통통 튀는 베이스
+  const bassAt = (x, v) => { sndTone(b, { f: sndFreq(base + x - 24), t: at, d: dur * .9, vol: vel(v), a: .006, to: out, lp: 650 }); sndTone(b, { type: 'triangle', f: sndFreq(base + x - 12), t: at, d: .1, vol: vel(v * .25), a: .004, to: out }); };
+  if (tune.bass === 'walk') { if (s8 % 2 === 0) bassAt([root, root + 12, root + 7, root + 12][s8 / 2], .2); }
+  else if (tune.bass === 'octave') { bassAt(s8 % 2 ? root + 12 : root, .17); }
+  // 드럼: 쿵 짝, 찰랑. 큰 소리가 나지 않게 낮춘다
+  if (tune.perc >= 1) {
+    if (s8 % 4 === 0) sndTone(b, { f: 140, f2: 55, t: at, d: .13, vol: vel(.24), a: .003, to: out });
+    if (s8 % 4 === 2) sndNoise(b, { t: at, d: .09, vol: vel(.1), hp: 1400, lp: 6500, to: out });   // 손뼉 느낌
+  }
+  if (tune.perc >= 2) { sndNoise(b, { t: at, d: .035, vol: vel(s8 % 2 ? .05 : .028), hp: 7000, to: out }); }
+  if (tune.perc >= 3 && !lite) sndNoise(b, { t: at + dur / 2, d: .03, vol: vel(.026), hp: 8000, to: out });
+  // 뒷부분에는 반짝이는 분산 화음을 얹는다
+  if (tune.sparkle && partB && !lite) SND_INST.bell(b, base + tr(s8 % 3) + 24, at + dur / 2, dur * .4, vel(.03), out);
+  // 네 번째·여덟 번째 마디 끝: 위로 올라가는 짧은 연결음
+  if (tune.sparkle && endOf && s8 >= 4) {
+    const run = tune.scale, idx = (s8 - 4) * 2;
+    for (const k of [0, 1]) SND_INST.bell(b, base + 12 + run[(idx + k) % run.length], at + k * dur / 2, dur * .4, vel(.05 + idx * .004), out);
+    if (tune.perc >= 1 && !lite) sndTone(b, { f: 240 - idx * 12, f2: 100, t: at, d: .09, vol: vel(.14), a: .003, to: out });
+  }
+}
+const Music = (() => {
+  let timer = 0, step = 0, next = 0, tuneKey = '', started = false, nextChirp = 0, forced = null;
+  const off = () => !S || S.music === false || document.hidden || restOpen || $('#home').hidden;
+  const scene = () => {
+    const p = S.pets && S.pets[S.active];
+    if (forced) return forced;
+    if (gameOn) return document.querySelector('#game.eng') ? 'learn' : 'game';
+    if (round) return 'game';
+    if (p && p.asleep) return 'sleep';
+    const a = World.area(); return a === 'obby' ? 'obby' : a === 'village' ? 'village' : 'house';
+  };
+  // 영어를 읽는 동안에는 음악을 낮춰 발음이 잘 들리게 한다
+  const speaking = () => engSpeaking > 0 || ('speechSynthesis' in window && (speechSynthesis.speaking || speechSynthesis.pending));
   function schedule() {
-    if (!AC || quiet()) { next = 0; return; }
-    const key = World.area() === 'obby' ? 'obby' : World.area() === 'village' ? 'village' : 'house';
-    if (key !== tuneKey) { tuneKey = key; step = 0; next = 0; }
-    const tune = TUNES[key], dur = 60 / tune.bpm / 2;
+    if (!AC || !sndB) return;
+    const vol = SND_VOL[Number.isInteger(S && S.musicVol) ? S.musicVol : 1];
+    if (off()) { sndB.music.gain.setTargetAtTime(.0001, AC.currentTime, .08); next = 0; return; }
+    const key = scene(), tune = MUSIC_TUNES[key], dur = 60 / tune.bpm / 2;
+    if (key !== tuneKey) { tuneKey = key; step = 0; next = AC.currentTime + .35; sndB.music.gain.setValueAtTime(.0001, AC.currentTime); }
+    sndB.music.gain.setTargetAtTime(MUSIC_GAIN * vol * (speaking() ? .22 : 1), AC.currentTime, speaking() ? .06 : .35);
     if (!next || next < AC.currentTime) next = AC.currentTime + .05;
-    while (next < AC.currentTime + .3) {
-      const m = tune.mel[step % tune.mel.length];
-      if (m !== null) note(freq(m), next, dur * 1.8, 'triangle', .5);
-      if (step % 8 === 0) { const c = tune.chords[(step / 8) % tune.chords.length]; note(freq(c - 24), next, dur * 7, 'sine', .45); note(freq(c - 12 + 4), next, dur * 7, 'sine', .14); }
-      step++; next += dur;
-    }
+    while (next < AC.currentTime + .3) { musicStep(sndB, tune, step, next, dur); step++; next += dur; }
+    // 마을의 작은 새소리
+    if (key === 'village' && S.sound && AC.currentTime > nextChirp) { if (nextChirp) sfx('chirp'); nextChirp = AC.currentTime + 6 + Math.random() * 9; }
   }
   function start() {
     if (started) return;
-    try {
-      AC = AC || new (window.AudioContext || window.webkitAudioContext)();
-      if (AC.state === 'suspended') AC.resume();
-      gain = AC.createGain(); gain.gain.value = .07; gain.connect(AC.destination);
-      started = true; timer = setInterval(schedule, 100);
-    } catch (e) {}
+    try { sndReady(); started = true; timer = setInterval(schedule, 100); } catch (e) {}
   }
-  return { start, sync() { if (S && S.music !== false) start(); else next = 0; } };
+  return { start, sync() { if (S && S.music !== false) start(); else next = 0; }, force(k) { forced = k; start(); } };
 })();
+function openSoundTest() {
+  const stop = () => Music.force(null), fxNames = { correct: '정답', coin: '코인', up: '성공', fanfare: '레벨업', magic: '마법', treasure: '보물', train: '기차', flip: '카드', bad: '틀림', jump: '점프', hatch: '알 깨기', pop: '터치' };
+  openSheet('🎵 소리 들어 보기', `<p class="msub">곡을 누르면 바로 들을 수 있어요. 배경음악이 꺼져 있으면 먼저 켜 주세요.</p><div class="eg-list">${Object.entries(MUSIC_TUNES).map(([k, t]) => `<button class="candy" data-tune="${k}">${escapeHTML(t.name)}</button>`).join('')}</div><h3 class="wear-h">효과음</h3><div class="snd-fx">${Object.entries(fxNames).map(([k, n]) => `<button class="candy" data-fx="${k}">${n}</button>`).join('')}</div><button class="candy" id="sndBack" style="width:100%;margin-top:10px">‹ 설정으로</button>`, body => body.addEventListener('click', ev => {
+    const t = ev.target.closest('[data-tune]'), f = ev.target.closest('[data-fx]');
+    if (t) { Music.force(t.dataset.tune); body.querySelectorAll('[data-tune]').forEach(b => b.classList.toggle('primary', b === t)); return; }
+    if (f) return sfx(f.dataset.fx);
+    if (ev.target.closest('#sndBack')) { stop(); openSettings(); }
+  }));
+  const close = scrim && scrim.querySelector('[data-close]'); if (close) close.addEventListener('click', stop);
+}
 ['pointerdown', 'keydown'].forEach(t => document.addEventListener(t, () => { if (S && S.music !== false) Music.start(); }, { capture: true }));
 $('#photoBtn').addEventListener('click', () => { sfx('tap'); takePhoto(); });
 
@@ -5532,6 +5663,7 @@ function openStand() {
 function goStand() { World.area() === 'village' ? World.goVillage('garden', true, openStand) : openStand(); }
 
 const NEWS = [
+  { v: '3.7', date: '11월 6일', items: ['🎵 새 배경음악: 집, 마을, 점프 코스, 영어 공부, 게임, 잠자는 시간마다 다른 밝은 곡이 나와요', '🔔 효과음을 새로 만들고, 영어를 읽을 때는 음악이 작아져요', '🎚️ 설정에서 음악과 효과음 크기를 고를 수 있어요'] },
   { v: '3.6', date: '11월 6일', items: ['🚂 문장 기차: 단어를 연결하면 기차가 출발해요', '🗺️ 단어 보물찾기: 영어로 부탁한 물건을 마을에서 찾아요', '🌟 오늘의 영어에 오늘의 단어와 게임 미션 추가 (쉬어도 잃는 것 없어요)'] },
   { v: '3.5', date: '11월 6일', items: ['🎮 영어 게임 3종: ✨ 알파벳 마법, 🎧 영어 듣고 잡기, 🃏 단어 카드 매칭', '🚌 탈것과 🏠 집안 물건 레슨 추가'] },
   { v: '3.4', date: '11월 6일', items: ['🐻 곰 선생님이 왔어요! 토끼, 민트 드래곤, 여우와 함께 영어를 알려 줘요', '🎨 더 따뜻한 색과 큰 버튼, 태블릿 화면 지원', '🌟 정답을 맞히면 안내 친구가 함께 기뻐하고, 틀려도 힌트를 줘요', '🔊 더 자연스러운 영어 목소리를 자동으로 고르고, 영어 지도에서 직접 고를 수도 있어요'] },
@@ -6609,11 +6741,13 @@ function engStop() {
   clearTimeout(speechTimer); speechTimer = 0; speechWait = [];
   if ('speechSynthesis' in window) { try { speechSynthesis.cancel(); } catch (e) {} }
 }
+let engSpeaking = 0;
 function engSay(text, o = {}) {
-  if (!engCanSpeak() || !S.sound) return;
+  if (!engCanSpeak()) return;   // 영어 소리는 학습 내용이라 효과음 설정과 따로 둔다
   const nat = nativeTTS();
   if (nat) {
-    const speak = () => nat.speak({ text, lang: o.lang || 'en-US', rate: o.rate || (engState().slow ? .62 : .92), pitch: 1, volume: 1, category: 'playback', queueStrategy: o.queue ? 1 : 0 }).catch(() => {});
+    engSpeaking++;
+    const speak = () => nat.speak({ text, lang: o.lang || 'en-US', rate: o.rate || (engState().slow ? .62 : .92), pitch: 1, volume: 1, category: 'playback', queueStrategy: o.queue ? 1 : 0 }).catch(() => {}).then(() => { engSpeaking = Math.max(0, engSpeaking - 1); });
     if (o.queue) speak(); else nat.stop().catch(() => {}).then(speak);
     return;
   }
@@ -6889,7 +7023,7 @@ function engLesson(stageIdx, unit, reviewList) {
     const pet = main.querySelector('.e-pet'); if (pet) { pet.innerHTML = petSVG(engGuide(q.type), { mood: ok ? 'happy' : 'normal', stage: 'kid' }); pet.classList.add(ok ? 'cheer' : 'nod'); }
     if (ok) {
       const praise = pick(['Great!', 'Good job!', 'Awesome!', 'You did it!', 'Wow!', 'Excellent!']);
-      sfx('coin'); engSay(q.sayOk || q.say || q.a); engSay(praise, { queue: true, rate: 1 });
+      sfx('correct'); engSay(q.sayOk || q.say || q.a); engSay(praise, { queue: true, rate: 1 });
       foot.innerHTML = `<p class="e-fb ok"><span class="e-star-pop" aria-hidden="true">⭐</span> ${praise}${q.type === 'type' ? ` <span class="e-sub">${escapeHTML(q.a)}</span>` : ''}</p><button class="candy primary e-next" id="eNext">다음 ▶</button>`;
     } else {
       sfx('bad'); engSay(q.type === 'blank' || q.type === 'order' || q.type === 'spell' ? q.say : q.a);
@@ -6925,7 +7059,7 @@ function engLesson(stageIdx, unit, reviewList) {
     const goals = engCheckGoals();
     const newAreas = Object.keys(AREA_NEED).filter(k => areaOpen(k) && !openBefore.includes(k));
     const pet = P(), form = formOf(pet.level), nextForm = FORMS[form + 1];
-    sfx(stars === 3 || ups.length ? 'hatch' : 'up'); if (stars >= 2 || ups.length) confetti(ups.length ? 80 : 40);
+    sfx(ups.length ? 'fanfare' : stars === 3 ? 'hatch' : 'up'); if (stars >= 2 || ups.length) confetti(ups.length ? 80 : 40);
     if (World.ok) World.trick('cheer');
     persist();
     const sameStage = st.units.findIndex(u => !engDone(u));   // 지금 공부하던 단계를 먼저 이어 간다
@@ -6993,7 +7127,7 @@ function egFinish(sh, { key, right, total, again }) {
   const gain = 8 + right * 2, coins = boundedReward('eg:' + key, 10, 5), ups = engAddXP(gain), petXP = Math.max(4, Math.round(gain / 2));
   change({ fun: 10 }); addXP(petXP);
   const de = dayEngState(); de.game = true; const dayDone = dayEngCheck(), goals = engCheckGoals(), pet = P();
-  sfx(stars === 3 || ups.length ? 'hatch' : 'up'); if (stars >= 2) confetti(40); if (World.ok) World.trick('cheer');
+  sfx(ups.length ? 'fanfare' : stars === 3 ? 'hatch' : 'up'); if (stars >= 2) confetti(40); if (World.ok) World.trick('cheer');
   persist();
   sh.bar.style.width = '100%';
   sh.main.innerHTML = `<div class="e-card done"><span class="e-pet" aria-hidden="true">${petSVG(pet.sp, { mood: 'happy', stage: stageOf(pet.level), hat: pet.hat })}</span><h3>${stars === 3 ? 'Perfect! 완벽해요!' : stars === 2 ? 'Great job! 잘했어요!' : 'Good try! 끝까지 해냈어요!'}</h3><div class="e-stars" aria-label="별 ${stars}개">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
@@ -7006,7 +7140,7 @@ function egFinish(sh, { key, right, total, again }) {
   sh.bind('gHome', () => { sh.close(); openEngGames(); });
   sh.wrap.querySelector('#gHome').focus({ preventScroll: true });
 }
-const egRight = word => { sfx('coin'); dayEngState().right++; const e = engState(); e.right = (e.right || 0) + 1; if (word) engMark(word, true); };
+const egRight = word => { sfx('correct'); dayEngState().right++; const e = engState(); e.right = (e.right || 0) + 1; if (word) engMark(word, true); };
 const egMiss = word => { sfx('bad'); const e = engState(); e.wrong = (e.wrong || 0) + 1; if (word) engMark(word, false); };
 
 // 게임 A: 알파벳 마법
@@ -7031,7 +7165,7 @@ function egAlphabet() {
       const b = ev.target.closest('[data-k]'); if (!b || b.disabled) return;
       if (opts[+b.dataset.k] !== x) { first = false; b.disabled = true; b.classList.add('wrong'); egMiss(x.w); sh.main.querySelector('#egHint').textContent = `힌트: ${x.l}${x.l.toLowerCase()}는 ${x.w}의 첫 글자예요. 다시 골라 봐요!`; engSay(sound); return; }
       if (first) right++;
-      egRight(x.w);
+      egRight(x.w); sfx('magic');
       sh.main.querySelectorAll('.e-opt').forEach(o => { o.disabled = true; });
       b.classList.add('right');
       sh.main.querySelector('#egCard').innerHTML = `<div class="eg-magic" aria-hidden="true">✨⭐✨</div><div class="e-letter">${x.l}<small>${x.l.toLowerCase()}</small></div><div class="e-pic">${x.e}</div><div class="e-word">${escapeHTML(x.w)}</div>`;
@@ -7097,7 +7231,7 @@ function egMatch(level) {
     const b = ev.target.closest('[data-i]'); if (!b || lock || b.disabled) return;
     const i = +b.dataset.i, c = cards[i];
     if (sel === i) { sel = null; b.classList.remove('sel'); if (L.hidden) b.classList.add('down'); return; }
-    b.classList.remove('down'); b.classList.add('sel'); if (!c.pic) engSay(c.x.w); sfx('tap');
+    b.classList.remove('down'); b.classList.add('sel'); if (!c.pic) engSay(c.x.w); sfx('flip');
     if (sel === null) { sel = i; return; }
     const o = cards[sel], ob = btn(sel); sel = null;
     if (o.id === c.id) {
@@ -7144,7 +7278,7 @@ function egTrain(level) {
       egRight(null);
       for (const w of toks) { const k = w.replace(/[.,!?]/g, '').toLowerCase(); if (engAllWords.has(k)) engMark(k, true); }
       sh.main.querySelectorAll('.e-tile,.eg-car').forEach(x => { x.disabled = true; });
-      sh.main.querySelector('#egTrainBox').classList.add('go');
+      sh.main.querySelector('#egTrainBox').classList.add('go'); sfx('train');
       engSay(en);
       sh.foot.innerHTML = `<p class="e-fb ok"><span class="e-star-pop" aria-hidden="true">⭐</span> 칙칙폭폭, 출발!</p><button class="candy primary e-next" id="eNext">다음 ▶</button>`;
       sh.bind('eNext', () => { i++; show(); }); sh.wrap.querySelector('#eNext').focus({ preventScroll: true });
@@ -7195,7 +7329,7 @@ function startWordHunt() {
       return;
     }
     if (!missed) right++;
-    egRight(t.word.w); World.huntRemove(i); boundedReward('eg:huntItem', 2, 40); burst(['💎', '✨'], 4, -.2); engSay(t.word.w);
+    egRight(t.word.w); sfx('treasure'); World.huntRemove(i); boundedReward('eg:huntItem', 2, 40); burst(['💎', '✨'], 4, -.2); engSay(t.word.w);
     round.got = ++idx; ui.querySelector('#hnGot').textContent = idx; missed = false;
     tip.textContent = `💎 보물을 찾았어요! ${t.word.w}: ${t.word.k}`;
     if (idx >= HUNT_TOTAL) return setTimeout(() => { if (round && round.ui === ui) end(true); }, 900);

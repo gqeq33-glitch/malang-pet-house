@@ -64,3 +64,46 @@ test('문장 기차·보물찾기·오늘의 미션이 연결되어 있다', () 
   const d = html.slice(html.indexOf('function dayEngState'), html.indexOf('/* ---------- 사용자 시험용 기록'));
   assert.ok(!/streak|연속/.test(d), '연속 기록이 없다');
 });
+const vmx = require('node:vm');
+function musicData() {
+  const a = html.indexOf('const MAJOR = ['), b = html.indexOf('// 음계에서 3도 위 화음 음', a), c = {};
+  vmx.createContext(c); vmx.runInContext(html.slice(a, b) + ';this.T = MUSIC_TUNES;', c); return c.T;
+}
+const mod12 = x => ((x % 12) + 12) % 12;
+test('음악: 길이가 맞고 음이 조성 안에 있으며, 강박은 코드와 어울린다', () => {
+  const T = musicData();
+  for (const k of ['house', 'village', 'obby', 'learn', 'game', 'sleep']) assert.ok(T[k], k);
+  for (const [k, t] of Object.entries(T)) {
+    assert.equal(t.mel.length, t.chords.length * 8, k + ' 멜로디 길이');
+    let strong = 0, good = 0;
+    t.mel.forEach((m, i) => {
+      if (m === null) return;
+      assert.ok(t.scale.includes(mod12(m)), `${k} ${i}번째 음 ${m}이 조성 밖이에요`);
+      if (i % 4 === 0) { const [r, q] = t.chords[Math.floor(i / 8)], tri = [r, r + (q === 'm' ? 3 : 4), r + 7].map(mod12); strong++; if (tri.includes(mod12(m))) good++; }
+    });
+    assert.equal(good, strong, k + ' 강박 음이 코드와 맞지 않아요');
+    for (const [r, q] of t.chords) { assert.ok(t.scale.includes(mod12(r)), k); assert.ok(t.scale.includes(mod12(r + (q === 'm' ? 3 : 4))), k + ' 코드 음'); assert.ok(t.scale.includes(mod12(r + 7)) || r === 11, k + ' 코드 5음'); }
+    const notes = t.mel.filter(m => m !== null).map(m => t.tonic + m);
+    assert.ok(Math.min(...notes) >= 55 && Math.max(...notes) <= 90, k + ' 음역');
+    assert.ok(t.bpm >= 50 && t.bpm <= 150, k + ' 빠르기');
+  }
+});
+test('게임에서 부르는 효과음이 모두 만들어져 있다', () => {
+  const fx = html.slice(html.indexOf('const SND_FX = {'), html.indexOf('const SND_VOL'));
+  const kinds = new Set([...html.matchAll(/\bsfx\('([a-zA-Z]+)'\)/g)].map(m => m[1]));
+  assert.ok(kinds.size >= 10);
+  for (const k of kinds) assert.ok(new RegExp(`\\n  ${k}\\(b, t\\)`).test(fx), k);
+});
+test('소리: 외부 파일을 쓰지 않고, 영어 음성은 효과음 설정과 분리되어 있다', () => {
+  assert.ok(!/\.(mp3|ogg|wav|m4a)["']/.test(html));
+  const a = html.slice(html.indexOf('function engSay'), html.indexOf('function engSay') + 200);
+  assert.ok(!a.includes('S.sound'));
+  assert.ok(html.includes('SND_VOL') && html.includes("id=\"setMusicVol\""));
+});
+test('음악: 놀이 곡은 16마디 이상이고 밝은 장조이며 장면마다 다르다', () => {
+  const T = musicData();
+  for (const k of ['house', 'village', 'obby', 'game']) { assert.ok(T[k].chords.length >= 16, k); assert.ok(T[k].scale.includes(4) && !T[k].scale.includes(3), k + ' 장조'); assert.ok(T[k].bpm >= 100, k); assert.ok(T[k].sparkle, k); }
+  const mels = Object.values(T).map(x => x.mel.join());
+  assert.equal(new Set(mels).size, mels.length);
+  assert.ok(html.includes('function openSoundTest'));
+});
