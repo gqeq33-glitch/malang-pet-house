@@ -57,3 +57,10 @@ test('영어 게임 3종이 메뉴에 연결되어 있고 코인 보상에 한�
   const g = html.slice(html.indexOf('function egShell'), html.indexOf('function openEngGames'));
   assert.ok(!/S\.coins\s*-=/.test(g), '게임에서 코인을 빼앗지 않는다');
 });
+test('문장 기차·보물찾기·오늘의 미션이 연결되어 있다', () => {
+  for (const f of ['function egTrain', 'function startWordHunt', 'function dayWordsQuiz', 'huntStart(list, cb)', 'huntStop()', "de.words = true", 'de.game = true', 'DAY_PET_XP']) assert.ok(html.includes(f), f);
+  const h = html.slice(html.indexOf('function startWordHunt'), html.indexOf('function openEngGames'));
+  assert.ok(!/setInterval|S\.coins\s*-=/.test(h), '시간제한과 코인 차감이 없다');
+  const d = html.slice(html.indexOf('function dayEngState'), html.indexOf('/* ---------- 사용자 시험용 기록'));
+  assert.ok(!/streak|연속/.test(d), '연속 기록이 없다');
+});

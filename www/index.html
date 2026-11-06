@@ -456,6 +456,11 @@ body{-webkit-touch-callout:none}
 .backup input[type=password]{width:100%;font-size:18px;padding:10px 12px;border:0;border-radius:12px;margin-bottom:8px;box-shadow:inset 0 0 0 2px var(--ink)}
 
 /* ---------- 2.0: 큰 버튼과 태블릿 ---------- */
+.eg-rail{position:relative;overflow:hidden;min-height:64px;padding:6px 0 12px;border-bottom:5px solid var(--ink)}
+.eg-train{display:flex;align-items:center;gap:4px;transition:transform 1.8s ease-in}.eg-train.go{transform:translateX(115%)}
+.eg-loco{font-size:42px;flex:none;transform:scaleX(-1)}.eg-cars{display:flex;flex-wrap:wrap;gap:4px;min-height:44px;align-items:center}
+.eg-car{border:0;border-radius:10px;background:var(--sky);color:var(--ink);font-family:var(--display);font-size:17px;padding:6px 9px;min-height:40px;box-shadow:0 0 0 2px var(--ink) inset}
+.eg-ask{pointer-events:auto;flex:1;min-width:0;font-size:17px;padding:8px 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .eg-list{display:grid;gap:8px}.eg-list .candy{min-height:54px;font-size:18px}
 .eg-magic{font-size:30px;animation:eStar .7s ease-out}
 .eg-catch{display:grid;grid-template-columns:1fr 1fr;gap:12px}.eg-catch .e-opt{font-size:60px;min-height:108px;padding:6px}
@@ -1034,7 +1039,7 @@ function saveGuard(raw, cat, opt = {}) {
     flat('badges', (x, v) => ['string', 'number', 'boolean'].includes(typeof v));
     flat('daily', (x, v) => (x === 'day' ? typeof v === 'string' : typeof v === 'number' && v >= 0 && v <= 10000000));
     const tut = sub(d, 'tut', ['step', 't0', 'secs', 'old']); if (tut) { if (!['egg', 'lesson', 'done'].includes(tut.step)) { fail('tut.step'); tut.step = 'done'; } num(tut, 't0', 0, now + 86400000, {}, 'tut.t0'); num(tut, 'secs', 0, 100000000, {}, 'tut.secs'); bool(tut, 'old', 'tut.old'); }
-    const de = sub(d, 'dayEng', ['day', 'lesson', 'right', 'care', 'got']); if (de) { str(de, 'day', 'dayEng.day'); num(de, 'right', 0, 100000, { int: true, def: 0 }, 'dayEng.right'); bool(de, 'lesson', 'dayEng.lesson'); bool(de, 'care', 'dayEng.care'); bool(de, 'got', 'dayEng.got'); }
+    const de = sub(d, 'dayEng', ['day', 'lesson', 'right', 'care', 'game', 'words', 'got']); if (de) { str(de, 'day', 'dayEng.day'); num(de, 'right', 0, 100000, { int: true, def: 0 }, 'dayEng.right'); bool(de, 'lesson', 'dayEng.lesson'); bool(de, 'care', 'dayEng.care'); bool(de, 'game', 'dayEng.game'); bool(de, 'words', 'dayEng.words'); bool(de, 'got', 'dayEng.got'); }
     const qa = sub(d, 'qa', ['t0', 'firstSec', 'days', 'daily', 'err']); if (qa) { num(qa, 't0', 0, now + 86400000, {}, 'qa.t0'); num(qa, 'firstSec', 0, 100000000, {}, 'qa.firstSec'); num(qa, 'daily', 0, 100000, { int: true }, 'qa.daily'); num(qa, 'err', 0, 100000, { int: true }, 'qa.err'); numList(qa, 'days', 'qa.days'); }
     const eng = sub(d, 'eng', ['stage', 'viewStage', 'xp', 'level', 'units', 'w', 'right', 'wrong', 'gifts', 'slow', 'goals', 'grad', 'chatN', 'chatNick', 'recent', 'voice']);
     if (eng) {
@@ -1376,7 +1381,7 @@ const World = (() => {
   const RIDE_SCALE = 1.3;   // 펫 크기(변신하면 1.1~1.5배)에 맞춘 탈것 크기
   let duo = null, pals = [];
   const fingers = new Map(); let steering = false, steerFingers = () => {};
-  let stickers = [], onSticker = null, treasures = [], onTreasure = null, onTagged = null;
+  let stickers = [], onSticker = null, treasures = [], onTreasure = null, onTagged = null, huntItems = [], onHunt = null;
   const cache = {};
   const toon = c => cache[c] || (cache[c] = new T.MeshToonMaterial({ color: c, gradientMap: grad }));
   let SPH, BOX, CYL, CONE, STAR, HALF;
@@ -2874,6 +2879,13 @@ const World = (() => {
       const by1 = Math.hypot(tr.position.x - st.x, tr.position.z - st.z) < 1.2, by2 = duo && Math.hypot(tr.position.x - duo.x, tr.position.z - duo.z) < 1.2;
       if (by1 || by2) { villageG.remove(tr); treasures.splice(i, 1); onTreasure && onTreasure(tr.userData.idx, by1 ? 1 : 2); }
     }
+    for (const it of huntItems) {
+      if (st.area !== 'village') break;
+      it.position.y = .75 + Math.sin(st.t * 2.4 + it.userData.idx) * .1;
+      const near = Math.hypot(it.position.x - st.x, it.position.z - st.z) < 1.2;
+      if (!near) it.userData.touched = false;   // 멀어져야 다시 집을 수 있다 (틀린 물건 앞에서 계속 반응하지 않게)
+      else if (!it.userData.touched) { it.userData.touched = true; onHunt && onHunt(it.userData.idx); }
+    }
     for (let i = stickers.length - 1; i >= 0; i--) {
       const sk = stickers[i], u = sk.userData; if (u.area !== st.area) continue;
       sk.position.y = u.y + Math.sin(st.t * 3 + i) * .1; sk.material.rotation = Math.sin(st.t * 2 + i) * .25;
@@ -3260,6 +3272,13 @@ const World = (() => {
     clearTreasure() { treasures.forEach(tr => villageG.remove(tr)); treasures = []; onTreasure = null; },
     setRide(kind) { setRide(kind); renderHUD(); return rideKind; },
     riding() { return rideKind; },
+    huntStart(list, cb) {
+      this.huntStop(); onHunt = cb;
+      if (!ok) return;
+      for (const it of list) { const [x, z] = clampVillage(it.x, it.z), sp = emojiSprite(it.e, .95); sp.position.set(VX + x, .75, z); sp.userData.idx = it.i; villageG.add(sp); huntItems.push(sp); }
+    },
+    huntRemove(i) { const k = huntItems.findIndex(x => x.userData.idx === i); if (k >= 0) { villageG.remove(huntItems[k]); huntItems.splice(k, 1); } },
+    huntStop() { huntItems.forEach(x => villageG.remove(x)); huntItems = []; onHunt = null; },
     spawnStickers(list, cb) {
       stickers.forEach(sk => sk.parent && sk.parent.remove(sk)); stickers = []; onSticker = cb;
       if (!ok) return;
@@ -5513,6 +5532,7 @@ function openStand() {
 function goStand() { World.area() === 'village' ? World.goVillage('garden', true, openStand) : openStand(); }
 
 const NEWS = [
+  { v: '3.6', date: '11월 6일', items: ['🚂 문장 기차: 단어를 연결하면 기차가 출발해요', '🗺️ 단어 보물찾기: 영어로 부탁한 물건을 마을에서 찾아요', '🌟 오늘의 영어에 오늘의 단어와 게임 미션 추가 (쉬어도 잃는 것 없어요)'] },
   { v: '3.5', date: '11월 6일', items: ['🎮 영어 게임 3종: ✨ 알파벳 마법, 🎧 영어 듣고 잡기, 🃏 단어 카드 매칭', '🚌 탈것과 🏠 집안 물건 레슨 추가'] },
   { v: '3.4', date: '11월 6일', items: ['🐻 곰 선생님이 왔어요! 토끼, 민트 드래곤, 여우와 함께 영어를 알려 줘요', '🎨 더 따뜻한 색과 큰 버튼, 태블릿 화면 지원', '🌟 정답을 맞히면 안내 친구가 함께 기뻐하고, 틀려도 힌트를 줘요', '🔊 더 자연스러운 영어 목소리를 자동으로 고르고, 영어 지도에서 직접 고를 수도 있어요'] },
   { v: '3.3', date: '11월 6일', items: ['🎯 정답률에 맞춰 문제가 쉬워지거나 어려워지고, 틀리면 짧은 해설이 나와요', '🌟 오늘의 영어: 5~10분 선택 미션 (쉬어도 잃는 것 없어요)', '🔡 파닉스 레슨 2개, 🎓 졸업 모자·옷 5종·가구 4종 추가', '🗺️ 영어 레슨을 끝낼수록 새 지역이 열려요'] },
@@ -6500,17 +6520,36 @@ const areaLockMsg = k => `🔒 영어 레슨 ${AREA_NEED[k]}개를 끝내면 ${A
 function syncAreaTabs() { document.querySelectorAll('#villageTabs [data-go]').forEach(b => { const k = b.dataset.go; b.classList.toggle('area-lock', !areaOpen(k)); }); }
 
 /* ---------- 오늘의 영어: 5~10분이면 끝나는 선택 미션. 연속 기록이 없고, 안 해도 잃는 것이 없다 ---------- */
-function dayEngState() { const t = today(); if (!S.dayEng || S.dayEng.day !== t) S.dayEng = { day: t, lesson: false, right: 0, care: false, got: false }; return S.dayEng; }
-const DAY_RIGHT = 10, DAY_COIN = 30;
+function dayEngState() { const t = today(); if (!S.dayEng || S.dayEng.day !== t) S.dayEng = { day: t, lesson: false, right: 0, care: false, game: false, words: false, got: false }; return S.dayEng; }
+const DAY_RIGHT = 10, DAY_COIN = 30, DAY_PET_XP = 20;
+const dayWordPool = () => { const e = engState(); return [...engAllWords.values()].filter(x => (e.w[x.w] || {}).b >= 1); };
+const dayNeedsWords = () => dayWordPool().length >= 3;
 function dayEngCheck() {
   const d = dayEngState();
-  if (d.got || !d.lesson || d.right < DAY_RIGHT || !d.care) return false;
+  if (d.got || !d.lesson || d.right < DAY_RIGHT || !d.care || !d.game || (dayNeedsWords() && !d.words)) return false;
   d.got = true; S.coins += DAY_COIN; const q = qaState(); q.daily = (q.daily || 0) + 1;
-  persist(); toast(`🌟 오늘의 영어 완료! +${DAY_COIN}코인`); return true;
+  if (P() && P().hatched) addXP(DAY_PET_XP);
+  persist(); toast(`🌟 오늘의 영어 완료! +${DAY_COIN}코인, 펫 경험치 +${DAY_PET_XP}`); return true;
 }
 function dayEngHTML() {
-  const d = dayEngState(), row = (on, t) => `<li>${on ? '✅' : '⬜'} ${t}</li>`;
-  return `<div class="day-eng"><b>🌟 오늘의 영어</b>${d.got ? ' · 완료!' : ` · ${DAY_COIN}코인`}<ul>${row(d.lesson, '레슨이나 복습 1번')}${row(d.right >= DAY_RIGHT, `문제 ${DAY_RIGHT}개 맞히기 (${Math.min(d.right, DAY_RIGHT)})`)}${row(d.care, '펫 돌보기 1번')}</ul><small>안 해도 괜찮아요. 쉬어도 모아 둔 것은 사라지지 않아요.</small></div>`;
+  const d = dayEngState(), row = (on, t) => `<li>${on ? '✅' : '⬜'} ${t}</li>`, need = dayNeedsWords();
+  return `<div class="day-eng"><b>🌟 오늘의 영어</b>${d.got ? ' · 완료!' : ` · ${DAY_COIN}코인 + 펫 경험치`}<ul>${row(d.lesson, '레슨이나 복습 1번')}${need ? row(d.words, '오늘의 단어 다시 만나기') : ''}${row(d.game, '영어 게임 1판')}${row(d.right >= DAY_RIGHT, `문제 ${DAY_RIGHT}개 맞히기 (${Math.min(d.right, DAY_RIGHT)})`)}${row(d.care, '펫 돌보기 1번')}</ul>${need && !d.words ? '<button class="candy" id="eDayWords" style="width:100%;margin-bottom:6px">💡 오늘의 단어 시작</button>' : ''}<small>안 해도 괜찮아요. 쉬어도 모아 둔 것은 사라지지 않아요.</small></div>`;
+}
+// 배운 단어를 새 상황에서 다시 만난다: 그 단어가 들어간 문장의 빈칸, 없으면 그림이나 뜻
+function dayWordsQuiz() {
+  const e = engState(), now = Date.now(), pool = dayWordPool().sort((x, y) => ((e.w[x.w].due || 0) <= now ? 0 : 1) - ((e.w[y.w].due || 0) <= now ? 0 : 1) || e.w[x.w].b - e.w[y.w].b).slice(0, 12);
+  const sentences = ENG.flatMap(g => g.units.flatMap(u => u.s || []));
+  const list = shuffle(pool).slice(0, 5).map(x => {
+    const others = [...engAllWords.values()].filter(y => y.stage === x.stage && y.w !== x.w);
+    const wrong = f => shuffle(others.map(y => y[f]).filter((v, i, a) => v && v !== x[f] && a.indexOf(v) === i)).slice(0, 2);
+    const re = /^[a-z]+$/.test(x.w) ? new RegExp(`(^|[ ])${x.w}(?=[ .,!?])`) : null, sen = re && shuffle(sentences).find(t => re.test(t[0]));
+    if (sen) return { type: 'blank', key: x.w, say: sen[0], q: sen[0].replace(re, '$1___'), a: x.w, o: shuffle(others.map(y => y.w).filter(w => /^[a-z]+$/.test(w) && !new RegExp(`\\b${w}\\b`).test(sen[0]))).slice(0, 2), k: sen[1] };
+    if (x.e && !x.noPic && x.stage > 0) return { type: 'picWord', key: x.w, say: null, e: x.e, a: x.w, o: wrong('w'), x };
+    if (x.e && !x.noPic) return { type: 'listenPic', key: x.w, say: x.w, a: x.e, o: wrong('e'), pic: true, x };
+    return { type: 'wordKo', key: x.w, say: x.w, w: x.w, a: x.k, o: wrong('k'), x };
+  });
+  list.dayWords = true; list.title = '💡 오늘의 단어';
+  return list;
 }
 /* ---------- 사용자 시험용 기록: 이 기기에만 두고, 보호자가 직접 복사해야만 밖으로 나간다. 이름은 넣지 않는다 ---------- */
 function qaState() { const q = S.qa || (S.qa = { t0: Date.now(), days: [], err: 0 }); const day = Math.floor((Date.now() - q.t0) / ENG_DAY); q.days = q.days || []; if (S.pets.length && !q.days.includes(day) && q.days.length < 400) q.days.push(day); return q; }
@@ -6755,7 +6794,7 @@ function engLesson(stageIdx, unit, reviewList) {
   let ci = 0, qi = 0, firstTry = 0, answered = false, cur = null, timer = 0, retried = new Set();
   const wrap = document.createElement('div'); wrap.id = 'game'; wrap.className = 'eng';
   wrap.setAttribute('role', 'dialog'); wrap.setAttribute('aria-modal', 'true'); wrap.setAttribute('aria-label', '말랑 영어');
-  wrap.innerHTML = `<div class="g-top gut"><span class="ttl">${review ? '🔁 복습' : `${unit.e} ${escapeHTML(unit.t)}`}</span><button class="icon-btn" id="eSlow" aria-label="천천히 듣기" aria-pressed="${!!e.slow}">🐢</button><button class="icon-btn" id="gClose" aria-label="그만하기">✕</button></div>
+  wrap.innerHTML = `<div class="g-top gut"><span class="ttl">${review ? escapeHTML(reviewList.title || '🔁 복습') : `${unit.e} ${escapeHTML(unit.t)}`}</span><button class="icon-btn" id="eSlow" aria-label="천천히 듣기" aria-pressed="${!!e.slow}">🐢</button><button class="icon-btn" id="gClose" aria-label="그만하기">✕</button></div>
     <div class="e-prog gut"><i id="eBar"></i></div><div class="e-main gut" id="eMain" aria-live="polite"></div><div class="e-foot gut" id="eFoot"></div>`;
   $('#app').appendChild(wrap); pushBack();
   const main = wrap.querySelector('#eMain'), foot = wrap.querySelector('#eFoot'), bar = wrap.querySelector('#eBar');
@@ -6879,7 +6918,7 @@ function engLesson(stageIdx, unit, reviewList) {
     const ups = engAddXP(gain);
     const petXP = Math.max(5, Math.round(gain / 2)), formBefore = formOf(P().level);
     change({ fun: 12, hunger: 6 }); addXP(petXP);
-    const de = dayEngState(); de.lesson = true; const dayDone = dayEngCheck();
+    const de = dayEngState(); de.lesson = true; if (reviewList && reviewList.dayWords) de.words = true; const dayDone = dayEngCheck();
     if (engLearned() >= 100) badge('words100');
     if (ENG.every(sg => sg.units.every(engDone))) badge('engAll');
     if (unit.exam && passed && !review) { const old = e.grad; e.grad = { date: old ? old.date : new Date().toLocaleDateString('ko-KR'), score: Math.max(score, old ? old.score : 0) }; badge('engGrad'); }
@@ -6953,7 +6992,7 @@ function egFinish(sh, { key, right, total, again }) {
   const e = engState(), rate = right / Math.max(1, total), stars = rate >= .9 ? 3 : rate >= .6 ? 2 : 1;
   const gain = 8 + right * 2, coins = boundedReward('eg:' + key, 10, 5), ups = engAddXP(gain), petXP = Math.max(4, Math.round(gain / 2));
   change({ fun: 10 }); addXP(petXP);
-  const de = dayEngState(); de.lesson = true; const dayDone = dayEngCheck(), goals = engCheckGoals(), pet = P();
+  const de = dayEngState(); de.game = true; const dayDone = dayEngCheck(), goals = engCheckGoals(), pet = P();
   sfx(stars === 3 || ups.length ? 'hatch' : 'up'); if (stars >= 2) confetti(40); if (World.ok) World.trick('cheer');
   persist();
   sh.bar.style.width = '100%';
@@ -7071,12 +7110,106 @@ function egMatch(level) {
     }
   });
 }
+// 게임 E: 문장 기차. 단어 칸을 순서대로 연결하면 기차가 출발한다
+const EG_TRAIN = {
+  easy: [['I like apples.', '나는 사과를 좋아해요.'], ['The cat is sleeping.', '고양이가 자고 있어요.'], ['I see a dog.', '나는 강아지가 보여요.'], ['It is a ball.', '그것은 공이에요.'], ['My friend is happy.', '내 친구는 행복해요.'], ['We can swim.', '우리는 수영할 수 있어요.'], ['I have a pen.', '나는 펜이 있어요.'], ['The bus is big.', '그 버스는 커요.']],
+  normal: [['I want a red balloon.', '나는 빨간 풍선을 갖고 싶어요.'], ['The bird is in the tree.', '새가 나무에 있어요.'], ['I go to school by bike.', '나는 자전거로 학교에 가요.'], ['Can I have some milk?', '우유 좀 주시겠어요?'], ['We play soccer after school.', '우리는 방과 후에 축구를 해요.'], ['The dog is under the table.', '강아지가 탁자 아래에 있어요.'], ['I brush my teeth every morning.', '나는 매일 아침 이를 닦아요.'], ['My friend likes green apples.', '내 친구는 초록 사과를 좋아해요.']]
+};
+function egTrain(level) {
+  if (!level) return openSheet('🚂 문장 기차', `<p class="msub">단어 칸을 순서대로 눌러 문장을 만들면 기차가 출발해요!</p><div class="eg-list"><button class="candy" data-lv="easy">짧은 문장 (3~4단어)</button><button class="candy" data-lv="normal">긴 문장 (5~6단어)</button></div><button class="candy" id="eBack" style="width:100%;margin-top:10px">‹ 게임 목록</button>`,
+    body => body.addEventListener('click', ev => { const b = ev.target.closest('[data-lv]'); if (b) return egTrain(b.dataset.lv); if (ev.target.closest('#eBack')) openEngGames(); }));
+  const sh = egShell('🚂 문장 기차'), list = shuffle(EG_TRAIN[level]).slice(0, 5);
+  let i = 0, right = 0;
+  function show() {
+    if (i >= list.length) return egFinish(sh, { key: 'train', right, total: list.length, again: () => egTrain(level) });
+    const [en, ko] = list[i], toks = en.split(' ');
+    let parts = shuffle(toks); for (let t = 0; t < 5 && parts.join(' ') === en; t++) parts = shuffle(toks);
+    let picked = [], first = true;
+    sh.bar.style.width = i / list.length * 100 + '%';
+    sh.main.innerHTML = `<p class="e-prompt"><span class="e-pet" aria-hidden="true">${petSVG('bear', { mood: 'talk', stage: 'kid' })}</span><span>단어 칸을 순서대로 눌러요</span></p><div class="e-card q"><div class="e-ko big">${escapeHTML(ko)}</div><button class="e-say" id="eSay" aria-label="다시 듣기">🔊</button></div><div class="eg-rail"><div class="eg-train" id="egTrainBox"><span class="eg-loco" aria-hidden="true">🚂</span><span class="eg-cars" id="egCars"></span></div></div><div class="e-tiles" id="eTiles">${parts.map((t, k) => `<button class="e-tile" data-t="${k}">${escapeHTML(t)}</button>`).join('')}</div><p class="e-why" id="egHint" role="status"></p>`;
+    sh.foot.innerHTML = '';
+    sh.bind('eSay', () => engSay(en)); engSay(en);
+    const cars = sh.main.querySelector('#egCars');
+    const paint = () => { cars.innerHTML = picked.map((k, n) => `<button class="eg-car" data-back="${n}">${escapeHTML(parts[k])}</button>`).join(''); sh.main.querySelectorAll('[data-t]').forEach(b => { b.disabled = picked.includes(+b.dataset.t); }); };
+    cars.addEventListener('click', ev => { const b = ev.target.closest('[data-back]'); if (b) { picked.splice(+b.dataset.back, 1); paint(); } });
+    sh.main.querySelector('#eTiles').addEventListener('click', ev => {
+      const b = ev.target.closest('[data-t]'); if (!b || b.disabled) return;
+      picked.push(+b.dataset.t); sfx('pop'); paint();
+      if (picked.length < parts.length) return;
+      if (picked.map(k => parts[k]).join(' ') !== en) {
+        first = false; picked = []; paint(); sfx('bad'); const e = engState(); e.wrong = (e.wrong || 0) + 1;
+        sh.main.querySelector('#egHint').textContent = `순서가 조금 달라요. "${toks[0]}"부터 시작해 봐요!`; engSay(en); return;
+      }
+      if (first) right++;
+      egRight(null);
+      for (const w of toks) { const k = w.replace(/[.,!?]/g, '').toLowerCase(); if (engAllWords.has(k)) engMark(k, true); }
+      sh.main.querySelectorAll('.e-tile,.eg-car').forEach(x => { x.disabled = true; });
+      sh.main.querySelector('#egTrainBox').classList.add('go');
+      engSay(en);
+      sh.foot.innerHTML = `<p class="e-fb ok"><span class="e-star-pop" aria-hidden="true">⭐</span> 칙칙폭폭, 출발!</p><button class="candy primary e-next" id="eNext">다음 ▶</button>`;
+      sh.bind('eNext', () => { i++; show(); }); sh.wrap.querySelector('#eNext').focus({ preventScroll: true });
+    });
+    paint();
+  }
+  show();
+}
+// 게임 B: 단어 보물찾기. 마을에 그림을 놓고, 아기 드래곤이 영어로 부탁한 물건을 찾아간다. 시간제한은 없다
+const HUNT_TOTAL = 5, HUNT_ITEMS = 8;
+function startWordHunt() {
+  const p = P();
+  if (!p || !p.hatched || p.asleep) return;
+  if (!World.ok) return toast('보물찾기는 3D를 켤 수 있는 기기에서 할 수 있어요');
+  if (!areaOpen('village')) return toast(areaLockMsg('village'));
+  if (p.energy < 15) return toast('너무 졸려서 못 나가요. 먼저 재워 주세요');
+  closeSheet(); if (talking) closeTalk();
+  if (World.area() !== 'village') { say('마을로 나가서 보물을 찾아요!', 2500); return World.area() === 'house' ? goOutsideThen(startWordHunt) : null; }
+  if (round) return;
+  if (following) { following = null; World.setFollow(null); }
+  if (World.riding()) World.setRide(null);
+  const seen = new Set(), pool = [];
+  for (const x of shuffle(['animal', 'food', 'transport', 'home'].flatMap(egWords))) { if (!seen.has(x.e)) { seen.add(x.e); pool.push(x); } if (pool.length >= HUNT_ITEMS) break; }
+  const spots = shuffle(TREASURE_SPOTS).slice(0, pool.length), items = pool.map((x, i) => ({ i, e: x.e, x: spots[i][0], z: spots[i][1], word: x }));
+  const queue = shuffle(items).slice(0, HUNT_TOTAL);
+  const ui = document.createElement('div'); ui.className = 'round-ui';
+  ui.innerHTML = '<span class="pill">🗺️ <b id="hnGot">0</b>/' + HUNT_TOTAL + '</span><button class="candy eg-ask" id="hnSay"></button><button class="icon-btn" id="hnQuit" aria-label="그만하기">✕</button>';
+  const tip = document.createElement('p'); tip.className = 'round-tip'; tip.setAttribute('role', 'status');
+  room.append(ui, tip);
+  round = { kind: 'hunt', total: HUNT_TOTAL, got: 0, on: true, ui, tip }; World.setNoAuto(true);
+  let idx = 0, right = 0, missed = false;
+  const cur = () => queue[idx];
+  const ask = () => { const w = cur().word.w; ui.querySelector('#hnSay').textContent = `🔊 Find the ${w}!`; engSay(`Find the ${w}!`); };
+  const end = done => {
+    round = null; World.huntStop(); World.setNoAuto(false); engStop(); ui.remove(); tip.remove(); renderHUD();
+    if (!done) return say('괜찮아! 하고 싶을 때 또 찾자!', 2500);
+    egFinish(egShell('🗺️ 단어 보물찾기'), { key: 'hunt', right, total: HUNT_TOTAL, again: startWordHunt });
+  };
+  ui._close = () => end(false);
+  ui.querySelector('#hnQuit').addEventListener('click', () => end(false));
+  ui.querySelector('#hnSay').addEventListener('click', () => engSay(`Find the ${cur().word.w}!`));
+  World.huntStart(items, i => {
+    if (!round || round.ui !== ui) return;
+    const it = items[i], t = cur();
+    if (it !== t) {
+      missed = true; egMiss(null); engSay(t.word.w);
+      tip.textContent = `이건 ${it.word.w}! 찾는 것은 ${t.e} ${t.word.w} (${t.word.k})예요`;
+      return;
+    }
+    if (!missed) right++;
+    egRight(t.word.w); World.huntRemove(i); boundedReward('eg:huntItem', 2, 40); burst(['💎', '✨'], 4, -.2); engSay(t.word.w);
+    round.got = ++idx; ui.querySelector('#hnGot').textContent = idx; missed = false;
+    tip.textContent = `💎 보물을 찾았어요! ${t.word.w}: ${t.word.k}`;
+    if (idx >= HUNT_TOTAL) return setTimeout(() => { if (round && round.ui === ui) end(true); }, 900);
+    setTimeout(() => { if (round && round.ui === ui) ask(); }, 1100);
+  });
+  tip.textContent = '🐉 꼬미의 부탁을 듣고 그 그림으로 달려가요!';
+  ask(); renderHUD();
+}
 function openEngGames() {
   const row = (id, e, t, d) => `<button class="dex-card" data-eg="${id}"><span class="emo day">${e}</span><span class="txt"><span class="t1">${t}</span><br><span class="t2">${d}</span></span><span class="go">시작 ▶</span></button>`;
-  openSheet('🎮 영어 게임', `<p class="msub">놀면서 영어를 익혀요. 맞힌 단어는 복습에 기록되고, 펫도 함께 자라요. 틀려도 잃는 것은 없어요.</p><div class="dex">${row('abc', '✨', '알파벳 마법', '대문자와 소문자, 첫소리를 찾아요')}${row('catch', '🎧', '영어 듣고 잡기', '듣고 맞는 그림을 잡아요')}${row('match', '🃏', '단어 카드 매칭', '그림과 단어를 연결해요')}</div><button class="candy" id="eBack" style="width:100%;margin-top:10px">‹ 영어 지도로</button>`,
+  openSheet('🎮 영어 게임', `<p class="msub">놀면서 영어를 익혀요. 맞힌 단어는 복습에 기록되고, 펫도 함께 자라요. 틀려도 잃는 것은 없어요.</p><div class="dex">${row('abc', '✨', '알파벳 마법', '대문자와 소문자, 첫소리를 찾아요')}${row('catch', '🎧', '영어 듣고 잡기', '듣고 맞는 그림을 잡아요')}${row('match', '🃏', '단어 카드 매칭', '그림과 단어를 연결해요')}${row('train', '🚂', '문장 기차', '단어를 순서대로 놓아 기차를 출발시켜요')}${row('hunt', '🗺️', '단어 보물찾기', '영어로 부탁한 물건을 마을에서 찾아요')}</div><button class="candy" id="eBack" style="width:100%;margin-top:10px">‹ 영어 지도로</button>`,
     body => body.addEventListener('click', ev => {
       const b = ev.target.closest('[data-eg]');
-      if (b) { if (engCanSpeak()) { try { engSay(' '); } catch (err) {} } return b.dataset.eg === 'abc' ? egAlphabet() : b.dataset.eg === 'catch' ? egCatch() : egMatch(); }
+      if (b) { if (engCanSpeak()) { try { engSay(' '); } catch (err) {} } return ({ abc: egAlphabet, catch: egCatch, match: egMatch, train: egTrain, hunt: startWordHunt })[b.dataset.eg](); }
       if (ev.target.closest('#eBack')) openEnglish();
     }));
 }
@@ -7108,6 +7241,7 @@ function openEnglish(tab) {
       if (ev.target.closest('#eReview')) { const q = engReviewQuiz(); if (!q) return toast('먼저 레슨을 하나 끝내면 복습할 수 있어요'); return engLesson(si, st.units[0], q); }
       if (ev.target.closest('#eAlbum')) return openEngAlbum();
       if (ev.target.closest('#eGames')) return openEngGames();
+      if (ev.target.closest('#eDayWords')) { const q = dayWordsQuiz(); return engLesson(0, ENG[0].units[0], q); }
       if (ev.target.closest('#eVoice')) return openEngVoice();
       if (ev.target.closest('#eGoals')) return openEngGoals();
       if (ev.target.closest('#eChat')) return openPals();
@@ -7317,7 +7451,7 @@ function openPlayMenu() {
   openSheet('뭐 하고 놀까?', `<div class="dex">
     <p class="arcade-head" style="margin-top:0">영어 배우기 <span class="arcade-tag">레벨 올리고 선물 받기</span></p>
     <button class="dex-card" data-game="english"><span class="emo day">📚</span><span class="txt"><span class="t1">말랑 영어</span><br><span class="t2">듣고, 고르고, 써 보며 배워요</span></span><span class="go">시작 ▶</span></button>
-    <button class="dex-card" data-game="enggames"><span class="emo day">🎮</span><span class="txt"><span class="t1">영어 게임</span><br><span class="t2">알파벳 마법, 듣고 잡기, 카드 매칭</span></span><span class="go">시작 ▶</span></button>
+    <button class="dex-card" data-game="enggames"><span class="emo day">🎮</span><span class="txt"><span class="t1">영어 게임</span><br><span class="t2">알파벳 마법, 듣고 잡기, 카드 매칭, 문장 기차, 보물찾기</span></span><span class="go">시작 ▶</span></button>
     <p class="arcade-head">새 놀이 <span class="arcade-tag">휴대폰으로 슥슥</span></p>
     ${card('runner', '🏃', '말랑 달리기', '좌우로 밀어 피하고, 위로 밀어 점프! 60초 달리기', 'day')}
     <p class="arcade-head">친구랑 같이 <span class="arcade-tag">한 화면에서 둘이</span></p>

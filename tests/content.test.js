@@ -95,3 +95,14 @@ test('영어 게임에 쓰는 단어 묶음이 충분하다', () => {
   assert.equal(abc.sort().join(''), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 });
 test('자연스럽지 않은 알파벳 문장을 쓰지 않는다', () => assert.ok(!html.includes('X is in box')));
+test('문장 기차: 문장과 뜻이 있고 첫 글자와 문장 부호가 맞으며 겹치지 않는다', () => {
+  const m = html.slice(html.indexOf('const EG_TRAIN = {'), html.indexOf('function egTrain'));
+  const c2 = {}; vm.createContext(c2); vm.runInContext(m + ';this.T = EG_TRAIN;', c2);
+  const all = [...c2.T.easy, ...c2.T.normal];
+  assert.ok(c2.T.easy.length >= 5 && c2.T.normal.length >= 5);
+  assert.equal(new Set(all.map(x => x[0])).size, all.length);
+  for (const [en, ko] of all) { assert.ok(/^[A-Z][^.?!]*[.?!]$/.test(en), en); assert.ok(KO.test(ko), en); }
+  for (const x of c2.T.easy) assert.ok(x[0].split(' ').length <= 4, x[0]);
+  for (const x of c2.T.normal) assert.ok(x[0].split(' ').length >= 5 && x[0].split(' ').length <= 6, x[0]);
+  for (const t of ['I like apples.', 'The cat is sleeping.', 'I want a red balloon.', 'Can I have some milk?']) assert.ok(all.some(x => x[0] === t), t);
+});
