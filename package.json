@@ -11,7 +11,7 @@
     "sync": "npx cap sync",
     "android:open": "npx cap open android",
     "ios:open": "npx cap open ios",
-    "test": "node --test tests/security.test.js tests/content.test.js"
+    "test": "node --test tests/security.test.js tests/content.test.js tests/ui.test.js"
   },
   "dependencies": {
     "@capacitor-community/text-to-speech": "^6.1.0",

@@ -2,7 +2,7 @@
   "appId": "com.malangpet.house",
   "appName": "말랑 영어 펫하우스",
   "webDir": "www",
-  "backgroundColor": "#DDF4EA",
+  "backgroundColor": "#FFF8E9",
   "android": {
     "allowMixedContent": false
   },

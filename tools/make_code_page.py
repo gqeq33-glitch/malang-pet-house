@@ -24,6 +24,7 @@ FILES = [
     ("www/manifest.webmanifest", "앱 설치 정보", "앱 이름·아이콘·전체 화면 설정이에요.", None, False),
     ("www/privacy.html", "개인정보처리방침", "스토어 등록에 필요한 페이지예요.", None, False),
     ("tests/security.test.js", "보안 테스트", "저장 검증과 채팅 제거를 확인해요. 실행: node --test tests/security.test.js", None, False),
+    ("tests/ui.test.js", "캐릭터·화면 검사", "대표 캐릭터 연결, 색상 대비, 글씨 크기를 확인해요.", None, False),
     ("tests/content.test.js", "영어 내용 검사", "번역 누락, 중복, 정답 오류를 기계로 검사해요. 사람 검수를 대신하지는 못해요.", None, False),
     (".github/workflows/ios.yml", "iOS 빌드 확인", "맥 없이 시뮬레이터용 컴파일을 확인해요.", None, False),
     ("docs/MOBILE.md", "4단계: 모바일 앱", "빌드 구조와 기기 점검표예요.", None, False),
