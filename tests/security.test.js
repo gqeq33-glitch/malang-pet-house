@@ -12,8 +12,8 @@ const section = html.slice(html.indexOf('/* SAVE-GUARD-START'), html.indexOf('/*
 const lineOf = name => html.split('\n').find(l => l.startsWith(`const ${name} = `));
 const ctx = {};
 vm.createContext(ctx);
-vm.runInContext(`${lineOf('escapeHTML')}\n${lineOf('cleanName')}\n${section}\nthis.saveGuard = saveGuard; this.cleanName = cleanName; this.escapeHTML = escapeHTML;`, ctx);
-const { saveGuard, cleanName, escapeHTML } = ctx;
+vm.runInContext(`${lineOf('escapeHTML')}\n${lineOf('cleanName')}\n${section}\nthis.saveGuard = saveGuard; this.migrateSave = migrateSave; this.SAVE_VERSION = SAVE_VERSION; this.cleanName = cleanName; this.escapeHTML = escapeHTML;`, ctx);
+const { saveGuard, cleanName, escapeHTML, migrateSave, SAVE_VERSION } = ctx;
 
 const table = (...ids) => Object.fromEntries(ids.map(i => [i, { name: i, slot: i === 'cape' ? 'back' : 'top' }]));
 const cat = {
@@ -31,7 +31,7 @@ const plain = v => JSON.parse(JSON.stringify(v));
 test('정상 백업: 값이 그대로 유지된다', () => {
   const d = save({
     best: { obby: 12.5 }, story: { i: 2, prog: 1, doneSeen: true }, parent: { limit: 60, breakEvery: 30, bedtime: true }, play: { day: 'Thu Nov 05 2026', sec: 10, extra: 0, nightOk: '' },
-    farm: { plots: [null, { crop: 'carrot', stage: 1, wet: true }], pantry: { carrot: 2 }, harvested: 1, cooked: 0 }, missions: { day: 'ongoing', list: [{ id: 'feed', prog: 0, claimed: false }] },
+    farm: { plots: [null, { crop: 'carrot', stage: 1, wet: true, start: 1000 }], pantry: { carrot: 2 }, harvested: 1, cooked: 0 }, missions: { day: 'ongoing', list: [{ id: 'feed', prog: 0, claimed: false }] },
     decor: { owned: ['teddy'], placed: { teddy: { x: 1, z: 2, r: 0 } } }, friends: { somsom: { pts: 3, met: true, day: '', q: 'none' } }, badges: { eng3: 'Thu Nov 05 2026' }, rewardClaims: { palAdd: 1 },
     stickers: { found: [1, 2], gifts: 0 }, pass: { pts: 10, got: 1 }, season: { id: 'halloween', year: 2026, candy: 1, found: [0] }, pals: [{ id: 'abc', n: '친구', s: 'cat' }], palId: 'abc123', palNote: 2,
     eng: { stage: 1, viewStage: 0, xp: 10, level: 2, units: { abc1: { stars: 3 } }, w: { "What's up?": { b: 1, due: 1000 } }, right: 3, wrong: 1, gifts: 1, slow: false, goals: { l1: 1 }, grad: { date: '2026. 11. 5.', score: 90 }, chatN: 1 }
@@ -88,7 +88,15 @@ const rejects = {
   '영어 속성 위조': save({ eng: { level: 1, evil: 1 } }),
   '친구 목록 위조': save({ pals: [{ id: 'a', n: 'x', s: 'dragon' }] }),
   '친구가 너무 많음': save({ pals: Array.from({ length: 9 }, (_, i) => ({ id: 'a' + i, n: 'x', s: 'cat' })) }),
-  '보호자 값 위조': save({ parent: { limit: 'none' } })
+  '보호자 값 위조': save({ parent: { limit: 'none' } }),
+  '텃밭 단계 위조': save({ farm: { plots: [{ crop: 'carrot', stage: 99 }], pantry: {}, harvested: 0, cooked: 0 } }),
+  '텃밭 시간이 글자': save({ farm: { plots: [{ crop: 'carrot', start: 'x' }], pantry: {}, harvested: 0, cooked: 0 } }),
+  '가구 위치가 글자': save({ decor: { owned: ['teddy'], placed: { teddy: { x: 'a', z: 1, r: 0 } } } }),
+  '친구 점수 위조': save({ friends: { somsom: { pts: -1 } } }),
+  '배지에 객체': save({ badges: { eng3: { a: 1 } } }),
+  '일일 기록 위조': save({ daily: { pat: 'x' } }),
+  '목표 값 위조': save({ eng: { goals: { l1: 9 } } }),
+  '더 새로운 버전': save({ sv: 999 })
 };
 for (const [name, d] of Object.entries(rejects)) test(`비정상 백업 거부: ${name}`, () => assert.ok(strict(d).err, '거부되어야 한다'));
 
@@ -147,4 +155,58 @@ test('서비스 워커: 게임 화면은 네트워크 우선이고 옛 화면을
   const sw = fs.readFileSync(path.join(root, 'www', 'sw.js'), 'utf8');
   assert.ok(sw.includes("req.mode === 'navigate'"));
   assert.ok(sw.includes('c.navigate(c.url)'));
+});
+test('마이그레이션: 옛 저장을 지금 버전으로 올리고 입력은 바꾸지 않는다', () => {
+  const old = { v: 1, coins: 3, pets: [pet()], chatOK: true, eng: { level: 2, chatNick: 7 } }, before = JSON.stringify(old);
+  const m = migrateSave(old);
+  assert.equal(JSON.stringify(old), before);
+  assert.equal(m.sv, SAVE_VERSION);
+  assert.equal(m.chatOK, undefined);
+  assert.equal(m.eng.chatNick, undefined);
+  assert.equal(m.eng.level, 2);
+});
+test('지금 버전의 저장에 없앤 값이 있으면 거부한다', () => assert.ok(strict(save({ sv: SAVE_VERSION, chatOK: true })).err));
+test('더 새로운 버전의 기기 저장은 멈추지 않고 읽는다', () => {
+  const r = fix(save({ sv: 999 }));
+  assert.equal(r.err, undefined);
+  assert.equal(r.data.sv, SAVE_VERSION);
+});
+test('변조된 중첩 값: 고쳐서 읽는다', () => {
+  const r = fix(save({ farm: { plots: [{ crop: 'carrot', stage: 99, wet: 'x', start: 'y', evil: 1 }], pantry: { carrot: -3 }, harvested: 'a', cooked: 0 }, decor: { owned: ['teddy'], placed: { teddy: { x: 'a', z: 5000, r: 0, evil: 1 } } }, friends: { somsom: { pts: 'x', met: 1, evil: 2 } }, badges: { a: { b: 1 } } }));
+  assert.equal(r.err, undefined);
+  const pl = r.data.farm.plots[0];
+  assert.equal(pl.stage, 3); assert.equal(pl.start, 0); assert.equal(pl.wet, undefined); assert.equal(pl.evil, undefined);
+  assert.deepEqual(plain(r.data.decor.placed.teddy), { x: 0, z: 1000, r: 0 });
+  assert.equal(r.data.friends.somsom.pts, undefined); assert.equal(r.data.friends.somsom.evil, undefined);
+  assert.equal(r.data.badges.a, undefined);
+});
+test('개인정보처리방침: 한국어와 영어의 구조가 같다', () => {
+  const pv = fs.readFileSync(path.join(root, 'www', 'privacy.html'), 'utf8');
+  const part = id => pv.slice(pv.indexOf(`<section id="${id}"`), pv.indexOf('</section>', pv.indexOf(`<section id="${id}"`)));
+  const ko = part('ko'), en = part('en');
+  const shape = x => x.split('<h2>').slice(1).map(sec => (sec.match(/<p>/g) || []).length);
+  assert.equal(shape(ko).length, 6);
+  assert.deepEqual(shape(ko), shape(en));
+  assert.ok(ko.includes('말랑 영어 펫하우스') && en.includes('Malang English Pet House'));
+  assert.ok(ko.includes('2026년 11월 6일') && en.includes('November 6, 2026'));
+  assert.ok(!pv.includes('<h1>말랑 펫하우스'));
+});
+test('서비스 워커: 미리 받는 파일이 모두 있다', () => {
+  const sw = fs.readFileSync(path.join(root, 'www', 'sw.js'), 'utf8');
+  const list = JSON.parse(sw.slice(sw.indexOf('[', sw.indexOf('const FILES')), sw.indexOf('];') + 1).replace(/'/g, '"').replace(/,\s*\]/, ']'));
+  for (const f of list) if (f !== './') assert.ok(fs.existsSync(path.join(root, 'www', f)), f);
+});
+test('서비스 워커(모의 실행): 인터넷이 끊기면 저장본을, 연결되면 새 화면을 준다', async () => {
+  const handlers = {}, saved = new Map([['index.html', 'OLD']]);
+  const cachesMock = { match: async k => saved.get(typeof k === 'string' ? k : k.url), open: async () => ({ put: async (k, v) => saved.set(k, v), addAll: async () => {} }), keys: async () => [], delete: async () => true };
+  let online = false;
+  const sandbox = { self: { addEventListener: (n, f) => { handlers[n] = f; }, location: { origin: 'https://a' } }, location: { origin: 'https://a' }, caches: cachesMock, URL, Response: { error: () => 'ERR' },
+    fetch: async () => { if (!online) throw new Error('offline'); return { ok: true, clone: () => 'NEW', body: 'NEW' }; } };
+  vm.runInNewContext(fs.readFileSync(path.join(root, 'www', 'sw.js'), 'utf8'), sandbox);
+  const go = () => new Promise((res, rej) => handlers.fetch({ request: { method: 'GET', url: 'https://a/', mode: 'navigate' }, respondWith: p => p.then(res, rej) }));
+  assert.equal(await go(), 'OLD');
+  online = true;
+  assert.equal((await go()).body, 'NEW');
+  await new Promise(r => setTimeout(r, 5));
+  assert.equal(saved.get('index.html'), 'NEW');
 });

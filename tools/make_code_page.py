@@ -31,6 +31,7 @@ FILES = [
     ("docs/USER_TEST_PLAN.md", "5단계: 사용자 시험", "보호자 동의서, 지표, 설문이에요.", None, False),
     ("docs/STORE_SUBMISSION.md", "6단계: 스토어·수익화", "제출 자료와 결제 설계예요.", None, False),
     ("tools/export_content.py", "검수용 CSV 만들기", "", None, False),
+    ("tools/set_contact_email.py", "문의 이메일 설정", "실제 주소를 정하면 개인정보처리방침에 넣어요.", None, False),
     ("README.md", "설치·출시 안내서", "PWA 설치, 구글 플레이, 앱스토어 출시 방법이에요.", None, False),
     ("capacitor.config.json", "네이티브 앱 설정", "앱 ID와 이름이에요.", None, False),
     ("package.json", "Capacitor 패키지 목록", "", None, False),

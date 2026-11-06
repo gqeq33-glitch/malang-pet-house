@@ -75,7 +75,7 @@ PWA는 https 주소에 올려야 폰에서 설치 버튼이 나옵니다.
 - **대상 연령에 어린이를 포함** 하면 "가족 정책(Families)" 요건이 적용됩니다. 이 게임은 광고·결제·데이터 수집이 없어서 요건을 맞추기 쉽습니다.
 - **데이터 보안 양식:** "수집하는 데이터 없음, 공유하는 데이터 없음"으로 답하면 됩니다.
 - **개인정보처리방침 URL:** `https://아이디.github.io/malang-pet-house/privacy.html`
-  (먼저 `www/privacy.html` 안의 `YOUR-EMAIL@example.com` 을 본인 문의 메일로 바꾸세요.)
+  (먼저 `python tools/set_contact_email.py 본인메일주소` 로 문의 메일을 설정하세요.)
 
 ---
 

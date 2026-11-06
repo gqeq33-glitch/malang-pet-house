@@ -858,7 +858,7 @@ const formOf = lv => FORMS.reduce((f, x, i) => lv >= x.lv ? i : f, 0);
    ========================================================= */
 let S = null;
 function freshSave() {
-  return { v: 1, coins: 30, sound: true, active: 0, pets: [], hats: [], rooms: ['mint'], room: 'mint', lastTick: Date.now() };
+  return { v: 1, sv: SAVE_VERSION, coins: 30, sound: true, active: 0, pets: [], hats: [], rooms: ['mint'], room: 'mint', lastTick: Date.now() };
 }
 function newPet(sp, name) {
   return { sp, name, level: 1, xp: 0, hunger: 75, fun: 80, clean: 90, energy: 85, hat: null, asleep: false, hatched: false, taps: 0 };
@@ -866,7 +866,18 @@ function newPet(sp, name) {
 /* SAVE-GUARD-START
    저장 데이터 검사. repair가 false면(백업 복원) 이상한 값이 하나라도 있으면 거부하고,
    true면(기기에 있던 저장 읽기) 아이의 기록을 잃지 않도록 이상한 값만 고치거나 뺀다. 원본은 호출한 쪽이 보관한다. */
-const SAVE_MAX_CODE = 2000000, SAVE_MAX_PETS = 30;
+const SAVE_MAX_CODE = 2000000, SAVE_MAX_PETS = 30, SAVE_VERSION = 2;
+// 옛 저장을 지금 형식으로 올린다. 입력은 바꾸지 않는다. 형식이 바뀔 때마다 아래에 한 단계씩 더한다 (v는 호환을 위해 1로 유지)
+function migrateSave(raw) {
+  const d = JSON.parse(JSON.stringify(raw));
+  const from = Number.isInteger(d.sv) ? d.sv : 1;
+  if (from < 2) {   // sv 2: 온라인 대화 삭제 (3.2)
+    delete d.chatOK;
+    if (d.eng && typeof d.eng === 'object') delete d.eng.chatNick;
+  }
+  if (from <= SAVE_VERSION) d.sv = SAVE_VERSION;
+  return d;
+}
 function saveGuard(raw, cat, opt = {}) {
   const repair = !!opt.repair, now = opt.now || Date.now(), fixes = [];
   const fail = m => { if (!repair) throw new Error(m); fixes.push(m); };
@@ -877,7 +888,8 @@ function saveGuard(raw, cat, opt = {}) {
     if (!isObj(raw) || raw.v !== 1 || !Array.isArray(raw.pets)) throw new Error('pets');
     const size = JSON.stringify(raw).length;
     if (size > SAVE_MAX_CODE) throw new Error('size');
-    const d = JSON.parse(JSON.stringify(raw));
+    const d = migrateSave(raw);
+    if (d.sv > SAVE_VERSION) { if (!repair) throw new Error('newer'); fixes.push('sv'); d.sv = SAVE_VERSION; }
     // 이름은 cleanName으로 다듬으므로 일반 글자 검사에서 뺀다. 친구 목록은 normPal이 따로 검사한다
     const rawPets = d.pets, rawPals = d.pals; delete d.pets; delete d.pals;
     let nodes = 0;
@@ -931,8 +943,7 @@ function saveGuard(raw, cat, opt = {}) {
     const numMap = (o, k, max, re = ID) => { const m = sub(o, k); if (!m) return; for (const x of Object.keys(m)) { if (!re.test(x)) { fail(k); delete m[x]; continue; } num(m, x, 0, max, {}, k + '.' + x); } };
     const clean = scan(d, 0, 'save');
     Object.keys(d).forEach(k => delete d[k]); Object.assign(d, clean);
-    delete d.chatOK;   // 없앤 기능의 옛 값
-    const TOP = ['v', 'coins', 'sound', 'music', 'haptic', 'active', 'hats', 'rooms', 'room', 'lastTick', 'lastGift', 'best', 'story', 'parent', 'play', 'farm', 'missions', 'daily', 'rewardClaims', 'badges', 'friends', 'decor', 'dyes', 'wear', 'rides', 'rideSel', 'stickers', 'palId', 'palNote', 'pass', 'season', 'eng', 'duoSp', 'newsSeen', 'tut', 'dayEng', 'qa'];
+    const TOP = ['v', 'sv', 'coins', 'sound', 'music', 'haptic', 'active', 'hats', 'rooms', 'room', 'lastTick', 'lastGift', 'best', 'story', 'parent', 'play', 'farm', 'missions', 'daily', 'rewardClaims', 'badges', 'friends', 'decor', 'dyes', 'wear', 'rides', 'rideSel', 'stickers', 'palId', 'palNote', 'pass', 'season', 'eng', 'duoSp', 'newsSeen', 'tut', 'dayEng', 'qa'];
     for (const k of Object.keys(d)) if (!TOP.includes(k)) { fail(k); delete d[k]; }
     num(d, 'coins', 0, 100000000, { req: true, def: 0 });
     bool(d, 'sound'); bool(d, 'music'); bool(d, 'haptic'); if (d.sound === undefined) d.sound = true;
@@ -949,7 +960,7 @@ function saveGuard(raw, cat, opt = {}) {
     numMap(d, 'best', 10000000, /^[A-Za-z0-9_]{1,24}$/);
     numMap(d, 'rewardClaims', 10000000, /^[A-Za-z0-9_:.-]{1,60}$/);
     const story = sub(d, 'story', ['i', 'prog', 'doneSeen']); if (story) { num(story, 'i', 0, 100000, { int: true, def: 0 }, 'story.i'); num(story, 'prog', 0, 100000000, { def: 0 }, 'story.prog'); bool(story, 'doneSeen', 'story.doneSeen'); }
-    const parent = sub(d, 'parent', ['limit', 'breakEvery', 'bedtime']); if (parent) { num(parent, 'limit', 0, 1440, {}, 'parent.limit'); num(parent, 'breakEvery', 0, 1440, {}, 'parent.breakEvery'); bool(parent, 'bedtime', 'parent.bedtime'); }
+    const parent = sub(d, 'parent', ['limit', 'breakEvery', 'bedtime', 'palsOff']); if (parent) { num(parent, 'limit', 0, 1440, {}, 'parent.limit'); num(parent, 'breakEvery', 0, 1440, {}, 'parent.breakEvery'); bool(parent, 'bedtime', 'parent.bedtime'); bool(parent, 'palsOff', 'parent.palsOff'); }
     const play = sub(d, 'play', ['day', 'sec', 'extra', 'nightOk']); if (play) { str(play, 'day', 'play.day'); num(play, 'sec', 0, 100000000, {}, 'play.sec'); num(play, 'extra', 0, 1000000, {}, 'play.extra'); str(play, 'nightOk', 'play.nightOk'); }
     const pass = sub(d, 'pass', ['pts', 'got']); if (pass) { num(pass, 'pts', 0, 1000000000, { def: 0 }, 'pass.pts'); num(pass, 'got', 0, 100000, { int: true, def: 0 }, 'pass.got'); }
     const numList = (o, k, path) => { if (o[k] === undefined) return; if (!Array.isArray(o[k]) || o[k].length > 1000 || !o[k].every(x => typeof x === 'number')) { fail(path); o[k] = []; } };
@@ -958,22 +969,23 @@ function saveGuard(raw, cat, opt = {}) {
     const farm = sub(d, 'farm');
     if (farm) {
       if (!Array.isArray(farm.plots) || farm.plots.length > 24) { if (farm.plots !== undefined) fail('farm.plots'); farm.plots = [null, null, null, null, null, null]; }
-      farm.plots = farm.plots.map(pl => { if (pl === null) return null; if (!isObj(pl)) { fail('farm.plots'); return null; } return own(cat.CROPS, pl.crop) ? pl : null; });
+      farm.plots = farm.plots.map(pl => { if (pl === null) return null; if (!isObj(pl)) { fail('farm.plots'); return null; } if (!own(cat.CROPS, pl.crop)) return null; const out = { crop: pl.crop }; for (const k of ['stage', 'wet', 'start']) if (pl[k] !== undefined) out[k] = pl[k]; num(out, 'stage', 0, 3, { int: true, def: 0 }, 'farm.stage'); bool(out, 'wet', 'farm.wet'); num(out, 'start', 0, now + 86400000, { def: 0 }, 'farm.start'); return out; });
       numMap(farm, 'pantry', 10000000); if (!farm.pantry) farm.pantry = {};
       num(farm, 'harvested', 0, 100000000, { def: 0 }, 'farm.harvested'); num(farm, 'cooked', 0, 100000000, { def: 0 }, 'farm.cooked');
     }
     const ms = sub(d, 'missions');
-    if (ms) { if (!Array.isArray(ms.list) || ms.list.length > 20 || !ms.list.every(x => isObj(x) && own(cat.MISSIONS, x.id) && typeof x.prog === 'number' && x.prog >= 0)) delete d.missions; }
+    if (ms) { if (!Array.isArray(ms.list) || ms.list.length > 20 || !ms.list.every(x => isObj(x) && own(cat.MISSIONS, x.id) && typeof x.prog === 'number' && x.prog >= 0 && x.prog <= 1000000)) delete d.missions; }
     const dec = sub(d, 'decor', ['owned', 'placed']);
-    if (dec) { list(dec, 'owned', cat.DECOR, 300, 'decor.owned'); if (!dec.owned) dec.owned = []; const pl = sub(dec, 'placed', null, 'decor.placed') || {}; for (const k of Object.keys(pl)) if (!own(cat.DECOR, k) || !isObj(pl[k])) delete pl[k]; dec.placed = pl; }
-    const fr = sub(d, 'friends'); if (fr) for (const k of Object.keys(fr)) { if (!own(cat.FRIENDS, k) || !isObj(fr[k])) { delete fr[k]; continue; } num(fr[k], 'pts', 0, 10000000, {}, 'friends.pts'); }
-    sub(d, 'badges'); sub(d, 'daily');
+    if (dec) { list(dec, 'owned', cat.DECOR, 300, 'decor.owned'); if (!dec.owned) dec.owned = []; const pl = sub(dec, 'placed', null, 'decor.placed') || {}; for (const k of Object.keys(pl)) { if (!own(cat.DECOR, k) || !isObj(pl[k])) { delete pl[k]; continue; } for (const a of ['x', 'z', 'r']) num(pl[k], a, -1000, 1000, { def: 0 }, 'decor.placed.' + a); for (const a of Object.keys(pl[k])) if (!['x', 'z', 'r'].includes(a)) delete pl[k][a]; } dec.placed = pl; }
+    const fr = sub(d, 'friends'); if (fr) for (const k of Object.keys(fr)) { if (!own(cat.FRIENDS, k) || !isObj(fr[k])) { delete fr[k]; continue; } num(fr[k], 'pts', 0, 10000000, {}, 'friends.pts'); bool(fr[k], 'met', 'friends.met'); for (const a of ['day', 'q', 'qday', 'gday', 'rday']) str(fr[k], a, 'friends.' + a); for (const a of ['rcount', 'rid']) num(fr[k], a, 0, 1000000, {}, 'friends.' + a); for (const a of Object.keys(fr[k])) if (!['pts', 'met', 'day', 'q', 'qday', 'gday', 'rday', 'rcount', 'rid'].includes(a)) delete fr[k][a]; }
+    const flat = (k, ok) => { const m = sub(d, k); if (m) for (const x of Object.keys(m)) if (!ok(x, m[x])) { fail(k + '.' + x); delete m[x]; } };
+    flat('badges', (x, v) => ['string', 'number', 'boolean'].includes(typeof v));
+    flat('daily', (x, v) => (x === 'day' ? typeof v === 'string' : typeof v === 'number' && v >= 0 && v <= 10000000));
     const tut = sub(d, 'tut', ['step', 't0', 'secs', 'old']); if (tut) { if (!['egg', 'lesson', 'done'].includes(tut.step)) { fail('tut.step'); tut.step = 'done'; } num(tut, 't0', 0, now + 86400000, {}, 'tut.t0'); num(tut, 'secs', 0, 100000000, {}, 'tut.secs'); bool(tut, 'old', 'tut.old'); }
     const de = sub(d, 'dayEng', ['day', 'lesson', 'right', 'care', 'got']); if (de) { str(de, 'day', 'dayEng.day'); num(de, 'right', 0, 100000, { int: true, def: 0 }, 'dayEng.right'); bool(de, 'lesson', 'dayEng.lesson'); bool(de, 'care', 'dayEng.care'); bool(de, 'got', 'dayEng.got'); }
     const qa = sub(d, 'qa', ['t0', 'firstSec', 'days', 'daily', 'err']); if (qa) { num(qa, 't0', 0, now + 86400000, {}, 'qa.t0'); num(qa, 'firstSec', 0, 100000000, {}, 'qa.firstSec'); num(qa, 'daily', 0, 100000, { int: true }, 'qa.daily'); num(qa, 'err', 0, 100000, { int: true }, 'qa.err'); numList(qa, 'days', 'qa.days'); }
     const eng = sub(d, 'eng', ['stage', 'viewStage', 'xp', 'level', 'units', 'w', 'right', 'wrong', 'gifts', 'slow', 'goals', 'grad', 'chatN', 'chatNick', 'recent']);
     if (eng) {
-      delete eng.chatNick;
       if (eng.recent !== undefined && (!Array.isArray(eng.recent) || eng.recent.length > 20 || !eng.recent.every(x => x === 0 || x === 1))) { fail('eng.recent'); delete eng.recent; }
       for (const k of ['stage', 'viewStage']) if (eng[k] !== null) num(eng, k, 0, cat.engStages - 1, { int: true }, 'eng.' + k);
       num(eng, 'xp', 0, 1000000000, { def: 0 }, 'eng.xp'); num(eng, 'level', 1, 100000, { int: true, def: 1 }, 'eng.level');
@@ -981,7 +993,7 @@ function saveGuard(raw, cat, opt = {}) {
       bool(eng, 'slow', 'eng.slow');
       const un = sub(eng, 'units', null, 'eng.units'); if (un) for (const k of Object.keys(un)) { if (!cat.engUnits.has(k) || !isObj(un[k])) { delete un[k]; continue; } num(un[k], 'stars', 0, 3, { int: true, def: 0 }, 'eng.units.stars'); }
       const w = sub(eng, 'w', null, 'eng.w'); if (w) for (const k of Object.keys(w)) { if (!cat.engWords.has(k) || !isObj(w[k])) { delete w[k]; continue; } num(w[k], 'b', 0, 5, { int: true, def: 0 }, 'eng.w.b'); num(w[k], 'due', 0, 100000000000000, { def: 0 }, 'eng.w.due'); }
-      sub(eng, 'goals', null, 'eng.goals');
+      const gl = sub(eng, 'goals', null, 'eng.goals'); if (gl) for (const k of Object.keys(gl)) num(gl, k, 0, 1, { int: true }, 'eng.goals');
       const gr = sub(eng, 'grad', ['date', 'score'], 'eng.grad'); if (gr) { str(gr, 'date', 'eng.grad.date'); num(gr, 'score', 0, 100, {}, 'eng.grad.score'); }
     }
     // 펫
@@ -4113,6 +4125,7 @@ function syncPals() { World.setPals(palList().map(q => Object.assign({}, q, { ti
 // 이 단계에서 내 친구들 중 제일 빠른 기록
 function palBest(key) { let b = null; for (const q of palList()) if (q.best[key] && (!b || q.best[key] < b.t)) b = { n: q.n, t: q.best[key] }; return b; }
 function openPals() {
+  if (S.parent && S.parent.palsOff) return openSheet('🤝 친구 코드', '<p class="msub">보호자가 친구 코드를 꺼 두었어요. 보호자 메뉴에서 켤 수 있어요.</p>');
   const code = makePalCode(), list = palList();
   const rows = list.map((q, i) => `<button class="dex-card" data-pal="${i}"><span class="art">${petSVG(q.s, { mood: 'happy', stage: 'kid', hat: q.h })}</span><span class="txt"><span class="t1">${escapeHTML(q.n)}</span><br><span class="t2">${SPECIES[q.s].kind}${q.t ? ' · ' + escapeHTML(titleName(q.t)) : ''}${Number.isInteger(q.m) && PAL_NOTES[q.m] ? ' · 💌' + PAL_NOTES[q.m][0] : ''}</span></span><span class="go">기록 보기</span></button>`).join('');
   openSheet('🤝 친구 코드', `<p class="msub">코드를 주고받으면 친구 펫이 내 마을에 놀러 오고, 점프 코스 기록으로 겨룰 수 있어요. 코드에는 <b>펫 이름·모습·칭호·코스 기록</b>만 들어 있어요. 아는 친구와, 보호자와 함께 주고받아 주세요.</p>
@@ -4478,6 +4491,9 @@ function openParent() {
     <h4>영어 학습</h4>
     <p class="msub" style="margin:0">${(() => { const e = engState(), done = Object.values(e.units).filter(u => u.stars).length, total = ENG.reduce((a, g) => a + g.units.length, 0), all = (e.right || 0) + (e.wrong || 0); return `영어 Lv.${e.level} · 끝낸 레슨 ${done}/${total}개 · 배운 단어 ${engLearned()}개${all ? ` · 정답률 ${Math.round((e.right || 0) / all * 100)}%` : ''}`; })()}</p>
     <p class="msub" style="margin:6px 0 0">영어 내용은 제작자가 구성했고, 아직 영어 교사나 원어민의 검수를 받지 않았어요.</p>
+    <h4>친구 코드</h4>
+    <div class="seg"><button data-palc="1" class="${pa.palsOff ? '' : 'on'}">켜기</button><button data-palc="0" class="${pa.palsOff ? 'on' : ''}">끄기</button></div>
+    <p class="msub" style="margin:6px 0 0">이 앱에는 온라인 채팅과 낯선 사람과의 연결이 없어요. 친구 코드는 직접 복사해 전달하는 글자이고, 펫 이름이 들어 있어요. 끄면 아이가 코드를 만들거나 넣을 수 없어요.</p>
     <h4>시험 참여 기록</h4>
     <p class="msub" style="margin:0">보호자 동의 시험에 참여할 때만 쓰는 기록이에요. 이름 없이 방문 날짜 순서와 진행 숫자만 있고, 인터넷으로 보내지 않아요. 복사해서 직접 전달해야만 밖으로 나가요.</p>
     <div class="pin-row"><button class="candy" id="qaCopy">🧪 기록 복사</button></div>
@@ -4494,6 +4510,7 @@ function openParent() {
     else if (b.dataset.brk !== undefined) { pa.breakEvery = +b.dataset.brk; contSec = 0; }
     else if (b.dataset.bed !== undefined) pa.bedtime = b.dataset.bed === '1';
     else if (b.id === 'plus15') { S.play.extra = (S.play.extra || 0) + 15; toast('오늘만 15분 더 놀 수 있어요'); }
+    else if (b.dataset.palc !== undefined) pa.palsOff = b.dataset.palc === '0';
     else if (b.id === 'qaCopy') { const t = qaReport(); try { navigator.clipboard.writeText(t).then(() => toast('시험 기록을 복사했어요'), () => toast(t)); } catch (err) { toast('복사하지 못했어요'); } return; }
     else if (b.id === 'pinSet') return openPinSetup();
     else if (b.id === 'pinOff') { pinClear(); toast('PIN을 껐어요'); }
@@ -4506,7 +4523,7 @@ function openParent() {
 
 /* ---------- 기록 백업: 서버 없이 '백업 코드' 글자로 옮긴다 ----------
    코드 = 'MALANG1.' + 저장 데이터(JSON)를 base64로 + '.' + 확인용 숫자. 저장 형식(S)은 바꾸지 않는다 */
-const BACKUP_PREFIX = 'MALANG1.';
+const BACKUP_PREFIX = 'MALANG1.', RESTORE_NOTE_KEY = 'malang-restore-note';
 const hashStr = str => { let h = 2166136261; for (let i = 0; i < str.length; i++) h = Math.imul(h ^ str.charCodeAt(i), 16777619) >>> 0; return h.toString(36); };
 const toB64 = str => { const b = new TextEncoder().encode(str); let bin = ''; for (let i = 0; i < b.length; i += 8192) bin += String.fromCharCode.apply(null, b.subarray(i, i + 8192)); return btoa(bin); };
 const fromB64 = b64 => new TextDecoder().decode(Uint8Array.from(atob(b64), c => c.charCodeAt(0)));
@@ -4514,6 +4531,7 @@ function makeBackup() { persist(); const json = JSON.stringify(S); return BACKUP
 // 코드가 맞는지 확인만 하고, 실제로 덮어쓰기 전에는 아무것도 바꾸지 않는다
 function readBackup(code) {
   const c = String(code || '').replace(/\s+/g, '');
+  if (!c) return { err: '백업 코드를 붙여 넣거나 파일을 골라 주세요.' };
   if (c.length > SAVE_MAX_CODE) return { err: '백업 코드가 너무 커서 읽을 수 없어요.' };
   if (!c.startsWith(BACKUP_PREFIX)) return { err: '말랑 펫하우스 백업 코드가 아니에요. MALANG1. 로 시작하는 글자 전체를 붙여 넣어 주세요.' };
   const parts = c.slice(BACKUP_PREFIX.length).split('.');
@@ -4523,15 +4541,26 @@ function readBackup(code) {
   try { json = fromB64(b64); d = JSON.parse(json); } catch (e) { return { err: '코드 일부가 빠진 것 같아요. 처음부터 끝까지 다시 복사해 주세요.' }; }
   if (hashStr(json) !== sum) return { err: '코드 일부가 바뀌었거나 빠졌어요. 다시 복사해 주세요.' };
   const res = saveGuard(d, saveCatalog());
-  if (res.err) return { err: res.err === 'pets' ? '이 코드에는 펫 기록이 없어요.' : `이 백업에 잘못된 값이 있어서 되살리지 않았어요. 지금 기록은 그대로예요. (항목: ${res.err})` };
+  if (res.err) return { err: res.err === 'pets' ? '이 코드에는 펫 기록이 없어요. 지금 기록은 그대로예요.' : res.err === 'newer' ? '더 새로운 버전에서 만든 백업이에요. 앱을 업데이트한 뒤 다시 해 주세요. 지금 기록은 그대로예요.' : res.err === 'size' ? '백업 데이터가 너무 커서 되살리지 않았어요. 지금 기록은 그대로예요.' : `이 백업에 잘못된 값이 있어서 되살리지 않았어요. 지금 기록은 그대로예요. (항목: ${res.err})` };
   return { data: res.data };
 }
 // 지금 저장을 따로 보관한 다음 바꾼다. 어느 단계에서 실패해도 원래 저장을 되돌린다
 function writeRestore(d) {
   const prev = localStorage.getItem(SAVE_KEY);
   localStorage.setItem(SAVE_KEY + '-before-restore', prev || JSON.stringify(S));
-  try { d.lastTick = Date.now(); localStorage.setItem(SAVE_KEY, JSON.stringify(d)); }
-  catch (e) { try { if (prev) localStorage.setItem(SAVE_KEY, prev); } catch (err) {} throw e; }
+  try {
+    d.lastTick = Date.now(); const json = JSON.stringify(d);
+    localStorage.setItem(SAVE_KEY, json);
+    if (localStorage.getItem(SAVE_KEY) !== json) throw new Error('verify');   // 제대로 써졌는지 다시 읽어 확인한다
+    localStorage.setItem(RESTORE_NOTE_KEY, JSON.stringify({ pets: d.pets.length, coins: d.coins }));
+  } catch (e) { try { if (prev) localStorage.setItem(SAVE_KEY, prev); } catch (err) {} throw e; }
+}
+// 다시 시작한 뒤 복원 결과를 알려 준다
+function showRestoreNote() {
+  try {
+    const n = JSON.parse(localStorage.getItem(RESTORE_NOTE_KEY) || 'null'); localStorage.removeItem(RESTORE_NOTE_KEY);
+    if (n && Number.isFinite(n.pets)) setTimeout(() => toast(`✅ 복원 완료: 펫 ${n.pets}마리, 코인 ${n.coins}개`), 900);
+  } catch (e) {}
 }
 function openBackupOut() {
   const code = makeBackup();
@@ -4575,7 +4604,7 @@ function openBackupIn() {
     body.querySelector('#bkUndo')?.addEventListener('click', undoRestore);
     const ta = body.querySelector('#bkPaste'), out = body.querySelector('#bkResult'), fileIn = body.querySelector('#bkFileIn');
     body.querySelector('#bkPick').addEventListener('click', () => fileIn.click());
-    fileIn.addEventListener('change', () => { const f = fileIn.files[0]; if (!f) return; if (f.size > SAVE_MAX_CODE) return warnOut('파일이 너무 커서 읽지 않았어요. 지금 기록은 그대로예요.'); f.text().then(t => { ta.value = t.trim(); check(); }); });
+    fileIn.addEventListener('change', () => { const f = fileIn.files[0]; if (!f) return; if (f.size > SAVE_MAX_CODE) return warnOut('파일이 너무 커서 읽지 않았어요. 지금 기록은 그대로예요.'); f.text().then(t => { ta.value = t.trim(); check(); }, () => warnOut('파일을 읽지 못했어요. 지금 기록은 그대로예요.')); });
     const warnOut = t => { const w = document.createElement('p'); w.className = 'warn'; w.textContent = t; out.replaceChildren(w); };
     const check = () => {
       const r = readBackup(ta.value);
@@ -4589,7 +4618,7 @@ function openBackupIn() {
       out.querySelector('#bkYes').addEventListener('click', () => {
         try {
           writeRestore(d);
-        } catch (e) { return warnOut('기기 저장 공간이 모자라 바꾸지 못했어요. 사진 앨범의 사진을 몇 장 지우고 다시 해 주세요.'); }
+        } catch (e) { return warnOut('기기 저장 공간이 모자라 바꾸지 못했어요. 지금 기록은 그대로예요. 사진 앨범의 사진을 몇 장 지우고 다시 해 주세요.'); }
         restoring = true; toast('기록을 되살렸어요! 다시 시작할게요'); setTimeout(() => location.reload(), 900);
       });
       out.querySelector('#bkYes').focus();
@@ -7186,22 +7215,44 @@ function tick() {
   if (P()) render();
 }
 let saveCount = 0;
+// 저장 때문에 시작하다 멈추면 저장을 덮어쓰지 않고 복구 화면을 보여 준다
+function bootFail(err) {
+  restoring = true;   // 깨진 상태를 저장하지 않는다
+  let raw = null;
+  try { raw = localStorage.getItem(SAVE_KEY); if (raw) localStorage.setItem(SAVE_KEY + '-invalid', raw); } catch (e) {}
+  const el = document.createElement('div'); el.className = 'gate-wrap'; el.id = 'bootFail';
+  const card = document.createElement('div'); card.className = 'g-card'; card.setAttribute('role', 'alertdialog'); card.setAttribute('aria-labelledby', 'bootT');
+  const title = document.createElement('h3'); title.id = 'bootT'; title.textContent = '기록을 여는 데 문제가 생겼어요';
+  const note = document.createElement('p'); note.textContent = '기록은 지우지 않고 기기에 보관해 두었어요. 어른과 함께 아래에서 골라 주세요.';
+  card.append(title, note);
+  const btn = (text, fn, cls = 'candy') => { const b = document.createElement('button'); b.className = cls; b.style.cssText = 'width:100%;margin-top:8px'; b.textContent = text; b.addEventListener('click', fn); card.append(b); return b; };
+  btn('다시 시도하기', () => location.reload(), 'candy primary');
+  if (hasBeforeRestore()) btn('복원하기 바로 전 기록으로 되돌리기', undoRestore);
+  btn('새로 시작하기 (보관한 기록은 남겨 둬요)', () => parentGate(() => {
+    try { if (raw) localStorage.setItem(SAVE_KEY + '-reset-backup', raw); localStorage.removeItem(SAVE_KEY); } catch (e) {}
+    location.reload();
+  }));
+  el.append(card); $('#app').appendChild(el);
+}
 function start(hotData) {
-  S = (hotData && hotData.v === 1 && Array.isArray(hotData.pets)) ? hotData : (load() || freshSave());
-  S.best = S.best || {};
-  S.story = S.story || { i: 0, prog: 0 };
-  S.parent = Object.assign({ limit: 60, breakEvery: 30, bedtime: true }, S.parent);
-  if (S.pets.length && !S.tut) S.tut = { step: 'done', old: true };   // 이미 하던 저장은 튜토리얼 없이, 열린 곳을 닫지 않는다
-  qaState();
-  if (!S.pets.length) { showStart(); }
-  else {
-    const away = (Date.now() - S.lastTick) / 60000;
-    showHome(); tick(); storyCatchUpOnLoad();
-    const p = P();
-    say(idleLine(), 7000);
-    // 영어가 이 게임의 중심: 켜면 영어 지도부터 보여 준다. 닫으면 바로 펫 놀이를 할 수 있다
-    if (p.hatched) setTimeout(() => { if (!scrim && !gameOn && !restOpen && !talking && !bathing) openEnglish(); }, 1500);
-  }
+  try {
+    S = (hotData && hotData.v === 1 && Array.isArray(hotData.pets)) ? hotData : (load() || freshSave());
+    S.best = S.best || {};
+    S.story = S.story || { i: 0, prog: 0 };
+    S.parent = Object.assign({ limit: 60, breakEvery: 30, bedtime: true }, S.parent);
+    if (S.pets.length && !S.tut) S.tut = { step: 'done', old: true };   // 이미 하던 저장은 튜토리얼 없이, 열린 곳을 닫지 않는다
+    qaState();
+    if (!S.pets.length) { showStart(); }
+    else {
+      const away = (Date.now() - S.lastTick) / 60000;
+      showHome(); tick(); storyCatchUpOnLoad();
+      const p = P();
+      say(idleLine(), 7000);
+      // 영어가 이 게임의 중심: 켜면 영어 지도부터 보여 준다. 닫으면 바로 펫 놀이를 할 수 있다
+      if (p.hatched) setTimeout(() => { if (!scrim && !gameOn && !restOpen && !talking && !bathing) openEnglish(); }, 1500);
+    }
+    showRestoreNote();
+  } catch (err) { bootFail(err); return; }
   setInterval(() => { if (!S.pets.length) return; tick(); playTick(); if (++saveCount % 10 === 0) persist(); }, 1000);
   document.addEventListener('visibilitychange', () => { if (S.pets.length) { tick(); persist(); } });
   window.addEventListener('pagehide', persist);
