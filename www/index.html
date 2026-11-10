@@ -1618,6 +1618,8 @@ const World = (() => {
      모델을 못 불러오면(오래된 기기, 파일 열기 실행 등) 예전 모습을 그대로 쓴다. 저장 데이터의 종족 이름은 그대로다 */
   let glbBear = null, glbPlaza = null, oldFountain = [], dropY = 1.85;
   const GLB_MATS = {}, FACE_TX = {};
+  // 저사양 기기(코어 4개 이하 또는 메모리 3GB 이하)는 코팅 광택이 없는 가벼운 재질을 쓴다
+  const LOW_GFX = (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 3;
   const MB_IRIS = '#8A5536';
   function mbEye(kind) {
     const c = document.createElement('canvas'); c.width = 160; c.height = 200; const g = c.getContext('2d'), cx = 80, cy = 104, TAU = Math.PI * 2;
@@ -1654,18 +1656,26 @@ const World = (() => {
     const key = src.uuid + (tint || '');
     if (GLB_MATS[key]) return GLB_MATS[key];
     const col = tint ? new T.Color(tint) : src.color.clone(), glow = src.emissive && (src.emissive.r + src.emissive.g + src.emissive.b) > .05;
-    return (GLB_MATS[key] = new T.MeshPhysicalMaterial({ color: col, roughness: Math.min(.7, src.roughness ?? .55), metalness: src.metalness || 0, clearcoat: .35, clearcoatRoughness: .45, emissive: glow ? src.emissive : col, emissiveIntensity: glow ? 1 : .13 }));
+    const opt = { color: col, roughness: Math.min(.7, src.roughness ?? .55), metalness: src.metalness || 0, emissive: glow ? src.emissive : col, emissiveIntensity: glow ? 1 : .13 };
+    return (GLB_MATS[key] = LOW_GFX ? new T.MeshStandardMaterial(opt) : new T.MeshPhysicalMaterial(Object.assign(opt, { clearcoat: .35, clearcoatRoughness: .45 })));
   }
   function glbBearInto(pt, body, tint, cloth) {
     const g = glbBear.scene.clone(true), sub = group(0, -.15, 0, body); sub.scale.setScalar(.66); sub.add(g);
-    g.traverse(o => { if (!o.isMesh) return; const fur = /^mat_ffdfb8$/i.test(o.material.name); o.material = glbMat(o.material, fur ? tint : null); o.castShadow = !o.material.transparent; o.receiveShadow = false; });
+    const own = [];
+    g.traverse(o => { if (!o.isMesh) return; const fur = /^mat_ffdfb8$/i.test(o.material.name); o.material = glbMat(o.material, fur ? tint : null); if (o.material.transparent) own.push(o.material); o.castShadow = !o.material.transparent; o.receiveShadow = false; });
+    pt.dispose = () => own.forEach(m => m.dispose());
     const n = k => g.getObjectByName(k);
     pt.legL = n('MB_legL'); pt.legR = n('MB_legR'); pt.footL = pt.legL; pt.footR = pt.legR; pt.footBase = pt.legL.position.y;
     pt.armL = n('MB_armL'); pt.armR = n('MB_armR'); pt.earL = n('MB_earL'); pt.earR = n('MB_earR'); pt.earBase = 0; pt.tail = n('MB_tail');
     pt.mbFace = { eye: 'open', shown: '', mouthK: '', eyeL: n('MB_eyeL').material, eyeR: n('MB_eyeR').material, mouth: n('MB_mouth').material };
-    if (cloth) { const sh = new T.Mesh(SPH, new T.MeshPhysicalMaterial({ color: cloth.c, roughness: .6, emissive: cloth.c, emissiveIntensity: .15 })); sh.position.set(0, .7, 0); sh.scale.set(.62, .61, .58); sh.castShadow = true; n('MB_body').add(sh); }
+    if (cloth) { const sh = new T.Mesh(SPH, new T.MeshStandardMaterial({ color: cloth.c, roughness: .6, emissive: cloth.c, emissiveIntensity: .15 })); own.push(sh.material); sh.position.set(0, .7, 0); sh.scale.set(.62, .61, .58); sh.castShadow = true; n('MB_body').add(sh); }
     // 깜빡임: 게임이 eyesOpen 크기를 줄이는 순간 눈 그림을 감은 눈으로 바꾼다
-    n('MB_skull').onBeforeRender = () => { const f = pt.mbFace, closed = pt.eyesOpen && pt.eyesOpen.scale.y < .5 && (f.eye === 'open' || f.eye === 'star'), want = closed ? 'closed' : f.eye; if (f.shown !== want) { f.shown = want; f.eyeL.map = f.eyeR.map = faceTex(want); } };
+    n('MB_skull').onBeforeRender = () => {
+      const f = pt.mbFace, now = performance.now();
+      if (f.eye !== f.last) { if (f.last) f.swapT = now; f.last = f.eye; }   // 표정이 바뀌면 0.09초 감았다 뜬다
+      const closed = (pt.eyesOpen && pt.eyesOpen.scale.y < .5 && (f.eye === 'open' || f.eye === 'star')) || now - (f.swapT || 0) < 90, want = closed ? 'closed' : f.eye;
+      if (f.shown !== want) { f.shown = want; f.eyeL.map = f.eyeR.map = faceTex(want); }
+    };
     pt.glb = true;
   }
   const GLB_FACE = { normal: ['open', 'w'], happy: ['happy', 'open'], love: ['heart', 'open'], eat: ['happy', 'open'], sleep: ['closed', 'sleep'], sad: ['sad', 'sad'], surprise: ['surprised', 'o'], talk: ['open', 'open'], curious: ['open', 'o'], think: ['open', 'flat'], excited: ['star', 'open'] };
@@ -1674,7 +1684,8 @@ const World = (() => {
     oldFountain.forEach(m => { m.visible = false; });
     const g = glbPlaza.scene.clone(true); g.position.set(VX, 0, -1.5);
     g.traverse(o => { if (o.isMesh) { o.material = glbMat(o.material); o.castShadow = !o.material.transparent; o.receiveShadow = true; } });
-    g.children.forEach(o => { if (/^PZ_lamp/.test(o.name) && o.position.z > 2) o.visible = false; });   // 카메라 쪽 가로등은 펫을 가린다
+    const root = g.getObjectByName('PZ_root') || g, cols = Array.isArray(root.userData.colliders) ? root.userData.colliders : [];
+    for (const [x, z, r] of cols) if ([x, z, r].every(Number.isFinite) && r > 0 && r < 2) OBS.push({ x0: x - r, x1: x + r, z0: z - 1.5 - r, z1: z - 1.5 + r });   // 모델 좌표는 분수 중심 기준
     villageG.add(g); dropY = 2.12;
   }
   function loadGlb() {
@@ -3349,7 +3360,7 @@ const World = (() => {
       if (!ok) { if (flat) flat.innerHTML = p.hatched ? petSVG(p.sp, { mood, stage: stageOf(p.level), hat: p.hat, dirt: Math.round(dirt * 10) / 10 }) : eggSVG(p.sp, p.taps); return; }
       const form = st.formHold !== null ? st.formHold : formOf(p.level);
       const tint = p.hatched ? dyeColor(p) : null, key = p.hatched ? `${p.sp}|${p.hat}|${form}|${tint}|${p.back || ''}|${p.neck || ''}|${p.top || ''}` : `egg|${p.sp}|${p.taps}`;
-      if (key !== petKey) { if (pet) scene.remove(pet.root); pet = p.hatched ? buildPet(p.sp, p.hat, form, tint, p.back, p.neck, p.top) : buildEgg(p.sp, p.taps); scene.add(pet.root); petKey = key; }
+      if (key !== petKey) { if (pet) { scene.remove(pet.root); if (pet.dispose) pet.dispose(); } pet = p.hatched ? buildPet(p.sp, p.hat, form, tint, p.back, p.neck, p.top) : buildEgg(p.sp, p.taps); scene.add(pet.root); petKey = key; }
       if (pet.setFace) { if (!TRICK_FACE[st.trick]) pet.setFace(mood); pet.setDirt(dirt); }
     },
     place(x, z) { trail = []; if (ok && st.area !== 'house') setArea('house'); st.x = x; st.z = z; st.path = []; st.mode = 'idle'; st.at = null; st.lift = 0; st.camX = clamp(x, -4.4, 4.4); st.camZ = clamp(z, -4.4, 5); },
@@ -3513,7 +3524,7 @@ const World = (() => {
       prScene.add(parts.root);
       const h = 1.85 * parts.root.scale.y; prCam.position.set(0, h * .62, h * 2.2); prCam.lookAt(0, h * .5, 0);
       pr.render(prScene, prCam); const url = pr.domElement.toDataURL('image/png');
-      prScene.remove(parts.root);
+      prScene.remove(parts.root); if (parts.dispose) parts.dispose();
       if (Object.keys(portraits).length > 60) for (const k of Object.keys(portraits)) if (k.startsWith('pet:')) delete portraits[k];
       return (portraits['pet:' + key] = url);
     },

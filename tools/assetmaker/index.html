@@ -5,6 +5,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/utils/BufferGeometryUtils.js"></script>
 <script src="malang_assets.js"></script>
 <script>
 const log = (...a) => { document.getElementById('log').textContent += '\n' + a.join(' '); };
@@ -68,7 +69,7 @@ async function run() {
   const gs = new THREE.Scene(); gs.add(GB.root);
   const glb = await new Promise(r => ex1.parse(gs, r, { binary: true, animations: clips, embedImages: true, onlyVisible: true }));
   await save('models/malang_bear.glb', new Blob([glb], { type: 'model/gltf-binary' }));
-  const GP = buildPlaza(true, pathAngles); const ps = new THREE.Scene(); ps.add(GP.root);
+  const GP = buildPlaza(true, pathAngles); const ps = new THREE.Scene(); ps.add(mergePlaza(GP.root));
   const glb2 = await new Promise(r => ex1.parse(ps, r, { binary: true, embedImages: true, onlyVisible: true }));
   await save('models/malang_plaza.glb', new Blob([glb2], { type: 'model/gltf-binary' }));
   // 다시 불러와 검사
@@ -77,7 +78,8 @@ async function run() {
     const buf = f === 'malang_bear.glb' ? glb : glb2;
     const g = await new Promise((res, rej) => loader.parse(buf, '', res, rej));
     let tris = 0, meshes = 0, mats = new Set(); g.scene.traverse(o => { if (o.isMesh) { meshes++; mats.add(o.material.uuid); const ix = o.geometry.index; tris += (ix ? ix.count : o.geometry.attributes.position.count) / 3; } });
-    stats[f] = { bytes: buf.byteLength, tris: Math.round(tris), meshes, materials: mats.size, clips: g.animations.map(a => a.name), nodes: ['MB_head', 'MB_armL', 'MB_armR', 'MB_legL', 'MB_legR', 'MB_earL', 'MB_earR', 'MB_tail', 'MB_eyeL', 'MB_mouth', 'PZ_fountain'].filter(n => g.scene.getObjectByName(n)) };
+    const colliders = (g.scene.getObjectByName('PZ_root') || {}).userData?.colliders;
+    stats[f] = { bytes: buf.byteLength, tris: Math.round(tris), meshes, materials: mats.size, clips: g.animations.map(a => a.name), nodes: ['MB_head', 'MB_armL', 'MB_armR', 'MB_legL', 'MB_legR', 'MB_earL', 'MB_earR', 'MB_tail', 'MB_eyeL', 'MB_mouth', 'PZ_fountain', 'PZ_decor'].filter(n => g.scene.getObjectByName(n)), colliders: colliders ? colliders.length : 0 };
   }
   stats.plazaCounts = GP.root.userData.counts;
   await save('models/model_report.json', new Blob([JSON.stringify(stats, null, 2)]));

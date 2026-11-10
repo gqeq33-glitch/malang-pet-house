@@ -192,3 +192,21 @@ test('업데이트: 놀이 중에는 새로고침을 미룬다', () => {
   assert.ok(sw.includes("c.visibilityState === 'visible' ? c.postMessage({ type: 'malang-updated' })"));
   assert.ok(html.includes("e.data.type !== 'malang-updated'") && html.includes('const safe = () => !gameOn && !scrim'));
 });
+
+// ---------- STEP 3: 3D 성능 정리 ----------
+test('3D 성능: 곰 1.1만·광장 2만 삼각형 이하, 광장은 합친 메시, 장식 충돌 정보', () => {
+  const tris = file => { const { json } = readGlb(file); let n = 0; for (const m of json.meshes) for (const pr of m.primitives) { const acc = json.accessors[pr.indices ?? pr.attributes.POSITION]; n += acc.count / 3; } return { n: Math.round(n), json }; };
+  const bear = tris('malang_bear.glb'), plaza = tris('malang_plaza.glb');
+  assert.ok(bear.n <= 11000, '곰 삼각형 ' + bear.n);
+  assert.ok(plaza.n <= 20000, '광장 삼각형 ' + plaza.n);
+  assert.ok(plaza.json.meshes.length <= 40, '광장 메시(그리기 횟수) ' + plaza.json.meshes.length);
+  const root = plaza.json.nodes.find(n => n.name === 'PZ_root');
+  assert.ok(root && Array.isArray(root.extras?.colliders) && root.extras.colliders.length >= 8, '장식 충돌 정보');
+  for (const c of root.extras.colliders) assert.ok(c.length === 3 && c.every(Number.isFinite) && c[2] > 0 && c[2] < 2);
+  assert.ok(html.includes('OBS.push({ x0: x - r, x1: x + r, z0: z - 1.5 - r, z1: z - 1.5 + r })'));
+});
+test('저사양 재질, 펫 교체 시 재질 정리, 표정 전환 깜빡임', () => {
+  assert.ok(html.includes('const LOW_GFX = (navigator.hardwareConcurrency || 8) <= 4') && html.includes('LOW_GFX ? new T.MeshStandardMaterial(opt)'));
+  assert.ok(html.includes('if (pet) { scene.remove(pet.root); if (pet.dispose) pet.dispose(); }') && html.includes('prScene.remove(parts.root); if (parts.dispose) parts.dispose();'));
+  assert.ok(html.includes('now - (f.swapT || 0) < 90'));
+});

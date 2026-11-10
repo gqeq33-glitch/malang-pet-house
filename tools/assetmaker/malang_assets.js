@@ -56,7 +56,7 @@ function starShape(R = 1, r = .48) { const s = new THREE.Shape(); for (let i = 0
 
 function makeKit(game) {
   const cache = {};
-  const seg = game ? [24, 16] : [48, 32], segS = game ? [14, 10] : [28, 18];
+  const seg = game ? [18, 12] : [48, 32], segS = game ? [12, 8] : [28, 18];   // 게임용은 가볍게 (곰 약 1만 삼각형)
   const G = { s: new THREE.SphereGeometry(1, seg[0], seg[1]), ss: new THREE.SphereGeometry(1, segS[0], segS[1]), c: new THREE.CylinderGeometry(1, 1, 1, game ? 16 : 32), cone: new THREE.ConeGeometry(1, 1, game ? 16 : 32) };
   const M = (color, o = {}) => {
     const k = color + JSON.stringify(o); if (cache[k]) return cache[k];
@@ -183,37 +183,76 @@ function buildPlaza(game, pathAngles = []) {
   const sg = new THREE.ExtrudeGeometry(starShape(), { depth: .35, bevelEnabled: true, bevelThickness: .14, bevelSize: .12, bevelSegments: 2 }); sg.center();
   mesh(f, sg, M('#FFD36E', { metalness: .4, roughness: .25, emissive: '#7A5200', emissiveIntensity: .3 }), 0, 2.72, 0, .3, .3, .3, 'PZ_star');
   for (let i = 0; i < 8; i++) { const a = i / 8 * TAU; mesh(f, G.ss, M('#FFE27A', { emissive: '#FFB800', emissiveIntensity: .25 }), Math.cos(a) * 2.05, .82, Math.sin(a) * 2.05, .09, .09, .09); }
-  // 꽃밭·덤불·가로등·벤치: 길이 나가는 방향은 비워 둔다
+  // 놓으면 안 되는 자리 (게임 마을의 건물·연못·놀이터·텃밭과 펫이 서는 자리). 좌표는 분수 중심 기준
+  const AVOID = [[-13.6, -12.6, -6.4, -6.2], [-4.1, -12.4, 4.1, -6.6], [6.4, -12.6, 13.6, -6.2], [-11.8, 5.4, -9.2, 9.6], [-8.2, 7.4, -3.8, 9.6], [6, 4.4, 12, 9.9], [5.4, -5.4, 14.4, -1.2]];
+  const SPOTS = [[0, 4.1], [-8, 4.7], [8.4, 3.9], [0, -6.1], [-10, -5.4], [10, -5.4]];
+  const free = (x, z, r) => !AVOID.some(([x0, z0, x1, z1]) => x + r > x0 && x - r < x1 && z + r > z0 && z - r < z1) && SPOTS.every(([sx, sz]) => Math.hypot(sx - x, sz - z) > r + 1.1);
   const far = (a, gap = .4) => pathAngles.every(p => Math.abs(Math.atan2(Math.sin(a - p), Math.cos(a - p))) > gap);
+  const colliders = [], put = (x, z, r) => colliders.push([+x.toFixed(2), +z.toFixed(2), +r.toFixed(2)]);
   const petal = ['#FF8FB1', '#FFE07A', '#FFFFFF', '#B99CFF', '#FFB27A'];
-  let beds = 0, lamps = 0, benches = 0;
+  let beds = 0, lamps = 0, benches = 0, trees = 0;
+  // 알록달록 디딤돌 고리 (바닥 장식이라 충돌 없음)
+  const stoneG = K.G.c;
+  for (let i = 0; i < 28; i++) { const a = i / 28 * TAU; if (!far(a, .22)) continue; mesh(root, stoneG, M(['#FFD6E0', '#FFF1B8', '#D6F2E6', '#DCE8FF', '#EBDDFF'][i % 5], { roughness: .7 }), Math.cos(a) * 4.25, .02, Math.sin(a) * 4.25, .32, .04, .32); }
+  // 꽃밭과 덤불 고리
   for (let i = 0; i < 36; i++) {
     const a = i / 36 * TAU; if (!far(a)) continue;
     const x = Math.cos(a) * 5.05, z = Math.sin(a) * 5.05;
+    if (!free(x, z, .6)) continue;
     if (i % 3 === 0) {
       const bed = grp(root, 'PZ_bed' + beds++, x, 0, z); bed.rotation.y = -a;
       mesh(bed, K.G.c, M('#C98F5C', { roughness: .8 }), 0, .12, 0, .62, .24, .62);
       mesh(bed, K.G.s, M('#7ED67F', { roughness: .8 }), 0, .26, 0, .6, .2, .6);
       for (let k = 0; k < 8; k++) { const aa = k / 8 * TAU, rr = .18 + (k % 3) * .13; mesh(bed, K.G.ss, M(petal[(k + i) % 5], { roughness: .6 }), Math.cos(aa) * rr, .44 + (k % 2) * .05, Math.sin(aa) * rr, .11, .09, .11); }
+      put(x, z, .62);
     } else {
       const r = .32 + (i % 2) * .08; mesh(root, K.G.s, M(i % 2 ? '#8FDB86' : '#A6E596', { roughness: .85 }), x, r * .8, z, r, r * .85, r);
       if (i % 2) mesh(root, K.G.ss, M(petal[i % 5]), x + .1, r * 1.45, z, .08, .07, .08);
+      put(x, z, r);
     }
   }
-  // 가로등: 길 사이 가장 넓은 빈 곳 4군데
+  // 가로등: 길 사이 넓은 빈 곳. 카메라 쪽(z > 2)은 펫을 가리므로 두지 않는다
   const sorted = pathAngles.slice().sort((p, q) => p - q), gaps = sorted.map((p, i) => { const q = sorted[(i + 1) % sorted.length] + (i === sorted.length - 1 ? TAU : 0); return [q - p, (p + q) / 2]; }).sort((u, v) => v[0] - u[0]);
-  for (const [, a] of gaps.slice(0, 4)) {
-    const lp = grp(root, 'PZ_lamp' + lamps++, Math.cos(a) * 5.9, 0, Math.sin(a) * 5.9);
+  for (const [, a] of gaps) {
+    if (lamps >= 3) break; const x = Math.cos(a) * 5.9, z = Math.sin(a) * 5.9;
+    if (z > 2 || !free(x, z, .3)) continue;
+    const lp = grp(root, 'PZ_lamp' + lamps++, x, 0, z);
     mesh(lp, K.G.c, M('#5A4E72', { roughness: .5 }), 0, 1.2, 0, .07, 2.4, .07);
     mesh(lp, K.G.s, M('#FFF3C4', { emissive: '#FFD27A', emissiveIntensity: .9 }), 0, 2.5, 0, .26, .3, .26, 'PZ_lampGlow' + lamps);
     mesh(lp, K.G.cone, M('#FF8E9E'), 0, 2.84, 0, .3, .28, .3);
+    put(x, z, .25);
   }
   // 벤치 2개 (분수를 바라본다)
-  for (const [, a] of gaps.slice(0, 2)) {
-    const bx = Math.cos(a + .32) * 3.7, bz = Math.sin(a + .32) * 3.7, bn = grp(root, 'PZ_bench' + benches++, bx, 0, bz); bn.rotation.y = -a - .32 - Math.PI / 2;
+  for (const [, a] of gaps) {
+    if (benches >= 2) break; const bx = Math.cos(a + .32) * 3.7, bz = Math.sin(a + .32) * 3.7;
+    if (bz > 2 || !free(bx, bz, .8)) continue;
+    const bn = grp(root, 'PZ_bench' + benches++, bx, 0, bz); bn.rotation.y = -a - .32 - Math.PI / 2;
     mesh(bn, new THREE.BoxGeometry(1.4, .12, .45), M('#E9A86B', { roughness: .6 }), 0, .45, 0); mesh(bn, new THREE.BoxGeometry(1.4, .4, .1), M('#E9A86B', { roughness: .6 }), 0, .72, -.2);
     for (const sx of [-.55, .55]) mesh(bn, new THREE.BoxGeometry(.1, .45, .4), M('#7A6A92'), sx, .22, 0);
+    put(bx, bz, .75);
   }
-  root.userData.counts = { beds, lamps, benches };
+  // 둥근 파스텔 나무: 광장 바깥쪽 뒤편(카메라 반대쪽)
+  for (let i = 0; i < 20 && trees < 5; i++) {
+    const a = -Math.PI + (i + .5) / 20 * Math.PI, rr = 6.8 + (i % 3) * .5, x = Math.cos(a) * rr, z = Math.sin(a) * rr;
+    if (!far(a, .3) || !free(x, z, .9)) continue;
+    const t = grp(root, 'PZ_tree' + trees++, x, 0, z), leaf = [['#8FDB86', '#A6E596'], ['#FFB7D0', '#FFD0E0'], ['#C9B2FF', '#DCCBFF']][trees % 3];
+    mesh(t, K.G.c, M('#B98256', { roughness: .8 }), 0, .7, 0, .17, 1.4, .17);
+    mesh(t, K.G.s, M(leaf[0], { roughness: .75 }), 0, 1.9, 0, .95, .85, .95); mesh(t, K.G.s, M(leaf[1], { roughness: .75 }), .45, 2.35, .15, .6, .55, .6); mesh(t, K.G.s, M(leaf[0], { roughness: .75 }), -.4, 2.3, -.1, .58, .52, .58);
+    put(x, z, .45);
+  }
+  root.userData.colliders = colliders;   // 게임이 마을 장애물 목록에 넣는다 (펫이 장식을 통과하지 않게)
+  root.userData.counts = { beds, lamps, benches, trees };
   return { root, kit: K };
+}
+// 게임용: 같은 재질끼리 하나로 합쳐 그리기 횟수를 줄인다. 분수(PZ_fountain)와 장식(PZ_decor) 두 묶음
+function mergePlaza(root) {
+  root.updateMatrixWorld(true);
+  const out = new THREE.Group(); out.name = 'PZ_root'; out.userData = root.userData;
+  for (const [name, test] of [['PZ_fountain', o => { let p = o; while (p) { if (p.name === 'PZ_fountain') return true; p = p.parent; } return false; }], ['PZ_decor', () => true]]) {
+    const byMat = new Map();
+    root.traverse(o => { if (!o.isMesh || o.userData.merged || !test(o)) return; o.userData.merged = true; const g = (o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone()); g.applyMatrix4(o.matrixWorld); for (const k of Object.keys(g.attributes)) if (!['position', 'normal'].includes(k)) g.deleteAttribute(k); /* 광장은 그림(텍스처)을 안 쓰므로 uv도 뺀다 */ if (!byMat.has(o.material)) byMat.set(o.material, []); byMat.get(o.material).push(g); });
+    const grpOut = new THREE.Group(); grpOut.name = name; out.add(grpOut);
+    for (const [mat, list] of byMat) { const m = new THREE.Mesh(THREE.BufferGeometryUtils.mergeVertices(THREE.BufferGeometryUtils.mergeBufferGeometries(list), 1e-4), mat); /* 겹치는 꼭짓점을 다시 묶어 용량을 줄인다 */ m.castShadow = !mat.transparent; grpOut.add(m); }
+  }
+  return out;
 }
