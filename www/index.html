@@ -456,6 +456,23 @@ body{-webkit-touch-callout:none}
 .backup input[type=password]{width:100%;font-size:18px;padding:10px 12px;border:0;border-radius:12px;margin-bottom:8px;box-shadow:inset 0 0 0 2px var(--ink)}
 
 /* ---------- 2.0: 큰 버튼과 태블릿 ---------- */
+:root{--m-cream:#FFF8E9;--m-sky:#75CFFF;--m-mint:#80DDBB;--m-yellow:#FFD36E;--m-lav:#BDA6F6;--m-coral:#FF967F;--m-ink:#35435A}
+.e-hub{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.hub-card{display:flex;flex-direction:column;align-items:center;gap:2px;border:0;border-radius:16px;padding:10px 6px;background:#fff;color:var(--m-ink);font:inherit;cursor:pointer;box-shadow:0 0 0 2.5px var(--hc,#E6DCCB) inset,0 3px 0 var(--hc,#E6DCCB);text-align:center;min-height:92px}
+.hub-card:active{transform:translateY(2px);box-shadow:0 0 0 2.5px var(--hc,#E6DCCB) inset}
+.hub-card .hi{font-size:28px;line-height:1.1}.hub-card b{font-family:var(--display);font-weight:400;font-size:16px}.hub-card small{font-size:13px;color:#5B6478;line-height:1.3}
+.hub-card.big{grid-column:1/-1;flex-direction:row;justify-content:flex-start;gap:12px;padding:12px 14px;background:linear-gradient(135deg,#FFF1C7,#FFE1D8);--hc:var(--m-coral);text-align:left;min-height:0}
+.hub-card.big .hi{font-size:36px}.hub-card.big .ht{display:flex;flex-direction:column;flex:1;min-width:0}.hub-card.big b{font-size:19px}.hub-card.big .go{font-family:var(--display);color:#C4553E;white-space:nowrap}
+.hub-card.c-sky{background:#EAF7FF;--hc:var(--m-sky)}.hub-card.c-mint{background:#E8F8F1;--hc:var(--m-mint)}.hub-card.c-yellow{background:#FFF6DC;--hc:var(--m-yellow)}.hub-card.c-lav{background:#F2EDFF;--hc:var(--m-lav)}.hub-card.c-coral{background:#FFEDE8;--hc:var(--m-coral)}.hub-card.c-cream{background:var(--m-cream);--hc:#E8CFA0}
+.e-actions.small .candy{font-size:13px;padding:6px 4px}
+@media (max-width:380px){.e-hub{grid-template-columns:repeat(2,1fr)}}
+.e-pet{position:relative}.e-prompt .e-pet{width:72px;height:72px}.e-pet img{width:100%;height:100%;object-fit:contain;display:block}
+.e-pet.think{animation:ePetThink 1.3s ease-in-out}.e-pet.think::after{content:'💭';position:absolute;right:-10px;top:-12px;font-size:20px;animation:ePetBubble 1.3s ease-out both}
+@keyframes ePetThink{0%,100%{transform:rotate(0)}35%,75%{transform:rotate(-9deg)}}
+@keyframes ePetBubble{0%{opacity:0;transform:scale(.4)}40%{opacity:1;transform:scale(1.1)}100%{opacity:1;transform:scale(1)}}
+.growth-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}.growth-top>span:last-child{display:flex;flex-direction:column;flex:1;gap:3px}.growth-top b{font-family:var(--display);font-weight:400;font-size:20px}.growth-top small{color:#5B6478}
+.e-pet.big{width:96px;height:96px}
+@media (prefers-reduced-motion:reduce){.e-pet.think,.e-pet.think::after{animation:none}}
 .study-row{display:flex;flex-wrap:wrap;gap:4px 12px;background:#F2F8FF;border-radius:12px;padding:7px 12px;margin-bottom:10px;font-size:14px}.study-row b{font-family:var(--display);font-weight:400}
 .report-top{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}.report-top div{background:var(--soft);border-radius:12px;padding:8px 4px;text-align:center;box-shadow:0 0 0 2px var(--line) inset}.report-top b{display:block;font-family:var(--display);font-weight:400;font-size:18px}.report-top small{font-size:13px;color:var(--muted)}
 .report-row{display:grid;grid-template-columns:96px 1fr 44px;align-items:center;gap:8px;font-size:14px;margin-bottom:6px}.report-row small{text-align:right;font-size:13px;color:var(--muted)}
@@ -816,8 +833,9 @@ const START_SPECIES = SPECIES_ORDER.slice(0, 5);   // 첫 화면은 5종. 나머
 
 function eyesSVG(mood, y, big) {
   const xs = [78, 122];
+  if (mood === 'think') y -= 3;
   const line = d => `<path d="${d}" fill="none" stroke="${INK}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`;
-  if (mood === 'happy' || mood === 'love') return xs.map(x => line(`M${x - 8} ${y + 3} Q${x} ${y - 8} ${x + 8} ${y + 3}`)).join('');
+  if (mood === 'happy' || mood === 'love' || mood === 'excited') return xs.map(x => line(`M${x - 8} ${y + 3} Q${x} ${y - 8} ${x + 8} ${y + 3}`)).join('') + (mood === 'excited' ? `<g fill="#FFD95A" stroke="${INK}" stroke-width="2" stroke-linejoin="round">${star(52, y - 22, 7, 2.8)}${star(150, y - 26, 6, 2.4)}</g>` : '');
   if (mood === 'sleep') return xs.map(x => line(`M${x - 8} ${y} Q${x} ${y + 7} ${x + 8} ${y}`)).join('');
   if (mood === 'eat') return line(`M${xs[0] - 6} ${y - 6} L${xs[0] + 5} ${y} L${xs[0] - 6} ${y + 6}`) + line(`M${xs[1] + 6} ${y - 6} L${xs[1] - 5} ${y} L${xs[1] + 6} ${y + 6}`);
   const rx = (big ? 10.5 : 9.5) + (mood === 'surprise' ? 1.5 : 0), ry = (big ? 13 : 12) + (mood === 'surprise' ? 3 : 0);
@@ -833,7 +851,9 @@ function eyesSVG(mood, y, big) {
 
 function mouthSVG(mood, y) {
   const st = `stroke="${INK}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"`;
-  if (mood === 'happy' || mood === 'love') return `<path d="M91 ${y} Q100 ${y + 14} 109 ${y} Z" fill="#F07A8E" ${st}/>`;
+  if (mood === 'happy' || mood === 'love' || mood === 'excited') return `<path d="M91 ${y} Q100 ${y + 14} 109 ${y} Z" fill="#F07A8E" ${st}/>`;
+  if (mood === 'think') return `<path d="M94 ${y + 4} L107 ${y + 1}" fill="none" ${st}/>`;
+  if (mood === 'curious') return `<ellipse cx="100" cy="${y + 3}" rx="3.6" ry="4.2" fill="#F07A8E" ${st}/>`;
   if (mood === 'sad') return `<path d="M93 ${y + 5} Q100 ${y - 2} 107 ${y + 5}" fill="none" ${st}/>`;
   if (mood === 'sleep') return `<ellipse cx="100" cy="${y + 2}" rx="3.2" ry="2.6" fill="${INK}"/>`;
   if (mood === 'surprise') return `<ellipse cx="100" cy="${y + 4}" rx="6" ry="8" fill="#F07A8E" ${st}/>`;
@@ -1410,7 +1430,9 @@ const World = (() => {
     door: { x: -7, z: 7, face: -Math.PI / 2, y: 0 },
     stove: { x: 6.1, z: 4.4, face: Math.PI / 2, y: 0 }
   };
-  const TRICK_LEN = { spin: .8, hop: .9, jump: .5, dance: 1.6, wave: 1.2, wobble: .5, transform: 1.8, sad: 1.6, surprise: .9, explain: 1.8, cheer: 1.6 };
+  const TRICK_LEN = { spin: .8, hop: .9, jump: .5, dance: 1.6, wave: 1.2, wobble: .5, transform: 1.8, sad: 1.6, surprise: .9, explain: 1.8, cheer: 1.6, clap: 1.4, think: 1.8, curious: 1.3, celebrate: 2 };
+  // 동작하는 동안 지을 표정
+  const TRICK_FACE = { cheer: 'excited', clap: 'excited', celebrate: 'excited', think: 'think', curious: 'curious', surprise: 'surprise' };
   const FORM_SCALE = [1.1, 1.26, 1.4, 1.46, 1.52];
   const LOOK_UP = -.2;   // 게임 카메라는 위에서 내려다보므로 몸을 살짝 뒤로 젖혀 얼굴이 카메라를 향하게 한다
   // 입히는 옷: 몸통·소매 색 c, 무늬 색 t
@@ -1428,8 +1450,8 @@ const World = (() => {
   };
   const PET3 = {
     bear:     { body: '#D9A066', R: .6, cy: 1.02, hat: 1.68, accent: '#75CFFF', twoBody: true, eye: { w: 1.08, h: 1.12, x: .24 } },
-    kitten: { body: '#FFCF93', R: .6, cy: 1.02, hat: 1.66, accent: '#FF8FA3', twoBody: true, eye: { w: 1.04, h: 1.06 } },
-    puppy:  { body: '#FFE7C4', R: .6, cy: 1.02, hat: 1.64, accent: '#7EC8F2', twoBody: true, eye: { w: 1.12, h: 1.12 } },
+    kitten: { body: '#FFCF93', R: .6, cy: 1.02, hat: 1.66, accent: '#FF8FA3', twoBody: true, eye: { w: 1.1, h: 1.12 }, iris: '#B9792A', hand: '#FFF6E9' },
+    puppy:  { body: '#FFE7C4', R: .6, cy: 1.02, hat: 1.7, accent: '#7EC8F2', twoBody: true, eye: { w: 1.16, h: 1.16 }, iris: '#6E4330' },
     otter:  { body: '#B98A62', R: .6, cy: 0.98, hat: 1.5,  accent: '#7ED9C3', twoBody: true, headW: 1.2, headH: .78, longBody: true },
     bunny:    { body: '#F7FCFF', R: .6, cy: 1.02, hat: 1.7, accent: '#BDA6F6', twoBody: true, eye: { w: 1.14, h: 1.18 } },
     hamster:  { body: '#FFD9A0', R: .6, cy: 1.02, hat: 1.62, accent: '#FF9EB0', twoBody: true, eye: { w: .92, h: 1, x: .2 } },
@@ -1613,6 +1635,10 @@ const World = (() => {
       case 'surprise': alx = arx = -.2; alz = -2; arz = 2; lx = -.2; rx = .2; break;
       case 'explain': arx = -1.05 + Math.sin(k * 5) * .2; arz = .6; alx = -.15; break;
       case 'cheer': { const d = Math.sin(k * 5); alx = arx = -.15; alz = -2.2 + d * .3; arz = 2.2 - d * .3; lx = Math.max(0, d) * .3; rx = Math.max(0, -d) * .3; break; }
+      case 'clap': { const d = Math.abs(Math.sin(k * 9)); alx = arx = -1.35; alz = .15 + d * .45; arz = -.15 - d * .45; fast = true; break; }
+      case 'think': arx = -2.3; arz = -.75; alx = .1; alz = -.3; break;
+      case 'curious': alx = .05; arx = -.5; arz = .7; break;
+      case 'celebrate': { const d = Math.sin(k * 6); alx = arx = -.1; alz = -2.4 + d * .25; arz = 2.4 - d * .25; lx = -.3; rx = .3; break; }
     }
     if (o.ride === 'scooter') { alx = arx = -1.25; alz = .1; arz = -.1; lx = -.1; rx = .14; }
     else if (o.ride === 'bike') { alx = arx = -1.2; alz = .08; arz = -.08; lx = -1.1 + s * .45; rx = -1.1 - s * .45; }
@@ -1666,7 +1692,11 @@ const World = (() => {
       for (const sd of [-1, 1]) for (const k of [0, 1]) { const w = mesh(CYL, INK, sd * .55, cy - .1 - k * .07, zAt(.4, cy - .1) + .02, .007, .24, .007, body, { cast: false }); w.rotation.z = sd * (Math.PI / 2 + (k ? -.14 : .14)); }
       pt.tail = pivot(.2, .26, -.22);
       add('#F7A65A', .14, .16, -.03, .07, .4, .07, pt.tail, 1.08, CYL).rotation.z = -.7; add('#F7A65A', .32, .34, -.03, .1, .1, .1, pt.tail, 1.08);
-      feet();
+      add('#FFF6E9', .38, .41, -.03, .085, .085, .085, pt.tail, 1.08);   // 하얀 꼬리 끝
+      for (const [x, r] of [[-.06, .35], [.06, -.35], [0, 0]]) { const tf = add('#FFF6E9', x, .58, .28, .05, .09, .04, body, 0, CONE); tf.rotation.z = Math.PI + r; }   // 가슴 털 뭉치
+      for (const sd of [-1, 1]) { const ck = add(bc, sd * .6, cy - .12, 0, .07, .13, .07, body, 1.08, CONE); ck.rotation.z = -sd * 1.9; }   // 볼 옆 털
+      if (form < 1 && !neck) { const cl = add('#FF6F8E', 0, cy - R * .82, 0, R * .55, R * .55, R * .55, body, 1.03, new T.TorusGeometry(1, .09, 10, 32)); cl.rotation.x = Math.PI / 2; add('#FFD54F', 0, cy - R * .82 - .05, R * .55 + .03, .065, .065, .065, body, 1.1); }   // 나비의 방울 목걸이
+      feet('#FFF6E9');
     } else if (spId === 'puppy') {
       pt.earL = pivot(-.52, cy + .36, .06); pt.earR = pivot(.52, cy + .36, .06); pt.earBase = -.32;
       for (const e of [pt.earL, pt.earR]) add('#C98F5A', 0, -.3, 0, .19, .37, .11, e, 1.08);
@@ -1677,7 +1707,11 @@ const World = (() => {
       add('#FF8FA3', 0, cy - .3, zAt(0, cy - .3) + .012, .06, .07, .025, body, 1.08);
       pt.tail = pivot(.24, .34, -.2);
       add(bc, .1, .08, -.02, .1, .15, .1, pt.tail, 1.08).rotation.z = -.6;
-      feet();
+      add('#FFFBF3', .17, .2, -.02, .085, .085, .085, pt.tail, 1.08);   // 솜뭉치 꼬리 끝
+      for (const [x, y, r] of [[-.08, .02, .08], [.06, .05, .09], [0, .1, .07]]) add('#FFF3DF', x, cy + R * .9 + y, .02, r, r, r, body, 1.06);   // 머리 위 솜털
+      for (const e of [pt.earL, pt.earR]) add('#B07A48', 0, -.56, .02, .14, .1, .08, e, 0);   // 귀 끝 진한 털
+      if (form < 1 && !neck) { const bd = add('#FF6B6B', 0, cy - R * .9, .31, .2, .17, .05, body, 1.08, CONE); bd.rotation.x = Math.PI; add('#FFFFFF', 0, cy - R * .9 + .03, .345, .025, .025, .01, body, 0); }   // 멍실이의 빨간 반다나
+      feet('#F2D3A8');
     } else if (spId === 'otter') {
       pt.earL = pivot(-.62, cy + .16, -.02); pt.earR = pivot(.62, cy + .16, -.02); pt.earBase = .05;
       for (const e of [pt.earL, pt.earR]) { add(bc, 0, .03, 0, .1, .1, .07, e, 1.1); add('#7A5638', 0, .03, .05, .055, .055, .02, e, 0); }
@@ -1772,7 +1806,7 @@ const World = (() => {
       for (const sd of [-1, 1]) {
         const arm = pivot(sd * ax, ay, az);
         add(cloth ? cloth.c : bc, 0, -.09, 0, .1, .13, .1, arm, 1.07);
-        add(bc, 0, -.2, 0, .105, .095, .105, arm, 1.08);
+        add(c.hand || bc, 0, -.2, 0, .105, .095, .105, arm, 1.08);
         add('#FFB8C9', 0, -.215, .088, .046, .04, .02, arm, 0);   // 분홍 젤리 손바닥
         if (sd < 0) pt.armL = arm; else pt.armR = arm;
       }
@@ -1799,7 +1833,7 @@ const World = (() => {
       const z = zAt(s * ex, ey);
       // 큰 눈: 짙은 눈동자 + 아래쪽 밝은 빛 + 하이라이트 2개
       const eb = mesh(SPH, '', s * ex, ey, z - .02, .112 * ew, .138 * eh, .05, pt.eyesOpen, { mat: ink, cast: false }); eb.rotation.y = s * .32;
-      mesh(SPH, '#8A5446', s * ex, ey - .05 * eh, z + .012, .078 * ew, .066 * eh, .02, pt.eyesOpen, { cast: false }).rotation.y = s * .32;
+      mesh(SPH, c.iris || '#8A5446', s * ex, ey - .05 * eh, z + .012, .078 * ew, .066 * eh, .02, pt.eyesOpen, { cast: false }).rotation.y = s * .32;
       mesh(SPH, '#E9A585', s * ex, ey - .088 * eh, z + .022, .042 * ew, .02 * eh, .01, pt.eyesOpen, { cast: false });
       mesh(SPH, '#FFFFFF', s * ex + .038 * ew, ey + .05 * eh, z + .026, .047 * ew, .047 * ew, .02, pt.eyesOpen, { cast: false });
       mesh(SPH, '#FFFFFF', s * ex - .04 * ew, ey - .042 * eh, z + .026, .021, .021, .01, pt.eyesOpen, { cast: false });
@@ -1812,18 +1846,23 @@ const World = (() => {
       const bl = mesh(SPH, '', s * .38, ey - .14, zAt(.38, ey - .14) - .005, form >= 2 && spId === 'hamster' ? .145 : .13, .062, .02, face, { mat: new T.MeshToonMaterial({ color: '#FFA3BC', gradientMap: grad, transparent: true, opacity: .72 }), cast: false });
       bl.rotation.y = s * .55;
     }
-    const my = spId === 'penguin' ? ey - .3 : c.twoBody ? ey - .21 : ey - .15, mz = zAt(0, my) + .01;
+    const my = spId === 'penguin' ? ey - .3 : c.twoBody ? ey - .21 : ey - .15, mz = zAt(0, my) + .01 + ({ bear: .06, kitten: .045, puppy: .045, hamster: .065, otter: .055, fox: .055, dragon: .065, squirrel: .065, turtle: .045 }[spId] || 0);   // 주둥이가 있으면 입을 주둥이 앞에
     pt.mouthSmile = group(0, my, mz, face);
     { const wArc = new T.TorusGeometry(.03, .013, 8, 12, Math.PI); for (const sd of [-1, 1]) mesh(wArc, '', sd * .03, 0, 0, 1, 1, 1, pt.mouthSmile, { mat: ink, cast: false }).rotation.z = Math.PI; }
     pt.mouthFrown = mesh(mArc, '', 0, my - .02, mz, 1, 1, 1, face, { mat: ink, cast: false });
     pt.mouthOpen = mesh(SPH, '#F07A8E', 0, my - .01, mz - .01, .06, .05, .03, face, { cast: false });
+    pt.mouthFlat = mesh(CYL, '', .02, my + .005, mz, .013, .075, .013, face, { mat: ink, cast: false }); pt.mouthFlat.rotation.z = Math.PI / 2 - .2;
+    pt.sparkle = group(0, 0, 0, body);
+    for (const [x, y, sz] of [[-.62, cy + .5, .09], [.66, cy + .36, .07], [.5, cy + .72, .05]]) mesh(STAR, '', x, y, .1, sz, sz, sz, pt.sparkle, { mat: basic('#FFE27A'), cast: false });
     pt.tear = mesh(SPH, '#8FD3FF', -ex - .03, ey - .11, zAt(ex, ey - .11) + .02, .03, .045, .03, face, { cast: false });
     pt.setFace = mood => {
-      const happy = ['happy', 'love', 'eat'].includes(mood);
-      pt.eyesOpen.visible = ['normal', 'sad', 'surprise', 'talk'].includes(mood); pt.eyesHappy.visible = happy && mood !== 'love'; pt.eyesLove.visible = mood === 'love'; pt.eyesSleep.visible = mood === 'sleep';
+      const happy = ['happy', 'love', 'eat', 'excited'].includes(mood);
+      pt.eyesOpen.visible = ['normal', 'sad', 'surprise', 'talk', 'curious', 'think'].includes(mood);
+      pt.eyesOpen.position.set(mood === 'think' ? .025 : 0, mood === 'think' ? .03 : 0, 0);   // 생각할 때는 눈이 위를 본다
+      pt.mouthFlat.visible = mood === 'think'; pt.sparkle.visible = mood === 'excited'; pt.eyesHappy.visible = happy && mood !== 'love'; pt.eyesLove.visible = mood === 'love'; pt.eyesSleep.visible = mood === 'sleep';
       pt.mouthSmile.visible = mood === 'normal'; pt.mouthFrown.visible = mood === 'sad'; pt.tear.visible = mood === 'sad';
-      pt.mouthOpen.visible = happy || ['sleep', 'surprise', 'talk'].includes(mood);
-      pt.mouthOpen.scale.set(mood === 'sleep' ? .03 : mood === 'surprise' ? .07 : .06, mood === 'sleep' ? .03 : mood === 'surprise' ? .09 : mood === 'talk' ? .04 : .05, .03);
+      pt.mouthOpen.visible = happy || ['sleep', 'surprise', 'talk', 'curious'].includes(mood);
+      pt.mouthOpen.scale.set(mood === 'sleep' || mood === 'curious' ? .035 : mood === 'surprise' ? .07 : mood === 'excited' ? .075 : .06, mood === 'sleep' ? .03 : mood === 'curious' ? .04 : mood === 'surprise' ? .09 : mood === 'excited' ? .07 : mood === 'talk' ? .04 : .05, .03);
     };
     // 대표 캐릭터의 소품: 멀리서도 구별되도록 (옷을 입으면 몸의 소품은 뺀다)
     if (spId === 'bear' && hatId !== 'glasses') {
@@ -2852,7 +2891,7 @@ const World = (() => {
       if (st.idleT <= 0) {
         const r = Math.random();
         if (r < .55) goTo(VX + rand(-7, 7), rand(-4, 6), false);
-        else if (r < .8) trick(pick(['spin', 'hop', 'dance', 'wave']));
+        else if (r < .8) trick(pick(['spin', 'hop', 'dance', 'wave', 'curious']));
         else { const n = pick(Object.keys(FRIENDS)); say(`${josa(FRIENDS[n].name, '이', '')}다! 안녕~`, 2500); }
         st.idleT = rand(4, 7);
       }
@@ -2863,7 +2902,7 @@ const World = (() => {
         if (sleepy) { if (r < .4) say(pick(['하암…', '졸려요…', '눈이 감겨요…']), 2500); st.idleT = rand(4, 7); }
         else if (r < .45) goTo(rand(here.x0 + 1.2, here.x1 - 1.2), rand(here.z0 + 1.2, here.z1 - 1.2), false);
         else if (r < .55) { const k = pick(Object.keys(ROOM3)); goTo(ROOM3[k].cx, ROOM3[k].cz, false); }
-        else if (r < .8) trick(pick(['spin', 'hop', 'dance', 'wave']));
+        else if (r < .8) trick(pick(['spin', 'hop', 'dance', 'wave', 'curious']));
         else if (r < .9 && roomAt(st.x, st.z) === 'living') kickBall(false);
         else { st.faceGoal = rand(-1.2, 1.2); }
         st.idleT = rand(3, 6);
@@ -2898,12 +2937,16 @@ const World = (() => {
         else if (st.trick === 'surprise') { y += Math.sin(Math.min(1, k / .35) * Math.PI) * .32; rx = -.1; }
         else if (st.trick === 'explain') { ry += Math.sin(k * 2.6) * .16; rz = Math.sin(k * 2.6) * .03; }
         else if (st.trick === 'cheer') { y += Math.abs(Math.sin(k * 5)) * .32; ry += Math.sin(k * 5) * .22; }
+        else if (st.trick === 'clap') y += Math.abs(Math.sin(k * 9)) * .08;
+        else if (st.trick === 'think') rz = Math.sin(Math.min(1, k * 3) * Math.PI / 2) * .12;
+        else if (st.trick === 'curious') { const a = Math.sin(Math.min(1, k * 4) * Math.PI / 2) * (k < 1 ? 1 : Math.max(0, (1.3 - k) / .3)); rz = a * .22; ry += a * .25; }
+        else if (st.trick === 'celebrate') { const j = Math.min(1, k / .7); y += Math.sin(j * Math.PI) * .9; if (k < .7) ry += j * Math.PI * 2; else y += Math.abs(Math.sin((k - .7) * 8)) * .2; }
         else if (st.trick === 'dance') { rz = Math.sin(k * 9) * .28; y += Math.abs(Math.sin(k * 9)) * .15; ry += Math.sin(k * 4.5) * .6; }
         else if (st.trick === 'transform') {
           ry += k * k * 16; y += Math.sin(Math.min(1, k / 1.8) * Math.PI) * 1.5;
           if (st.formHold !== null && k > .9) { st.formHold = null; $('#flash').classList.remove('go'); void room.offsetWidth; $('#flash').classList.add('go'); renderPet(); st.transformCb && st.transformCb(); st.transformCb = null; }
         }
-        if (k >= TRICK_LEN[st.trick]) st.trick = null;
+        if (k >= TRICK_LEN[st.trick]) { if (TRICK_FACE[st.trick] && pet.setFace) pet.setFace(st.mood); st.trick = null; }
       }
       const wave = st.trick === 'wave' ? Math.sin(st.trickT * 12) * .5 + .9 : 0;
       const inAir = st.area === 'obby' && ob ? !ob.ground : false;
@@ -3145,7 +3188,7 @@ const World = (() => {
     };
   }
 
-  function trick(name) { if (pet && !pet.isEgg && name === 'wobble') return; st.trick = name; st.trickT = 0; if (name === 'jump') st.flick = .35; }
+  function trick(name) { if (pet && !pet.isEgg && name === 'wobble') return; st.trick = name; st.trickT = 0; if (name === 'jump') st.flick = .35; if (pet && pet.setFace && TRICK_FACE[name]) pet.setFace(TRICK_FACE[name]); }
   function kickBall(fromTap) {
     if (!ball) return;
     const bx = ball.m.position.x, bz = ball.m.position.z;
@@ -3225,7 +3268,7 @@ const World = (() => {
       const form = st.formHold !== null ? st.formHold : formOf(p.level);
       const tint = p.hatched ? dyeColor(p) : null, key = p.hatched ? `${p.sp}|${p.hat}|${form}|${tint}|${p.back || ''}|${p.neck || ''}|${p.top || ''}` : `egg|${p.sp}|${p.taps}`;
       if (key !== petKey) { if (pet) scene.remove(pet.root); pet = p.hatched ? buildPet(p.sp, p.hat, form, tint, p.back, p.neck, p.top) : buildEgg(p.sp, p.taps); scene.add(pet.root); petKey = key; }
-      if (pet.setFace) { pet.setFace(mood); pet.setDirt(dirt); }
+      if (pet.setFace) { if (!TRICK_FACE[st.trick]) pet.setFace(mood); pet.setDirt(dirt); }
     },
     place(x, z) { trail = []; if (ok && st.area !== 'house') setArea('house'); st.x = x; st.z = z; st.path = []; st.mode = 'idle'; st.at = null; st.lift = 0; st.camX = clamp(x, -4.4, 4.4); st.camZ = clamp(z, -4.4, 5); },
     area() { return st.area; },
@@ -3375,6 +3418,23 @@ const World = (() => {
     },
     snapshot() { if (!ok || !renderer) return null; placeBubble(); renderer.render(scene, camera); return renderer.domElement; },
     raceCancel() { if (race) { race.n.racing = false; st.run = false; race = null; } },
+    // 내 펫을 표정·자세와 함께 사진으로 찍는다 (레슨 화면용, 같은 모습은 다시 찍지 않는다)
+    petPic(q, mood, act) {
+      if (!ok || !q || !q.hatched) return '';
+      const form = formOf(q.level), tint = dyeColor(q), key = [q.sp, q.hat, form, tint, q.back, q.neck, q.top, mood, act].join('|');
+      if (portraits['pet:' + key]) return portraits['pet:' + key];
+      if (!pr) this.portrait(Object.keys(FRIENDS)[0]);
+      if (!pr) return '';
+      const parts = buildPet(q.sp, q.hat, form, tint, q.back, q.neck, q.top);
+      parts.dirt.visible = false; parts.setFace(mood);
+      if (act) poseLimbs(parts, 1, { act, k: .3, t: 0 });
+      prScene.add(parts.root);
+      const h = 1.85 * parts.root.scale.y; prCam.position.set(0, h * .62, h * 2.2); prCam.lookAt(0, h * .5, 0);
+      pr.render(prScene, prCam); const url = pr.domElement.toDataURL('image/png');
+      prScene.remove(parts.root);
+      if (Object.keys(portraits).length > 60) for (const k of Object.keys(portraits)) if (k.startsWith('pet:')) delete portraits[k];
+      return (portraits['pet:' + key] = url);
+    },
     portrait(id) {
       if (portraits[id]) return portraits[id];
       if (!ok) return '';
@@ -5695,6 +5755,7 @@ function openStand() {
 function goStand() { World.area() === 'village' ? World.goVillage('garden', true, openStand) : openStand(); }
 
 const NEWS = [
+  { v: '4.2', date: '11월 10일', items: ['🐱 나비와 🐶 멍실이가 더 귀여워졌어요 (방울 목걸이, 빨간 반다나, 솜털)', '🤔 펫에게 궁금한 얼굴, 생각하는 얼굴, 신난 얼굴과 박수·축하 동작이 생겼어요', '📚 영어 레슨에서 내 펫이 정답엔 박수, 오답엔 생각하며 힌트를 봐요', '🧭 영어 화면이 7개 메뉴로 바뀌었어요: 오늘의 모험, 도감, 듣기, 문장, 미니게임, 복습, 나의 성장'] },
   { v: '4.1', date: '11월 6일', items: ['📅 공부한 날이 쌓이면 특별 장식 선물! 쉬어도 끊기지 않아요', '🗓️ 일주일에 3일 공부하면 배지와 코인', '🔁 복습은 10분 뒤, 다음 날, 며칠 뒤에 다시 나오고, 자주 틀린 단어는 쉽게 나와요', '🗺️ 복습해도 새 지역이 열리고, 🎭 이야기를 완주하면 옷을 받아요', '🧸 펫들이 더 말랑하고 반짝이는 눈으로 바뀌었어요', '💼 어른 영어 14개 레슨: 여행·일·이메일·자주 틀리는 표현, 받아쓰기와 직접 쓰기'] },
   { v: '4.0', date: '11월 6일', items: ['🧸 새 레슨 5개: 장난감, 옷, 자연, 우리 동네, 나의 하루', '🎯 레슨마다 오늘의 목표를 보여 줘요', '✏️ 틀린 뜻과 맞지 않는 그림을 고쳤어요'] },
   { v: '3.9', date: '11월 6일', items: ['📖 이야기 모험 "말 나무를 살려요" 시작! 8장 동안 친구들과 날아간 말을 찾아요', '🌳 이야기를 듣고, 단어를 익히고, 게임에서 쓰면 말 나무가 자라요'] },
@@ -7146,7 +7207,9 @@ function engLesson(stageIdx, unit, reviewList) {
     <div class="e-prog gut"><i id="eBar"></i></div><div class="e-main gut" id="eMain" aria-live="polite"></div><div class="e-foot gut" id="eFoot"></div>`;
   $('#app').appendChild(wrap); pushBack();
   const main = wrap.querySelector('#eMain'), foot = wrap.querySelector('#eFoot'), bar = wrap.querySelector('#eBar');
-  const mascot = (mood, sp = p.sp) => `<span class="e-pet" aria-hidden="true">${petSVG(sp, { mood, stage: sp === p.sp ? stageOf(p.level) : 'kid', hat: sp === p.sp ? p.hat : null })}</span>`;
+  // 안내 캐릭터는 내 펫. 3D를 쓸 수 없는 기기에서는 그림(SVG)으로 대신한다
+  const petFace = (mood, act, sp = p.sp) => { const img = sp === p.sp && World.ok ? World.petPic(p, mood, act) : ''; return img ? `<img src="${img}" alt="">` : petSVG(sp, { mood, stage: sp === p.sp ? stageOf(p.level) : 'kid', hat: sp === p.sp ? p.hat : null }); };
+  const mascot = (mood, sp = p.sp) => `<span class="e-pet" aria-hidden="true">${petFace(mood, null, sp)}</span>`;
   const sayBtn = (id, big) => `<button class="e-say${big ? ' big' : ''}" id="${id}" aria-label="다시 듣기">🔊</button>`;
   const setBar = () => { const all = cards.length + total, done = ci + qi; bar.style.width = (all ? done / all * 100 : 0) + '%'; };
   function bind(id, fn) { const el = wrap.querySelector('#' + id); if (el) el.addEventListener('click', fn); return el; }
@@ -7190,7 +7253,7 @@ function engLesson(stageIdx, unit, reviewList) {
     const tile = q.type === 'spell' || q.type === 'order';
     const typing = ['type', 'dict', 'produce'].includes(q.type), hint = !typing ? '' : q.type === 'dict' ? q.a.split(' ').map(w => w.replace(/[A-Za-z0-9]/g, '_')).join(' ') : q.a.split(' ').map((w, i) => i ? w.replace(/[A-Za-z0-9]/g, '_') : w).join(' ');
     const opts = tile || typing ? '' : shuffle([q.a, ...q.o]);
-    main.innerHTML = `<p class="e-prompt">${mascot('talk', engGuide(q.type))}<span>${q.inWord ? '이 글자가 들어 있는 그림은?' : PROMPT[q.type]}</span></p><div class="e-card q">${head}</div>${typing
+    main.innerHTML = `<p class="e-prompt">${mascot('curious')}<span>${q.inWord ? '이 글자가 들어 있는 그림은?' : PROMPT[q.type]}</span></p><div class="e-card q">${head}</div>${typing
       ? `<form class="e-type" id="eForm"><input id="eIn" maxlength="80" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" lang="en" aria-label="영어로 쓰기" placeholder="영어로 써 보세요"><button class="candy primary">확인</button></form><p class="e-hint">힌트: ${escapeHTML(hint)}</p>`
       : tile
       ? `<div class="e-ans${q.type === 'spell' ? ' sp' : ''}" id="eAns" aria-label="내가 만든 답"></div><div class="e-tiles" id="eTiles">${q.parts.map((t, i) => `<button class="e-tile" data-t="${i}">${escapeHTML(t)}</button>`).join('')}</div>`
@@ -7236,7 +7299,8 @@ function engLesson(stageIdx, unit, reviewList) {
     main.querySelectorAll('.e-opt').forEach(b => { b.disabled = true; if (b.textContent.slice(1) === q.a) b.classList.add('right'); });
     if (btn && !ok) btn.classList.add('wrong');
     // 틀려도 울거나 혼내지 않는다: 안내 캐릭터가 고개를 끄덕이며 힌트를 준다
-    const pet = main.querySelector('.e-pet'); if (pet) { pet.innerHTML = petSVG(engGuide(q.type), { mood: ok ? 'happy' : 'normal', stage: 'kid' }); pet.classList.add(ok ? 'cheer' : 'nod'); }
+    // 맞히면 신나서 박수, 틀리면 화내지 않고 생각하는 얼굴로 힌트를 본다
+    const pet = main.querySelector('.e-pet'); if (pet) { pet.innerHTML = petFace(ok ? 'excited' : 'think', ok ? 'clap' : 'think'); pet.classList.add(ok ? 'cheer' : 'think'); }
     if (ok) {
       const praise = pick(['Great!', 'Good job!', 'Awesome!', 'You did it!', 'Wow!', 'Excellent!']);
       sfx('correct'); engSay(q.sayOk || q.say || q.a); engSay(praise, { queue: true, rate: 1 });
@@ -7278,7 +7342,7 @@ function engLesson(stageIdx, unit, reviewList) {
     const newAreas = Object.keys(AREA_NEED).filter(k => areaOpen(k) && !openBefore.includes(k));
     const pet = P(), form = formOf(pet.level), nextForm = FORMS[form + 1];
     sfx(ups.length ? 'fanfare' : stars === 3 ? 'hatch' : 'up'); if (stars >= 2 || ups.length) confetti(ups.length ? 80 : 40);
-    if (World.ok) World.trick('cheer');
+    if (World.ok) World.trick(ups.length ? 'celebrate' : 'clap');   // 영어 레벨이 오르면 특별 축하
     persist();
     const sameStage = st.units.findIndex(u => !engDone(u));   // 지금 공부하던 단계를 먼저 이어 간다
     const nx = !review && firstStars ? (sameStage >= 0 ? { si: stageIdx, ui: sameStage } : engNext()) : null, need = engNeed(e.level);
@@ -7896,10 +7960,13 @@ function sagaEnd(i) {
     sh.bind('gHome', () => { sh.close(); openSaga(); });
   });
 }
-function openEngGames() {
+const EG_LIST = [['abc', '✨', '알파벳 마법', '대문자와 소문자, 첫소리를 찾아요'], ['catch', '🎧', '영어 듣고 잡기', '듣고 맞는 그림을 잡아요'], ['match', '🃏', '단어 카드 매칭', '그림과 단어를 연결해요'], ['train', '🚂', '문장 기차', '단어를 순서대로 놓아 기차를 출발시켜요'], ['hunt', '🗺️', '단어 보물찾기', '영어로 부탁한 물건을 마을에서 찾아요'], ['cafe', '☕', '펫 카페', '손님의 영어 주문을 듣고 메뉴와 수량을 골라요'], ['jungle', '🌴', '영어 정글 탐험', '길 안내를 듣고 보물까지 가요'], ['story', '🎭', '이야기 극장', '고른 말에 따라 이야기가 달라져요'], ['speak', '🎤', '발음 별 수집', '듣고 따라 말하며 별을 모아요 (마이크 없음)']];
+const EG_GROUP = { listen: ['🎧 듣기 게임', ['catch', 'cafe', 'jungle', 'speak']], sentence: ['🧩 문장 만들기', ['train', 'story', 'cafe']] };
+function openEngGames(group) {
   sagaAfter = null;
+  const g = EG_GROUP[group], list = g ? EG_LIST.filter(x => g[1].includes(x[0])) : EG_LIST;
   const row = (id, e, t, d) => `<button class="dex-card" data-eg="${id}"><span class="emo day">${e}</span><span class="txt"><span class="t1">${t}</span><br><span class="t2">${d}</span></span><span class="go">시작 ▶</span></button>`;
-  openSheet('🎮 영어 게임', `<p class="msub">놀면서 영어를 익혀요. 맞힌 단어는 복습에 기록되고, 펫도 함께 자라요. 틀려도 잃는 것은 없어요.</p><div class="dex">${row('abc', '✨', '알파벳 마법', '대문자와 소문자, 첫소리를 찾아요')}${row('catch', '🎧', '영어 듣고 잡기', '듣고 맞는 그림을 잡아요')}${row('match', '🃏', '단어 카드 매칭', '그림과 단어를 연결해요')}${row('train', '🚂', '문장 기차', '단어를 순서대로 놓아 기차를 출발시켜요')}${row('hunt', '🗺️', '단어 보물찾기', '영어로 부탁한 물건을 마을에서 찾아요')}${row('cafe', '☕', '펫 카페', '손님의 영어 주문을 듣고 메뉴와 수량을 골라요')}${row('jungle', '🌴', '영어 정글 탐험', '길 안내를 듣고 보물까지 가요')}${row('story', '🎭', '이야기 극장', '고른 말에 따라 이야기가 달라져요')}${row('speak', '🎤', '발음 별 수집', '듣고 따라 말하며 별을 모아요 (마이크 없음)')}</div><button class="candy" id="eBack" style="width:100%;margin-top:10px">‹ 영어 지도로</button>`,
+  openSheet(g ? g[0] : '🎮 영어 게임', `<p class="msub">놀면서 영어를 익혀요. 맞힌 단어는 복습에 기록되고, 펫도 함께 자라요. 틀려도 잃는 것은 없어요.</p><div class="dex">${list.map(x => row(...x)).join('')}</div><button class="candy" id="eBack" style="width:100%;margin-top:10px">‹ 영어 지도로</button>`,
     body => body.addEventListener('click', ev => {
       const b = ev.target.closest('[data-eg]');
       if (b) { if (engCanSpeak()) { try { engSay(' '); } catch (err) {} } return ({ abc: egAlphabet, catch: egCatch, match: egMatch, train: egTrain, hunt: startWordHunt, cafe: egCafe, jungle: egJungle, story: egStory, speak: egSpeak })[b.dataset.eg](); }
@@ -7918,13 +7985,23 @@ function openEnglish(tab) {
   const si = tab ?? e.viewStage ?? e.stage; e.viewStage = si;
   const st = ENG[si], need = engNeed(e.level), due = engDue().length, learned = engLearned(), rk = engRank(e.level), lessons = engLessonsDone(), lessonAll = engLessonTotal();
   const nextGift = Object.keys(ENG_GIFTS).map(Number).find(l => l > e.level);
+  const nx = engNext(), nxU = nx && ENG[nx.si].units[nx.ui];
   const rows = st.units.map((u, i) => {
     const open = engOpen(st, i), stars = (e.units[u.id] || {}).stars || 0;
     return `<button class="dex-card" data-unit="${i}"${open ? '' : ' disabled style="opacity:.55"'}><span class="emo day">${open ? u.e : '🔒'}</span><span class="txt"><span class="t1">${i + 1}. ${escapeHTML(u.t)}</span><br><span class="t2">${open ? (stars ? '⭐'.repeat(stars) + '☆'.repeat(3 - stars) : '🎯 ' + engMeta(u)[2]) : '앞 레슨을 끝내면 열려요'}</span></span><span class="go">${stars ? '다시' : open ? '시작 ▶' : '잠김'}</span></button>`;
   }).join('');
   openSheet('📚 말랑 영어', `<div class="mission" style="margin-bottom:10px"><span class="mi">${rk.cur[1]}</span><span class="mt"><b>영어 Lv.${e.level} ${rk.cur[2]} · 배운 단어 ${learned}개</b><span class="mbar"><i style="width:${e.xp / need * 100}%"></i></span><small>${e.xp} / ${need}${nextGift ? ` · Lv.${nextGift}에 특별 선물 🎁` : ''}${rk.nx ? ` · Lv.${rk.nx[0]} ${rk.nx[1]} ${rk.nx[2]}` : ''}<br>전체 여정 ${Math.round(lessons / lessonAll * 100)}% (레슨 ${lessons}/${lessonAll})</small></span></div>
     <div class="tabs" role="tablist">${ENG.map((g, i) => `<button role="tab" aria-selected="${i === si}" data-st="${i}">${g.icon} ${g.name}</button>`).join('')}</div>
-    <div class="e-actions"><button class="candy" id="eReview">🔁 복습${due ? ` ${due}` : ''}</button><button class="candy primary" id="eGames">🎮 영어 게임</button><button class="candy" id="eAlbum">📒 단어 도감</button><button class="candy" id="eVoice">🔊 목소리</button><button class="candy" id="eGoals">🏆 도전 목표</button><button class="candy" id="eChat">💌 친구 쪽지</button>${e.grad ? '<button class="candy" id="eCert">🎓 수료증</button>' : ''}<button class="candy" id="eAge">나이 바꾸기</button></div>
+    <div class="e-hub">
+      <button class="hub-card big" id="hubToday"><span class="hi" aria-hidden="true">🧭</span><span class="ht"><b>오늘의 영어 모험</b><small>${nxU ? `다음 레슨: ${escapeHTML(nxU.t)}` : '모든 레슨을 끝냈어요! 복습으로 실력을 지켜요'}</small></span><span class="go">출발 ▶</span></button>
+      <button class="hub-card c-sky" id="eAlbum"><span class="hi" aria-hidden="true">📒</span><b>단어 도감</b><small>배운 단어 ${learned}개</small></button>
+      <button class="hub-card c-mint" id="hubListen"><span class="hi" aria-hidden="true">🎧</span><b>듣기 게임</b><small>듣고 잡고, 주문 받기</small></button>
+      <button class="hub-card c-yellow" id="hubSentence"><span class="hi" aria-hidden="true">🧩</span><b>문장 만들기</b><small>문장 기차, 이야기</small></button>
+      <button class="hub-card c-lav" id="eGames"><span class="hi" aria-hidden="true">🎮</span><b>영어 미니게임</b><small>게임 9가지</small></button>
+      <button class="hub-card c-coral" id="eReview"><span class="hi" aria-hidden="true">🔁</span><b>복습</b><small>${due ? `지금 ${due}개` : '지금은 쉬어도 돼요'}</small></button>
+      <button class="hub-card c-cream" id="hubGrowth"><span class="hi" aria-hidden="true">🌱</span><b>나의 영어 성장</b><small>${rk.cur[2]} · 별 ${e.stars || 0}개</small></button>
+    </div>
+    <div class="e-actions small"><button class="candy" id="eVoice">🔊 목소리</button><button class="candy" id="eChat">💌 친구 쪽지</button><button class="candy" id="eAge">나이 바꾸기</button></div>
     ${engCanSpeak() && !noEngVoice() ? '' : '<p class="warn">이 기기에서는 영어 소리가 나오지 않아요. 🔊 목소리를 눌러 방법을 확인해 주세요.</p>'}
     <button class="saga-card" id="eSaga"><span class="row" aria-hidden="true">${['bear', 'bunny', 'dragon', 'fox'].map(sp => petSVG(sp, { mood: 'happy', stage: 'kid' })).join('')}</span><span class="tx"><b>📖 이야기 모험</b><small>${sagaState().done >= SAGA.length ? '말 나무를 살렸어요! 다시 보기' : `${sagaState().done + 1}장. ${escapeHTML(SAGA[sagaState().done].t)}`}</small></span><span class="go">▶</span></button>
     ${studyHTML()}${dayEngHTML()}<p class="msub">${st.desc}</p><div class="dex">${rows}</div>`,
@@ -7933,6 +8010,10 @@ function openEnglish(tab) {
       const u = ev.target.closest('[data-unit]'); if (u && !u.disabled) { if (engCanSpeak()) { try { engSay(' '); } catch (err) {} } return engLesson(si, st.units[+u.dataset.unit]); }
       if (ev.target.closest('#eReview')) { const q = engReviewQuiz(); if (!q) return toast('먼저 레슨을 하나 끝내면 복습할 수 있어요'); return engLesson(si, st.units[0], q); }
       if (ev.target.closest('#eAlbum')) return openEngAlbum();
+      if (ev.target.closest('#hubToday')) { if (!nxU) return ev.target.closest('.sheet') && document.querySelector('#eReview').click(); if (engCanSpeak()) { try { engSay(' '); } catch (err) {} } return engLesson(nx.si, nxU); }
+      if (ev.target.closest('#hubListen')) return openEngGames('listen');
+      if (ev.target.closest('#hubSentence')) return openEngGames('sentence');
+      if (ev.target.closest('#hubGrowth')) return openEngGrowth();
       if (ev.target.closest('#eSaga')) return openSaga();
       if (ev.target.closest('#eGames')) return openEngGames();
       if (ev.target.closest('#eDayWords')) { const q = dayWordsQuiz(); return engLesson(0, ENG[0].units[0], q); }
@@ -7941,6 +8022,21 @@ function openEnglish(tab) {
       if (ev.target.closest('#eChat')) return openPals();
       if (ev.target.closest('#eCert')) return openEngCert();
       if (ev.target.closest('#eAge')) return openEngAge();
+    }));
+}
+function openEngGrowth() {
+  const e = engState(), rk = engRank(e.level), need = engNeed(e.level), w = studyWeek(), p = P();
+  const pic = World.ok && p && p.hatched ? World.petPic(p, 'excited', 'cheer') : '';
+  const stages = ENG.map(g => { const d = g.units.filter(engDone).length; return `<div class="report-row"><span>${g.icon} ${escapeHTML(g.name)}</span><span class="mbar"><i style="width:${d / g.units.length * 100}%"></i></span><small>${d}/${g.units.length}</small></div>`; }).join('');
+  openSheet('🌱 나의 영어 성장', `<div class="growth-top"><span class="e-pet big" aria-hidden="true">${pic ? `<img src="${pic}" alt="">` : p ? petSVG(p.sp, { mood: 'excited', stage: stageOf(p.level), hat: p.hat }) : ''}</span><span><b>${rk.cur[1]} ${rk.cur[2]}</b><small>영어 Lv.${e.level}${rk.nx ? ` · Lv.${rk.nx[0]}에 ${rk.nx[1]} ${rk.nx[2]}` : ''}</small><span class="mbar"><i style="width:${e.xp / need * 100}%"></i></span></span></div>
+    <div class="report-top"><div><b>${e.days || 0}일</b><small>공부한 날</small></div><div><b>${engLearned()}개</b><small>배운 단어</small></div><div><b>${e.stars || 0}</b><small>모은 별</small></div><div><b>${Math.min(w.days, WEEK_GOAL)}/${WEEK_GOAL}</b><small>이번 주</small></div></div>
+    <h3 class="wear-h">단계별 진도</h3>${stages}
+    <div class="e-actions"><button class="candy primary" id="eGoals">🏆 도전 목표</button>${e.grad ? '<button class="candy" id="eCert">🎓 수료증</button>' : ''}</div>
+    <button class="candy" id="eBack" style="width:100%;margin-top:6px">‹ 영어 지도로</button>`,
+    body => body.addEventListener('click', ev => {
+      if (ev.target.closest('#eGoals')) return openEngGoals();
+      if (ev.target.closest('#eCert')) return openEngCert();
+      if (ev.target.closest('#eBack')) return openEnglish();
     }));
 }
 function openEngVoice() {

@@ -108,7 +108,7 @@ test('음악: 놀이 곡은 16마디 이상이고 밝은 장조이며 장면마�
   assert.ok(html.includes('function openSoundTest'));
 });
 test('영어 게임 9종이 목록에 모두 연결되어 있고, 발음 게임은 마이크를 쓰지 않는다', () => {
-  for (const k of ['abc', 'catch', 'match', 'train', 'hunt', 'cafe', 'jungle', 'story', 'speak']) assert.ok(html.includes(`row('${k}'`), k);
+  for (const k of ['abc', 'catch', 'match', 'train', 'hunt', 'cafe', 'jungle', 'story', 'speak']) assert.ok(html.includes(`['${k}', '`) && html.includes('list.map(x => row(...x))'), k);
   assert.ok(!/getUserMedia|SpeechRecognition/.test(html));
   const g = html.slice(html.indexOf('function egCafe'), html.indexOf('function openEngGames'));
   assert.ok(!/S\.coins\s*-=/.test(g));
@@ -136,4 +136,11 @@ test('어른 영어는 직접 떠올려 쓰는 문제(받아쓰기, 한국어 �
 });
 test('펫은 부드러운 테두리와 재질을 쓴다', () => {
   assert.ok(html.includes("ink: petInk, mat: toonSoft(color)") && html.includes('gradSoft = new T.DataTexture'));
+});
+test('MALANG WORLD 2차: 새 표정과 동작, 정답·오답 반응, 영어 메뉴 7개', () => {
+  for (const k of ["clap: 1.4", "think: 1.8", "curious: 1.3", "celebrate: 2", "case 'clap'", "case 'think'", "case 'celebrate'", "pt.mouthFlat", "pt.sparkle"]) assert.ok(html.includes(k), k);
+  assert.ok(html.includes("petFace(ok ? 'excited' : 'think', ok ? 'clap' : 'think')"), '오답에 화내지 않고 생각하는 얼굴');
+  for (const id of ['hubToday', 'eAlbum', 'hubListen', 'hubSentence', 'eGames', 'eReview', 'hubGrowth']) assert.ok(html.includes(`id="${id}"`), id);
+  assert.ok(html.includes('function openEngGrowth') && html.includes('const EG_GROUP'));
+  assert.ok(html.includes("World.trick(ups.length ? 'celebrate' : 'clap')"));
 });
