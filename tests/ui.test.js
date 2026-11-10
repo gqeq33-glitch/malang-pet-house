@@ -144,3 +144,28 @@ test('MALANG WORLD 2차: 새 표정과 동작, 정답·오답 반응, 영어 메
   assert.ok(html.includes('function openEngGrowth') && html.includes('const EG_GROUP'));
   assert.ok(html.includes("World.trick(ups.length ? 'celebrate' : 'clap')"));
 });
+
+// GLB 파일 검사: glTF 바이너리 머리말과 JSON 묶음을 직접 읽는다
+function readGlb(file) {
+  const b = fs.readFileSync(path.join(__dirname, '..', 'www', 'models', file));
+  assert.equal(b.toString('ascii', 0, 4), 'glTF'); assert.equal(b.readUInt32LE(4), 2);
+  const len = b.readUInt32LE(12); return { size: b.length, json: JSON.parse(b.toString('utf8', 20, 20 + len)) };
+}
+test('새 말랑 베어 GLB: 관절과 얼굴과 애니메이션 10개, 휴대폰에 맞는 크기', () => {
+  const { size, json } = readGlb('malang_bear.glb');
+  const names = json.nodes.map(n => n.name);
+  for (const n of ['MB_root', 'MB_body', 'MB_head', 'MB_skull', 'MB_armL', 'MB_armR', 'MB_legL', 'MB_legR', 'MB_earL', 'MB_earR', 'MB_tail', 'MB_eyeL', 'MB_eyeR', 'MB_mouth']) assert.ok(names.includes(n), n);
+  assert.deepEqual(json.animations.map(a => a.name).sort(), ['dance', 'happy', 'idle', 'jump', 'run', 'sad', 'sleep', 'surprised', 'walk', 'wave']);
+  assert.ok(json.materials.some(m => /^mat_ffdfb8$/i.test(m.name)), '염색할 털 재질 이름');
+  assert.ok(size < 1.5e6, '1.5MB 이하');
+});
+test('새 광장 GLB와 게임 연결: 실패하면 예전 모습, 오프라인 캐시, 되돌리기 설정', () => {
+  const { size, json } = readGlb('malang_plaza.glb');
+  assert.ok(json.nodes.some(n => n.name === 'PZ_fountain') && size < 5e5);
+  assert.ok(html.includes('<script src="vendor/GLTFLoader.js"></script>') && fs.existsSync(path.join(__dirname, '..', 'www', 'vendor', 'GLTFLoader.js')));
+  assert.ok(html.includes("const nb = spId === 'bear' && !!glbBear && !S.gfxOld;"), '모델이 없으면 예전 곰');
+  assert.ok(html.includes("console.warn('말랑 베어 모델을 불러오지 못해 예전 모습을 써요'"));
+  assert.ok(html.includes('id="setGfx"'));
+  const sw = fs.readFileSync(path.join(__dirname, '..', 'www', 'sw.js'), 'utf8');
+  for (const f of ['vendor/GLTFLoader.js', 'models/malang_bear.glb', 'models/malang_plaza.glb']) assert.ok(sw.includes(`'${f}'`), f);
+});

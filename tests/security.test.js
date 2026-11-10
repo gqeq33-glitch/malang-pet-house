@@ -141,7 +141,7 @@ test('검사는 입력을 바꾸지 않는다', () => {
 
 test('공개 버전에 채팅·PeerJS가 없다', () => {
   for (const w of ['PeerJS', 'peerjs', 'new window.Peer', 'openChat', 'chatCheck', 'RTCPeerConnection', 'WebSocket']) assert.ok(!html.includes(w), w);
-  assert.ok(/connect-src 'self';/.test(html));
+  assert.ok(/connect-src 'self' blob:;/.test(html), '외부 서버 연결은 막고, 3D 모델 안의 그림(기기 메모리의 blob)만 허용');
   assert.ok(!fs.existsSync(path.join(root, 'www', 'vendor', 'peerjs.min.js')));
   assert.ok(!fs.readFileSync(path.join(root, 'www', 'sw.js'), 'utf8').includes('peerjs'));
 });
@@ -215,4 +215,10 @@ test('새 학습 기록: 정상 값은 통과하고 위조 값은 거부한다',
   const r = strict(good); assert.equal(r.err, undefined);
   assert.equal(r.data.eng.week.days, 2); assert.equal(r.data.eng.w.apple.m, 2);
   for (const bad of [{ days: -1 }, { days: 'x' }, { week: { id: 1, days: 99 } }, { week: { id: 1, days: 1, evil: 1 } }, { stars: '<b>' }, { w: { apple: { b: 7 } } }, { w: { apple: { b: 1, m: -1 } } }]) assert.ok(strict(save({ eng: Object.assign({ level: 1 }, bad) })).err, JSON.stringify(bad));
+});
+
+test('새 그래픽 설정(gfxOld)은 참·거짓만 받는다', () => {
+  assert.equal(strict(save({ gfxOld: true })).err, undefined);
+  assert.equal(strict(save({ gfxOld: false })).err, undefined);
+  assert.ok(strict(save({ gfxOld: 'yes' })).err);
 });

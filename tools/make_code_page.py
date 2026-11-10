@@ -42,6 +42,10 @@ FILES = [
     ("tools/make_artifact.py", "공유 페이지 만들기 도구", "", None, False),
     ("tools/make_icons.py", "아이콘 만들기 도구", "", None, False),
     ("tools/make_fonts.py", "글꼴 줄이기 도구", "", None, False),
+    ("docs/ASSETS.md", "3D 에셋 안내", "말랑 베어·광장 GLB의 내용, 라이선스, 다시 만드는 법이에요.", None, False),
+    ("tools/assetmaker/malang_assets.js", "3D 에셋 설계 코드", "말랑 베어와 광장을 만드는 코드예요. GLB 파일 자체는 그림 파일이라 여기 넣지 않았어요.", None, False),
+    ("tools/assetmaker/index.html", "3D 에셋 제작기", "브라우저에서 GLB·PNG를 다시 만들어요.", None, False),
+    ("tools/assetmaker/save_server.py", "제작기 저장 서버", "", None, False),
 ]
 items = []
 for path, title, desc, text, main in FILES:

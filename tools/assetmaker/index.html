@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>말랑 에셋 제작기</title>
+<style>body{margin:0;background:#FFF6EE;font-family:system-ui,sans-serif}#log{white-space:pre-wrap;font-size:13px;padding:10px}canvas{display:block}</style></head>
+<body><div id="log">준비 중…</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/exporters/GLTFExporter.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="malang_assets.js"></script>
+<script>
+const log = (...a) => { document.getElementById('log').textContent += '\n' + a.join(' '); };
+const save = async (f, blob) => { const r = await fetch('/save?f=' + encodeURIComponent(f), { method: 'POST', body: blob }); log(r.ok ? '저장' : '실패', f, blob.size); return r.ok; };
+const R = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+R.outputEncoding = THREE.sRGBEncoding; R.toneMapping = THREE.ACESFilmicToneMapping; R.toneMappingExposure = 1; R.shadowMap.enabled = true; R.shadowMap.type = THREE.PCFSoftShadowMap;
+function studio(bg) {
+  const s = new THREE.Scene(); s.background = bg || null;
+  const hl = new THREE.HemisphereLight('#FFF6EE', '#FFD9C8', .7); hl.color.convertSRGBToLinear(); hl.groundColor.convertSRGBToLinear(); s.add(hl);
+  const sun = new THREE.DirectionalLight('#FFF1DC', 1.25); sun.position.set(-4, 9, 7); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); Object.assign(sun.shadow.camera, { left: -5, right: 5, top: 5, bottom: -5 }); sun.shadow.radius = 5; sun.shadow.bias = -.0005; s.add(sun);
+  const rim = new THREE.DirectionalLight('#D8C8FF', .75); rim.position.set(5, 5, -8); s.add(rim);
+  return s;
+}
+function bgCanvasTex(stops) { const c = canvas(1024, 1024, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); stops.forEach(([p, col]) => gr.addColorStop(p, col)); g.fillStyle = gr; g.fillRect(0, 0, w, h); for (let i = 0; i < 26; i++) { g.fillStyle = `rgba(255,255,255,${.15 + Math.random() * .25})`; g.beginPath(); g.arc(Math.random() * w, Math.random() * h * .7, 20 + Math.random() * 70, 0, TAU); g.fill(); } }); const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; return t; }
+function floor(s, color = '#FFF0E4') { const m = new THREE.Mesh(new THREE.CircleGeometry(12, 64), new THREE.ShadowMaterial({ opacity: .18 })); m.rotation.x = -Math.PI / 2; m.receiveShadow = true; s.add(m); return m; }
+async function shot(scene, cam, w, h, file) { R.setSize(w, h); R.render(scene, cam); const blob = await new Promise(r => R.domElement.toBlob(r, 'image/png')); return save(file, blob); }
+function camAt(target, dist, yaw, h = 0, fov = 30, aspect = 1) { const c = new THREE.PerspectiveCamera(fov, aspect, .1, 100); c.position.set(target.x + Math.sin(yaw) * dist, target.y + h, target.z + Math.cos(yaw) * dist); c.lookAt(target); return c; }
+async function run() {
+  const pathAngles = [3.075, -2.805, -1.571, -.337, 2.539, .454, .093];
+  /* 1) 그림(PNG) */
+  const B = buildBear(false);
+  const s1 = studio(bgCanvasTex([[0, '#FFE6F0'], [.6, '#FFF3E2'], [1, '#FFE1D2']])); floor(s1); s1.add(B.root);
+  const tgt = new THREE.Vector3(0, 1.25, 0);
+  applyPose(B, poseAt('wave', .5)); setFaceTex(B, 'happy', 'open');
+  await shot(s1, camAt(tgt, 6.2, -.35, .5, 32), 1024, 1024, 'bear/bear_01_concept_v1.png');
+  applyPose(B, poseAt('idle', 0)); B.n.head.rotation.set(0, 0, 0); setFaceTex(B, 'open', 'w');
+  const s2 = studio(null); floor(s2); s2.add(B.root);
+  // 3D 변환용 정면 A포즈: 팔을 벌리고 배경은 단색
+  B.n.armL.rotation.set(0, 0, -.55); B.n.armR.rotation.set(0, 0, .55);
+  s2.background = new THREE.Color('#E9E7EE');
+  await shot(s2, camAt(tgt, 6.4, 0, .2, 32, .75), 768, 1024, 'bear/bear_02_front_apose_v1.png');
+  // 설정화: 앞·3/4·옆·뒤
+  const views = [['front', 0], ['quarter', -.75], ['side', -Math.PI / 2], ['back', Math.PI]];
+  const tiles = [];
+  for (const [name, yaw] of views) { B.root.rotation.y = yaw; R.setSize(600, 800); R.render(s2, camAt(tgt, 6.4, 0, .2, 32, .75)); tiles.push(await createImageBitmap(R.domElement)); await shot(s2, camAt(tgt, 6.4, 0, .2, 32, .75), 600, 800, `bear/views/bear_view_${name}.png`); }
+  B.root.rotation.y = 0;
+  const sheet = canvas(2400, 900, (g, w, h) => { g.fillStyle = '#E9E7EE'; g.fillRect(0, 0, w, h); g.font = '34px sans-serif'; g.fillStyle = '#6E6482'; g.textAlign = 'center'; tiles.forEach((im, i) => { g.drawImage(im, i * 600, 40, 600, 800); g.fillText(['FRONT', '3/4', 'SIDE', 'BACK'][i], i * 600 + 300, 880); }); });
+  await save('bear/bear_03_turnaround_v1.png', await new Promise(r => sheet.toBlob(r, 'image/png')));
+  // 표정 6종
+  const ex = [['happy', 'open', '기쁨'], ['star', 'open', '신남'], ['surprised', 'o', '놀람'], ['sad', 'sad', '슬픔'], ['sleepy', 'sleep', '졸림'], ['open', 'o', '궁금']];
+  const heads = [];
+  B.n.armL.rotation.set(0, 0, -.16); B.n.armR.rotation.set(0, 0, .16);
+  for (const [e, m] of ex) { setFaceTex(B, e, m); B.n.head.rotation.set(e === 'sad' ? .2 : 0, 0, e === 'open' ? .22 : 0); R.setSize(512, 512); R.render(s2, camAt(new THREE.Vector3(0, 1.75, 0), 3.4, 0, .05, 30)); heads.push(await createImageBitmap(R.domElement)); }
+  const exs = canvas(1536, 1100, (g, w, h) => { g.fillStyle = '#F6F1F8'; g.fillRect(0, 0, w, h); g.font = '36px sans-serif'; g.fillStyle = '#5A4E72'; g.textAlign = 'center'; heads.forEach((im, i) => { const x = (i % 3) * 512, y = Math.floor(i / 3) * 550; g.drawImage(im, x, y, 512, 512); g.fillText(ex[i][2], x + 256, y + 535); }); });
+  await save('bear/bear_04_expressions_v1.png', await new Promise(r => exs.toBlob(r, 'image/png')));
+  B.n.head.rotation.set(0, 0, 0); setFaceTex(B, 'open', 'w');
+  // 아이콘(투명 배경)
+  s2.background = null; await shot(s2, camAt(new THREE.Vector3(0, 1.7, 0), 3.6, -.2, .1, 30), 512, 512, 'bear/bear_icon_512.png');
+  /* 2) 광장 그림 */
+  const P = buildPlaza(false, pathAngles);
+  const s3 = studio(bgCanvasTex([[0, '#8FD3FF'], [.55, '#D8F0FF'], [1, '#FFF1DE']]));
+  const grass = new THREE.Mesh(new THREE.CircleGeometry(9, 64), new THREE.MeshStandardMaterial({ color: new THREE.Color('#A8E39A').convertSRGBToLinear(), roughness: .9 })); grass.rotation.x = -Math.PI / 2; grass.receiveShadow = true; s3.add(grass);
+  const tile = new THREE.Mesh(new THREE.CircleGeometry(4.6, 64), new THREE.MeshStandardMaterial({ color: new THREE.Color('#F2E6D0').convertSRGBToLinear(), roughness: .85 })); tile.rotation.x = -Math.PI / 2; tile.position.y = .01; tile.receiveShadow = true; s3.add(tile);
+  s3.children.filter(o => o.isDirectionalLight).forEach(l => { if (l.shadow) Object.assign(l.shadow.camera, { left: -9, right: 9, top: 9, bottom: -9 }); });
+  s3.add(P.root); const B2 = buildBear(false); B2.root.position.set(0, 0, 3); applyPose(B2, poseAt('wave', .5)); setFaceTex(B2, 'happy', 'open'); s3.add(B2.root);
+  const pc = new THREE.PerspectiveCamera(40, 16 / 9, .1, 100); pc.position.set(0, 9, 13); pc.lookAt(0, 1, 0);
+  await shot(s3, pc, 1600, 900, 'plaza/plaza_01_overview_v1.png');
+  /* 3) 게임용 GLB */
+  const ex1 = new THREE.GLTFExporter();
+  const GB = buildBear(true); const clips = bakeClips(GB);
+  const gs = new THREE.Scene(); gs.add(GB.root);
+  const glb = await new Promise(r => ex1.parse(gs, r, { binary: true, animations: clips, embedImages: true, onlyVisible: true }));
+  await save('models/malang_bear.glb', new Blob([glb], { type: 'model/gltf-binary' }));
+  const GP = buildPlaza(true, pathAngles); const ps = new THREE.Scene(); ps.add(GP.root);
+  const glb2 = await new Promise(r => ex1.parse(ps, r, { binary: true, embedImages: true, onlyVisible: true }));
+  await save('models/malang_plaza.glb', new Blob([glb2], { type: 'model/gltf-binary' }));
+  // 다시 불러와 검사
+  const loader = new THREE.GLTFLoader(); const stats = {};
+  for (const f of ['malang_bear.glb', 'malang_plaza.glb']) {
+    const buf = f === 'malang_bear.glb' ? glb : glb2;
+    const g = await new Promise((res, rej) => loader.parse(buf, '', res, rej));
+    let tris = 0, meshes = 0, mats = new Set(); g.scene.traverse(o => { if (o.isMesh) { meshes++; mats.add(o.material.uuid); const ix = o.geometry.index; tris += (ix ? ix.count : o.geometry.attributes.position.count) / 3; } });
+    stats[f] = { bytes: buf.byteLength, tris: Math.round(tris), meshes, materials: mats.size, clips: g.animations.map(a => a.name), nodes: ['MB_head', 'MB_armL', 'MB_armR', 'MB_legL', 'MB_legR', 'MB_earL', 'MB_earR', 'MB_tail', 'MB_eyeL', 'MB_mouth', 'PZ_fountain'].filter(n => g.scene.getObjectByName(n)) };
+  }
+  stats.plazaCounts = GP.root.userData.counts;
+  await save('models/model_report.json', new Blob([JSON.stringify(stats, null, 2)]));
+  log('완료', JSON.stringify(stats));
+  window.__done = stats;
+}
+run().catch(e => { log('오류', e.stack || e); window.__err = String(e.stack || e); });
+</script></body></html>
