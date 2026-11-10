@@ -210,3 +210,9 @@ test('서비스 워커(모의 실행): 인터넷이 끊기면 저장본을, 연�
   await new Promise(r => setTimeout(r, 5));
   assert.equal(saved.get('index.html'), 'NEW');
 });
+test('새 학습 기록: 정상 값은 통과하고 위조 값은 거부한다', () => {
+  const good = save({ eng: { level: 3, days: 4, lastDay: 'Fri Nov 06 2026', week: { id: 2965, days: 2, got: false }, weeks: 1, stars: 30, reviews: 2, w: { apple: { b: 6, due: 1, m: 2 } } } });
+  const r = strict(good); assert.equal(r.err, undefined);
+  assert.equal(r.data.eng.week.days, 2); assert.equal(r.data.eng.w.apple.m, 2);
+  for (const bad of [{ days: -1 }, { days: 'x' }, { week: { id: 1, days: 99 } }, { week: { id: 1, days: 1, evil: 1 } }, { stars: '<b>' }, { w: { apple: { b: 7 } } }, { w: { apple: { b: 1, m: -1 } } }]) assert.ok(strict(save({ eng: Object.assign({ level: 1 }, bad) })).err, JSON.stringify(bad));
+});

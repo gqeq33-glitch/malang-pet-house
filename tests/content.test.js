@@ -59,7 +59,7 @@ test('회화: 상황마다 대화 6개, 정답이 오답과 겹치지 않고 같
   const bad = [], seen = new Map();
   for (const u of units) {
     if (!u.d) continue;
-    if (u.d.length !== 6) bad.push(['개수', u.id]);
+    if (u.d.length !== (ENG[u.si].adult ? 3 : 6)) bad.push(['개수', u.id]);   // 어른 영어는 대화 3개 + 다른 문제 유형
     for (const x of u.d) {
       if (!EN.test(x[0] + x[2] + x[4].join('')) || !KO.test(x[1]) || !KO.test(x[3])) bad.push(['형식', u.id, x[0]]);
       if (x[4].includes(x[2]) || x[4][0] === x[4][1]) bad.push(['보기', u.id, x[0]]);
@@ -204,4 +204,15 @@ test('그림 검사: 뜻과 맞지 않는 것으로 확인한 그림을 다시 �
 });
 test('새 레슨과 보기: 같은 뜻의 단어가 한 레슨에 겹쳐 답이 둘이 되지 않는다', () => {
   for (const u of units) { const ks = (u.w || []).map(w => w[1]); assert.equal(new Set(ks).size, ks.length, u.id); }
+});
+
+test('어른 영어: 레슨마다 표현·문장·빈칸·대화·읽기가 모두 있다', () => {
+  const st = ENG.find(g => g.adult);
+  assert.ok(st && st.free && st === ENG[ENG.length - 1], '맨 뒤에 붙여 기존 진도가 잠기지 않는다');
+  assert.ok(st.units.length >= 14);
+  for (const u of st.units) {
+    assert.ok(u.w.length >= 6 && u.s.length === 4 && u.b.length === 3 && u.d.length === 3 && u.r.length === 1, u.id);
+    for (const b of u.b) { assert.ok(b[0].includes('___') && !b[2].includes(b[1]) && KO.test(b[3]), u.id + ' ' + b[0]); }
+    for (const r of u.r) assert.ok(!r.o.includes(r.a) && KO.test(r.k), u.id);
+  }
 });

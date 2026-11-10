@@ -116,3 +116,24 @@ test('영어 게임 9종이 목록에 모두 연결되어 있고, 발음 게임�
 test('이야기 모험이 지도와 놀이 메뉴에 있고, 게임이 끝나면 이야기로 돌아온다', () => {
   for (const f of ['function openSaga', 'function sagaPlay', 'function sagaEnd', 'id="eSaga"', 'data-game="saga"', 'if (sagaAfter)', 'cat.sagaLen']) assert.ok(html.includes(f), f);
 });
+test('학습 보상은 누적 방식이고, 쉬어도 줄어들지 않는다', () => {
+  const m = html.slice(html.indexOf('/* ---------- 누적 학습'), html.indexOf('/* ---------- 사용자 시험용 기록'));
+  assert.ok(m.includes('STUDY_GIFTS') && m.includes('WEEK_GOAL') && m.includes('e.days = (e.days || 0) + 1'));
+  assert.ok(!/days\s*=\s*0[^,]*;.*lastDay|streak|연속 학습|e\.days\s*-=|S\.coins\s*-=/.test(m.replace('days: 0, got: false', '')), '기록을 깎지 않는다');
+  assert.ok(html.includes('ENG_GAP = [0, 10 / 1440, 1, 3, 7, 14, 30]'));
+  assert.ok(html.includes('n = weak ? 1 :'), '약한 단어는 쉽게');
+  assert.ok(html.includes('areaProgress() >= AREA_NEED[k]'));
+  assert.ok(html.includes('function openEngReport') && html.includes('id="rpOpen"'));
+});
+
+test('어른 영어는 직접 떠올려 쓰는 문제(받아쓰기, 한국어 보고 쓰기)를 낸다', () => {
+  const f = html.slice(html.indexOf('function engAdultQuiz'), html.indexOf('function engDlgQ'));
+  for (const k of ["type: 'dict'", "type: 'produce'", "engDlgQ(x, 'hear')", "engDlgQ(x, 'type')", "type: 'read'"]) assert.ok(f.includes(k), k);
+  assert.ok(html.includes("if (st.adult) return engAdultQuiz(unit);"));
+  assert.ok(html.includes("['type', 'dict', 'produce'].includes(q.type)"), '쓰기 문제는 입력창으로');
+  assert.ok(html.includes("dict: '잘 듣고 들리는 문장을 그대로 써요'") && html.includes("produce: '한국어를 보고 영어로 써 봐요'"));
+  assert.ok(html.includes('i === 0 || !!st.free || engDone'));
+});
+test('펫은 부드러운 테두리와 재질을 쓴다', () => {
+  assert.ok(html.includes("ink: petInk, mat: toonSoft(color)") && html.includes('gradSoft = new T.DataTexture'));
+});
