@@ -233,7 +233,6 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
 .p.plus{font-family:var(--display);font-size:18px;color:var(--ink);background:#fff;padding:1px 9px;border-radius:99px;box-shadow:0 0 0 2px var(--ink) inset}
 .p.bub{width:var(--s);height:var(--s);border-radius:50%;background:radial-gradient(circle at 32% 30%,#fff 0 18%,rgba(190,235,255,.55) 22%,rgba(150,215,245,.35));box-shadow:0 0 0 1.5px rgba(120,190,230,.8) inset;animation:bubble 1s ease-out forwards}
 .p.crumb{font-size:14px;animation:crumb .7s ease-in forwards}
-.flyfood{position:absolute;font-size:40px;z-index:6;pointer-events:none;transition:left .55s cubic-bezier(.4,0,.2,1),top .55s cubic-bezier(.3,-.6,.6,1),transform .55s;transform:translate(-50%,-50%)}
 .sponge{position:absolute;font-size:42px;z-index:6;pointer-events:none;transform:translate(-50%,-50%) rotate(-12deg)}
 .bath-bar{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);display:flex;align-items:center;gap:10px;background:var(--paper);border-radius:99px;padding:6px 6px 6px 16px;box-shadow:0 0 0 2.5px var(--ink) inset;z-index:7;white-space:nowrap;font-size:14px}
 .bath-bar .candy{padding:6px 12px;font-size:15px}
@@ -507,11 +506,8 @@ body{-webkit-touch-callout:none}
 @media (max-width:430px){#stageTxt{display:none}.lv .xp{flex:1;max-width:none}}
 .candy,.tabs button{min-height:44px}
 .icon-btn{width:46px;height:46px}
-.e-guides{display:flex;align-items:center;gap:8px;background:#EAF7FF;border-radius:18px;padding:8px 12px;margin-bottom:10px;font-size:15px;line-height:1.35}
-.e-guides .row{display:flex;flex:none}.e-guides svg{width:38px;height:38px;margin-right:-6px;display:block}
-.e-pet.cheer{animation:ePetCheer .7s ease-out}.e-pet.nod{animation:ePetNod .9s ease-in-out}
+.e-pet.cheer{animation:ePetCheer .7s ease-out}
 @keyframes ePetCheer{0%{transform:translateY(0) scale(1)}35%{transform:translateY(-12px) scale(1.12)}70%{transform:translateY(0) scale(.97)}100%{transform:none}}
-@keyframes ePetNod{0%,100%{transform:rotate(0)}30%{transform:rotate(-7deg)}65%{transform:rotate(6deg)}}
 .e-star-pop{display:inline-block;animation:eStar .6s ease-out}
 @keyframes eStar{0%{transform:scale(.3);opacity:0}60%{transform:scale(1.25);opacity:1}100%{transform:scale(1)}}
 @media (min-width:700px) and (min-height:600px){
@@ -942,7 +938,6 @@ const DECAY_ASLEEP = { hunger: -0.4, fun: 0,    clean: -0.2, energy: 3.5 };
 const FLOOR = 8, HATCH_TAPS = 3, ADOPT_PRICE = 100;
 const needXP = lv => 30 + lv * 15;
 const stageOf = lv => lv < 5 ? 'baby' : lv < 10 ? 'kid' : 'adult';
-const STAGE_KO = { baby: '아기', kid: '어린이', adult: '어른' };
 // 레벨업 변신 단계. 단계가 바뀌는 순간 빛나는 변신 연출과 함께 3D 모습이 바뀐다
 const FORMS = [
   { lv: 1, name: '아기' }, { lv: 5, name: '어린이' }, { lv: 10, name: '어른' }, { lv: 15, name: '반짝' }, { lv: 20, name: '무지개' }
@@ -1696,7 +1691,7 @@ const World = (() => {
   }
 
   /* ---------- 펫 만들기 ---------- */
-  /* 로블록스 캐릭터처럼 몸·팔·다리가 따로 움직인다. 목표 자세를 정하고 부드럽게 따라간다
+  /* 블록 인형처럼 몸·팔·다리가 따로 움직인다. 목표 자세를 정하고 부드럽게 따라간다
      o: walk 걷는 중, run 달리는 중, cyc 걸음 위상, air 공중, act 동작 이름, k 동작 시간, t 시간, ride 탈것 */
   function poseLimbs(pt, dt, o = {}) {
     if (!pt.legL) return;
@@ -5828,7 +5823,7 @@ const dyeColor = p => (DYES[p.dye] || DYES.base)[1];
 
 /* =========================================================
    9-6. 펫 가족 · 날씨 · 특별 채소 · 채소 가게 · 말랑 소식지
-   로블록스 인기 게임(펫 키우기·텃밭)의 핵심을 안전하게 옮긴 부분: 돈·채팅·뽑기 없이 재미만 가져온다.
+   펫 키우기·텃밭 놀이를 어린이에게 안전하게 담은 부분: 돈·채팅·뽑기 없이 재미만 가져온다.
    ========================================================= */
 const SELL = { carrot: 4, strawberry: 5, tomato: 9, corn: 12, pumpkin: 25 };
 let rainUntil = 0;
@@ -7308,7 +7303,6 @@ function engReviewQuiz() {
 }
 
 // 문제 유형별 안내 캐릭터: 듣기는 여우, 단어는 토끼, 문장과 설명은 곰
-const engGuide = t => ({ listenPic: 'fox', hear: 'fox', talk: 'fox', type: 'fox', dict: 'fox', letter: 'bunny', picWord: 'bunny', wordKo: 'bunny', koWord: 'bunny', spell: 'bunny' }[t] || 'bear');
 // 틀렸을 때 보여 주는 짧은 해설
 function engWhy(q) {
   if (q.x) return `${q.x.w}: "${q.x.k}"라는 뜻이에요.`;
