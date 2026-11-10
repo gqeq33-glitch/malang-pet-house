@@ -42,6 +42,8 @@ FILES = [
     ("tools/make_artifact.py", "공유 페이지 만들기 도구", "", None, False),
     ("tools/make_icons.py", "아이콘 만들기 도구", "", None, False),
     ("tools/make_fonts.py", "글꼴 줄이기 도구", "", None, False),
+    ("tools/check_release.js", "배포 전 점검", "필수 파일·문법·3D 모델·설정을 확인해요. CI가 빌드 전에 실행해요.", None, False),
+    ("tools/smoke_test.js", "브라우저 첫 화면 시험", "크롬을 화면 없이 켜서 휴대폰·PC 크기에서 첫 화면이 뜨는지 봐요.", None, False),
     ("docs/REVIEW_GUIDE.md", "코드 검토 안내서", "검토하시는 분이 구조·시험·한계를 빨리 파악하도록 정리했어요.", None, False),
     ("docs/ASSETS.md", "3D 에셋 안내", "말랑 베어·광장 GLB의 내용, 라이선스, 다시 만드는 법이에요.", None, False),
     ("tools/assetmaker/malang_assets.js", "3D 에셋 설계 코드", "말랑 베어와 광장을 만드는 코드예요. GLB 파일 자체는 그림 파일이라 여기 넣지 않았어요.", None, False),

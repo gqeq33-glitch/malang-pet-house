@@ -13,9 +13,11 @@
 
 | 하는 일 | 명령 |
 |---|---|
-| 자동 시험 (102건) | `npm test` (Node 18 이상) |
+| 자동 시험 | `npm test` (Node 18 이상) |
+| 배포 전 점검 | `node tools/check_release.js` (필수 파일·문법·GLB·설정, 출시 직전엔 `--release`) |
+| 브라우저 첫 화면 시험 | `node tools/smoke_test.js` (크롬 필요, 휴대폰·PC 크기) |
 | 로컬 실행 | `www` 폴더에서 `python -m http.server 8000` → http://localhost:8000 |
-| 안드로이드 빌드 | GitHub에 올리면 `.github/workflows/android.yml`이 자동 실행 |
+| 안드로이드 빌드 | GitHub에 올리면 `.github/workflows/android.yml`이 자동 실행 (설치 → 시험 → 점검 → 브라우저 시험이 모두 통과해야 빌드) |
 | iOS 빌드 확인 | `.github/workflows/ios.yml` (서명 없는 시뮬레이터 빌드) |
 | 웹 배포 | `.github/workflows/pages.yml` (GitHub Pages) |
 
@@ -53,7 +55,7 @@ docs/                설계·검수·출시 문서
 | 영어 게임 | `EG_LIST`, `egShell`, `egFinish`, `egAlphabet` 등 | 영어 게임 9종 |
 | 이야기 | `const SAGA =`, `STORIES` | 이야기 모험 8장, 이야기 극장 3편 |
 | 보상 | `studyMark`, `boundedReward`, `engCheckGoals` | 누적 학습(쉬어도 줄지 않음), 횟수 제한 보상 |
-| 보호자 | `parentGate`, `openParent`, `openEngReport`, `playTick` | 보호자 확인, 놀이 시간·휴식·밤 시간 제한, 학습 결과 |
+| 보호자 | `parentGate`, `openParent`, `openEngReport`, `playTick`, `pinSave`, `hasRecovery` | 보호자 확인, PIN과 복구 코드, 놀이 시간·휴식·밤 시간 제한, 학습 결과, 앱 안 개인정보처리방침 |
 | 소리 | `MUSIC_TUNES`, `sfx(` | 직접 합성한 음악과 효과음 (외부 음원 없음) |
 | 소식 | `const NEWS =` | 업데이트 소식 |
 
@@ -92,6 +94,7 @@ docs/                설계·검수·출시 문서
 - **콘텐츠 검수 전**: 영어 문장은 교사·원어민 검수를 받지 않았습니다(`docs/CONTENT_REVIEW.md`).
 - **한 파일 구조**: `index.html` 하나에 기능이 모여 있어 길고, 화면·규칙·그리기가 섞인 부분이 있습니다. 그리기(3D)부터 분리하는 것을 다음 정리 후보로 봅니다.
 - **곰 모델 폴리곤**: 목표(8천~1.2만)보다 조금 많습니다(약 1.5만).
+- **보호자 확인의 한계**: 곱셈 문제는 성인 인증이 아닙니다. PIN을 만들면 복구 코드로만 PIN을 지울 수 있지만, 기기 저장 데이터를 지울 수 있는 사람까지 막지는 못합니다. 복구 코드가 생기기 전에 만든 PIN은 10분 대기 후 곱셈으로 지울 수 있습니다.
 - **운영자 연락처**: 개인정보처리방침의 문의 메일이 아직 자리표시(`YOUR-EMAIL@example.com`)입니다. `python tools/set_contact_email.py 주소`로 넣습니다.
 - **결제 없음**: 유료 기능은 설계 문서(`docs/STORE_SUBMISSION.md`)만 있고 구현하지 않았습니다.
 

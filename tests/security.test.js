@@ -188,13 +188,22 @@ test('개인정보처리방침: 한국어와 영어의 구조가 같다', () => 
   assert.equal(shape(ko).length, 6);
   assert.deepEqual(shape(ko), shape(en));
   assert.ok(ko.includes('말랑 영어 펫하우스') && en.includes('Malang English Pet House'));
-  assert.ok(ko.includes('2026년 11월 6일') && en.includes('November 6, 2026'));
+  // 시행일이 양쪽 언어에서 같은 날짜여야 한다
+  const kd = ko.match(/시행일: (\d{4})년 (\d{1,2})월 (\d{1,2})일/), ed = en.match(/Effective: ([A-Z][a-z]+) (\d{1,2}), (\d{4})/);
+  assert.ok(kd && ed, '시행일 표기');
+  const MON = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  assert.deepEqual([+kd[1], +kd[2], +kd[3]], [+ed[3], MON.indexOf(ed[1]) + 1, +ed[2]]);
   assert.ok(!pv.includes('<h1>말랑 펫하우스'));
 });
 test('서비스 워커: 미리 받는 파일이 모두 있다', () => {
   const sw = fs.readFileSync(path.join(root, 'www', 'sw.js'), 'utf8');
-  const list = JSON.parse(sw.slice(sw.indexOf('[', sw.indexOf('const FILES')), sw.indexOf('];') + 1).replace(/'/g, '"').replace(/,\s*\]/, ']'));
-  for (const f of list) if (f !== './') assert.ok(fs.existsSync(path.join(root, 'www', f)), f);
+  // 필수(CORE)와 선택(OPTIONAL) 목록을 모두 읽어 실제 파일이 있는지 본다
+  const listOf = name => { const m = sw.match(new RegExp(`const ${name} = \\[([\\s\\S]*?)\\]`)); assert.ok(m, name + ' 목록'); return [...m[1].matchAll(/'([^']+)'/g)].map(x => x[1]); };
+  const core = listOf('CORE'), optional = listOf('OPTIONAL');
+  assert.ok(core.includes('index.html') && core.includes('vendor/three.min.js') && core.includes('privacy.html'));
+  assert.ok(optional.includes('models/malang_bear.glb') && optional.includes('models/malang_plaza.glb'));
+  for (const f of [...core, ...optional]) if (f !== './') assert.ok(fs.existsSync(path.join(root, 'www', f)), f);
+  assert.ok(sw.includes('c.addAll(CORE)') && sw.includes('OPTIONAL.map(f => c.add(f).catch('), '선택 파일이 없어도 설치는 계속');
 });
 test('서비스 워커(모의 실행): 인터넷이 끊기면 저장본을, 연결되면 새 화면을 준다', async () => {
   const handlers = {}, saved = new Map([['index.html', 'OLD']]);
@@ -221,4 +230,53 @@ test('새 그래픽 설정(gfxOld)은 참·거짓만 받는다', () => {
   assert.equal(strict(save({ gfxOld: true })).err, undefined);
   assert.equal(strict(save({ gfxOld: false })).err, undefined);
   assert.ok(strict(save({ gfxOld: 'yes' })).err);
+});
+
+// ---------- STEP 2: 보호자 PIN 복구 코드, 이름 칸, 백업 왕복 ----------
+function pinBox() {
+  const a = html.indexOf('const PIN_KEY'), b = html.indexOf('function openPinSetup');
+  const store = new Map();
+  const box = { crypto: globalThis.crypto, TextEncoder, Uint8Array, localStorage: { getItem: k => store.has(k) ? store.get(k) : null, setItem: (k, v) => store.set(k, String(v)), removeItem: k => store.delete(k) } };
+  vm.createContext(box);
+  vm.runInContext(html.slice(a, b) + '\nthis.pinSave = pinSave; this.pinState = pinState; this.pinHash = pinHash; this.hasRecovery = hasRecovery; this.normRC = normRC; this.pinClear = pinClear;', box);
+  return box;
+}
+test('보호자 PIN: 만들면 복구 코드를 주고, 복구 코드는 해시로만 저장한다', async () => {
+  const b = pinBox();
+  const rc = await b.pinSave('4826');
+  assert.match(rc, /^[A-HJKMNP-Z2-9]{4}-[A-HJKMNP-Z2-9]{4}$/, '헷갈리는 글자(0 O 1 I L) 없는 8자리');
+  const st = b.pinState();
+  assert.ok(b.hasRecovery(st));
+  assert.ok(!JSON.stringify(st).includes(rc.replace('-', '')) && !JSON.stringify(st).includes('4826'), '원래 PIN과 복구 코드는 저장하지 않는다');
+  assert.equal(await b.pinHash('4826', st.salt), st.hash);
+  assert.equal(await b.pinHash(b.normRC(rc.toLowerCase().replace('-', ' ')), st.rsalt), st.rhash, '소문자·공백으로 써도 맞다');
+  assert.notEqual(await b.pinHash(b.normRC('AAAA-AAAA'), st.rsalt), st.rhash);
+});
+test('PIN을 잊었을 때: 복구 코드가 있으면 곱셈으로는 지울 수 없다', () => {
+  const f = html.slice(html.indexOf('  const forgot = () => {'), html.indexOf('  const pin = st => {'));
+  const withCode = f.slice(0, f.indexOf('return;\n    }'));
+  assert.ok(withCode.includes('hasRecovery(st0)') && withCode.includes('pinHash(normRC(inp.value), now.rsalt) === now.rhash'));
+  assert.ok(!/a \* b/.test(withCode), '복구 코드 경로에는 곱셈 정답 확인이 없다');
+  assert.ok(f.includes('lock(inp, opened + 600000)'), '예전 PIN은 10분 대기');
+  assert.ok(withCode.includes('now.fails >= 5'), '복구 코드도 틀리면 잠긴다');
+});
+test('이름 칸: 전화번호·이메일·주소는 막고 보통 이름은 통과', () => {
+  const box = {}; vm.createContext(box); vm.runInContext(lineOf('piiLike') + '\nthis.piiLike = piiLike;', box);
+  for (const v of ['010-1234-5678', '01012345678', 'me@mail', 'www.site', 'abc.com', 'http://x', '123']) assert.equal(box.piiLike(v), true, v);
+  for (const v of ['뽀삐', '구름2', '콩떡이7', 'Lulu', '말랑 베어', '12']) assert.equal(box.piiLike(v), false, v);
+  assert.ok(html.includes("if (piiLike($('#nameInput').value)) return toast(PII_MSG);") && html.includes("if (piiLike(body.querySelector('#adoptName').value)) return toast(PII_MSG);"));
+});
+test('백업 코드 왕복: 만든 코드를 되살리면 같은 기록, 한 글자만 바뀌어도 거부', () => {
+  const a = html.indexOf('const BACKUP_PREFIX'), b = html.indexOf('// 지금 저장을 따로 보관한 다음 바꾼다');
+  const box = { TextEncoder, TextDecoder, btoa, atob, saveCatalog: () => cat };
+  vm.createContext(box);
+  vm.runInContext(`${lineOf('escapeHTML')}\n${lineOf('cleanName')}\n${section}\n${html.slice(a, b)}\nthis.readBackup = readBackup; this.toB64 = toB64; this.hashStr = hashStr;`, box);
+  const d = save({ coins: 77, pets: [pet({ name: '구름이', level: 9 })] }), json = JSON.stringify(d);
+  const code = 'MALANG1.' + box.toB64(json) + '.' + box.hashStr(json);
+  const r = box.readBackup(code);
+  assert.equal(r.err, undefined); assert.equal(r.data.coins, 77); assert.equal(r.data.pets[0].name, '구름이'); assert.equal(r.data.pets[0].level, 9);
+  const mid = 'MALANG1.'.length + 10, broken = code.slice(0, mid) + (code[mid] === 'A' ? 'B' : 'A') + code.slice(mid + 1);
+  assert.ok(box.readBackup(broken).err, '바뀐 코드');
+  assert.ok(box.readBackup('HELLO').err, '다른 글자');
+  assert.ok(box.readBackup(code.slice(0, code.length - 3)).err, '잘린 코드');
 });

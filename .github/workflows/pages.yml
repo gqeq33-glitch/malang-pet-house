@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['www/**']
+    paths: ['www/**', 'tests/**', 'tools/check_release.js', 'tools/smoke_test.js', '.github/workflows/pages.yml']
 
 permissions:
   contents: read
@@ -24,6 +24,16 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      # 시험이 실패하면 웹에 올리지 않는다 (시험은 추가 패키지가 필요 없다)
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Tests
+        run: npm test
+      - name: Release checks (files, syntax, models)
+        run: node tools/check_release.js
+      - name: Browser smoke test
+        run: node tools/smoke_test.js
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

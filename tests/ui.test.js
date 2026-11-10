@@ -169,3 +169,26 @@ test('새 광장 GLB와 게임 연결: 실패하면 예전 모습, 오프라인 
   const sw = fs.readFileSync(path.join(__dirname, '..', 'www', 'sw.js'), 'utf8');
   for (const f of ['vendor/GLTFLoader.js', 'models/malang_bear.glb', 'models/malang_plaza.glb']) assert.ok(sw.includes(`'${f}'`), f);
 });
+
+// ---------- STEP 2: 배포 전 점검이 빌드보다 먼저 실행된다 ----------
+test('CI: 시험·점검이 빌드와 배포보다 먼저, 잠금 파일로 설치', () => {
+  const wf = f => fs.readFileSync(path.join(__dirname, '..', '.github', 'workflows', f), 'utf8');
+  const before = (text, a, b) => text.indexOf(a) >= 0 && text.indexOf(b) > text.indexOf(a);
+  const steps = t => t.slice(t.indexOf('steps:'));   // 실행 조건(paths)에 적힌 이름은 빼고 단계만 본다
+  const an = steps(wf('android.yml')), io = steps(wf('ios.yml')), pg = steps(wf('pages.yml'));
+  assert.ok(before(an, 'npm ci', 'npm test') && before(an, 'npm test', 'check_release.js') && before(an, 'smoke_test.js', 'gradlew'), 'android');
+  assert.ok(before(io, 'npm ci', 'npm test') && before(io, 'check_release.js', 'xcodebuild'), 'ios');
+  assert.ok(before(pg, 'npm test', 'deploy-pages') && before(pg, 'smoke_test.js', 'upload-pages-artifact'), 'pages');
+  for (const f of ['android.yml', 'ios.yml', 'pages.yml']) assert.ok(wf(f).includes("'tests/**'"), '시험만 바뀌어도 실행: ' + f);
+  for (const f of ['package-lock.json', 'tools/check_release.js', 'tools/smoke_test.js']) assert.ok(fs.existsSync(path.join(__dirname, '..', f)), f);
+});
+test('개인정보처리방침: 앱 안에서 볼 수 있고, 웹과 앱의 차이를 양쪽 언어로 쓴다', () => {
+  const pv = fs.readFileSync(path.join(__dirname, '..', 'www', 'privacy.html'), 'utf8');
+  assert.ok(pv.includes('설치형 앱(안드로이드·iOS)은') && pv.includes('The installed apps (Android and iOS)'));
+  assert.ok(html.includes('id="privOpen"') && html.includes('<iframe src="privacy.html"'));
+});
+test('업데이트: 놀이 중에는 새로고침을 미룬다', () => {
+  const sw = fs.readFileSync(path.join(__dirname, '..', 'www', 'sw.js'), 'utf8');
+  assert.ok(sw.includes("c.visibilityState === 'visible' ? c.postMessage({ type: 'malang-updated' })"));
+  assert.ok(html.includes("e.data.type !== 'malang-updated'") && html.includes('const safe = () => !gameOn && !scrim'));
+});

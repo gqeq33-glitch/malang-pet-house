@@ -613,6 +613,9 @@ body{-webkit-touch-callout:none}
 const $ = s => document.querySelector(s);
 const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 // 아이가 지은 이름: 보이지 않는 제어 문자와 꺾쇠를 빼고 8글자까지. 화면에 넣을 때는 늘 textContent나 escapeHTML을 거친다
+// 이름 칸에 전화번호·이메일·인터넷 주소를 넣지 못하게 (펫 이름은 친구 코드로 남에게 보일 수 있다)
+const piiLike = value => /\d{3,}|@|https?:|www\.|\.(com|net|org|kr|co)\b/i.test(String(value ?? '').replace(/[\s.\-]/g, m => m === '.' ? '.' : ''));
+const PII_MSG = '전화번호·이메일·주소는 이름에 쓸 수 없어요. 펫 이름을 지어 주세요';
 const cleanName = (value, fallback) => String(value ?? '').replace(/[\u0000-\u001F\u007F-\u009F\u200B-\u200F\u202A-\u202E\u2066-\u2069<>]/g, '').trim().slice(0, 8) || fallback;
 const INK = '#35435A';
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -4716,9 +4719,14 @@ async function pinHash(pin, saltHex) {
   const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt, iterations: PIN_ITER }, key, 256);
   return [...new Uint8Array(bits)].map(b => b.toString(16).padStart(2, '0')).join('');
 }
+// 복구 코드: PIN을 만들 때 한 번만 보여 준다. PIN을 잊으면 이 코드로만 PIN을 지울 수 있다 (곱셈 문제로는 지울 수 없음)
+const RC_ABC = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789', normRC = v => String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+const hex16 = () => [...crypto.getRandomValues(new Uint8Array(16))].map(b => b.toString(16).padStart(2, '0')).join('');
+const hasRecovery = st => !!st && /^[0-9a-f]{32}$/.test(st.rsalt || '') && /^[0-9a-f]{64}$/.test(st.rhash || '');
 async function pinSave(pin) {
-  const salt = [...crypto.getRandomValues(new Uint8Array(16))].map(b => b.toString(16).padStart(2, '0')).join('');
-  return pinWrite({ salt, hash: await pinHash(pin, salt), fails: 0, until: 0 });
+  const salt = hex16(), rsalt = hex16(), rc = [...crypto.getRandomValues(new Uint8Array(8))].map(b => RC_ABC[b % RC_ABC.length]).join('');
+  const ok = pinWrite({ salt, hash: await pinHash(pin, salt), rsalt, rhash: await pinHash(rc, rsalt), fails: 0, until: 0 });
+  return ok ? rc.slice(0, 4) + '-' + rc.slice(4) : '';
 }
 function openPinSetup() {
   if (!pinCan()) return toast('이 기기에서는 PIN을 쓸 수 없어요');
@@ -4732,8 +4740,10 @@ function openPinSetup() {
       const a = body.querySelector('#pinA').value, b = body.querySelector('#pinB').value;
       if (!PIN_RE.test(a)) return msg('숫자 4~6자리로 써 주세요.');
       if (a !== b) return msg('두 번 쓴 PIN이 달라요.');
-      if (!await pinSave(a)) return msg('저장하지 못했어요. 기기 저장 공간을 확인해 주세요.');
-      toast('PIN을 저장했어요'); openParent();
+      const rc = await pinSave(a);
+      if (!rc) return msg('저장하지 못했어요. 기기 저장 공간을 확인해 주세요.');
+      openSheet('🔑 복구 코드', `<div class="backup"><p class="msub" style="margin:0 0 8px">PIN을 잊었을 때 <b>이 코드로만</b> PIN을 지울 수 있어요. 종이에 적거나 사진으로 찍어 <b>아이가 볼 수 없는 곳</b>에 보관해 주세요. 이 화면을 닫으면 다시 볼 수 없어요.</p><p class="rc-code" style="font:700 30px/1.3 ui-monospace,Consolas,monospace;letter-spacing:.12em;text-align:center;background:#FFF6E2;border-radius:14px;padding:12px;margin:8px 0">${rc}</p><button class="candy primary" id="rcOk" style="width:100%">적어 두었어요</button></div>`,
+        b2 => b2.querySelector('#rcOk').addEventListener('click', () => { toast('PIN을 저장했어요'); openParent(); }));
     });
   });
 }
@@ -4763,9 +4773,29 @@ function parentGate(onPass) {
     wire(inp, () => { if (inp.disabled) return; if (+inp.value === a * b) return pass(); toast('답이 달라요'); if (++fails >= 3) { fails = 0; math(); lock(el.querySelector('#gateIn'), Date.now() + 30000); } else math(); });
   };
   const forgot = () => {
+    const st0 = pinState();
+    if (hasRecovery(st0)) {
+      // 복구 코드가 있으면 복구 코드로만 지운다. 틀리면 PIN과 같은 방식으로 점점 길게 잠긴다
+      const inp = frame('PIN을 만들 때 받은 <b>복구 코드</b>(8자리)를 써 주세요.<br><small>복구 코드도 잃어버렸다면 기기 설정에서 이 앱의 저장 데이터를 지워야 해요. 그러면 기록도 함께 지워지니, 다른 곳에 보관한 백업 코드가 있는지 먼저 확인해 주세요.</small>', '복구 코드', 'maxlength="12" autocapitalize="characters" spellcheck="false"');
+      if (st0.until > Date.now()) lock(inp, st0.until);
+      let busy = false;
+      wire(inp, async () => {
+        if (busy || inp.disabled) return; busy = true;
+        const now = pinState(); let ok = false;
+        try { ok = !!now && normRC(inp.value).length === 8 && await pinHash(normRC(inp.value), now.rsalt) === now.rhash; } catch (e) {}
+        busy = false; if (!now) return close();
+        if (ok) { pinClear(); toast('PIN을 지웠어요. 보호자 메뉴에서 새로 만들 수 있어요'); return pass(); }
+        now.fails = (now.fails | 0) + 1;
+        if (now.fails >= 5) now.until = Date.now() + Math.min(3600000, 60000 * 2 ** (now.fails - 5));
+        pinWrite(now); toast('복구 코드가 달라요'); inp.value = '';
+        if (now.until > Date.now()) lock(inp, now.until);
+      });
+      return;
+    }
+    // 복구 코드가 생기기 전에 만든 PIN: 10분을 기다린 뒤 어려운 곱셈 (완전한 보안은 아니다)
     const a = 23 + Math.floor(Math.random() * 60), b = 13 + Math.floor(Math.random() * 60), opened = Date.now();
-    const inp = frame('PIN을 지우려면 어른이 이 문제를 풀어 주세요. 1분을 기다려야 확인할 수 있어요.<br><small>기기에 저장되는 잠금이라 완전한 보안은 아니에요.</small>', `${a} × ${b} = ?`, 'inputmode="numeric" maxlength="5"');
-    lock(inp, opened + 60000);
+    const inp = frame('예전에 만든 PIN이라 복구 코드가 없어요. 어른이 이 문제를 풀어 주세요. 10분을 기다려야 확인할 수 있어요.<br><small>PIN을 다시 만들면 복구 코드를 받아 이 방법을 쓰지 않게 돼요. 기기에 저장되는 잠금이라 완전한 보안은 아니에요.</small>', `${a} × ${b} = ?`, 'inputmode="numeric" maxlength="5"');
+    lock(inp, opened + 600000);
     wire(inp, () => { if (inp.disabled) return; if (+inp.value === a * b) { pinClear(); toast('PIN을 지웠어요. 보호자 메뉴에서 새로 만들 수 있어요'); return pass(); } toast('답이 달라요'); close(); });
   };
   const pin = st => {
@@ -4831,11 +4861,13 @@ function openParent() {
     <p class="msub" style="margin:0">보호자 동의 시험에 참여할 때만 쓰는 기록이에요. 이름 없이 방문 날짜 순서와 진행 숫자만 있고, 인터넷으로 보내지 않아요. 복사해서 직접 전달해야만 밖으로 나가요.</p>
     <div class="pin-row"><button class="candy" id="qaCopy">🧪 기록 복사</button></div>
     <h4>보호자 PIN</h4>
-    <p class="msub" style="margin:0">${pinState() ? 'PIN이 켜져 있어요. 이 메뉴를 열 때 PIN을 물어봐요.' : 'PIN을 만들면 곱셈 문제 대신 PIN으로 이 메뉴를 열어요.'} PIN은 암호화해 이 기기에만 저장해요. 기기 저장 공간을 지울 수 있는 사람까지 막지는 못해요.</p>
+    <p class="msub" style="margin:0">${pinState() ? 'PIN이 켜져 있어요. 이 메뉴를 열 때 PIN을 물어봐요.' + (hasRecovery(pinState()) ? '' : ' <b>복구 코드가 없는 예전 PIN이에요. PIN 바꾸기를 누르면 복구 코드를 받아요.</b>') : 'PIN을 만들면 곱셈 문제 대신 PIN으로 이 메뉴를 열어요. 만들 때 PIN을 잊었을 때 쓸 복구 코드를 함께 드려요.'} PIN은 암호화해 이 기기에만 저장해요. 기기 저장 공간을 지울 수 있는 사람까지 막지는 못해요.</p>
     <div class="pin-row"><button class="candy" id="pinSet">${pinState() ? '🔑 PIN 바꾸기' : '🔑 PIN 만들기'}</button>${pinState() ? '<button class="candy" id="pinOff">PIN 끄기</button>' : ''}</div>
     <h4>기록 백업</h4>
     <p class="msub" style="margin:0">기록은 이 기기에만 있어요. 앱을 지우거나 폰을 바꾸기 전에 백업 코드를 만들어 메모장·메일 등에 보관해 주세요.</p>
     <div class="backup"><div class="row"><button class="candy" id="bkOut">💾 백업 코드 만들기</button><button class="candy" id="bkIn">📥 백업 코드로 되살리기</button></div></div>
+    <h4>개인정보처리방침</h4>
+    <div class="pin-row"><button class="candy" id="privOpen">📄 개인정보처리방침 보기</button></div>
     <p class="fine" style="margin-top:14px;text-align:left">광고, 결제, 온라인 채팅은 없어요. 놀이 기록은 이 기기에만 저장돼요.<br>이 메뉴를 열 때 푸는 곱셈 문제는 아이가 실수로 설정을 바꾸지 않게 돕는 장치일 뿐, 보안 인증이 아니에요. 아이가 답을 알면 열 수 있어요. 확실한 시간 관리는 기기의 보호자 기능(안드로이드 패밀리 링크, 아이폰 스크린 타임)을 함께 사용해 주세요.</p>
   </div>`, body => body.addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
@@ -4847,6 +4879,7 @@ function openParent() {
     else if (b.id === 'rpOpen') return openEngReport();
     else if (b.id === 'qaCopy') { const t = qaReport(); try { navigator.clipboard.writeText(t).then(() => toast('시험 기록을 복사했어요'), () => toast(t)); } catch (err) { toast('복사하지 못했어요'); } return; }
     else if (b.id === 'pinSet') return openPinSetup();
+    else if (b.id === 'privOpen') return openSheet('📄 개인정보처리방침', '<iframe src="privacy.html" title="개인정보처리방침" style="width:100%;height:60vh;border:0;border-radius:12px;background:#fff"></iframe><button class="candy" id="privBack" style="width:100%;margin-top:8px">‹ 보호자 메뉴로</button>', b2 => b2.querySelector('#privBack').addEventListener('click', openParent));
     else if (b.id === 'pinOff') { pinClear(); toast('PIN을 껐어요'); }
     else if (b.id === 'bkOut') return openBackupOut();
     else if (b.id === 'bkIn') return openBackupIn();
@@ -5836,6 +5869,7 @@ function openStand() {
 function goStand() { World.area() === 'village' ? World.goVillage('garden', true, openStand) : openStand(); }
 
 const NEWS = [
+  { v: '4.4', date: '11월 10일', items: ['🔑 보호자 PIN을 만들면 복구 코드를 드려요. PIN을 잊으면 복구 코드로만 지울 수 있어요', '📄 보호자 메뉴에서 개인정보처리방침을 볼 수 있어요', '🛡️ 이름 칸에는 전화번호·이메일을 쓸 수 없어요'] },
   { v: '4.3', date: '11월 10일', items: ['🐻 새 말랑 베어! 반짝이는 큰 눈, 정수리 털, 배의 하트, 코랄 가방과 별 핀', '⛲ 마을 광장에 새 분수대, 꽃밭, 가로등, 벤치가 생겼어요', '⚙️ 설정에서 예전 그래픽으로 되돌릴 수 있어요'] },
   { v: '4.2', date: '11월 10일', items: ['🐱 나비와 🐶 멍실이가 더 귀여워졌어요 (방울 목걸이, 빨간 반다나, 솜털)', '🤔 펫에게 궁금한 얼굴, 생각하는 얼굴, 신난 얼굴과 박수·축하 동작이 생겼어요', '📚 영어 레슨에서 내 펫이 정답엔 박수, 오답엔 생각하며 힌트를 봐요', '🧭 영어 화면이 7개 메뉴로 바뀌었어요: 오늘의 모험, 도감, 듣기, 문장, 미니게임, 복습, 나의 성장'] },
   { v: '4.1', date: '11월 6일', items: ['📅 공부한 날이 쌓이면 특별 장식 선물! 쉬어도 끊기지 않아요', '🗓️ 일주일에 3일 공부하면 배지와 코인', '🔁 복습은 10분 뒤, 다음 날, 며칠 뒤에 다시 나오고, 자주 틀린 단어는 쉽게 나와요', '🗺️ 복습해도 새 지역이 열리고, 🎭 이야기를 완주하면 옷을 받아요', '🧸 펫들이 더 말랑하고 반짝이는 눈으로 바뀌었어요', '💼 어른 영어 14개 레슨: 여행·일·이메일·자주 틀리는 표현, 받아쓰기와 직접 쓰기'] },
@@ -6087,6 +6121,7 @@ function adoptSheet(sp) {
     <button class="candy primary" id="adoptGo" style="width:100%;font-size:19px"><i class="coin"></i> ${ADOPT_PRICE}코인으로 알 받기</button>`, body => {
     body.querySelector('#adoptGo').addEventListener('click', () => {
       if (S.coins < ADOPT_PRICE) return toast(`코인이 ${ADOPT_PRICE - S.coins}개 모자라요. 놀이로 모아 봐요!`);
+      if (piiLike(body.querySelector('#adoptName').value)) return toast(PII_MSG);
       const name = cleanName(body.querySelector('#adoptName').value, s.name);
       S.coins -= ADOPT_PRICE; S.pets.push(newPet(sp, name)); S.active = S.pets.length - 1;
       if (S.pets.length >= SPECIES_ORDER.length) badge('collector');
@@ -8505,6 +8540,7 @@ function showStart() {
   renderPick();
 }
 $('#startBtn').addEventListener('click', () => {
+  if (piiLike($('#nameInput').value)) return toast(PII_MSG);
   const name = cleanName($('#nameInput').value, SPECIES[chosen].name);
   S.pets.push(newPet(chosen, name)); S.active = 0; S.lastTick = Date.now();
   S.tut = { step: 'egg', t0: Date.now() };
@@ -8577,6 +8613,14 @@ function start(hotData) {
 }
 if ('serviceWorker' in navigator && !window.Capacitor && (location.protocol === 'https:' || ['localhost', '127.0.0.1'].includes(location.hostname))) {
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  // 새 버전이 설치되면: 놀이·레슨 중이 아닐 때만 다시 연다 (저장은 localStorage라 새로고침해도 그대로)
+  navigator.serviceWorker.addEventListener('message', e => {
+    if (!e.data || e.data.type !== 'malang-updated') return;
+    const safe = () => !gameOn && !scrim && !document.querySelector('#game');
+    if (safe()) { persist(); location.reload(); return; }
+    toast('새 버전이 준비됐어요. 지금 놀이가 끝나면 바뀌어요');
+    const iv = setInterval(() => { if (safe()) { clearInterval(iv); persist(); location.reload(); } }, 2000);
+  });
 }
 window.claude?.hot?.snapshot?.(() => S);
 window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? null);

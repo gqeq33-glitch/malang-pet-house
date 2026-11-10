@@ -1,9 +1,11 @@
 // 말랑 펫하우스 오프라인 캐시.
 // 게임 파일을 바꿔 다시 올릴 때는 VERSION 숫자를 올려야 기존 설치본도 새 파일을 받는다.
-const VERSION = 'malang-v36';
-const FILES = [
+const VERSION = 'malang-v37';
+// 꼭 있어야 하는 파일: 하나라도 없으면 새 버전 설치를 멈추고 예전 버전을 계속 쓴다
+const CORE = [
   './',
   'index.html',
+  'privacy.html',
   'manifest.webmanifest',
   'fonts/Jua-Regular.woff2',
   'fonts/GowunDodum-Regular.woff2',
@@ -12,14 +14,19 @@ const FILES = [
   'icons/maskable-192.png',
   'icons/maskable-512.png',
   'icons/apple-touch-icon.png',
-  'vendor/three.min.js',
+  'vendor/three.min.js'
+];
+// 있으면 좋은 파일(새 3D 그래픽): 받지 못해도 설치는 계속되고, 게임은 예전 그래픽으로 켜진다
+const OPTIONAL = [
   'vendor/GLTFLoader.js',
   'models/malang_bear.glb',
   'models/malang_plaza.glb'
 ];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(VERSION).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(VERSION)
+    .then(c => c.addAll(CORE).then(() => Promise.all(OPTIONAL.map(f => c.add(f).catch(() => {})))))
+    .then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', e => {
@@ -29,9 +36,9 @@ self.addEventListener('activate', e => {
         const old = keys.filter(k => k !== VERSION);
         return Promise.all(old.map(k => caches.delete(k)))
           .then(() => self.clients.claim())
-          // 예전 버전을 쓰던 화면은 새 파일로 한 번 다시 연다 (처음 설치 때는 하지 않는다)
+          // 예전 버전을 쓰던 화면: 보이는 화면에는 알려서 놀이가 끝난 뒤 다시 열게 하고, 뒤에 있는 화면은 바로 다시 연다
           .then(() => old.length ? self.clients.matchAll({ type: 'window' }) : [])
-          .then(list => Promise.all(list.map(c => c.navigate(c.url).catch(() => {}))));
+          .then(list => Promise.all(list.map(c => c.visibilityState === 'visible' ? c.postMessage({ type: 'malang-updated' }) : c.navigate(c.url).catch(() => {}))));
       })
   );
 });

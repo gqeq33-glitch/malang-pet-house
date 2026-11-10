@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['www/**', 'assets/**', 'capacitor.config.json', 'package.json', '.github/workflows/ios.yml']
+    paths: ['www/**', 'assets/**', 'tests/**', 'tools/check_release.js', 'capacitor.config.json', 'package.json', 'package-lock.json', '.github/workflows/ios.yml']
 
 jobs:
   build:
@@ -19,7 +19,12 @@ jobs:
           node-version: 20
 
       - name: Install Capacitor
-        run: npm install
+        run: npm ci
+
+      - name: Tests and release checks
+        run: |
+          npm test
+          node tools/check_release.js
 
       - name: Create iOS project
         run: |
