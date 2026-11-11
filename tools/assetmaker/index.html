@@ -79,7 +79,7 @@ async function run() {
     const g = await new Promise((res, rej) => loader.parse(buf, '', res, rej));
     let tris = 0, meshes = 0, mats = new Set(); g.scene.traverse(o => { if (o.isMesh) { meshes++; mats.add(o.material.uuid); const ix = o.geometry.index; tris += (ix ? ix.count : o.geometry.attributes.position.count) / 3; } });
     const colliders = (g.scene.getObjectByName('PZ_root') || {}).userData?.colliders;
-    stats[f] = { bytes: buf.byteLength, tris: Math.round(tris), meshes, materials: mats.size, clips: g.animations.map(a => a.name), nodes: ['MB_head', 'MB_armL', 'MB_armR', 'MB_legL', 'MB_legR', 'MB_earL', 'MB_earR', 'MB_tail', 'MB_eyeL', 'MB_mouth', 'PZ_fountain', 'PZ_decor'].filter(n => g.scene.getObjectByName(n)), colliders: colliders ? colliders.length : 0 };
+    stats[f] = { bytes: buf.byteLength, tris: Math.round(tris), meshes, materials: mats.size, clips: g.animations.map(a => a.name), nodes: ['MB_head', 'MB_armL', 'MB_armR', 'MB_legL', 'MB_legR', 'MB_earL', 'MB_earR', 'MB_tail', 'MB_eyeL', 'MB_mouth', 'PZ_fountain', 'PZ_decor', 'PZ_mstar', 'PZ_shard4', 'PZ_chest', 'PZ_chestLid', 'PZ_key_red', 'PZ_key_blue', 'PZ_key_yellow', 'PZ_board', 'PZ_portal'].filter(n => g.scene.getObjectByName(n)), colliders: colliders ? colliders.length : 0 };
   }
   stats.plazaCounts = GP.root.userData.counts;
   await save('models/model_report.json', new Blob([JSON.stringify(stats, null, 2)]));

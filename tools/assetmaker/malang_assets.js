@@ -66,7 +66,7 @@ function makeKit(game) {
     return (cache[k] = m);
   };
   const tex = c => { const t = new THREE.CanvasTexture(c); if (!game) t.encoding = THREE.sRGBEncoding; t.anisotropy = 4; return t; };
-  const mesh = (p, geo, mat, x, y, z, sx, sy = sx, sz = sx, name) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.scale.set(sx, sy, sz); m.castShadow = true; if (name) m.name = name; p.add(m); return m; };
+  const mesh = (p, geo, mat, x, y, z, sx = 1, sy = sx, sz = sx, name) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.scale.set(sx, sy, sz); m.castShadow = true; if (name) m.name = name; p.add(m); return m; };
   const grp = (p, name, x = 0, y = 0, z = 0) => { const g = new THREE.Group(); g.name = name || ''; g.position.set(x, y, z); p.add(g); return g; };
   const patch = (sph, mat, cx, cy, w, h, name, r = 1.012) => { const m = new THREE.Mesh(new THREE.SphereGeometry(r, 12, 12, Math.PI / 2 + cx - w / 2, w, Math.PI / 2 - cy - h / 2, h), mat); m.name = name; m.renderOrder = 2; sph.add(m); return m; };
   const faceMat = (canvasEl, name, gloss = .6) => { const m = new THREE.MeshPhysicalMaterial({ map: tex(canvasEl), transparent: true, depthWrite: false, roughness: .3, clearcoat: gloss, clearcoatRoughness: .15, polygonOffset: true, polygonOffsetFactor: -2 }); m.name = name; return m; };
@@ -186,11 +186,53 @@ function buildPlaza(game, pathAngles = []) {
   // 놓으면 안 되는 자리 (게임 마을의 건물·연못·놀이터·텃밭과 펫이 서는 자리). 좌표는 분수 중심 기준
   const AVOID = [[-13.6, -12.6, -6.4, -6.2], [-4.1, -12.4, 4.1, -6.6], [6.4, -12.6, 13.6, -6.2], [-11.8, 5.4, -9.2, 9.6], [-8.2, 7.4, -3.8, 9.6], [6, 4.4, 12, 9.9], [5.4, -5.4, 14.4, -1.2]];
   const SPOTS = [[0, 4.1], [-8, 4.7], [8.4, 3.9], [0, -6.1], [-10, -5.4], [10, -5.4]];
-  const free = (x, z, r) => !AVOID.some(([x0, z0, x1, z1]) => x + r > x0 && x - r < x1 && z + r > z0 && z - r < z1) && SPOTS.every(([sx, sz]) => Math.hypot(sx - x, sz - z) > r + 1.1);
+  const occ = [];   // 모험 소품이 차지한 자리 [x, z, r]
+  const free = (x, z, r) => !AVOID.some(([x0, z0, x1, z1]) => x + r > x0 && x - r < x1 && z + r > z0 && z - r < z1) && SPOTS.every(([sx, sz]) => Math.hypot(sx - x, sz - z) > r + 1.1) && occ.every(([ox, oz, or]) => Math.hypot(ox - x, oz - z) > r + or + .3);
   const far = (a, gap = .4) => pathAngles.every(p => Math.abs(Math.atan2(Math.sin(a - p), Math.cos(a - p))) > gap);
   const colliders = [], put = (x, z, r) => colliders.push([+x.toFixed(2), +z.toFixed(2), +r.toFixed(2)]);
   const petal = ['#FF8FB1', '#FFE07A', '#FFFFFF', '#B99CFF', '#FFB27A'];
   let beds = 0, lamps = 0, benches = 0, trees = 0;
+  // ---------- 첫 모험 소품 (게임이 움직이거나 빛나게 하므로 합치지 않고 이름을 붙여 둔다) ----------
+  const gold = M('#FFD36E', { metalness: .35, roughness: .3, emissive: '#7A5200', emissiveIntensity: .25 });
+  const STARG = new THREE.ExtrudeGeometry(starShape(), { depth: .3, bevelEnabled: true, bevelThickness: .12, bevelSize: .1, bevelSegments: 2 }); STARG.center();
+  // 말랑별: 분수 위에 떠 있는 큰 별과 조각 자리 5개 (처음에는 빛이 꺼져 있음)
+  const ms = grp(root, 'PZ_mstar', 0, 4.7, 0);
+  mesh(ms, STARG, M('#C9C2DA', { roughness: .4 }), 0, 0, 0, .55, .55, .55, 'PZ_mstarCore');
+  for (let i = 0; i < 5; i++) { const a = Math.PI / 2 + i / 5 * TAU; mesh(ms, STARG, M('#B7B0C8', { roughness: .4 }), Math.cos(a) * 1.05, Math.sin(a) * 1.05, 0, .2, .2, .2, 'PZ_shard' + i); }
+  // 별빛 상자: 분수 앞 왼쪽
+  const cx = -2.95, cz = .9, ch = grp(root, 'PZ_chest', cx, 0, cz); ch.rotation.y = .5;
+  mesh(ch, new THREE.BoxGeometry(1.1, .62, .74), M('#C9824A', { roughness: .6 }), 0, .31, 0);
+  for (const bx of [-.36, .36]) mesh(ch, new THREE.BoxGeometry(.1, .64, .76), gold, bx, .32, 0);
+  const lid = grp(ch, 'PZ_chestLid', 0, .62, -.37);
+  const lidG = new THREE.CylinderGeometry(.37, .37, 1.1, 18, 1, false, 0, Math.PI); lidG.rotateZ(Math.PI / 2); lidG.rotateX(Math.PI / 2);
+  mesh(lid, lidG, M('#D99456', { roughness: .55 }), 0, 0, .37, 1, .7, 1);
+  mesh(lid, new THREE.BoxGeometry(.18, .2, .06), gold, 0, -.02, .74, 1, 1, 1, 'PZ_chestLock');
+  mesh(ch, new THREE.CylinderGeometry(.05, .05, .04, 12), M('#3A2A38'), 0, .44, .38).rotation.x = Math.PI / 2;
+  occ.push([cx, cz, .75]); put(cx, cz, .62);
+  // 열쇠 3개 (빨강·파랑·노랑): 고리 + 몸통 + 이
+  const keyAt = { red: [2.7, -2.7], blue: [-3.1, 2.3], yellow: [-3.6, -1.4] };
+  for (const [col, hex] of [['red', '#FF4D5E'], ['blue', '#4D8DFF'], ['yellow', '#FFD23F']]) {
+    const [kx, kz] = keyAt[col], k = grp(root, 'PZ_key_' + col, kx, .55, kz), km = M(hex, { roughness: .3, metalness: .2, emissive: hex, emissiveIntensity: .15 });
+    mesh(k, new THREE.TorusGeometry(.17, .06, 10, 24), km, 0, .2, 0);
+    mesh(k, new THREE.BoxGeometry(.08, .42, .08), km, 0, -.13, 0);
+    mesh(k, new THREE.BoxGeometry(.14, .06, .08), km, .07, -.26, 0); mesh(k, new THREE.BoxGeometry(.1, .06, .08), km, .05, -.15, 0);
+    mesh(k, G.c, M('#FFFFFF', { roughness: .5 }), 0, -.53, 0, .22, .04, .22);   // 바닥의 작은 받침
+    occ.push([kx, kz, .35]);
+  }
+  // 오늘의 모험 게시판
+  const bdA = -.95, bdx = Math.cos(bdA) * 5.0, bdz = Math.sin(bdA) * 5.0, bd = grp(root, 'PZ_board', bdx, 0, bdz); bd.rotation.y = Math.atan2(-Math.cos(bdA), -Math.sin(bdA));   // 앞면이 광장 가운데를 본다
+  for (const sx of [-.55, .55]) mesh(bd, G.c, M('#B98256', { roughness: .7 }), sx, .7, 0, .07, 1.4, .07);
+  mesh(bd, new THREE.BoxGeometry(1.4, .9, .1), M('#FFF6E4', { roughness: .7 }), 0, 1.2, 0);
+  mesh(bd, new THREE.BoxGeometry(1.55, .14, .2), M('#FF8E9E'), 0, 1.72, 0);
+  mesh(bd, STARG, gold, 0, 1.22, .08, .22, .22, .22, 'PZ_boardStar');
+  occ.push([bdx, bdz, .8]); put(bdx, bdz, .6);
+  // 별빛 포털 (아직 닫혀 있음: 별빛 조각이 모이면 열린다)
+  const ptA = -2.2, ptx = Math.cos(ptA) * 6.3, ptz = Math.sin(ptA) * 6.3, pt = grp(root, 'PZ_portal', ptx, 0, ptz); pt.rotation.y = Math.atan2(-Math.cos(ptA), -Math.sin(ptA));
+  for (const sx of [-1, 1]) mesh(pt, G.c, M('#EDE4FF', { roughness: .5 }), sx * 1.05, 1.1, 0, .2, 2.2, .2);
+  const arch = mesh(pt, new THREE.TorusGeometry(1.05, .16, 10, 32, Math.PI), M('#BDA6F6', { roughness: .4 }), 0, 2.2, 0);
+  mesh(pt, new THREE.CircleGeometry(.95, 32), M('#9C86E8', { transparent: true, opacity: .55, emissive: '#7B5BD6', emissiveIntensity: .4, side: THREE.DoubleSide }), 0, 1.5, 0, 1, 1.35, 1, 'PZ_portalDisc');
+  for (let i = 0; i < 5; i++) { const a = Math.PI * (i + .5) / 5; mesh(pt, STARG, M('#B7B0C8'), Math.cos(a) * 1.05, 2.2 + Math.sin(a) * 1.05, .12, .11, .11, .11, 'PZ_portalStar' + i); }
+  occ.push([ptx, ptz, 1.4]); put(ptx + Math.cos(ptA + Math.PI / 2) * 1.05, ptz + Math.sin(ptA + Math.PI / 2) * 1.05, .3); put(ptx - Math.cos(ptA + Math.PI / 2) * 1.05, ptz - Math.sin(ptA + Math.PI / 2) * 1.05, .3);
   // 알록달록 디딤돌 고리 (바닥 장식이라 충돌 없음)
   const stoneG = K.G.c;
   for (let i = 0; i < 28; i++) { const a = i / 28 * TAU; if (!far(a, .22)) continue; mesh(root, stoneG, M(['#FFD6E0', '#FFF1B8', '#D6F2E6', '#DCE8FF', '#EBDDFF'][i % 5], { roughness: .7 }), Math.cos(a) * 4.25, .02, Math.sin(a) * 4.25, .32, .04, .32); }
@@ -248,11 +290,14 @@ function buildPlaza(game, pathAngles = []) {
 function mergePlaza(root) {
   root.updateMatrixWorld(true);
   const out = new THREE.Group(); out.name = 'PZ_root'; out.userData = root.userData;
+  const KEEP = /^PZ_(mstar|chest|key_|board|portal)/, keep = root.children.filter(c => KEEP.test(c.name));
+  keep.forEach(c => root.remove(c)); root.updateMatrixWorld(true);
   for (const [name, test] of [['PZ_fountain', o => { let p = o; while (p) { if (p.name === 'PZ_fountain') return true; p = p.parent; } return false; }], ['PZ_decor', () => true]]) {
     const byMat = new Map();
     root.traverse(o => { if (!o.isMesh || o.userData.merged || !test(o)) return; o.userData.merged = true; const g = (o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone()); g.applyMatrix4(o.matrixWorld); for (const k of Object.keys(g.attributes)) if (!['position', 'normal'].includes(k)) g.deleteAttribute(k); /* 광장은 그림(텍스처)을 안 쓰므로 uv도 뺀다 */ if (!byMat.has(o.material)) byMat.set(o.material, []); byMat.get(o.material).push(g); });
     const grpOut = new THREE.Group(); grpOut.name = name; out.add(grpOut);
     for (const [mat, list] of byMat) { const m = new THREE.Mesh(THREE.BufferGeometryUtils.mergeVertices(THREE.BufferGeometryUtils.mergeBufferGeometries(list), 1e-4), mat); /* 겹치는 꼭짓점을 다시 묶어 용량을 줄인다 */ m.castShadow = !mat.transparent; grpOut.add(m); }
   }
+  keep.forEach(c => out.add(c));   // 모험 소품: 이름과 구조를 그대로 둔다
   return out;
 }
