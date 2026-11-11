@@ -5,7 +5,7 @@
 | 파일 | 내용 | 크기 | 삼각형 |
 |---|---|---|---|
 | `www/models/malang_bear.glb` | 말랑 베어. 관절 노드(머리·팔·다리·귀·꼬리), 얼굴 그림(눈·입·볼), 애니메이션 10개(idle, walk, run, jump, wave, dance, happy, sad, surprised, sleep) | 약 514KB | 약 10,800 |
-| `www/models/malang_plaza.glb` | 마을 광장: 분수대, 꽃밭, 덤불, 가로등 3, 벤치 2, 파스텔 나무 2, 디딤돌 고리. 같은 재질끼리 합쳐 메시 32개(합치기 전 98개). 장식 충돌 정보 16곳(`PZ_root`의 extras.colliders) | 약 385KB | 약 18,200 |
+| `www/models/malang_plaza.glb` | 마을 광장: 분수대, 꽃밭, 덤불, 가로등 3, 벤치 2, 디딤돌 고리 + 첫 모험 소품(말랑별과 조각 자리 5, 별빛 상자, 열쇠 3, 게시판, 별빛 포털). 같은 재질끼리 합쳐 메시 40개. 장식 충돌 정보 14곳(`PZ_root`의 extras.colliders) | 약 374KB | 약 15,200 |
 | `www/vendor/GLTFLoader.js` | three.js r128의 GLB 불러오기 도구 (MIT 라이선스, three.js와 같은 저작권) | 약 95KB | - |
 
 ## 만든 방법과 라이선스
@@ -21,6 +21,13 @@
 - 저장 데이터의 종족 이름(`bear`), 레벨, 모자, 옷, 염색은 그대로 쓰입니다.
 - 모델을 못 불러오면(오래된 기기, 파일을 직접 여는 실행 등) 예전 곰과 예전 분수가 그대로 나옵니다.
 - 보안 설정(CSP)의 `connect-src`에 `blob:`을 더했습니다. GLB 안의 그림을 기기 메모리에서 읽기 위한 것이고, 외부 서버 연결은 여전히 막혀 있습니다.
+
+## 첫 모험 소품 (MALANG WORLD 4.0 STEP 4)
+
+- 움직이거나 빛이 바뀌는 것만 이름 붙은 노드로 따로 둡니다: `PZ_mstar`(`PZ_mstarCore`, `PZ_shard0~4`), `PZ_chest`(`PZ_chestLid`, `PZ_chestLock`), `PZ_key_red/blue/yellow`, `PZ_portal`(`PZ_portalDisc`).
+- 게시판·포털 틀·열쇠 받침은 움직이지 않아 광장 장식과 합쳤고, `PZ_board`·`PZ_portal`은 자리만 알려 주는 빈 노드입니다. 게임은 그 자리에 보이지 않는 누름 상자를 붙입니다.
+- 게임 쪽 연결: `advSetup`(노드 잡기), `advTick`(움직임·상자 연출), `aqState`(저장 단계에 맞춰 모습 복원), `aqShards`(조각 수만큼 말랑별·분수·조명이 밝아짐).
+- **임시 표시**: 모험 화면의 아이콘(열쇠·별·스피커·메달·책)은 코드로 그린 임시 SVG입니다. 정식 아이콘으로 바꿀 자리는 `ADV_ICON` 하나입니다.
 
 ## 확인하지 못한 것
 

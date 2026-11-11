@@ -210,3 +210,63 @@ test('저사양 재질, 펫 교체 시 재질 정리, 표정 전환 깜빡임', 
   assert.ok(html.includes('if (pet) { scene.remove(pet.root); if (pet.dispose) pet.dispose(); }') && html.includes('prScene.remove(parts.root); if (parts.dispose) parts.dispose();'));
   assert.ok(html.includes('now - (f.swapT || 0) < 90'));
 });
+
+// ---------- STEP 4: 첫 모험 「첫 번째 별빛 조각」 ----------
+const vmMod = require('node:vm');
+const fnSrc = name => { const i = html.indexOf(`\nfunction ${name}(`); assert.ok(i >= 0, name); return html.slice(i + 1, html.indexOf('\n}\n', i) + 2); };
+// 모험 함수를 꺼내 가짜 게임 위에서 실행한다 (화면·3D 없이 규칙만 확인)
+function advSandbox(q1 = 0) {
+  const log = { xp: 0, marks: [], badges: [], persist: 0, quest: [], say: [] };
+  const ctx = {
+    S: { adv: { q1, hint: 0, shards: [] }, coins: 50 }, log,
+    ADV_NPC: 'somsom', ADV_REWARD: { xp: 40, words: ['red', 'key'], badge: 'firstShard', shard: 'village' },
+    ADV_KO: { red: '빨간', blue: '파란', yellow: '노란' }, ADV_EN: { red: 'red', blue: 'blue', yellow: 'yellow' }, ADV_HEX: { red: '#f00', blue: '#00f', yellow: '#ff0' },
+    ADV_LINE: { lost: ['a', 'b'], find: ['a', 'b'], hint: ['Look for the red one!', '빨간색을 찾아봐!'], give: ['a', 'b'], open: ['a', 'b'], thanks: ['Thank you!', '고마워!'], star: ['We found the first star!', '첫 번째 별을 찾았어!'] },
+    ADV_ICON: { key: () => '' }, advBusy: false,
+    advS() { return ctx.S.adv; }, advName: () => '솜솜', advSay: p => log.say.push(p[0]), advPop() {}, advShowAct() {}, renderAdv() {}, renderHUD() {}, advShardScreen() {},
+    addXP: n => { log.xp += n; }, engMark: (w, ok) => log.marks.push([w, ok]), badge: id => log.badges.push(id), persist: () => { log.persist++; },
+    engSay: t => log.say.push(t), say: t => log.say.push(t), sfx() {}, confetti() {}, setTimeout() {},
+    World: { quest: (...a) => { log.quest.push(a); return true; }, trick() {} }
+  };
+  vmMod.createContext(ctx);
+  vmMod.runInContext(['advFinish', 'advPick', 'advHint', 'advOpen'].map(fnSrc).join('\n') + '\nthis.advFinish = advFinish; this.advPick = advPick; this.advHint = advHint;', ctx);
+  return ctx;
+}
+test('첫 모험: 보상은 딱 한 번 (경험치·조각·배지·복습 단어)', () => {
+  const c = advSandbox(3);
+  c.advFinish(); c.advFinish(); c.advFinish();
+  assert.equal(c.S.adv.q1, 4);
+  assert.equal(c.log.xp, 40);
+  assert.deepEqual([...c.S.adv.shards], ['village']);
+  assert.deepEqual(c.log.badges, ['firstShard']);
+  assert.deepEqual(c.log.marks.map(m => m.join(':')), ['red:true', 'key:true']);
+});
+test('첫 모험: 다른 색 열쇠는 벌점 없이 힌트만 올라가고, 빨간 열쇠면 들고 간다', () => {
+  const c = advSandbox(1);
+  c.advPick('blue');
+  assert.equal(c.S.adv.q1, 1); assert.equal(c.log.xp, 0); assert.equal(c.S.coins, 50);
+  c.advHint(true); c.advHint(); c.advHint(); c.advHint();
+  assert.equal(c.S.adv.hint, 3, '힌트는 3단계까지');
+  assert.ok(c.log.say.includes('Look for the red one!'));
+  c.advPick('red');
+  assert.equal(c.S.adv.q1, 2); assert.equal(c.S.adv.hint, 0);
+  assert.ok(c.log.quest.some(a => a[0] === 'carry' && a[1] === 'red'));
+  c.advPick('red');
+  assert.equal(c.S.adv.q1, 2, '단계가 지나면 다시 줍지 않는다');
+});
+test('첫 모험: 대사·화면·연결이 모두 있다', () => {
+  for (const t of ['I lost my red key!', '빨간 열쇠를 잃어버렸어!', 'Find the red key!', '빨간 열쇠를 찾아봐!', 'Look for the red one!', '빨간색을 찾아봐!', 'Thank you!', 'We found the first star!', '첫 번째 별을 찾았어!']) assert.ok(html.includes(t), t);
+  for (const f of ['advIntro', 'advShardScreen', 'advDoneScreen', 'advTeaser', 'advBoard', 'advPop', 'renderAdv', 'advShowAct', 'advTap', 'advGive', 'advSetup', 'advTick', 'aqOpen', 'aqState', 'aqShards']) assert.ok(html.includes(`function ${f}(`), f);
+  assert.ok(html.includes('id="advCard"') && html.includes('id="actBtn"'));
+  assert.ok(html.includes("showNode((id === ADV_NPC && advNode()) || menu(id, true))"), '솜솜 대화 분기');
+  assert.ok(html.includes("if (u.use && /^q(key:|chest$|board$|portal$)/.test(u.use)) return advTap(u.use);"), '3D 누르기');
+  assert.ok(html.includes('advSetup(root);') && html.includes('movePals(dt); advTick(dt);'));
+  assert.ok(html.includes("firstShard: ['⭐', '첫 모험'"), '배지');
+  assert.ok(html.includes("const ENG_EXTRA = [['key', '열쇠', '🔑']];"), '복습 단어 key');
+  assert.ok(/const TOP = \[[^\]]*'adv'\]/.test(html), '저장 허용 목록');
+  assert.ok(html.includes("'.mini, .race-ui, .gate-wrap, .rest, .adv-ov'"), '안내 화면이 뜨면 달리기를 멈춘다');
+});
+test('첫 모험: 광장 GLB에 모험 소품 노드가 있다', () => {
+  const { json } = readGlb('malang_plaza.glb'), names = new Set(json.nodes.map(n => n.name));
+  for (const n of ['PZ_mstar', 'PZ_mstarCore', 'PZ_shard0', 'PZ_shard1', 'PZ_shard2', 'PZ_shard3', 'PZ_shard4', 'PZ_chest', 'PZ_chestLid', 'PZ_chestLock', 'PZ_key_red', 'PZ_key_blue', 'PZ_key_yellow', 'PZ_board', 'PZ_portal', 'PZ_portalDisc']) assert.ok(names.has(n), n);
+});

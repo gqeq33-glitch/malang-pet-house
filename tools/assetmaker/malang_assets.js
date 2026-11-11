@@ -192,46 +192,55 @@ function buildPlaza(game, pathAngles = []) {
   const colliders = [], put = (x, z, r) => colliders.push([+x.toFixed(2), +z.toFixed(2), +r.toFixed(2)]);
   const petal = ['#FF8FB1', '#FFE07A', '#FFFFFF', '#B99CFF', '#FFB27A'];
   let beds = 0, lamps = 0, benches = 0, trees = 0;
-  // ---------- 첫 모험 소품 (게임이 움직이거나 빛나게 하므로 합치지 않고 이름을 붙여 둔다) ----------
+  // ---------- 첫 모험 소품: 움직이거나 빛나는 것만 이름을 붙여 따로 두고, 나머지는 장식과 합친다 ----------
   const gold = M('#FFD36E', { metalness: .35, roughness: .3, emissive: '#7A5200', emissiveIntensity: .25 });
   const STARG = new THREE.ExtrudeGeometry(starShape(), { depth: .3, bevelEnabled: true, bevelThickness: .12, bevelSize: .1, bevelSegments: 2 }); STARG.center();
   // 말랑별: 분수 위에 떠 있는 큰 별과 조각 자리 5개 (처음에는 빛이 꺼져 있음)
   const ms = grp(root, 'PZ_mstar', 0, 4.7, 0);
   mesh(ms, STARG, M('#C9C2DA', { roughness: .4 }), 0, 0, 0, .55, .55, .55, 'PZ_mstarCore');
   for (let i = 0; i < 5; i++) { const a = Math.PI / 2 + i / 5 * TAU; mesh(ms, STARG, M('#B7B0C8', { roughness: .4 }), Math.cos(a) * 1.05, Math.sin(a) * 1.05, 0, .2, .2, .2, 'PZ_shard' + i); }
-  // 별빛 상자: 분수 앞 왼쪽
+  // 여러 부품을 한 덩어리로 합친다 (그리기 횟수를 줄인다). 부품: [geo, x, y, z, sx, sy, sz, rx]
+  const fuse = parts => THREE.BufferGeometryUtils.mergeBufferGeometries(parts.map(([g, x, y, z, sx = 1, sy = sx, sz = sx, rx = 0]) => {
+    const c = g.clone(); c.scale(sx, sy, sz); if (rx) c.rotateX(rx); c.translate(x, y, z); return c;
+  }));
+  // 별빛 상자: 분수 앞 왼쪽. 몸통(나무)·금띠(한 덩어리)·뚜껑(움직임)·자물쇠
   const cx = -2.95, cz = .9, ch = grp(root, 'PZ_chest', cx, 0, cz); ch.rotation.y = .5;
   mesh(ch, new THREE.BoxGeometry(1.1, .62, .74), M('#C9824A', { roughness: .6 }), 0, .31, 0);
-  for (const bx of [-.36, .36]) mesh(ch, new THREE.BoxGeometry(.1, .64, .76), gold, bx, .32, 0);
+  const band = new THREE.BoxGeometry(.1, .64, .76);
+  mesh(ch, fuse([[band, -.36, .32, 0], [band, .36, .32, 0]]), gold, 0, 0, 0);
   const lid = grp(ch, 'PZ_chestLid', 0, .62, -.37);
   const lidG = new THREE.CylinderGeometry(.37, .37, 1.1, 18, 1, false, 0, Math.PI); lidG.rotateZ(Math.PI / 2); lidG.rotateX(Math.PI / 2);
   mesh(lid, lidG, M('#D99456', { roughness: .55 }), 0, 0, .37, 1, .7, 1);
   mesh(lid, new THREE.BoxGeometry(.18, .2, .06), gold, 0, -.02, .74, 1, 1, 1, 'PZ_chestLock');
-  mesh(ch, new THREE.CylinderGeometry(.05, .05, .04, 12), M('#3A2A38'), 0, .44, .38).rotation.x = Math.PI / 2;
   occ.push([cx, cz, .75]); put(cx, cz, .62);
-  // 열쇠 3개 (빨강·파랑·노랑): 고리 + 몸통 + 이
+  // 열쇠 3개 (빨강·파랑·노랑): 고리+몸통+이를 한 덩어리로. 받침은 움직이지 않으니 광장 장식에 합친다
+  const art = grp(root, 'PZ_art', 0, 0, 0);   // 이름이 PZ_art로 시작하는 것은 장식과 함께 합쳐진다
   const keyAt = { red: [2.7, -2.7], blue: [-3.1, 2.3], yellow: [-3.6, -1.4] };
+  const ring = new THREE.TorusGeometry(.17, .06, 10, 24), bar = new THREE.BoxGeometry(1, 1, 1);
+  const keyG = fuse([[ring, 0, .2, 0], [bar, 0, -.13, 0, .08, .42, .08], [bar, .07, -.26, 0, .14, .06, .08], [bar, .05, -.15, 0, .1, .06, .08]]);
   for (const [col, hex] of [['red', '#FF4D5E'], ['blue', '#4D8DFF'], ['yellow', '#FFD23F']]) {
-    const [kx, kz] = keyAt[col], k = grp(root, 'PZ_key_' + col, kx, .55, kz), km = M(hex, { roughness: .3, metalness: .2, emissive: hex, emissiveIntensity: .15 });
-    mesh(k, new THREE.TorusGeometry(.17, .06, 10, 24), km, 0, .2, 0);
-    mesh(k, new THREE.BoxGeometry(.08, .42, .08), km, 0, -.13, 0);
-    mesh(k, new THREE.BoxGeometry(.14, .06, .08), km, .07, -.26, 0); mesh(k, new THREE.BoxGeometry(.1, .06, .08), km, .05, -.15, 0);
-    mesh(k, G.c, M('#FFFFFF', { roughness: .5 }), 0, -.53, 0, .22, .04, .22);   // 바닥의 작은 받침
+    const [kx, kz] = keyAt[col], k = grp(root, 'PZ_key_' + col, kx, .55, kz);
+    mesh(k, keyG, M(hex, { roughness: .3, metalness: .2, emissive: hex, emissiveIntensity: .15 }), 0, 0, 0);
+    mesh(art, G.c, M('#FFFFFF', { roughness: .6 }), kx, .02, kz, .24, .04, .24);
     occ.push([kx, kz, .35]);
   }
-  // 오늘의 모험 게시판
-  const bdA = -.95, bdx = Math.cos(bdA) * 5.0, bdz = Math.sin(bdA) * 5.0, bd = grp(root, 'PZ_board', bdx, 0, bdz); bd.rotation.y = Math.atan2(-Math.cos(bdA), -Math.sin(bdA));   // 앞면이 광장 가운데를 본다
-  for (const sx of [-.55, .55]) mesh(bd, G.c, M('#B98256', { roughness: .7 }), sx, .7, 0, .07, 1.4, .07);
-  mesh(bd, new THREE.BoxGeometry(1.4, .9, .1), M('#FFF6E4', { roughness: .7 }), 0, 1.2, 0);
+  // 오늘의 모험 게시판: 모양은 장식에 합치고, 자리만 PZ_board(빈 노드)로 남긴다 (게임이 누를 자리를 만든다)
+  const bdA = -.95, bdx = Math.cos(bdA) * 5.0, bdz = Math.sin(bdA) * 5.0, bdR = Math.atan2(-Math.cos(bdA), -Math.sin(bdA));
+  grp(root, 'PZ_board', bdx, 0, bdz).rotation.y = bdR;
+  const bd = grp(art, 'PZ_art_board', bdx, 0, bdz); bd.rotation.y = bdR;
+  for (const sx of [-.55, .55]) mesh(bd, G.c, M('#C98F5C', { roughness: .8 }), sx, .7, 0, .07, 1.4, .07);
+  mesh(bd, new THREE.BoxGeometry(1.4, .9, .1), M('#FFF1B8', { roughness: .7 }), 0, 1.2, 0);
   mesh(bd, new THREE.BoxGeometry(1.55, .14, .2), M('#FF8E9E'), 0, 1.72, 0);
-  mesh(bd, STARG, gold, 0, 1.22, .08, .22, .22, .22, 'PZ_boardStar');
+  mesh(bd, STARG, M('#FFE07A', { roughness: .6 }), 0, 1.22, .08, .22, .22, .22);
   occ.push([bdx, bdz, .8]); put(bdx, bdz, .6);
-  // 별빛 포털 (아직 닫혀 있음: 별빛 조각이 모이면 열린다)
-  const ptA = -2.2, ptx = Math.cos(ptA) * 6.3, ptz = Math.sin(ptA) * 6.3, pt = grp(root, 'PZ_portal', ptx, 0, ptz); pt.rotation.y = Math.atan2(-Math.cos(ptA), -Math.sin(ptA));
-  for (const sx of [-1, 1]) mesh(pt, G.c, M('#EDE4FF', { roughness: .5 }), sx * 1.05, 1.1, 0, .2, 2.2, .2);
-  const arch = mesh(pt, new THREE.TorusGeometry(1.05, .16, 10, 32, Math.PI), M('#BDA6F6', { roughness: .4 }), 0, 2.2, 0);
+  // 별빛 포털 (아직 닫혀 있음): 틀은 장식에 합치고, 빛이 바뀌는 막(PZ_portalDisc)만 따로 둔다
+  const ptA = -2.2, ptx = Math.cos(ptA) * 6.3, ptz = Math.sin(ptA) * 6.3, ptR = Math.atan2(-Math.cos(ptA), -Math.sin(ptA));
+  const pt = grp(root, 'PZ_portal', ptx, 0, ptz); pt.rotation.y = ptR;
   mesh(pt, new THREE.CircleGeometry(.95, 32), M('#9C86E8', { transparent: true, opacity: .55, emissive: '#7B5BD6', emissiveIntensity: .4, side: THREE.DoubleSide }), 0, 1.5, 0, 1, 1.35, 1, 'PZ_portalDisc');
-  for (let i = 0; i < 5; i++) { const a = Math.PI * (i + .5) / 5; mesh(pt, STARG, M('#B7B0C8'), Math.cos(a) * 1.05, 2.2 + Math.sin(a) * 1.05, .12, .11, .11, .11, 'PZ_portalStar' + i); }
+  const pa = grp(art, 'PZ_art_portal', ptx, 0, ptz); pa.rotation.y = ptR;
+  for (const sx of [-1, 1]) mesh(pa, G.c, M('#EBDDFF', { roughness: .7 }), sx * 1.05, 1.1, 0, .2, 2.2, .2);
+  mesh(pa, new THREE.TorusGeometry(1.05, .16, 10, 32, Math.PI), M('#B99CFF', { roughness: .6 }), 0, 2.2, 0);
+  for (let i = 0; i < 5; i++) { const a = Math.PI * (i + .5) / 5; mesh(pa, STARG, M('#DCE8FF', { roughness: .7 }), Math.cos(a) * 1.05, 2.2 + Math.sin(a) * 1.05, .12, .11, .11, .11); }
   occ.push([ptx, ptz, 1.4]); put(ptx + Math.cos(ptA + Math.PI / 2) * 1.05, ptz + Math.sin(ptA + Math.PI / 2) * 1.05, .3); put(ptx - Math.cos(ptA + Math.PI / 2) * 1.05, ptz - Math.sin(ptA + Math.PI / 2) * 1.05, .3);
   // 알록달록 디딤돌 고리 (바닥 장식이라 충돌 없음)
   const stoneG = K.G.c;

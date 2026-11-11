@@ -280,3 +280,27 @@ test('백업 코드 왕복: 만든 코드를 되살리면 같은 기록, 한 글
   assert.ok(box.readBackup('HELLO').err, '다른 글자');
   assert.ok(box.readBackup(code.slice(0, code.length - 3)).err, '잘린 코드');
 });
+
+// ---------- STEP 4: 첫 모험 저장 (S.adv) ----------
+test('첫 모험 저장: 정상 값은 그대로, 옛 저장은 없어도 통과', () => {
+  const r = strict(save({ adv: { q1: 4, hint: 0, shards: ['village'] } }));
+  assert.equal(r.err, undefined);
+  assert.deepEqual(plain(r.data.adv), { q1: 4, hint: 0, shards: ['village'] });
+  const old = strict(save());
+  assert.equal(old.err, undefined);
+  assert.equal(old.data.adv, undefined);
+});
+test('첫 모험 저장: 잘못된 값은 거부하고, 고칠 때는 범위 안으로 정리한다', () => {
+  for (const adv of [{ q1: 9 }, { q1: 1.5 }, { hint: 7 }, { q1: 'done' }, { shards: 'village' }, { q1: 1, extra: true }, 'x']) assert.ok(strict(save({ adv })).err, JSON.stringify(adv));
+  // 목록에 없는 조각 이름은 다른 목록과 같이 호환을 위해 빼고 통과한다
+  assert.deepEqual(plain(strict(save({ adv: { q1: 1, shards: ['moon'] } })).data.adv.shards), []);
+  const f = fix(save({ adv: { q1: 9, hint: -2, shards: ['village', 'village', 'moon', 3], extra: 1 } }));
+  assert.equal(f.err, undefined);
+  assert.deepEqual(plain(f.data.adv), { q1: 4, hint: 0, shards: ['village'] });
+});
+test('첫 모험 저장: 백업 왕복(JSON)에서도 그대로 남는다', () => {
+  const d = save({ adv: { q1: 2, hint: 3, shards: [] } });
+  const back = strict(JSON.parse(JSON.stringify(strict(d).data)));
+  assert.equal(back.err, undefined);
+  assert.deepEqual(plain(back.data.adv), { q1: 2, hint: 3, shards: [] });
+});

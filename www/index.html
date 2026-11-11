@@ -379,6 +379,37 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
 .round-big{position:absolute;top:30%;left:50%;transform:translateX(-50%);z-index:9;font-family:var(--display);font-size:64px;color:#fff;text-shadow:0 4px 0 var(--ink),0 0 20px rgba(53,67,90,.35);pointer-events:none;white-space:nowrap}
 .round-tip{position:absolute;top:96px;left:16px;right:16px;z-index:8;margin:0;text-align:center;font-family:var(--display);font-size:15px;color:#fff;text-shadow:0 2px 0 var(--ink);pointer-events:none}
 .room.duo .photo-btn,.room.duo .emote-btn,.room.duo .jump-mini,.room.duo .ride-btn,.room.duo .quest,.room.duo .bubble{display:none!important}
+/* 첫 모험: 미션 카드 · 상호작용 버튼 · 안내 화면 (휴대폰 세로 먼저) */
+.adv-card{position:absolute;left:66px;right:78px;bottom:64px;z-index:6;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.96);border-radius:18px;padding:7px 8px 7px 10px;box-shadow:0 0 0 2.5px var(--ink) inset,0 4px 0 rgba(53,67,90,.2)}
+.adv-card .ai{width:38px;height:38px;flex:none}.adv-card .ai svg{width:100%;height:100%}
+.adv-card .at{flex:1;min-width:0;line-height:1.15}.adv-card .at b{display:block;font-family:var(--display);font-size:17px;overflow-wrap:anywhere}.adv-card .at small{display:block;font-size:14px;color:#5A6478}
+.adv-card button{flex:none;border:0;border-radius:12px;min-width:46px;min-height:46px;padding:0 8px;font-family:var(--display);font-size:15px;line-height:1;background:#FFF1A8;color:var(--ink);box-shadow:0 0 0 2px var(--ink) inset;display:grid;place-items:center}
+.adv-card button svg{width:24px;height:24px}.adv-card button small{display:block;font-size:13px;margin-top:2px}
+.adv-card .go{background:var(--coral);color:#fff;padding:0 14px;font-size:17px;box-shadow:0 4px 0 #B54A60}
+.adv-act{position:absolute;left:50%;bottom:84px;z-index:7;display:flex;align-items:center;gap:8px;border:0;border-radius:99px;padding:8px 22px 8px 12px;min-height:58px;font-family:var(--display);font-size:20px;color:var(--ink);background:#FFE36E;box-shadow:0 0 0 3px var(--ink) inset,0 5px 0 rgba(53,67,90,.3);transform:translateX(-50%);animation:advPulse 1.3s ease-in-out infinite;white-space:nowrap}
+.adv-act svg{width:36px;height:36px}
+@keyframes advPulse{50%{transform:translateX(-50%) scale(1.06)}}
+.adv-ov{position:absolute;inset:0;z-index:12;display:grid;place-items:center;background:rgba(40,30,70,.55);padding:12px 16px}
+.adv-box{width:min(100%,380px);max-height:100%;overflow:auto;background:var(--paper);border-radius:24px;padding:18px 18px 16px;text-align:center;box-shadow:0 0 0 3px var(--ink) inset,0 8px 0 rgba(0,0,0,.2)}
+.adv-box .big{width:92px;height:92px;margin:0 auto 4px}.adv-box .big svg{width:100%;height:100%}
+.adv-box .big.glow{filter:drop-shadow(0 0 14px #FFD36E);animation:advSpin 2.4s ease-in-out infinite}
+@keyframes advSpin{50%{transform:scale(1.1) rotate(8deg)}}
+.adv-box .kick{font-family:var(--display);font-size:13px;letter-spacing:.12em;color:#7B5BD6;margin:0}
+.adv-box h2{font-family:var(--display);font-size:26px;margin:2px 0 6px}
+.adv-box .en{font-family:var(--display);font-size:21px;color:#7B5BD6;margin:0 0 6px}
+.adv-box p{font-size:17px;margin:6px 0;line-height:1.45}.adv-box .dim{font-size:15px;color:#5A6478}
+.adv-box ul{list-style:none;padding:0;margin:10px 0 4px;text-align:left;font-size:16px}
+.adv-box .guide li{display:flex;flex-direction:column;padding:7px 10px;margin:5px 0;background:#F3EEFF;border-radius:12px}.adv-box .guide b{font-family:var(--display);font-size:15px;color:#7B5BD6}
+.adv-box .rew li{display:flex;align-items:center;gap:10px;padding:7px 6px;font-size:17px}.adv-box .rew svg{width:32px;height:32px;flex:none}
+.adv-box .candy{margin-top:12px;min-width:170px;font-size:19px}
+.adv-pop{position:absolute;left:50%;top:38%;z-index:11;display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--paper);border-radius:22px;padding:12px 22px;box-shadow:0 0 0 3px var(--ink) inset,0 6px 0 rgba(0,0,0,.2);transform:translate(-50%,-50%);animation:advPop .35s ease-out;pointer-events:none;text-align:center}
+.adv-pop svg{width:64px;height:64px}.adv-pop b{font-family:var(--display);font-size:20px}.adv-pop .en{font-family:var(--display);font-size:18px;color:#E8476A}
+@keyframes advPop{from{transform:translate(-50%,-50%) scale(.6);opacity:0}}
+.adv-board{text-align:center}.adv-board .ab-stars{display:flex;justify-content:center;gap:6px}.adv-board .ab-stars svg{width:44px;height:44px}.adv-board .ab-now{background:#F3EEFF;border-radius:14px;padding:10px;font-size:17px}
+.room.duo .adv-card,.room.duo .adv-act{display:none!important}
+.room.adv-on .quest{display:none!important}.room.adv-on .adv-card{bottom:10px;right:10px}
+@media (orientation:landscape) and (min-width:700px){.adv-card{left:auto;right:82px;width:380px}.room.adv-on .adv-card{right:82px}}
+@media (prefers-reduced-motion:reduce){.adv-act,.adv-box .big.glow{animation:none}}
 .ntag.p1{background:#FFD3DE}.ntag.p2{background:#CDEBFF}.ntag.pal{background:#FFF1A8}
 .pal-code{width:100%;min-height:72px;font:12px/1.4 ui-monospace,Consolas,monospace;border:0;border-radius:12px;padding:10px;box-shadow:0 0 0 2px var(--line) inset;background:var(--soft);color:var(--ink);user-select:text;-webkit-user-select:text;word-break:break-all;resize:vertical}
 .pal-table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
@@ -567,6 +598,8 @@ body{-webkit-touch-callout:none}
       <div class="night"></div>
       <div class="flash" id="flash"></div>
       <button class="quest" id="questBtn" hidden></button>
+      <div class="adv-card" id="advCard" role="region" aria-label="지금 모험" hidden></div>
+      <button class="adv-act" id="actBtn" hidden></button>
       <button class="photo-btn" id="photoBtn" aria-label="사진 찍기">📷</button>
       <button class="jump-mini" id="jumpBtn" aria-label="점프">점프</button>
       <button class="ride-btn" id="rideBtn" aria-label="탈것 타기" aria-pressed="false" hidden>🛴</button>
@@ -1034,7 +1067,7 @@ function saveGuard(raw, cat, opt = {}) {
     const numMap = (o, k, max, re = ID) => { const m = sub(o, k); if (!m) return; for (const x of Object.keys(m)) { if (!re.test(x)) { fail(k); delete m[x]; continue; } num(m, x, 0, max, {}, k + '.' + x); } };
     const clean = scan(d, 0, 'save');
     Object.keys(d).forEach(k => delete d[k]); Object.assign(d, clean);
-    const TOP = ['v', 'sv', 'coins', 'sound', 'music', 'haptic', 'gfxOld', 'active', 'hats', 'rooms', 'room', 'lastTick', 'lastGift', 'best', 'story', 'parent', 'play', 'farm', 'missions', 'daily', 'rewardClaims', 'badges', 'friends', 'decor', 'dyes', 'wear', 'rides', 'rideSel', 'stickers', 'palId', 'palNote', 'pass', 'season', 'eng', 'duoSp', 'newsSeen', 'tut', 'dayEng', 'qa', 'musicVol', 'sfxVol'];
+    const TOP = ['v', 'sv', 'coins', 'sound', 'music', 'haptic', 'gfxOld', 'active', 'hats', 'rooms', 'room', 'lastTick', 'lastGift', 'best', 'story', 'parent', 'play', 'farm', 'missions', 'daily', 'rewardClaims', 'badges', 'friends', 'decor', 'dyes', 'wear', 'rides', 'rideSel', 'stickers', 'palId', 'palNote', 'pass', 'season', 'eng', 'duoSp', 'newsSeen', 'tut', 'dayEng', 'qa', 'musicVol', 'sfxVol', 'adv'];
     for (const k of Object.keys(d)) if (!TOP.includes(k)) { fail(k); delete d[k]; }
     num(d, 'coins', 0, 100000000, { req: true, def: 0 });
     bool(d, 'sound'); bool(d, 'music'); bool(d, 'haptic'); bool(d, 'gfxOld'); num(d, 'musicVol', 0, 2, { int: true }); num(d, 'sfxVol', 0, 2, { int: true }); if (d.sound === undefined) d.sound = true;
@@ -1057,6 +1090,7 @@ function saveGuard(raw, cat, opt = {}) {
     const numList = (o, k, path) => { if (o[k] === undefined) return; if (!Array.isArray(o[k]) || o[k].length > 1000 || !o[k].every(x => typeof x === 'number')) { fail(path); o[k] = []; } };
     const st = sub(d, 'stickers', ['found', 'gifts']); if (st) { numList(st, 'found', 'stickers.found'); if (!st.found) st.found = []; num(st, 'gifts', 0, 100000, { int: true }, 'stickers.gifts'); }
     const sea = sub(d, 'season', ['id', 'year', 'candy', 'found']); if (sea) { str(sea, 'id', 'season.id'); num(sea, 'year', 0, 9999, { int: true }, 'season.year'); num(sea, 'candy', 0, 10000000, { def: 0 }, 'season.candy'); numList(sea, 'found', 'season.found'); if (!sea.found) sea.found = []; }
+    const adv = sub(d, 'adv', ['q1', 'hint', 'shards']); if (adv) { num(adv, 'q1', 0, 4, { int: true, def: 0 }, 'adv.q1'); num(adv, 'hint', 0, 3, { int: true, def: 0 }, 'adv.hint'); list(adv, 'shards', { village: 1 }, 6, 'adv.shards'); if (!adv.shards) adv.shards = []; }
     const farm = sub(d, 'farm');
     if (farm) {
       if (!Array.isArray(farm.plots) || farm.plots.length > 24) { if (farm.plots !== undefined) fail('farm.plots'); farm.plots = [null, null, null, null, null, null]; }
@@ -1682,12 +1716,170 @@ const World = (() => {
     const root = g.getObjectByName('PZ_root') || g, cols = Array.isArray(root.userData.colliders) ? root.userData.colliders : [];
     for (const [x, z, r] of cols) if ([x, z, r].every(Number.isFinite) && r > 0 && r < 2) OBS.push({ x0: x - r, x1: x + r, z0: z - 1.5 - r, z1: z - 1.5 + r });   // 모델 좌표는 분수 중심 기준
     villageG.add(g); dropY = 2.12;
+    advSetup(root);
   }
   function loadGlb() {
     if (!T.GLTFLoader || S.gfxOld) return;
     const L = new T.GLTFLoader();
     L.load('models/malang_bear.glb', g => { glbBear = g; petKey = ''; }, undefined, e => console.warn('말랑 베어 모델을 불러오지 못해 예전 모습을 써요', e && e.message));
     L.load('models/malang_plaza.glb', g => { glbPlaza = g; usePlaza(); }, undefined, e => console.warn('광장 모델을 불러오지 못해 예전 광장을 써요', e && e.message));
+  }
+
+  /* ---------- 첫 모험 「첫 번째 별빛 조각」: 광장 GLB 안의 이름 붙은 소품을 움직인다 ----------
+     게임 쪽(advStart 등)이 World.quest(명령)으로 부르고, 가까워짐·상자 단계는 World.onQuest로 알려 준다 */
+  const AQ = { ready: false, keys: {}, shown: {}, carry: null, hint: 0, wig: {}, open: null, shards: 0, target: null, near: null, t: 0, water: [], on: null };
+  const AQ_COLORS = ['red', 'blue', 'yellow'];
+  function aqGlowTex() {
+    const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'), gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gr.addColorStop(0, 'rgba(255,248,214,1)'); gr.addColorStop(.35, 'rgba(255,214,110,.7)'); gr.addColorStop(1, 'rgba(255,200,80,0)');
+    g.fillStyle = gr; g.fillRect(0, 0, 64, 64); return new T.CanvasTexture(c);
+  }
+  const aqPick = (o, on) => { const i = pickV.indexOf(o); if (on && i < 0) pickV.push(o); if (!on && i >= 0) pickV.splice(i, 1); };
+  function advSetup(root) {
+    const n = k => root.getObjectByName(k);
+    Object.assign(AQ, { mstar: n('PZ_mstar'), core: n('PZ_mstarCore'), slots: [0, 1, 2, 3, 4].map(i => n('PZ_shard' + i)), chest: n('PZ_chest'), lid: n('PZ_chestLid'), board: n('PZ_board'), portal: n('PZ_portal'), disc: n('PZ_portalDisc') });
+    AQ_COLORS.forEach(c => { AQ.keys[c] = n('PZ_key_' + c); });
+    if (!AQ.mstar || !AQ.core || AQ.slots.some(s => !s) || !AQ.chest || !AQ.lid || AQ_COLORS.some(c => !AQ.keys[c])) { console.warn('광장 모델에 모험 소품이 없어 첫 모험을 열지 않아요'); return; }
+    // 빛이 바뀌는 부품은 재질을 따로 갖게 한다 (같은 재질을 쓰는 다른 곳까지 빛나지 않게)
+    [AQ.core, ...AQ.slots].forEach(o => { o.material = o.material.clone(); });
+    const fo = n('PZ_fountain'); if (fo) fo.traverse(o => { if (o.isMesh && o.material.transparent) AQ.water.push(o.material); });
+    AQ.keys.red.userData.use = 'qkey:red'; AQ.keys.blue.userData.use = 'qkey:blue'; AQ.keys.yellow.userData.use = 'qkey:yellow';
+    AQ.chest.userData.use = 'qchest'; aqPick(AQ.chest, true);
+    // 게시판·포털은 모양이 장식에 합쳐져 있어 보이지 않는 누름 상자를 붙인다 (보이지 않아도 누를 수 있다)
+    const hitBox = (o, w, h, y, use) => { const m = new T.Mesh(new T.BoxGeometry(w, h, .6), new T.MeshBasicMaterial()); m.visible = false; m.position.y = y; o.add(m); o.userData.use = use; aqPick(o, true); };
+    if (AQ.board) hitBox(AQ.board, 1.7, 1.9, .95, 'qboard');
+    if (AQ.portal) hitBox(AQ.portal, 2.5, 3, 1.5, 'qportal');
+    AQ_COLORS.forEach(c => { AQ.keys[c].visible = false; AQ.shown[c] = false; });
+    // 가까이 가면 되는 범위를 바닥에 노란 고리로 보여 준다
+    AQ.ring = new T.Mesh(new T.RingGeometry(1.55, 1.8, 40), new T.MeshBasicMaterial({ color: '#FFE36E', transparent: true, opacity: .75, depthWrite: false, side: T.DoubleSide }));
+    AQ.ring.rotation.x = -Math.PI / 2; AQ.ring.visible = false; villageG.add(AQ.ring);
+    // 3단계 힌트: 빨간 열쇠 위에서 통통 튀는 화살표
+    AQ.arrow = new T.Mesh(new T.ConeGeometry(.28, .55, 16), new T.MeshStandardMaterial({ color: '#FF4D5E', emissive: '#FF4D5E', emissiveIntensity: .5, roughness: .4 }));
+    AQ.arrow.rotation.x = Math.PI; AQ.arrow.visible = false; villageG.add(AQ.arrow);
+    AQ.glow = new T.Sprite(new T.SpriteMaterial({ map: aqGlowTex(), transparent: true, depthWrite: false, blending: T.AdditiveBlending, opacity: 0 }));
+    AQ.glow.visible = false; villageG.add(AQ.glow);
+    if (!LOW_GFX) { AQ.light = new T.PointLight('#FFE2A0', 0, 14, 1.6); AQ.light.position.set(VX, 3.2, -1.5); villageG.add(AQ.light); }   // 조각이 모일수록 광장이 따뜻해진다
+    AQ.ready = true; aqShards(0);
+    AQ.on && AQ.on('ready');
+  }
+  const aqWorld = o => o.getWorldPosition(new T.Vector3());
+  function aqChestFront(d = 1.25) { const p = aqWorld(AQ.chest), r = AQ.chest.rotation.y; return [p.x + Math.sin(r) * d, p.z + Math.cos(r) * d]; }
+  function aqShowKey(c, on) { const k = AQ.keys[c]; if (!k) return; AQ.shown[c] = on; k.visible = on; aqPick(k, on && AQ.carry !== k); }
+  // 조각 수만큼: 별 자리에 금빛, 가운데 별은 점점 밝게, 분수 물빛·광장 조명도 따뜻하게
+  function aqShards(n) {
+    AQ.shards = n = Math.max(0, Math.min(5, n));
+    AQ.slots.forEach((s, i) => { const on = i < n; s.material.color.set(on ? '#FFD36E' : '#B7B0C8'); s.material.emissive.set(on ? '#FFB020' : '#000000'); s.material.emissiveIntensity = on ? .9 : 0; });
+    const k = n / 5; AQ.core.material.color.set('#C9C2DA').lerp(new T.Color('#FFEFB0'), Math.min(1, k * 1.6)); AQ.core.material.emissive.set(n ? '#FFC23A' : '#000000'); AQ.core.material.emissiveIntensity = .15 + k * .7;
+    AQ.water.forEach(m => { if (m.emissive) { m.emissive.set(n ? '#7FD8FF' : '#000000'); m.emissiveIntensity = n ? .25 + k * .6 : 0; } });
+    if (AQ.light) AQ.light.intensity = n ? .55 + k * 1.2 : 0;
+    if (AQ.disc) AQ.disc.material.opacity = .45 + k * .4;
+  }
+  function aqCarry(c) {
+    if (AQ.carry) { AQ.carry.scale.setScalar(1); AQ.carry = null; }
+    if (!c) return;
+    const k = AQ.keys[c]; villageG.attach(k); k.visible = true; AQ.shown[c] = true; AQ.carry = k; aqPick(k, false);
+  }
+  // 의뢰 친구 이동: 점들을 차례로 걷는다. stay면 도착한 뒤 그 자리에 서 있는다
+  function aqNpcTo(id, pts, stay) { const q = npcs[id]; if (!q) return; q.goal = pts.map(p => p.slice()); q.goalStay = !!stay; }
+  function aqNpcAt(id, x, z, stay) { const q = npcs[id]; if (!q) return; q.x = q.hx = q.tx = x; q.z = q.hz = q.tz = z; q.goal = stay ? [] : null; q.goalStay = !!stay; }
+  // 상자 옆 친구 자리(마을 좌표): 상자 앞 2.3m에서 옆으로 0.5m (분수 테두리와 파란 열쇠를 피한다)
+  function aqChestSpot() { const p = aqWorld(AQ.chest), r = AQ.chest.rotation.y; return [p.x - VX + Math.sin(r) * 2.3 + Math.cos(r) * .5, p.z + Math.cos(r) * 2.3 - Math.sin(r) * .5]; }
+  const AQ_WAY = [1.2, 2.6];   // 분수를 돌아가는 길목
+  function aqOpen(cb) {
+    const k = AQ.keys.red, q = npcs[ADV_NPC]; aqCarry(null); villageG.attach(k); k.visible = true; aqPick(k, false);
+    if (q) k.position.set(VX + q.x, 1.2, q.z);   // 친구가 들고 있던 열쇠가 상자로 날아간다
+    const p = aqWorld(AQ.chest), [fx, fz] = aqChestFront(.42);
+    const shard = new T.Mesh(AQ.slots[0].geometry, new T.MeshStandardMaterial({ color: '#FFD36E', emissive: '#FFB020', emissiveIntensity: 1, roughness: .3 }));
+    shard.scale.setScalar(.34); shard.visible = false; villageG.add(shard);
+    AQ.open = { t: 0, cb, key: k, shard, from: k.position.clone(), hole: new T.Vector3(fx, .46, fz), base: new T.Vector3(p.x, .9, p.z), slot: null, done: {} };
+  }
+  function aqStep(o, name) { if (o.done[name]) return; o.done[name] = true; AQ.on && AQ.on('step', name); }
+  function advTick(dt) {
+    if (!AQ.ready) return;
+    const t = AQ.t += dt, ease = a => a * a * (3 - 2 * a);
+    AQ.mstar.rotation.y = Math.sin(t * .4) * .25; AQ.mstar.position.y = 4.7 + Math.sin(t * .9) * .08;
+    for (const c of AQ_COLORS) {
+      const k = AQ.keys[c]; if (!k.visible || k === AQ.carry || (AQ.open && AQ.open.key === k)) continue;
+      const hi = c === 'red' && AQ.hint >= 2, w = AQ.wig[c] || 0;
+      k.rotation.y = t * 1.3 + c.length; k.position.y = .55 + Math.sin(t * 2.2 + c.length) * .07 + (hi ? .12 : 0);
+      if (w > 0) { AQ.wig[c] = w - dt; k.rotation.z = Math.sin(w * 28) * .4 * w; } else k.rotation.z = 0;
+      k.scale.setScalar(hi ? 1.25 + Math.sin(t * 6) * .12 : 1);   // 2단계 힌트: 빨간 열쇠가 크게 반짝인다
+    }
+    if (AQ.carry) { const k = AQ.carry; k.position.set(st.x, 2.05 + Math.sin(t * 4) * .06, st.z); k.rotation.set(0, t * 2, 0); }
+    const red = AQ.keys.red, showArrow = AQ.hint >= 3 && red.visible && red !== AQ.carry && !AQ.open;
+    AQ.arrow.visible = showArrow;
+    if (showArrow) { const p = aqWorld(red); AQ.arrow.position.set(p.x, 1.75 + Math.abs(Math.sin(t * 4)) * .35, p.z); }
+    // 지금 할 일의 대상: 고리 표시와 가까움 판정
+    let tx = null, tz = null, range = 0;
+    if (AQ.target === 'npc' && npcs[ADV_NPC]) { tx = VX + npcs[ADV_NPC].x; tz = npcs[ADV_NPC].z; range = 2.4; }
+    else if (AQ.target === 'chest') { [tx, tz] = aqChestFront(.2); range = 2.3; }
+    AQ.ring.visible = tx !== null && !AQ.open;
+    if (AQ.ring.visible) { AQ.ring.position.set(tx, .05, tz); const s = range / 1.8 * (1 + Math.sin(t * 3) * .03); AQ.ring.scale.set(s, s, 1); }
+    let near = null;
+    if (!AQ.open) {
+      if (tx !== null && Math.hypot(st.x - tx, st.z - tz) < range) near = AQ.target;
+      else if (AQ.target === 'keys') { let best = 1.7; for (const c of AQ_COLORS) { const k = AQ.keys[c]; if (!k.visible || k === AQ.carry) continue; const p = aqWorld(k), d = Math.hypot(st.x - p.x, st.z - p.z); if (d < best) { best = d; near = 'key:' + c; } } }
+    }
+    if (near !== AQ.near) { AQ.near = near; AQ.on && AQ.on('near', near); }
+    // 상자 열기 연출: 열쇠가 날아가 꽂힘 → 흔들림 → 뚜껑이 열리며 빛 → 조각이 떠올라 하늘의 별 자리로
+    const o = AQ.open; if (!o) return;
+    o.t += dt; const a = o.t;
+    if (a < .9) { const e = ease(a / .9); o.key.position.lerpVectors(o.from, o.hole, e); o.key.position.y += Math.sin(e * Math.PI) * .9; o.key.rotation.set(Math.PI / 2 * e, AQ.chest.rotation.y, 0); }
+    else if (!o.done.insert) { o.key.visible = false; aqStep(o, 'insert'); }
+    if (a > .9 && a < 1.9) AQ.chest.rotation.z = Math.sin(a * 38) * .05 * (1.9 - a); else AQ.chest.rotation.z = 0;
+    if (a > 1.9) { const e = ease(Math.min(1, (a - 1.9) / .7)); AQ.lid.rotation.x = -1.9 * e; aqStep(o, 'open'); AQ.glow.visible = true; AQ.glow.position.copy(o.base); const g = Math.min(1, (a - 1.9) / .5); AQ.glow.material.opacity = g * (a < 4.4 ? 1 : Math.max(0, 1 - (a - 4.4) / .8)); AQ.glow.scale.setScalar(1.2 + g * 1.6 + Math.sin(a * 8) * .1); }
+    if (a > 2.5 && a < 3.5) { o.shard.visible = true; const e = ease((a - 2.5) / 1); o.shard.position.set(o.base.x, .7 + e * 1.6, o.base.z); o.shard.rotation.y = a * 6; aqStep(o, 'shard'); }
+    if (a >= 3.5 && a < 4.7) {
+      if (!o.slot) { const i = Math.min(4, AQ.shards); o.slot = aqWorld(AQ.slots[i]); o.lift = o.shard.position.clone(); aqStep(o, 'fly'); }
+      const e = ease((a - 3.5) / 1.2); o.shard.position.lerpVectors(o.lift, o.slot, e); o.shard.position.y += Math.sin(e * Math.PI) * 1.2; o.shard.rotation.y = a * 8; o.shard.scale.setScalar(.34 - e * .12);
+    }
+    if (a >= 4.7 && !o.done.lit) { villageG.remove(o.shard); o.shard.material.dispose(); aqShards(AQ.shards + 1); aqStep(o, 'lit'); }
+    if (a >= 5.3) { AQ.glow.visible = false; AQ.open = null; const cb = o.cb; cb && cb(); }
+  }
+  // 저장된 단계에 맞춰 세상을 맞춘다 (다시 켰을 때도 같은 모습)
+  function aqState(q, shards) {
+    AQ.open = null; AQ.glow.visible = false;
+    aqShards(shards);
+    AQ.lid.rotation.x = q >= 4 ? -1.9 : 0;
+    aqCarry(null);
+    if (AQ.keys.red.parent === villageG) AQ.chest.parent.attach(AQ.keys.red);
+    for (const c of AQ_COLORS) {
+      const k = AQ.keys[c];
+      if (k.userData.home) k.position.copy(k.userData.home); else k.userData.home = k.position.clone();
+      k.scale.setScalar(1); k.rotation.set(0, 0, 0);
+      aqShowKey(c, c === 'red' ? q === 1 || q === 2 : q >= 1);
+    }
+    if (q === 2) aqCarry('red');
+    const s = npcs[ADV_NPC];
+    if (s) {
+      s.mood = q === 1 || q === 2 ? 'sad' : null;
+      if (q === 3) { const [x, z] = aqChestSpot(); aqNpcAt(ADV_NPC, x, z, true); }
+      else { const h = FRIENDS[ADV_NPC].home; if (Math.hypot(s.hx - h[0], s.hz - h[1]) > .1 && !s.goal) aqNpcAt(ADV_NPC, h[0], h[1]); }
+    }
+    AQ.target = q === 1 ? 'keys' : q === 2 ? 'npc' : q === 3 ? 'chest' : null;
+  }
+  function aqQuest(cmd, a, b) {
+    if (cmd === 'ready') return AQ.ready;
+    if (!AQ.ready) return null;
+    const q = npcs[ADV_NPC];
+    switch (cmd) {
+      case 'state': aqState(a | 0, b | 0); return true;
+      case 'hint': AQ.hint = a | 0; return true;
+      case 'wiggle': AQ.wig[a] = .7; return true;
+      case 'carry': aqCarry(a); return true;
+      case 'give': { const k = AQ.keys.red; aqCarry(null); AQ.chest.parent.attach(k); if (k.userData.home) k.position.copy(k.userData.home); aqShowKey('red', false); return true; }
+      case 'target': AQ.target = a || null; return true;
+      case 'keyPos': { const p = aqWorld(AQ.keys[a]); return [p.x, p.z]; }
+      case 'chestFront': return aqChestFront(1.3);
+      case 'mood': if (npcs[a]) npcs[a].mood = b || null; return true;
+      case 'hop': if (npcs[a]) npcs[a].jumpT = .6; return true;
+      case 'npcToChest': aqNpcTo(ADV_NPC, [AQ_WAY, aqChestSpot()], true); return true;
+      case 'npcHome': if (q) { q.mood = null; aqNpcTo(ADV_NPC, [AQ_WAY, FRIENDS[ADV_NPC].home], false); } return true;
+      case 'open': aqOpen(a); return true;
+      case 'shards': aqShards(a | 0); return true;
+      case 'info': return { target: AQ.target, near: AQ.near, hint: AQ.hint, shards: AQ.shards, carry: !!AQ.carry, shown: Object.assign({}, AQ.shown), lid: AQ.lid.rotation.x, open: !!AQ.open, npc: q ? [q.x, q.z, q.mood || null] : null };
+    }
+    return null;
   }
 
   /* ---------- 펫 만들기 ---------- */
@@ -2358,7 +2550,7 @@ const World = (() => {
 
   function animateVillage(dt) {
     const t = st.t;
-    movePals(dt);
+    movePals(dt); advTick(dt);
     for (const n of Object.values(npcs)) {
       const p = n.parts, dx = st.x - (VX + n.x), dz = st.z - n.z, near = Math.hypot(dx, dz) < 3.2;
       n.t += dt;
@@ -2385,6 +2577,15 @@ const World = (() => {
         if (d > .35) { const sp = Math.min(d, (d > 3 ? 4.2 : 2.2) * dt); n.x += ex / d * sp; n.z += ez / d * sp; n.faceGoal = Math.atan2(ex, ez); n.walk = true; }
         else { n.walk = false; n.faceGoal = st.face; }
       }
+      else if (n.goal && !n.talking) {
+        // 모험: 정해진 점들을 차례로 걷고(분수를 돌아서), 다 오면 그 자리에 선다
+        const g = n.goal[0];
+        if (g) {
+          const ex = g[0] - n.x, ez = g[1] - n.z, d = Math.hypot(ex, ez);
+          if (d > .08) { const sp = Math.min(d, 2.3 * dt); n.x += ex / d * sp; n.z += ez / d * sp; n.faceGoal = Math.atan2(ex, ez); n.walk = true; }
+          else { n.goal.shift(); if (!n.goal.length) { n.walk = false; n.hx = n.tx = n.x; n.hz = n.tz = n.z; if (!n.goalStay) n.goal = null; } }
+        } else { n.walk = false; if (near) n.faceGoal = Math.atan2(dx, dz); }
+      }
       else if (n.talking || near) { n.walk = false; n.faceGoal = Math.atan2(dx, dz); }
       else {
         n.wt -= dt;
@@ -2405,7 +2606,7 @@ const World = (() => {
       if (p.wingL) { const f = Math.sin(n.t * 5) * .3; p.wingL.rotation.y = p.wingBase + f; p.wingR.rotation.y = -p.wingBase - f; }
       if (p.flL) { const f = Math.sin(n.t * 2) * .1; p.flL.rotation.z = -p.flBase - f - (n.talking ? Math.abs(Math.sin(n.t * 6)) * .6 : 0); p.flR.rotation.z = p.flBase - f; }
       n.blink -= dt; if (n.blink < 0) n.blink = rand(2.5, 5);
-      if (p.eyesOpen) p.setFace(n.blink < .12 ? 'sleep' : (n.talking ? 'happy' : 'normal'));
+      if (p.eyesOpen) p.setFace(n.blink < .12 ? 'sleep' : (n.mood || (n.talking ? 'happy' : 'normal')));
       // 이름표
       const v = new T.Vector3(VX + n.x, 2.6, n.z).project(camera);
       const on = v.z < 1 && Math.abs(v.x) < 1.1 && Math.abs(v.y) < 1.1;
@@ -3562,6 +3763,8 @@ const World = (() => {
       return { x: c.x, y: c.y, w: h, h };
     },
     set onTap(fn) { onTap = fn; },
+    quest: aqQuest,
+    set onQuest(fn) { AQ.on = fn; },
     get st() { return st; }
   };
 })();
@@ -3588,6 +3791,7 @@ World.onTap = hit => {
   if (u.use && u.use.startsWith('plot:')) return tapPlot(+u.use.slice(5));
   if (u.use === 'portal') return World.goVillage('portal', true, startObby);
   if (u.use && u.use.startsWith('bld:')) return World.goVillage(u.use.slice(4), true);
+  if (u.use && /^q(key:|chest$|board$|portal$)/.test(u.use)) return advTap(u.use);
   if (u.use) return useThing(u.use);
   if (u.floor && !p.asleep) {
     const st = World.st, far = Math.hypot(hit.point.x - st.x, hit.point.z - st.z) > 4;
@@ -3605,7 +3809,7 @@ const driveKeys = {};
 const DRIVE_MAP = { ArrowLeft: 'l', a: 'l', A: 'l', ArrowRight: 'r', d: 'r', D: 'r', ArrowUp: 'u', w: 'u', W: 'u', ArrowDown: 'd', s: 'd', S: 'd' };
 function driveBlocked() {
   const a = document.activeElement, typing = a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA');
-  return typing || $('#home').hidden || World.area() === 'obby' || !!scrim || !!talking || gameOn || !!document.querySelector('.mini, .race-ui, .gate-wrap, .rest');
+  return typing || $('#home').hidden || World.area() === 'obby' || !!scrim || !!talking || gameOn || !!document.querySelector('.mini, .race-ui, .gate-wrap, .rest, .adv-ov');
 }
 function applyDriveKeys() {
   const d = World.drive; d.x = (driveKeys.r ? 1 : 0) - (driveKeys.l ? 1 : 0); d.z = (driveKeys.d ? 1 : 0) - (driveKeys.u ? 1 : 0);
@@ -3915,8 +4119,8 @@ function talkTo(id) {
     $('#talkName').textContent = f.name; $('#talkJob').textContent = f.job;
     $('#talk').hidden = false; pushBack(); sfx('pop');
     const s = fs(id);
-    if (!s.met) { s.met = true; s.day = 'met'; addFriend(id, 30); if (Object.keys(FRIENDS).every(k => fs(k).met)) badge('friends8'); showNode(firstMeet(id)); }
-    else showNode(menu(id, true));
+    if (!s.met) { s.met = true; s.day = 'met'; addFriend(id, 30); if (Object.keys(FRIENDS).every(k => fs(k).met)) badge('friends8'); showNode((id === ADV_NPC && advNode()) || firstMeet(id)); }
+    else showNode((id === ADV_NPC && advNode()) || menu(id, true));
     mission('talk');
   });
 }
@@ -5423,6 +5627,7 @@ $('#emoteTray').addEventListener('click', e => {
 
 /* ---------- 배지 ---------- */
 const BADGES = {
+  firstShard: ['⭐', '첫 모험', '첫 번째 별빛 조각 찾기'],
   eng3:     ['🌱', 'ABC 새싹', '영어 Lv.3 달성'],
   eng5:     ['📗', '영어 꿈나무', '영어 Lv.5 달성'],
   eng10:    ['🧭', '영어 탐험가', '영어 Lv.10 달성'],
@@ -5484,6 +5689,253 @@ function openBadges() {
   const got = S.badges || {}, n = Object.keys(got).length;
   openSheet('배지 수집첩', `${missionTabs('b')}<p class="msub">${n} / ${Object.keys(BADGES).length}개 모았어요</p><div class="badges">${Object.entries(BADGES).map(([k, [e, name, how]]) => `<div class="badge-card${got[k] ? ' got' : ''}"><span class="be">${got[k] ? e : '🔒'}</span><b>${name}</b><small>${how}</small></div>`).join('')}</div>`,
     body => body.addEventListener('click', e => { const tb = e.target.closest('[data-mtab]'); if (tb) openMissions(tb.dataset.mtab); }));
+}
+
+/* =========================================================
+   9-4b. 첫 모험 「첫 번째 별빛 조각 · 잃어버린 빨간 열쇠」 (MALANG WORLD 4.0)
+   S.adv.q1 단계: 0 시작 전 · 1 열쇠 찾기 · 2 열쇠 들고 가기 · 3 상자 열기 · 4 완료
+   광장 GLB(모험 소품 포함)가 준비됐을 때만 열린다. 저사양 모드(gfxOld)나 모델을 못 불러온 경우에는 예전처럼 논다
+   ========================================================= */
+const ADV_NPC = 'somsom';            // 의뢰하는 친구: 이 한 줄만 바꾸면 다른 친구가 맡는다 (FRIENDS에 있는 id)
+const ADV_REWARD = { xp: 40, words: ['red', 'key'], badge: 'firstShard', shard: 'village' };
+const ADV_KO = { red: '빨간', blue: '파란', yellow: '노란' }, ADV_EN = { red: 'red', blue: 'blue', yellow: 'yellow' }, ADV_HEX = { red: '#FF4D5E', blue: '#4D8DFF', yellow: '#FFD23F' };
+const ADV_LINE = {
+  lost: ['I lost my red key!', '빨간 열쇠를 잃어버렸어!'],
+  find: ['Find the red key!', '빨간 열쇠를 찾아봐!'],
+  hint: ['Look for the red one!', '빨간색을 찾아봐!'],
+  give: ['Give the key to Somsom!', '솜솜에게 열쇠를 갖다 줘!'],
+  open: ['Open the star chest!', '별빛 상자를 열어 봐!'],
+  thanks: ['Thank you!', '고마워!'],
+  star: ['We found the first star!', '첫 번째 별을 찾았어!']
+};
+// 임시 아이콘(인라인 SVG): 정식 아이콘이 나오면 이 표만 바꾼다
+const ADV_ICON = {
+  key: c => `<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="15" cy="15" r="9.5" fill="none" stroke="#35435A" stroke-width="9"/><path d="M22 22l18 18m-7-7l-5 5m10 0l-4 4" stroke="#35435A" stroke-width="9" stroke-linecap="round"/><circle cx="15" cy="15" r="9.5" fill="none" stroke="${c}" stroke-width="5"/><path d="M22 22l18 18m-7-7l-5 5m10 0l-4 4" stroke="${c}" stroke-width="5" stroke-linecap="round"/></svg>`,
+  star: (c = '#FFD36E') => `<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 3.5l6 13 14.3 1.6-10.6 9.8 2.9 14.1L24 35 11.4 42l2.9-14.1L3.7 18.1 18 16.5z" fill="${c}" stroke="#35435A" stroke-width="2.6" stroke-linejoin="round"/></svg>`,
+  crack: () => `<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 3.5l6 13 14.3 1.6-10.6 9.8 2.9 14.1L24 35 11.4 42l2.9-14.1L3.7 18.1 18 16.5z" fill="#C9C2DA" stroke="#35435A" stroke-width="2.6" stroke-linejoin="round"/><path d="M25 9l-3 9 5 4-4 8 2 6" fill="none" stroke="#35435A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  sound: () => `<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 19h8l10-8v26l-10-8H8z" fill="#35435A"/><path d="M32 17c3 4 3 10 0 14M37 12c6 7 6 17 0 24" fill="none" stroke="#35435A" stroke-width="4" stroke-linecap="round"/></svg>`,
+  heart: () => `<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 41S6 30 6 17a9 9 0 0118-3 9 9 0 0118 3c0 13-18 24-18 24z" fill="#FF8E9E" stroke="#35435A" stroke-width="2.6"/></svg>`,
+  medal: () => `<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M14 4h8l4 12h-8zM34 4h-8l-4 12h8z" fill="#7C86E0"/><circle cx="24" cy="30" r="13" fill="#FFD36E" stroke="#35435A" stroke-width="2.6"/><path d="M24 22l2.6 5.4 5.9.7-4.4 4 1.2 5.8-5.3-3-5.3 3 1.2-5.8-4.4-4 5.9-.7z" fill="#fff"/></svg>`,
+  book: () => `<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M6 10c7-2 13-1 18 3 5-4 11-5 18-3v28c-7-2-13-1-18 3-5-4-11-5-18-3z" fill="#CDEBFF" stroke="#35435A" stroke-width="2.6" stroke-linejoin="round"/><path d="M24 13v28" stroke="#35435A" stroke-width="2.6"/></svg>`
+};
+const advS = () => S.adv || (S.adv = { q1: 0, hint: 0, shards: [] });
+const advReady = () => !!(World.ok && !S.gfxOld && World.quest('ready'));
+const advName = () => FRIENDS[ADV_NPC].name;
+const advSay = (pair, hold = 3800) => { engSay(pair[0]); say(`${pair[0]} ${pair[1]}`, hold); };
+let advPending = false, advBusy = false, advNear = null, advCardKey = '';
+
+// 지금 단계를 3D 세상에 맞춘다 (켤 때·불러올 때·단계가 바뀔 때)
+function advSync() {
+  if (!advReady()) return renderAdv();
+  const a = advS(); World.quest('state', a.q1, a.shards.length); World.quest('hint', a.q1 === 1 ? a.hint : 0);
+  renderAdv();
+}
+function advBegin() {
+  const a = advS(); if (a.q1 !== 0) return;
+  a.q1 = 1; a.hint = 0; advPending = false; persist(); advSync();
+  World.quest('mood', ADV_NPC, 'sad');
+}
+// 의뢰 친구와 말할 때 단계별 대화 (없으면 null → 보통 대화)
+function advNode() {
+  if (!advReady()) return null;
+  const a = advS(), nm = advName();
+  if (a.q1 === 0 && advPending) {
+    World.quest('mood', ADV_NPC, 'sad'); setTimeout(() => engSay(ADV_LINE.lost[0]), 350);
+    return { text: `${ADV_LINE.lost[0]}\n${ADV_LINE.lost[1]} 분수 근처에서 떨어뜨렸나 봐…`, choices: [
+      { label: '내가 찾아 줄게!', fn: () => { advBegin(); setTimeout(() => engSay(ADV_LINE.find[0]), 300); return { text: `${ADV_LINE.find[0]}\n${ADV_LINE.find[1]} 광장 어딘가에 열쇠가 세 개 떨어져 있어.`, choices: [{ label: '찾으러 가자!', fn: () => null }] }; } },
+      { label: '다시 듣기', fn: () => advNode() }
+    ] };
+  }
+  if (a.q1 === 1) {
+    setTimeout(() => engSay(ADV_LINE.find[0]), 300);
+    return { text: `${ADV_LINE.find[0]}\n${ADV_LINE.find[1]}`, choices: [{ label: '힌트 주세요', fn: () => { setTimeout(advHint, 200); return null; } }, { label: '찾으러 갈게!', fn: () => null }] };
+  }
+  if (a.q1 === 2) return advGive();
+  if (a.q1 === 3) {
+    setTimeout(() => engSay(ADV_LINE.open[0]), 300);
+    return { text: `${ADV_LINE.open[0]}\n${ADV_LINE.open[1]} 상자 앞에 서면 [상자 열기] 버튼이 나와.`, choices: [{ label: '알았어!', fn: () => null }] };
+  }
+  return null;
+}
+function advGive() {
+  const a = advS(); if (a.q1 !== 2) return null;
+  a.q1 = 3; persist();
+  World.quest('give'); World.quest('mood', ADV_NPC, 'happy'); World.quest('hop', ADV_NPC);
+  sfx('correct'); setTimeout(() => engSay(ADV_LINE.thanks[0]), 250);
+  World.quest('npcToChest'); World.quest('target', 'chest'); renderAdv();
+  return { text: `${ADV_LINE.thanks[0]}\n${ADV_LINE.thanks[1]} 이건 별빛 상자 열쇠야. 분수 옆 상자로 같이 가자!`, choices: [{ label: '좋아, 가자!', fn: () => null }] };
+}
+// 힌트 3단계: 1 말로(빨간색을 찾아봐) → 2 빨간 열쇠가 크게 반짝 → 3 화살표가 가리킨다. 틀려도 벌점은 없다
+function advHint(fromWrong) {
+  const a = advS(); if (a.q1 !== 1) return;
+  a.hint = Math.min(3, (a.hint || 0) + 1); persist(); World.quest('hint', a.hint); renderAdv();
+  if (a.hint === 1) advSay(ADV_LINE.hint, 4200);
+  else if (a.hint === 2) { engSay(ADV_LINE.hint[0]); say('빨간 열쇠가 반짝반짝 커졌어! 잘 봐!', 4200); }
+  else { engSay(ADV_LINE.hint[0]); say('빨간 화살표가 열쇠를 가리키고 있어. 따라가 봐!', 4200); }
+  if (!fromWrong) sfx('star');
+}
+function advPick(c) {
+  const a = advS(); if (a.q1 !== 1 || advBusy) return;
+  if (c !== 'red') {
+    World.quest('wiggle', c); sfx('bub'); engSay(`This is ${ADV_EN[c]}.`);
+    say(`이건 ${ADV_KO[c]} 열쇠야. ${ADV_EN[c]}! 괜찮아, 다시 찾아보자.`, 3000);
+    setTimeout(() => advHint(true), 2600);
+    return;
+  }
+  a.q1 = 2; a.hint = 0; persist();
+  World.quest('carry', 'red'); World.quest('hint', 0); World.quest('target', 'npc');
+  sfx('correct'); World.trick('cheer'); engSay('Red key!');
+  advPop(`${ADV_ICON.key(ADV_HEX.red)}<b>빨간 열쇠를 찾았어요!</b><span class="en">Red key!</span>`);
+  setTimeout(() => say(`${ADV_LINE.give[0]} ${advName()}에게 갖다 주자!`, 3600), 1700);
+  renderAdv();
+}
+function advOpen() {
+  const a = advS(); if (a.q1 !== 3 || advBusy) return;
+  advBusy = true; advShowAct(null); renderAdv();
+  World.quest('open', advFinish);
+}
+function advStep(name) {
+  if (name === 'insert') { sfx('tap'); say('찰칵! 열쇠가 꼭 맞아요.', 1600); }
+  else if (name === 'open') sfx('star');
+  else if (name === 'shard') { sfx('hatch'); say('반짝이는 별빛 조각이 나왔어요!', 2200); }
+  else if (name === 'lit') { sfx('coin'); confetti(70); World.trick('cheer'); World.quest('mood', ADV_NPC, 'happy'); World.quest('hop', ADV_NPC); }
+}
+// 끝: 보상은 한 번만 (q1이 4가 되는 순간에만 준다. 다시 불러도 두 번 받지 않는다)
+function advFinish() {
+  const a = advS(); advBusy = false;
+  if (a.q1 >= 4) return renderAdv();
+  a.q1 = 4; a.hint = 0;
+  if (!a.shards.includes(ADV_REWARD.shard)) a.shards.push(ADV_REWARD.shard);
+  addXP(ADV_REWARD.xp); ADV_REWARD.words.forEach(w => engMark(w, true));
+  persist(); badge(ADV_REWARD.badge); renderHUD(); World.quest('target', null);
+  engSay(`${ADV_LINE.thanks[0]} ${ADV_LINE.star[0]}`); say(`${advName()}: ${ADV_LINE.thanks[0]} ${ADV_LINE.star[0]} ${ADV_LINE.thanks[1]} ${ADV_LINE.star[1]}`, 5200);
+  renderAdv();
+  setTimeout(advShardScreen, 2400);
+}
+
+/* ---------- 화면: 시작 안내 · 열쇠 획득 · 조각 · 완료 · 다음 모험 ---------- */
+function advOverlay(html, label, next, cls = '') {
+  const ov = document.createElement('div'); ov.className = 'adv-ov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true');
+  ov.innerHTML = `<div class="adv-box ${cls}">${html}<button class="candy adv-next">${label}</button></div>`;
+  $('#room').appendChild(ov); World.drive.x = World.drive.z = 0;
+  const b = ov.querySelector('.adv-next'); b.focus({ preventScroll: true });
+  b.addEventListener('click', () => { sfx('tap'); ov.remove(); $('#world').focus({ preventScroll: true }); next && next(); });
+  return ov;
+}
+function advPop(html) {
+  document.querySelectorAll('.adv-pop').forEach(x => x.remove());
+  const el = document.createElement('div'); el.className = 'adv-pop'; el.setAttribute('role', 'status'); el.innerHTML = html;
+  $('#room').appendChild(el); setTimeout(() => el.remove(), 2300);
+}
+function advIntro(next) {
+  advOverlay(`<div class="big">${ADV_ICON.crack()}</div><p class="kick">THE FIRST STAR SHARD</p><h2>첫 번째 별빛 조각</h2>
+    <p>말랑별에 금이 가서 마을 빛이 약해졌어요.<br>별빛 조각을 찾아 말랑별을 고쳐 주세요!</p>
+    <ul class="guide"><li><b>움직이기</b><span>화면을 누른 채 끌기 · 방향키 / WASD</span></li><li><b>살펴보기</b><span>가까이 가면 큰 노란 버튼이 나와요. 키보드는 E 키</span></li><li><b>힌트</b><span>어려우면 아래 카드의 [힌트]를 눌러요</span></li></ul>`, '모험 시작!', next);
+}
+function advShardScreen() {
+  engSay('First star shard!');
+  advOverlay(`<div class="big glow">${ADV_ICON.star()}</div><h2>첫 번째 별빛 조각!</h2><p class="en">First star shard!</p><p>하늘의 말랑별이 조금 밝아지고<br>광장에 따뜻한 빛이 돌아왔어요.</p>`, '좋아요!', advDoneScreen, 'shard');
+}
+function advDoneScreen() {
+  const n = advS().shards.length;
+  advOverlay(`<p class="kick">QUEST COMPLETE</p><h2>모험 완료!</h2><ul class="rew">
+    <li>${ADV_ICON.heart()}<span>펫 경험치 +${ADV_REWARD.xp}</span></li><li>${ADV_ICON.star()}<span>별빛 조각 ${n} / 5</span></li>
+    <li>${ADV_ICON.medal()}<span>배지: ${BADGES[ADV_REWARD.badge][1]}</span></li><li>${ADV_ICON.book()}<span>새 단어 <b>red · key</b> (복습에 들어갔어요)</span></li></ul>`, '다음', advTeaser);
+}
+function advTeaser() {
+  const n = advS().shards.length;
+  advOverlay(`<div class="big">${ADV_ICON.star('#BDA6F6')}</div><p class="kick">NEXT ADVENTURE</p><h2>다음 모험 예고</h2><p>광장의 별빛 포털 너머에서<br>반짝반짝 소리가 들려요…</p><p class="dim">별빛 조각을 모으면 포털이 열려요 (${n} / 5)</p>`, '곧 만나요!', () => { World.quest('npcHome'); renderAdv(); });
+}
+function advBoard() {
+  const a = advS(), n = a.shards.length, steps = ['아직 시작 전이에요', ADV_LINE.find[1], ADV_LINE.give[1], ADV_LINE.open[1], '첫 모험 완료!'];
+  openSheet('오늘의 모험', `<div class="adv-board"><div class="ab-stars">${[0, 1, 2, 3, 4].map(i => ADV_ICON.star(i < n ? '#FFD36E' : '#D9D4E4')).join('')}</div><p>별빛 조각 <b>${n} / 5</b></p>
+    <p class="ab-now"><b>첫 번째 별빛 조각</b><br>${steps[a.q1] || ''}</p>${a.q1 === 0 ? '<button class="candy" id="abGo">모험 시작!</button>' : ''}</div>`,
+    body => { const g = body.querySelector('#abGo'); if (g) g.addEventListener('click', () => { closeSheet(); advStart(); }); });
+}
+
+/* ---------- 미션 카드 · 상호작용 버튼 ---------- */
+function advHidden() {
+  return !advReady() || $('#home').hidden || World.area() === 'obby' || !!talking || !!gameOn || !!round || !!scrim || !P() || !P().hatched
+    || !!document.querySelector('.adv-ov, .mini, .race-ui, .gate-wrap, .rest') || $('#room').classList.contains('duo');
+}
+function renderAdv() {
+  const el = $('#advCard'); if (!el) return;
+  const a = advS(), hide = advHidden() || a.q1 >= 4 || advBusy || (a.q1 > 0 && World.area() !== 'village' && World.area() !== 'house');
+  const key = hide ? 'off' : `${a.q1}:${a.hint}:${World.area()}`;
+  if (key === advCardKey) return; advCardKey = key;
+  el.hidden = hide; $('#room').classList.toggle('adv-on', !hide && a.q1 > 0);   // 모험 중에는 카드가 아래 줄을 쓴다
+  if (hide) { advShowAct(null); return; }
+  const house = World.area() === 'house';
+  if (a.q1 === 0) el.innerHTML = `<span class="ai">${ADV_ICON.crack()}</span><span class="at"><b>첫 모험</b><small>잃어버린 빨간 열쇠</small></span><button class="go" data-adv="start">출발</button>`;
+  else {
+    const L = a.q1 === 1 ? ADV_LINE.find : a.q1 === 2 ? ADV_LINE.give : ADV_LINE.open, ic = a.q1 === 3 ? ADV_ICON.star() : ADV_ICON.key(ADV_HEX.red);
+    el.innerHTML = `<span class="ai">${ic}</span><span class="at"><b>${L[0]}</b><small>${house ? '광장으로 나가서 해요' : L[1]}</small></span>`
+      + (house ? '<button class="go" data-adv="out">광장</button>' : `<button data-adv="hear" aria-label="영어 다시 듣기">${ADV_ICON.sound()}</button>`)
+      + (a.q1 === 1 && !house ? `<button data-adv="hint" aria-label="힌트 ${a.hint}/3">힌트<small>${a.hint}/3</small></button>` : '');
+  }
+}
+function advShowAct(kind) {
+  const b = $('#actBtn'); if (!b) return;
+  const a = advS(), ok = kind && !advHidden() && !advBusy && World.area() === 'village'
+    && ((kind.startsWith('key:') && a.q1 === 1) || (kind === 'npc' && a.q1 === 2) || (kind === 'chest' && a.q1 === 3));
+  b.hidden = !ok; b.dataset.kind = ok ? kind : '';
+  if (!ok) return;
+  if (kind.startsWith('key:')) { const c = kind.slice(4); b.innerHTML = `${ADV_ICON.key(ADV_HEX[c])}<span>${ADV_KO[c]} 열쇠 줍기</span>`; }
+  else if (kind === 'npc') b.innerHTML = `${ADV_ICON.key(ADV_HEX.red)}<span>${advName()}에게 주기</span>`;
+  else b.innerHTML = `${ADV_ICON.star()}<span>상자 열기</span>`;
+}
+function advAct(kind) {
+  if (!kind || advBusy) return;
+  if (kind.startsWith('key:')) return advPick(kind.slice(4));
+  if (kind === 'npc') return talkTo(ADV_NPC);
+  if (kind === 'chest') return advOpen();
+}
+// 3D에서 모험 물건을 누름: 그쪽으로 걸어가서 살펴본다
+function advTap(use) {
+  const a = advS();
+  if (use === 'qboard') return advBoard();
+  if (use === 'qportal') return toast(`별빛 조각을 다섯 개 모으면 열려요 (${a.shards.length} / 5)`);
+  if (!advReady()) return;
+  const walk = (x, z, cb) => { const s = World.st, d = Math.hypot(s.x - x, s.z - z) || 1; World.goTo(x + (s.x - x) / d * .85, z + (s.z - z) / d * .85, d > 4, cb); };
+  if (use.startsWith('qkey:')) {
+    const c = use.slice(5), [x, z] = World.quest('keyPos', c);
+    if (a.q1 === 1) return walk(x, z, () => advPick(c));
+    if (a.q1 === 2) return say(`${advName()}에게 열쇠를 먼저 갖다 주자!`, 2600);
+    engSay(ADV_EN[c]); return say(`${ADV_KO[c]} 열쇠! ${ADV_EN[c]}!`, 2200);
+  }
+  if (use === 'qchest') {
+    if (a.q1 === 3) { const [x, z] = World.quest('chestFront'); return World.goTo(x, z, true, advOpen); }
+    if (a.q1 >= 4) return say('열린 별빛 상자예요. 첫 번째 별빛 조각이 여기서 나왔어요!', 2800);
+    return say('단단히 잠겨 있어요. 맞는 열쇠가 필요해요!', 2600);
+  }
+}
+function advStart() {
+  if (!advReady()) return toast('지금은 모험을 열 수 없어요');
+  if (advS().q1 > 0) return World.area() === 'house' ? goOutsideThen(() => World.goVillage('plaza', true)) : null;
+  if (World.area() === 'house') return goOutsideThen(advStart);
+  advIntro(() => { advPending = true; talkTo(ADV_NPC); });
+}
+$('#advCard').addEventListener('click', e => {
+  const b = e.target.closest('[data-adv]'); if (!b) return;
+  sfx('tap'); const k = b.dataset.adv, a = advS();
+  if (k === 'start') advStart();
+  else if (k === 'out') advStart();
+  else if (k === 'hint') advHint();
+  else if (k === 'hear') advSay(a.q1 === 1 ? ADV_LINE.find : a.q1 === 2 ? ADV_LINE.give : ADV_LINE.open, 3200);
+});
+$('#actBtn').addEventListener('click', () => { sfx('tap'); advAct($('#actBtn').dataset.kind); });
+document.addEventListener('keydown', e => { if ((e.key === 'e' || e.key === 'E') && !e.repeat && !$('#actBtn').hidden && !driveBlocked()) { e.preventDefault(); $('#actBtn').click(); } });
+World.onQuest = (type, v) => {
+  if (type === 'ready') advSync();
+  else if (type === 'near') { advNear = v; advShowAct(v); }
+  else if (type === 'step') advStep(v);
+};
+if (World.ok && World.quest('ready')) advSync();
+setInterval(() => { renderAdv(); if (!$('#actBtn').hidden && advHidden()) advShowAct(null); else if ($('#actBtn').hidden && advNear) advShowAct(advNear); }, 400);
+// 솜솜 메뉴에도 모험 고리를 단다 (카드를 못 봤어도 말 걸어서 시작할 수 있게)
+{
+  const s0 = SPECIAL[ADV_NPC];
+  SPECIAL[ADV_NPC] = () => [...(advReady() && advS().q1 === 0 ? [{ label: '무슨 일 있어?', fn: () => { advPending = true; return advNode(); } }] : []), ...(s0 ? s0() : [])];
 }
 
 /* =========================================================
@@ -5875,6 +6327,7 @@ function openStand() {
 function goStand() { World.area() === 'village' ? World.goVillage('garden', true, openStand) : openStand(); }
 
 const NEWS = [
+  { v: '4.5', date: '11월 11일', items: ['⭐ 첫 모험 「첫 번째 별빛 조각」! 마을 광장에서 솜솜의 빨간 열쇠를 찾아 주세요', '🔑 가까이 가면 큰 노란 버튼이 나와요. 어려우면 힌트 3단계', '🌟 별빛 상자를 열면 하늘의 말랑별이 밝아지고 광장에 빛이 돌아와요', '📚 모험에서 만난 단어 red·key가 복습에 들어가요'] },
   { v: '4.4', date: '11월 10일', items: ['🔑 보호자 PIN을 만들면 복구 코드를 드려요. PIN을 잊으면 복구 코드로만 지울 수 있어요', '📄 보호자 메뉴에서 개인정보처리방침을 볼 수 있어요', '🛡️ 이름 칸에는 전화번호·이메일을 쓸 수 없어요'] },
   { v: '4.3', date: '11월 10일', items: ['🐻 새 말랑 베어! 반짝이는 큰 눈, 정수리 털, 배의 하트, 코랄 가방과 별 핀', '⛲ 마을 광장에 새 분수대, 꽃밭, 가로등, 벤치가 생겼어요', '⚙️ 설정에서 예전 그래픽으로 되돌릴 수 있어요'] },
   { v: '4.2', date: '11월 10일', items: ['🐱 나비와 🐶 멍실이가 더 귀여워졌어요 (방울 목걸이, 빨간 반다나, 솜털)', '🤔 펫에게 궁금한 얼굴, 생각하는 얼굴, 신난 얼굴과 박수·축하 동작이 생겼어요', '📚 영어 레슨에서 내 펫이 정답엔 박수, 오답엔 생각하며 힌트를 봐요', '🧭 영어 화면이 7개 메뉴로 바뀌었어요: 오늘의 모험, 도감, 듣기, 문장, 미니게임, 복습, 나의 성장'] },
@@ -7076,7 +7529,9 @@ const engRank = lv => { let cur = ENG_RANKS[0], nx = null; for (const r of ENG_R
 const engWords = u => (u.w || []).map(x => ({ w: x[0], k: x[1], e: x[2], l: x[3] }));
 const engDone = u => !!(engState().units[u.id] && engState().units[u.id].stars);
 const engOpen = (st, i) => i === 0 || !!st.free || engDone(st.units[i - 1]);
-const engAllWords = (() => { const m = new Map(); ENG.forEach((st, si) => st.units.forEach(u => engWords(u).forEach(x => { if (!m.has(x.w)) m.set(x.w, Object.assign({ stage: si, noPic: u.noPic }, x)); }))); return m; })();
+// 레슨 밖에서 배우는 단어(모험 등): 복습·도감에 함께 들어간다. 레슨 내용은 바꾸지 않는다
+const ENG_EXTRA = [['key', '열쇠', '🔑']];
+const engAllWords = (() => { const m = new Map(); ENG.forEach((st, si) => st.units.forEach(u => engWords(u).forEach(x => { if (!m.has(x.w)) m.set(x.w, Object.assign({ stage: si, noPic: u.noPic }, x)); }))); ENG_EXTRA.forEach(([w, k, e]) => { if (!m.has(w)) m.set(w, { stage: 0, w, k, e, extra: true }); }); return m; })();
 const engLearned = () => Object.values(engState().w).filter(v => v.b >= 1).length;
 const engDue = () => { const now = Date.now(); return Object.entries(engState().w).filter(([k, v]) => engAllWords.has(k) && (v.due || 0) <= now); };
 function engNext() { const e = engState(), si = e.stage ?? 0; for (let k = si; k < ENG.length; k++) { const i = ENG[k].units.findIndex(u => !engDone(u)); if (i >= 0) return { si: k, ui: i }; } return null; }
