@@ -304,3 +304,21 @@ test('첫 모험 저장: 백업 왕복(JSON)에서도 그대로 남는다', () =
   assert.equal(back.err, undefined);
   assert.deepEqual(plain(back.data.adv), { q1: 2, hint: 3, shards: [] });
 });
+
+// P1: 저장 실패를 조용히 넘기지 않는다
+test('저장 실패: 한 번만 알리고, 다시 저장되면 회복을 알린다', () => {
+  const a = html.indexOf('let saveFailing = false;'), b = html.indexOf('\n}', html.indexOf('function persist()', a)) + 2;
+  assert.ok(a > 0 && b > a);
+  const msgs = [], store = { fail: true, data: null };
+  const c = { msgs, S: { coins: 1 }, SAVE_KEY: 'k', restoring: false, toast: m => msgs.push(m),
+    localStorage: { setItem: (k, v) => { if (store.fail) throw new Error('QuotaExceededError'); store.data = v; } } };
+  vm.createContext(c);
+  vm.runInContext(`${html.slice(a, b)}\nthis.persist = persist;`, c);
+  c.persist(); c.persist(); c.persist();
+  assert.equal(msgs.length, 1); assert.match(msgs[0], /저장되지 않고/); assert.match(msgs[0], /백업 코드/);
+  store.fail = false; c.persist(); c.persist();
+  assert.equal(msgs.length, 2); assert.match(msgs[1], /다시 저장/); assert.equal(store.data, '{"coins":1}');
+});
+test('웹판만 저장 보관(storage.persist)을 요청하고, 앱판(Capacitor)은 건너뛴다', () => {
+  assert.match(html, /!window\.Capacitor\?\.isNativePlatform\?\.\(\) && navigator\.storage && navigator\.storage\.persist\) navigator\.storage\.persisted\(\)\.then\(on => on \|\| navigator\.storage\.persist\(\)\)\.catch/);
+});

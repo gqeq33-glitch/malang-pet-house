@@ -270,3 +270,20 @@ test('첫 모험: 광장 GLB에 모험 소품 노드가 있다', () => {
   const { json } = readGlb('malang_plaza.glb'), names = new Set(json.nodes.map(n => n.name));
   for (const n of ['PZ_mstar', 'PZ_mstarCore', 'PZ_shard0', 'PZ_shard1', 'PZ_shard2', 'PZ_shard3', 'PZ_shard4', 'PZ_chest', 'PZ_chestLid', 'PZ_chestLock', 'PZ_key_red', 'PZ_key_blue', 'PZ_key_yellow', 'PZ_board', 'PZ_portal', 'PZ_portalDisc']) assert.ok(names.has(n), n);
 });
+
+// P1: 곰 GLB에 들어 있는 애니메이션을 실제로 재생한다
+test('곰 GLB 애니메이션: AnimationMixer로 재생하고 상태별 동작을 고른다', () => {
+  const fs2 = require('node:fs'), p2 = require('node:path');
+  const h = fs2.readFileSync(p2.join(__dirname, '..', 'www', 'index.html'), 'utf8');
+  assert.match(h, /new T\.AnimationMixer\(g\)/);
+  assert.match(h, /crossFadeFrom\(prev, fade, false\)/);
+  assert.match(h, /if \(pet\.mixer\) \{ pet\.playClip\(petClip\(walking, inAir, rideKind\)\); pet\.mixer\.update\(dt\); \}/);
+  assert.match(h, /mixer\.stopAllAction\(\); mixer\.uncacheRoot\(g\)/);   // 펫을 바꿀 때 정리
+  // 상태 → 동작 이름은 GLB에 실제로 있는 10개 중에서만 고른다
+  const glb = fs2.readFileSync(p2.join(__dirname, '..', 'www', 'models', 'malang_bear.glb'));
+  const j = JSON.parse(glb.slice(20, 20 + glb.readUInt32LE(12)).toString());
+  const have = new Set(j.animations.map(a => a.name.toLowerCase()));
+  const map = h.match(/const CLIP_OF_TRICK = (\{[^}]+\})/)[1];
+  const used = new Set([...map.matchAll(/'(\w+)'/g)].map(m => m[1]).concat(['jump', 'walk', 'run', 'sleep', 'happy', 'idle']));
+  for (const u of used) assert.ok(have.has(u), u + ' 동작이 GLB에 없음');
+});

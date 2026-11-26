@@ -1177,7 +1177,13 @@ function load() {
   } catch (e) { keep(); return null; }
 }
 let restoring = false;
-function persist() { if (restoring) return; try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) {} }
+// 저장: 실패하면(저장 공간 부족·사생활 보호 모드 등) 조용히 넘기지 않고 한 번 알린다. 다시 저장되면 그것도 알린다
+let saveFailing = false;
+function persist() {
+  if (restoring) return;
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); if (saveFailing) { saveFailing = false; toast('다시 저장되고 있어요'); } }
+  catch (e) { if (!saveFailing) { saveFailing = true; toast('기록이 저장되지 않고 있어요. 설정에서 백업 코드를 만들어 두세요'); } }
+}
 const P = () => S.pets[S.active];
 
 /* =========================================================
@@ -1706,6 +1712,31 @@ const World = (() => {
       if (f.shown !== want) { f.shown = want; f.eyeL.map = f.eyeR.map = faceTex(want); }
     };
     pt.glb = true;
+    // GLB에 들어 있는 애니메이션(idle·walk·run·jump·wave·dance·happy·sad·surprised·sleep)을 실제로 재생한다.
+    // 예전에는 관절을 코드로만 돌렸다. 상태가 바뀌면 0.22초 동안 부드럽게 섞어 넘어간다
+    if (glbBear.animations && glbBear.animations.length) {
+      const mixer = new T.AnimationMixer(g), acts = {};
+      for (const c of glbBear.animations) acts[c.name.toLowerCase()] = mixer.clipAction(c);
+      pt.mixer = mixer; pt.acts = acts; pt.curClip = null;
+      pt.playClip = (name, fade = .22) => {
+        if (!acts[name]) name = 'idle'; if (pt.curClip === name || !acts[name]) return;
+        const a = acts[name], prev = pt.curClip && acts[pt.curClip];
+        a.reset(); a.setLoop(T.LoopRepeat, Infinity); a.enabled = true; a.setEffectiveWeight(1);
+        if (prev) a.crossFadeFrom(prev, fade, false); a.play(); pt.curClip = name;
+      };
+      const before = pt.dispose; pt.dispose = () => { mixer.stopAllAction(); mixer.uncacheRoot(g); before && before(); };
+    }
+  }
+  // 펫 상태 → 곰 GLB 애니메이션 이름
+  const CLIP_OF_TRICK = { wave: 'wave', dance: 'dance', sad: 'sad', surprise: 'surprised', jump: 'jump', hop: 'jump', celebrate: 'happy', cheer: 'happy', clap: 'happy', spin: 'happy', transform: 'happy' };
+  function petClip(walking, inAir, riding) {
+    if (inAir) return 'jump';
+    if (st.trick && CLIP_OF_TRICK[st.trick]) return CLIP_OF_TRICK[st.trick];
+    if (walking && !riding) return st.run || st.area === 'obby' ? 'run' : 'walk';
+    const pp = typeof P === 'function' ? P() : null;
+    if (pp && pp.asleep) return 'sleep';
+    if (st.eatT > 0) return 'happy';
+    return 'idle';
   }
   const GLB_FACE = { normal: ['open', 'w'], happy: ['happy', 'open'], love: ['heart', 'open'], eat: ['happy', 'open'], sleep: ['closed', 'sleep'], sad: ['sad', 'sad'], surprise: ['surprised', 'o'], talk: ['open', 'open'], curious: ['open', 'o'], think: ['open', 'flat'], excited: ['star', 'open'] };
   function usePlaza() {
@@ -3238,11 +3269,12 @@ const World = (() => {
       }
       const wave = st.trick === 'wave' ? Math.sin(st.trickT * 12) * .5 + .9 : 0;
       const inAir = st.area === 'obby' && ob ? !ob.ground : false;
-      poseLimbs(pet, dt, { walk: walking, run: st.run || st.area === 'obby', cyc, t, air: inAir, act: st.trick, k: st.trickT, ride: rideKind, eat: st.eatT > 0 });
-      if (pet.footL) { pet.footL.position.y = pet.footBase + (walking && !rideKind ? Math.max(0, Math.sin(cyc)) * .05 : 0); pet.footR.position.y = pet.footBase + (walking && !rideKind ? Math.max(0, -Math.sin(cyc)) * .05 : 0); }
+      if (pet.mixer) { pet.playClip(petClip(walking, inAir, rideKind)); pet.mixer.update(dt); }   // 곰 GLB: 실제 애니메이션
+      else poseLimbs(pet, dt, { walk: walking, run: st.run || st.area === 'obby', cyc, t, air: inAir, act: st.trick, k: st.trickT, ride: rideKind, eat: st.eatT > 0 });
+      if (pet.footL && !pet.mixer) { pet.footL.position.y = pet.footBase + (walking && !rideKind ? Math.max(0, Math.sin(cyc)) * .05 : 0); pet.footR.position.y = pet.footBase + (walking && !rideKind ? Math.max(0, -Math.sin(cyc)) * .05 : 0); }
       st.flick -= dt; const flick = st.flick > 0 ? Math.sin(st.flick * 40) * .25 : 0; if (st.flick < -rand(2, 6)) st.flick = .3;
-      if (pet.earL) { const sw = walking ? Math.sin(cyc) * .18 : Math.sin(t * 2.3) * .05; pet.earL.rotation.z = pet.earBase + sw + flick + wave; pet.earR.rotation.z = -pet.earBase - sw; }
-      if (pet.tail) pet.tail.rotation.y = Math.sin(t * (st.mood === 'happy' || st.mood === 'love' ? 9 : 4)) * .38;
+      if (pet.earL && !pet.mixer) { const sw = walking ? Math.sin(cyc) * .18 : Math.sin(t * 2.3) * .05; pet.earL.rotation.z = pet.earBase + sw + flick + wave; pet.earR.rotation.z = -pet.earBase - sw; }
+      if (pet.tail && !pet.mixer) pet.tail.rotation.y = Math.sin(t * (st.mood === 'happy' || st.mood === 'love' ? 9 : 4)) * .38;
       if (pet.wingL) { const f = Math.sin(t * (walking ? 16 : 5)) * .35; pet.wingL.rotation.y = pet.wingBase + f; pet.wingR.rotation.y = -pet.wingBase - f; }
       if (pet.flL) { const f = walking ? Math.sin(cyc) * .5 : Math.sin(t * 2) * .1; pet.flL.rotation.z = -pet.flBase - f - wave * 1.6; pet.flR.rotation.z = pet.flBase - f; }
       if (pet.handL) { pet.handL.position.y = PET3.hamster.cy - .3 + wave * .2; }
@@ -3763,6 +3795,7 @@ const World = (() => {
       return { x: c.x, y: c.y, w: h, h };
     },
     set onTap(fn) { onTap = fn; },
+    petAnim() { return pet && pet.mixer ? pet.curClip : null; },   // 시험·진단: 지금 재생 중인 곰 애니메이션
     quest: aqQuest,
     set onQuest(fn) { AQ.on = fn; },
     get st() { return st; }
@@ -9073,6 +9106,8 @@ function start(hotData) {
 }
 if ('serviceWorker' in navigator && !window.Capacitor && (location.protocol === 'https:' || ['localhost', '127.0.0.1'].includes(location.hostname))) {
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  // 웹판: 저장 공간이 부족할 때 브라우저가 기록을 지우지 않도록 '보관'을 요청한다 (거절돼도 게임은 그대로)
+  if (!window.Capacitor?.isNativePlatform?.() && navigator.storage && navigator.storage.persist) navigator.storage.persisted().then(on => on || navigator.storage.persist()).catch(() => {});
   // 새 버전이 설치되면: 놀이·레슨 중이 아닐 때만 다시 연다 (저장은 localStorage라 새로고침해도 그대로)
   navigator.serviceWorker.addEventListener('message', e => {
     if (!e.data || e.data.type !== 'malang-updated') return;
