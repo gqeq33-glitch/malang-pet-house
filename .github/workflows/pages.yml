@@ -27,7 +27,7 @@ jobs:
       # 시험이 실패하면 웹에 올리지 않는다 (시험은 추가 패키지가 필요 없다)
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22  # Capacitor 8은 Node 22 이상 필요
       - name: Tests
         run: npm test
       - name: Release checks (files, syntax, models)

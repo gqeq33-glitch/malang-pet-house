@@ -10,13 +10,13 @@ on:
 
 jobs:
   build:
-    runs-on: macos-15
+    runs-on: macos-26   # Capacitor 8 iOS는 Xcode 26 이상 필요
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22  # Capacitor 8은 Node 22 이상 필요
 
       - name: Install Capacitor
         run: npm ci
