@@ -331,3 +331,50 @@ test('주인공 저장: 정해진 값만 받고, 이상한 값은 빼며, 예전
   const f = fix(save({ hero: 'zombie' })); assert.equal(f.err, undefined); assert.equal(f.data.hero, undefined);
   assert.equal(strict(JSON.parse(JSON.stringify(strict(save({ hero: 'male-a' })).data))).data.hero, 'male-a');   // 백업 왕복
 });
+
+// ---------- 친밀도 단계 (friends[id].tier: 받은 단계 선물 0~2) ----------
+test('친밀도 저장: tier는 0~2 정수만, 옛 저장(칸 없음)도 통과, 꼬깔 보상 횟수(rtotal)는 다시 불러와도 남는다', () => {
+  const ok = strict(save({ friends: { somsom: { pts: 420, met: true, day: '', q: 'none', tier: 2, rtotal: 3 } } }));
+  assert.equal(ok.err, undefined);
+  assert.equal(ok.data.friends.somsom.tier, 2); assert.equal(ok.data.friends.somsom.rtotal, 3);
+  const old = strict(save({ friends: { somsom: { pts: 420, met: true } } }));
+  assert.equal(old.err, undefined); assert.equal(old.data.friends.somsom.tier, undefined);
+  for (const tier of [3, -1, 1.5, '2', true]) assert.ok(strict(save({ friends: { somsom: { pts: 1, tier } } })).err, JSON.stringify(tier));
+  const f = fix(save({ friends: { somsom: { pts: 1, tier: 9 } } }));
+  assert.equal(f.err, undefined); assert.ok(f.data.friends.somsom.tier === undefined || f.data.friends.somsom.tier <= 2);
+  // 백업 왕복(JSON)
+  const back = strict(JSON.parse(JSON.stringify(ok.data)));
+  assert.equal(back.err, undefined); assert.equal(back.data.friends.somsom.tier, 2);
+});
+test('친밀도 단계: 하트로 단계를 정하고, 단계 선물은 한 번만 (반복해도 다시 받지 않음)', () => {
+  const a = html.indexOf('const heartsOf = '), b = html.indexOf('let watered = ');
+  const box = { S: { coins: 0, friends: {}, decor: { owned: ['plant'], placed: {} } }, toasts: [] };
+  vm.createContext(box);
+  vm.runInContext(`const FRIENDS = { somsom: { name: '솜솜' }, porong: { name: '포롱' } };
+    const DECOR = { balloon: { name: '풍선 다발', e: '🎈' }, plant: { name: '큰 화분', e: '🌿' } };
+    const batchim = s => { const c = s.charCodeAt(s.length - 1); return c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28 > 0; };
+    const josa = (s, x, y) => s + (batchim(s) ? x : y);
+    const decorState = () => S.decor, toast = m => toasts.push(m), sfx = () => {}, persist = () => {}, badge = () => {}, confetti = () => {}, setTimeout = f => f();
+    ${html.slice(html.indexOf('function fs(id) {'), html.indexOf('const heartsOf = '))}
+    ${html.slice(a, b)}
+    this.addFriend = addFriend; this.bondOf = bondOf; this.bondCheck = bondCheck; this.bondNext = bondNext; this.fs = fs;`, box);
+  assert.equal(box.bondOf('somsom'), 0); assert.equal(box.bondNext('somsom'), '하트 2개 더 모으면 친구');
+  box.addFriend('somsom', 199); assert.equal(box.bondOf('somsom'), 0); assert.equal(box.fs('somsom').tier, undefined);
+  box.addFriend('somsom', 1); assert.equal(box.bondOf('somsom'), 1); assert.equal(box.fs('somsom').tier, 1);
+  const coins1 = box.S.coins;
+  for (let i = 0; i < 20; i++) box.bondCheck('somsom');   // 반복해도 선물은 그대로
+  assert.equal(box.S.coins, coins1); assert.equal(box.fs('somsom').tier, 1);
+  box.addFriend('somsom', 200); assert.equal(box.bondOf('somsom'), 2); assert.equal(box.fs('somsom').tier, 2);
+  assert.ok(box.S.decor.owned.includes('balloon')); assert.equal(box.bondNext('somsom'), '');
+  const n = box.S.decor.owned.length; box.addFriend('somsom', 500); assert.equal(box.S.decor.owned.length, n);
+  // 이미 가진 가구는 30코인으로 대신, 옛 저장(tier 없음 + 하트 4개)은 두 단계 선물을 한 번에
+  box.S.friends.porong = { pts: 450, met: true }; const c0 = box.S.coins;
+  box.bondCheck('porong'); assert.equal(box.fs('porong').tier, 2); assert.equal(box.S.coins, c0 + 30);
+  box.bondCheck('porong'); assert.equal(box.S.coins, c0 + 30);
+  // 하트(pts)를 줄이는 코드가 없다
+  assert.ok(!/\.pts\s*(-=|=\s*0\b)/.test(html.slice(html.indexOf('function fs(id)'), html.indexOf('/* ---------- 대화창'))));
+});
+test('대화 건너뛰기 버튼이 있고 대화창을 닫는다', () => {
+  assert.ok(html.includes('id="talkSkip" type="button" aria-label="대화 건너뛰기"'));
+  assert.match(html, /\$\('#talkSkip'\)\.addEventListener\('click', \(\) => \{ sfx\('tap'\); closeTalk\(\); \}\);/);
+});

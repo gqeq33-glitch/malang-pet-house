@@ -215,6 +215,7 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
 .talk-name{font-family:var(--display);font-weight:400;font-size:21px;line-height:1.1}
 .talk-job{font-size:13px;color:var(--muted)}
 .talk-hearts{margin-left:auto;color:#E8476A;font-size:16px;letter-spacing:1px;white-space:nowrap}
+.talk-skip{flex:none;min-height:36px;padding:4px 10px;border-radius:999px;border:2px solid var(--line, #D9E2EC);background:#fff;color:var(--ink);font:inherit;font-size:13px;cursor:pointer}
 .talk-text{font-size:17px;line-height:1.6;margin:10px 0 12px;min-height:3.3em;cursor:pointer;text-wrap:pretty}
 .talk-choices{display:grid;gap:8px}
 .talk-choices .candy{text-align:left;font-size:16px;padding:10px 14px}
@@ -624,7 +625,7 @@ body{-webkit-touch-callout:none}
   </section>
 
   <div class="talk gut" id="talk" role="dialog" aria-labelledby="talkName" aria-describedby="talkText" hidden>
-    <div class="talk-head"><span class="talk-face" id="talkFace"></span><span class="talk-who"><b class="talk-name" id="talkName"></b><span class="talk-job" id="talkJob"></span></span><span class="talk-hearts" id="talkHearts" role="img" aria-label="친한 정도"></span></div>
+    <div class="talk-head"><span class="talk-face" id="talkFace"></span><span class="talk-who"><b class="talk-name" id="talkName"></b><span class="talk-job" id="talkJob"></span></span><span class="talk-hearts" id="talkHearts" role="img" aria-label="친한 정도"></span><button class="talk-skip" id="talkSkip" type="button" aria-label="대화 건너뛰기">건너뛰기</button></div>
     <p class="talk-text" id="talkText" aria-live="polite"></p>
     <div class="talk-choices" id="talkChoices" role="group" aria-label="대답 고르기"></div>
   </div>
@@ -1109,7 +1110,7 @@ function saveGuard(raw, cat, opt = {}) {
     if (ms) { if (!Array.isArray(ms.list) || ms.list.length > 20 || !ms.list.every(x => isObj(x) && own(cat.MISSIONS, x.id) && typeof x.prog === 'number' && x.prog >= 0 && x.prog <= 1000000)) delete d.missions; }
     const dec = sub(d, 'decor', ['owned', 'placed']);
     if (dec) { list(dec, 'owned', cat.DECOR, 300, 'decor.owned'); if (!dec.owned) dec.owned = []; const pl = sub(dec, 'placed', null, 'decor.placed') || {}; for (const k of Object.keys(pl)) { if (!own(cat.DECOR, k) || !isObj(pl[k])) { delete pl[k]; continue; } for (const a of ['x', 'z', 'r']) num(pl[k], a, -1000, 1000, { def: 0 }, 'decor.placed.' + a); for (const a of Object.keys(pl[k])) if (!['x', 'z', 'r'].includes(a)) delete pl[k][a]; } dec.placed = pl; }
-    const fr = sub(d, 'friends'); if (fr) for (const k of Object.keys(fr)) { if (!own(cat.FRIENDS, k) || !isObj(fr[k])) { delete fr[k]; continue; } num(fr[k], 'pts', 0, 10000000, {}, 'friends.pts'); bool(fr[k], 'met', 'friends.met'); for (const a of ['day', 'q', 'qday', 'gday', 'rday']) str(fr[k], a, 'friends.' + a); for (const a of ['rcount', 'rid']) num(fr[k], a, 0, 1000000, {}, 'friends.' + a); for (const a of Object.keys(fr[k])) if (!['pts', 'met', 'day', 'q', 'qday', 'gday', 'rday', 'rcount', 'rid'].includes(a)) delete fr[k][a]; }
+    const fr = sub(d, 'friends'); if (fr) for (const k of Object.keys(fr)) { if (!own(cat.FRIENDS, k) || !isObj(fr[k])) { delete fr[k]; continue; } num(fr[k], 'pts', 0, 10000000, {}, 'friends.pts'); bool(fr[k], 'met', 'friends.met'); for (const a of ['day', 'q', 'qday', 'gday', 'rday']) str(fr[k], a, 'friends.' + a); for (const a of ['rcount', 'rid', 'rtotal']) num(fr[k], a, 0, 1000000, {}, 'friends.' + a); num(fr[k], 'tier', 0, 2, { int: true }, 'friends.tier'); for (const a of Object.keys(fr[k])) if (!['pts', 'met', 'day', 'q', 'qday', 'gday', 'rday', 'rcount', 'rid', 'rtotal', 'tier'].includes(a)) delete fr[k][a]; }
     const flat = (k, ok) => { const m = sub(d, k); if (m) for (const x of Object.keys(m)) if (!ok(x, m[x])) { fail(k + '.' + x); delete m[x]; } };
     flat('badges', (x, v) => ['string', 'number', 'boolean'].includes(typeof v));
     flat('daily', (x, v) => (x === 'day' ? typeof v === 'string' : typeof v === 'number' && v >= 0 && v <= 10000000));
@@ -4193,12 +4194,49 @@ function fs(id) {
   return S.friends[id] || (S.friends[id] = { pts: 0, met: false, day: '', q: 'none', qday: '', gday: '', rday: '', rcount: 0, rid: 0 });
 }
 const heartsOf = id => Math.min(5, Math.floor(fs(id).pts / 100));
+// 친밀도 단계: 하트 0~1 새 친구, 2~3 친구, 4~5 단짝. 하트(pts)는 오르기만 하고 날짜가 지나도 줄지 않는다. 낮아도 불이익은 없다
+const BOND = [{ name: '새 친구', min: 0 }, { name: '친구', min: 2 }, { name: '단짝', min: 4 }];
+const bondOf = id => { const h = heartsOf(id); return h >= BOND[2].min ? 2 : h >= BOND[1].min ? 1 : 0; };
+const bondNext = id => { const b = bondOf(id); return b >= 2 ? '' : `하트 ${BOND[b + 1].min - heartsOf(id)}개 더 모으면 ${BOND[b + 1].name}`; };
+// 친구가 되면 그 친구 스티커, 단짝이 되면 집에 놓는 가구(이미 있으면 30코인). 단계마다 한 번만
+const BOND_GIFT = {
+  somsom: { st: '☁️', decor: 'balloon' }, tosil: { st: '🍯', decor: 'cushion' }, kokkal: { st: '📖', decor: 'shelf' }, porong: { st: '🌷', decor: 'plant' },
+  banjjak: { st: '⭐', decor: 'blocks' }, ruru: { st: '🔥', decor: 'lamp' }, neurit: { st: '🐚', decor: 'fishbowl' }, mongsil: { st: '🐑', decor: 'beanbag' }
+};
+const BOND_GREET = {
+  somsom: ['친구 왔다! 너랑 수다 떨면 시간이 금방 가!', '내 단짝! 오늘은 비밀 이야기 하나 해 줄게. 쉿, 헤헤'],
+  tosil: ['오, 우리 친구! 오늘 꿀빵은 특별히 꿀을 더 발랐단다.', '단짝 손님이 왔구나! 너만 보면 반죽이 더 잘 부풀어!'],
+  kokkal: ['반갑구나, 친구야. 너는 질문을 참 잘하는구나.', '내 단짝 꼬마 학자! 오늘은 무슨 책 이야기를 해 볼까?'],
+  porong: ['친구야! 네가 오니까 꽃들이 더 활짝 폈어.', '단짝 왔다! 너를 닮은 꽃을 한 송이 키우고 있어!'],
+  banjjak: ['친구다! 오늘도 같이 신나게 놀자!', '단짝 출동! 너랑 놀면 놀이터가 두 배로 재밌어!'],
+  ruru: ['친구 왔구나! 모닥불 옆 네 자리 비워 뒀어.', '내 단짝! 오늘 밤 별자리는 너랑 제일 먼저 볼 거야.'],
+  neurit: ['친구야... 오늘도... 와 줘서... 고마워...', '단짝... 너랑 있으면... 파도도... 천천히 와...'],
+  mongsil: ['메에~ 친구 왔다! 숨바꼭질 한 판 할래?', '메에~ 내 단짝! 꽃언덕 비밀 장소를 너한테만 알려 줄게!']
+};
+function bondCheck(id) {
+  const f = fs(id), now = bondOf(id), g = BOND_GIFT[id], nm = FRIENDS[id].name;
+  let got = f.tier || 0;
+  if (now <= got) return;
+  const msg = [];
+  while (got < now) {   // 옛 저장은 tier가 없으므로 지금 단계까지의 선물을 한 번에 받는다
+    got++;
+    if (got === 1) msg.push(`${josa(nm, '과', '와')} 친구가 됐어요! ${g.st} ${nm} 스티커`);
+    else {
+      const ds = decorState();
+      if (!ds.owned.includes(g.decor)) { ds.owned.push(g.decor); msg.push(`${nm}의 단짝! 선물 ${DECOR[g.decor].e} ${DECOR[g.decor].name} (상점 › 가구에서 놓아요)`); }
+      else { S.coins += 30; msg.push(`${nm}의 단짝! 선물 +30코인`); }
+    }
+  }
+  f.tier = got; persist(); sfx('up');
+  toast(msg.join(' · '));
+}
 function addFriend(id, n) {
   const before = heartsOf(id); fs(id).pts += n;
   const after = heartsOf(id);
   if (after >= 5) badge('bestie');
   if (after > before) { S.coins += 20; sfx('up'); confetti(50); toast(`${josa(FRIENDS[id].name, '과', '와')} 더 친해졌어요! ${'♥'.repeat(after)} +20코인`); }
   persist();
+  if (bondOf(id) > (fs(id).tier || 0)) setTimeout(() => bondCheck(id), after > before ? 2400 : 0);   // 하트 안내가 보인 뒤 단계 선물 안내
 }
 let watered = [false, false, false], starsStarted = false;
 function friendAlert(id) {
@@ -4217,6 +4255,7 @@ function typeText(t) {
   typeTimer = setInterval(() => { i += 2; el.textContent = t.slice(0, i); if (i >= t.length) clearInterval(typeTimer); }, 28);
 }
 $('#talkText').addEventListener('click', () => { clearInterval(typeTimer); $('#talkText').textContent = fullText; });
+$('#talkSkip').addEventListener('click', () => { sfx('tap'); closeTalk(); });   // 아이·보호자가 원하면 언제든 대화를 끝낸다 (하트·보상은 이미 받은 것 그대로)
 function showNode(node) {
   if (!node || !talking) return closeTalk();
   typeText(node.text);
@@ -4226,9 +4265,9 @@ function showNode(node) {
     b.addEventListener('click', () => { sfx('tap'); showNode(c.fn()); });
     box.appendChild(b);
   }
-  const h = heartsOf(talking);
-  $('#talkHearts').textContent = '♥'.repeat(h) + '♡'.repeat(5 - h);
-  $('#talkHearts').setAttribute('aria-label', `친한 정도 하트 5개 중 ${h}개`);
+  const h = heartsOf(talking), b = bondOf(talking), tier = fs(talking).tier || 0;
+  $('#talkHearts').textContent = `${tier ? BOND_GIFT[talking].st + ' ' : ''}${BOND[b].name} ${'♥'.repeat(h)}${'♡'.repeat(5 - h)}`;
+  $('#talkHearts').setAttribute('aria-label', `${BOND[b].name}, 친한 정도 하트 5개 중 ${h}개`);
   box.querySelector('button')?.focus({ preventScroll: true });
 }
 function talkTo(id) {
@@ -4245,6 +4284,7 @@ function talkTo(id) {
     if (!s.met) { s.met = true; s.day = 'met'; addFriend(id, 30); if (Object.keys(FRIENDS).every(k => fs(k).met)) badge('friends8'); showNode((id === ADV_NPC && advNode()) || firstMeet(id)); }
     else showNode((id === ADV_NPC && advNode()) || menu(id, true));
     mission('talk');
+    if (bondOf(id) > (s.tier || 0)) setTimeout(() => bondCheck(id), 700);
   });
 }
 function closeTalk() {
@@ -4267,6 +4307,7 @@ function menu(id, greet) {
   const p = P();
   return {
     text: greet && (p.back || p.neck) && Math.random() < .3 ? pick([`우와, ${WEAR[p.back || p.neck].name}! 정말 멋지다!`, `${josa(p.name, '이', '')} 오늘 멋 좀 냈네? ${WEAR[p.back || p.neck].e}`, `나도 ${WEAR[p.back || p.neck].name} 갖고 싶다~`])
+      : greet && bondOf(id) && Math.random() < .5 ? BOND_GREET[id][bondOf(id) - 1]
       : greet ? (SEASON && Math.random() < .35 ? pick(['해피 할로윈! 🎃 마을에 사탕이 숨어 있대!', '호박 등불 봤어? 밤이 되면 더 예뻐!', '나는 할로윈에 유령 분장을 할 거야! 우우~']) : pick(GREET[id](p))) : '또 무슨 이야기 할까?',
     choices: [{ label: '📚 영어 배우고 싶어!', fn: () => { setTimeout(openEnglish, 50); return null; } }, { label: '💬 이야기하자', fn: () => chat(id) }, ...SPECIAL[id](), followChoice(id), { label: '👋 안녕!', fn: bye }]
   };
@@ -6703,9 +6744,9 @@ function openDex() {
   }).join('');
   const village = Object.entries(FRIENDS).map(([id, f]) => {
     const met = fs(id).met, h = heartsOf(id);
-    return `<div class="dex-card"><span class="art"><img src="${World.portrait(id)}" alt=""${met ? '' : ' class="sil"'}></span><span class="txt"><span class="t1">${met ? f.name : '???'}</span><br><span class="t2">${met ? `${f.job} · ${'♥'.repeat(h)}${'♡'.repeat(5 - h)}` : '마을에서 만나 보세요'}</span></span></div>`;
+    return `<div class="dex-card"><span class="art"><img src="${World.portrait(id)}" alt=""${met ? '' : ' class="sil"'}></span><span class="txt"><span class="t1">${met ? f.name : '???'}</span><br><span class="t2">${met ? `${f.job} · ${'♥'.repeat(h)}${'♡'.repeat(5 - h)}` : '마을에서 만나 보세요'}</span>${met ? `<br><span class="t2">${fs(id).tier ? BOND_GIFT[id].st + ' ' : ''}<b>${BOND[bondOf(id)].name}</b> · ${bondNext(id) || '단짝 선물을 받았어요'}</span>` : ''}</span></div>`;
   }).join('');
-  openSheet(`우리 친구들 ${S.pets.length}/${SPECIES_ORDER.length}`, `<div class="dex">${cards}<button class="candy" id="dexPals" style="width:100%">🤝 친구 코드로 진짜 친구 초대하기</button><p class="arcade-head">마을 친구 <span class="arcade-tag">대화할수록 하트가 쌓여요</span></p>${village}</div>`, body => body.addEventListener('click', e => {
+  openSheet(`우리 친구들 ${S.pets.length}/${SPECIES_ORDER.length}`, `<div class="dex">${cards}<button class="candy" id="dexPals" style="width:100%">🤝 친구 코드로 진짜 친구 초대하기</button><p class="arcade-head">마을 친구 <span class="arcade-tag">이야기·부탁을 하면 하트가 쌓여요. 줄어들지 않아요</span></p>${village}</div>`, body => body.addEventListener('click', e => {
     if (e.target.closest('#dexPals')) return openPals();
     const sw = e.target.closest('[data-switch]');
     if (sw) {
