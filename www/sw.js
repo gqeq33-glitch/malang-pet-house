@@ -1,6 +1,6 @@
 // 말랑 펫하우스 오프라인 캐시.
 // 게임 파일을 바꿔 다시 올릴 때는 VERSION 숫자를 올려야 기존 설치본도 새 파일을 받는다.
-const VERSION = 'malang-v39';
+const VERSION = 'malang-v40';
 // 꼭 있어야 하는 파일: 하나라도 없으면 새 버전 설치를 멈추고 예전 버전을 계속 쓴다
 const CORE = [
   './',
@@ -20,7 +20,16 @@ const CORE = [
 const OPTIONAL = [
   'vendor/GLTFLoader.js',
   'models/malang_bear.glb',
-  'models/malang_plaza.glb'
+  'models/malang_plaza.glb',
+  'models/people/Textures/colormap.png',
+  'models/people/character-female-b.glb',
+  'models/people/character-female-c.glb',
+  'models/people/character-male-a.glb',
+  'models/people/character-male-e.glb',
+  'models/people/hero-female-b.png',
+  'models/people/hero-female-c.png',
+  'models/people/hero-male-a.png',
+  'models/people/hero-male-e.png'
 ];
 
 self.addEventListener('install', e => {

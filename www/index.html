@@ -254,6 +254,7 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
 .item .em{font-size:38px;line-height:1.15}
 .item .art{width:72px;height:60px}
 .item .art svg{width:100%;height:100%}
+.item .art img{width:100%;height:100%;object-fit:contain}
 .item .nm{font-family:var(--display);font-size:15px}
 .item .pr{font-size:13px;display:flex;align-items:center;gap:4px;color:var(--muted)}
 .item .eff{font-size:13px;color:var(--muted)}
@@ -990,6 +991,7 @@ function newPet(sp, name) {
 /* SAVE-GUARD-START
    저장 데이터 검사. repair가 false면(백업 복원) 이상한 값이 하나라도 있으면 거부하고,
    true면(기기에 있던 저장 읽기) 아이의 기록을 잃지 않도록 이상한 값만 고치거나 뺀다. 원본은 호출한 쪽이 보관한다. */
+const HERO_IDS = ['none', 'female-b', 'female-c', 'male-a', 'male-e'];
 const SAVE_MAX_CODE = 2000000, SAVE_MAX_PETS = 30, SAVE_VERSION = 2;
 // 옛 저장을 지금 형식으로 올린다. 입력은 바꾸지 않는다. 형식이 바뀔 때마다 아래에 한 단계씩 더한다 (v는 호환을 위해 1로 유지)
 function migrateSave(raw) {
@@ -1067,7 +1069,7 @@ function saveGuard(raw, cat, opt = {}) {
     const numMap = (o, k, max, re = ID) => { const m = sub(o, k); if (!m) return; for (const x of Object.keys(m)) { if (!re.test(x)) { fail(k); delete m[x]; continue; } num(m, x, 0, max, {}, k + '.' + x); } };
     const clean = scan(d, 0, 'save');
     Object.keys(d).forEach(k => delete d[k]); Object.assign(d, clean);
-    const TOP = ['v', 'sv', 'coins', 'sound', 'music', 'haptic', 'gfxOld', 'active', 'hats', 'rooms', 'room', 'lastTick', 'lastGift', 'best', 'story', 'parent', 'play', 'farm', 'missions', 'daily', 'rewardClaims', 'badges', 'friends', 'decor', 'dyes', 'wear', 'rides', 'rideSel', 'stickers', 'palId', 'palNote', 'pass', 'season', 'eng', 'duoSp', 'newsSeen', 'tut', 'dayEng', 'qa', 'musicVol', 'sfxVol', 'adv'];
+    const TOP = ['v', 'sv', 'coins', 'sound', 'music', 'haptic', 'gfxOld', 'active', 'hats', 'rooms', 'room', 'lastTick', 'lastGift', 'best', 'story', 'parent', 'play', 'farm', 'missions', 'daily', 'rewardClaims', 'badges', 'friends', 'decor', 'dyes', 'wear', 'rides', 'rideSel', 'stickers', 'palId', 'palNote', 'pass', 'season', 'eng', 'duoSp', 'newsSeen', 'tut', 'dayEng', 'qa', 'musicVol', 'sfxVol', 'adv', 'hero'];
     for (const k of Object.keys(d)) if (!TOP.includes(k)) { fail(k); delete d[k]; }
     num(d, 'coins', 0, 100000000, { req: true, def: 0 });
     bool(d, 'sound'); bool(d, 'music'); bool(d, 'haptic'); bool(d, 'gfxOld'); num(d, 'musicVol', 0, 2, { int: true }); num(d, 'sfxVol', 0, 2, { int: true }); if (d.sound === undefined) d.sound = true;
@@ -1078,6 +1080,8 @@ function saveGuard(raw, cat, opt = {}) {
     idOf(d, 'room', cat.ROOMS, 'mint'); if (!d.room) d.room = 'mint';
     list(d, 'dyes', cat.DYES, 100); list(d, 'wear', cat.WEAR, 200); list(d, 'rides', cat.RIDES, 100);
     idOf(d, 'rideSel', cat.RIDES); idOf(d, 'duoSp', cat.SPECIES);
+    // 마을 주인공(사람): 정해진 4명 또는 'none'(펫만). 다른 값은 빼고 통과(고르기 화면이 다시 나온다)
+    if (d.hero !== undefined && !HERO_IDS.includes(d.hero)) { fail('hero'); delete d.hero; }
     str(d, 'newsSeen');
     if (d.palId !== undefined && (typeof d.palId !== 'string' || !/^[a-z0-9]{1,16}$/.test(d.palId))) { fail('palId'); delete d.palId; }
     if (d.palNote !== undefined && d.palNote !== null) num(d, 'palNote', 0, cat.notes - 1, { int: true });
@@ -1727,6 +1731,34 @@ const World = (() => {
       const before = pt.dispose; pt.dispose = () => { mixer.stopAllAction(); mixer.uncacheRoot(g); before && before(); };
     }
   }
+  // 마을 주인공(사람, Kenney Mini Characters · CC0). 마을에서는 아이가 주인공을 움직이고 펫은 뒤를 따라온다.
+  // 집 안·장애물 코스·둘이 하기·탈것·경주 때는 예전처럼 펫만 보인다
+  const HERO_SCALE = 3, HERO_TRICK = { celebrate: 'emote-yes', cheer: 'emote-yes', clap: 'emote-yes', dance: 'emote-yes', sad: 'emote-no', jump: 'jump', hop: 'jump' };
+  let hero = null, heroLook = null;
+  const pf = { x: 0, z: 0, face: 0, walk: false, on: false };   // 따라오는 펫의 자리
+  function setHero(look) {
+    heroLook = look;
+    if (hero) {
+      scene.remove(hero.g); hero.mixer.stopAllAction(); hero.mixer.uncacheRoot(hero.g);
+      hero.g.traverse(o => { if (o.isMesh) { o.geometry.dispose(); [].concat(o.material).forEach(m => { if (m.map) m.map.dispose(); m.dispose(); }); } });
+      hero = null;
+    }
+    if (!ok || !look || look === 'none' || !T.GLTFLoader || S.gfxOld) return;
+    new T.GLTFLoader().load(`models/people/character-${look}.glb`, g => {
+      if (heroLook !== look || hero) return;   // 받는 사이 다른 주인공을 골랐으면 버린다
+      const root = g.scene; root.scale.setScalar(HERO_SCALE); root.visible = false;
+      root.traverse(o => { if (!o.isMesh) return; o.castShadow = true; o.receiveShadow = false; o.frustumCulled = false; const m = o.material; if (m.map) { m.map.encoding = T.LinearEncoding; m.map.needsUpdate = true; } m.roughness = .75; m.metalness = 0; m.needsUpdate = true; });
+      const mixer = new T.AnimationMixer(root), acts = {};
+      for (const c of g.animations) acts[c.name] = mixer.clipAction(c);
+      hero = { g: root, mixer, acts, cur: null }; scene.add(root);
+    }, undefined, e => console.warn('주인공 모델을 불러오지 못해 펫만 보여요', e && e.message));
+  }
+  function heroPlay(name) {
+    if (!hero.acts[name]) name = 'idle'; if (hero.cur === name) return;
+    const a = hero.acts[name], prev = hero.cur && hero.acts[hero.cur];
+    a.reset(); a.enabled = true; a.setEffectiveWeight(1); if (prev) a.crossFadeFrom(prev, .2, false); a.play(); hero.cur = name;
+  }
+  const heroOn = () => !!hero && ok && st.area === 'village' && !duo && !rideKind && !race;
   // 펫 상태 → 곰 GLB 애니메이션 이름
   const CLIP_OF_TRICK = { wave: 'wave', dance: 'dance', sad: 'sad', surprise: 'surprised', jump: 'jump', hop: 'jump', celebrate: 'happy', cheer: 'happy', clap: 'happy', spin: 'happy', transform: 'happy' };
   function petClip(walking, inAir, riding) {
@@ -3094,7 +3126,7 @@ const World = (() => {
       const p = c.parts, vis = st.area !== 'obby' && !duo;
       p.root.visible = vis; if (!vis) return;
       // 펫이 지나간 길을 그대로 따라오기 때문에 문을 지나 방을 옮겨도 벽을 뚫지 않는다
-      const back = trail[trail.length - 1 - 7 * (k + 1)] || [st.x - Math.sin(st.face) * 1.4, st.z - Math.cos(st.face) * 1.4];
+      const back = trail[trail.length - 1 - 7 * (k + 1 + (heroOn() ? 1 : 0))] || [st.x - Math.sin(st.face) * 1.4, st.z - Math.cos(st.face) * 1.4];
       const side = (k ? -1 : 1) * .6, tx = back[0] + side * Math.cos(st.face), tz = back[1] - side * Math.sin(st.face);
       if (Math.hypot(tx - c.x, tz - c.z) > 14) { c.x = tx; c.z = tz; }
       const ex = tx - c.x, ez = tz - c.z, d = Math.hypot(ex, ez);
@@ -3209,7 +3241,7 @@ const World = (() => {
       st.idleT -= dt;
       if (st.idleT <= 0) {
         const r = Math.random();
-        if (r < .55) goTo(VX + rand(-7, 7), rand(-4, 6), false);
+        if (r < .55) { if (!heroOn()) goTo(VX + rand(-7, 7), rand(-4, 6), false); }
         else if (r < .8) trick(pick(['spin', 'hop', 'dance', 'wave', 'curious']));
         else { const n = pick(Object.keys(FRIENDS)); say(`${josa(FRIENDS[n].name, '이', '')}다! 안녕~`, 2500); }
         st.idleT = rand(4, 7);
@@ -3234,9 +3266,21 @@ const World = (() => {
 
   function animate(dt, p) {
     if (!pet) return;
-    const t = st.t, walking = (st.mode === 'walk' && st.path.length > 0) || st.driving || !!(race && race.t >= 0) || (st.area === 'obby' && st.obMove), cyc = t * (st.run ? 11.5 : 8);
+    const t = st.t, heroWalk = (st.mode === 'walk' && st.path.length > 0) || st.driving || !!(race && race.t >= 0) || (st.area === 'obby' && st.obMove), cyc = t * (st.run ? 11.5 : 8);
     st.face = turn(st.face, st.faceGoal, dt * 9);
-    let y = st.lift, rx = 0, ry = st.face, rz = 0, sx = 1, sy = 1;
+    const hOn = heroOn() && !pet.isEgg;
+    if (hero) hero.g.visible = hOn;
+    if (hOn) {
+      // 펫은 주인공이 지나간 길(trail)을 1.5m쯤 뒤에서 따라온다. 멀리 떨어지면(순간 이동) 바로 옆으로 온다
+      const back = trail[trail.length - 5] || [st.x - Math.sin(st.face) * 1.1, st.z - Math.cos(st.face) * 1.1];
+      const tx = heroWalk ? back[0] + Math.cos(st.face) * 1.1 : st.x + 1.7, tz = heroWalk ? back[1] - Math.sin(st.face) * 1.1 : st.z - .6;
+      if (!pf.on || Math.hypot(tx - pf.x, tz - pf.z) > 12) { pf.x = tx; pf.z = tz; pf.face = st.face; pf.on = true; }
+      const ex = tx - pf.x, ez = tz - pf.z, d = Math.hypot(ex, ez);
+      if (d > .25) { const sp = Math.min(d, (d > 2.5 ? 5.4 : 2.6) * dt); pf.x += ex / d * sp; pf.z += ez / d * sp; pf.face = turn(pf.face, Math.atan2(ex, ez), dt * 8); pf.walk = true; }
+      else { pf.walk = false; pf.face = turn(pf.face, Math.atan2(st.x - pf.x, st.z - pf.z), dt * 4); }
+    } else pf.on = false;
+    const walking = hOn ? pf.walk : heroWalk;
+    let y = st.lift, rx = 0, ry = hOn ? pf.face : st.face, rz = 0, sx = 1, sy = 1;
     if (pet.isEgg) {
       if (st.trick === 'wobble') { st.trickT += dt; rz = Math.sin(st.trickT * 32) * .28 * (1 - st.trickT / .5); if (st.trickT > .5) st.trick = null; }
       else rz = Math.sin(t * 1.6) * .03;
@@ -3296,7 +3340,12 @@ const World = (() => {
       const moved = rideLast ? Math.hypot(st.x - rideLast[0], st.z - rideLast[1]) : 0; rideLast = [st.x, st.z];
       for (const w of rideWheels) w.m.rotation.x += moved / (w.r * RIDE_SCALE);
     }
-    pet.root.position.set(st.x, y, st.z); pet.root.rotation.set(rx, ry, rz); pet.body.scale.set(sx, sy, sx); pet.body.rotation.x = pet.isEgg || (p.asleep && st.at === 'bed') ? 0 : LOOK_UP + (walking && st.run && !rideKind ? .22 : 0);
+    if (hOn) {
+      hero.g.position.set(st.x, 0, st.z); hero.g.rotation.y = st.face;
+      heroPlay(talking ? 'interact-right' : HERO_TRICK[st.trick] || (heroWalk ? (st.run ? 'sprint' : 'walk') : 'idle'));
+      hero.mixer.update(dt);
+    }
+    pet.root.position.set(hOn ? pf.x : st.x, y, hOn ? pf.z : st.z); pet.root.rotation.set(rx, ry, rz); pet.body.scale.set(sx, sy, sx); pet.body.rotation.x = pet.isEgg || (p.asleep && st.at === 'bed') ? 0 : LOOK_UP + (walking && st.run && !rideKind ? .22 : 0);
   }
 
   function loop(now) {
@@ -3392,7 +3441,7 @@ const World = (() => {
 
   function screen(h) {
     const k = pet ? pet.root.scale.y : 1;
-    const v = new T.Vector3(st.x, st.lift + h * k, st.z).project(camera);
+    const v = new T.Vector3(pet ? pet.root.position.x : st.x, st.lift + h * k, pet ? pet.root.position.z : st.z).project(camera);   // 말풍선·하트는 펫 머리 위(주인공이 있으면 따라오는 펫 자리)
     return { x: (v.x + 1) / 2 * room.clientWidth, y: (1 - v.y) / 2 * room.clientHeight };
   }
 
@@ -3580,6 +3629,7 @@ const World = (() => {
       bindInput();
       ok = true;
       loadGlb();
+      setHero(S.hero);
       requestAnimationFrame(loop);
       return true;
     },
@@ -3795,7 +3845,10 @@ const World = (() => {
       return { x: c.x, y: c.y, w: h, h };
     },
     set onTap(fn) { onTap = fn; },
-    petAnim() { return pet && pet.mixer ? pet.curClip : null; },   // 시험·진단: 지금 재생 중인 곰 애니메이션
+    petAnim() { return pet && pet.mixer ? pet.curClip : null; },
+    setHero(look) { setHero(look); },
+    canHero() { return ok && !!T.GLTFLoader && !S.gfxOld; },
+    heroAnim() { return hero && hero.g.visible ? hero.cur : null; },   // 시험·진단: 마을에서 주인공이 하는 동작   // 시험·진단: 지금 재생 중인 곰 애니메이션
     quest: aqQuest,
     set onQuest(fn) { AQ.on = fn; },
     get st() { return st; }
@@ -4768,6 +4821,19 @@ function waterBed(i) {
     renderHUD();
   });
 }
+/* ---------- 마을 주인공(사람) 고르기 ---------- */
+const HEROES = { 'female-b': '하나', 'female-c': '소라', 'male-a': '준', 'male-e': '민' };
+function openHeroPick() {
+  const p = P();
+  const cards = Object.entries(HEROES).map(([id, nm]) => `<button class="item${S.hero === id ? ' on' : ''}" data-hero="${id}"><span class="art"><img src="models/people/hero-${id}.png" alt="" width="96" height="96"></span><span class="nm">${nm}</span></button>`).join('')
+    + `<button class="item${S.hero === 'none' ? ' on' : ''}" data-hero="none"><span class="art">${petSVG(p.sp, { mood: 'happy', stage: 'kid' })}</span><span class="nm">펫만</span></button>`;
+  openSheet('🧒 마을에서 함께 걸을 나', `<p class="msub">마을에서는 내가 걷고, ${escapeHTML(josa(p.name, '이', '가'))} 뒤를 따라와요. 설정에서 언제든 바꿀 수 있어요.</p><div class="grid">${cards}</div>`,
+    body => body.addEventListener('click', e => {
+      const b = e.target.closest('[data-hero]'); if (!b) return;
+      S.hero = b.dataset.hero; persist(); World.setHero(S.hero); closeSheet();
+      toast(S.hero === 'none' ? '마을에서 펫이 혼자 걸어요' : `${josa(HEROES[S.hero], '과', '와')} 함께 마을을 걸어요`);
+    }));
+}
 function onEnterVillage() {
   mission('outside'); badge('village');
   spawnCandies();
@@ -4776,6 +4842,7 @@ function onEnterVillage() {
   if (fs('banjjak').q === 'active' && !starsStarted) startStars();
   if (fs('neurit').q === 'active' && !shellsStarted) startShells();
   hide = null; following = null;
+  if (S.hero === undefined && World.canHero()) setTimeout(openHeroPick, 900);   // 처음 한 번: 주인공 고르기
   say(pick(['와! 마을이다! 친구들한테 인사하자!', '바람 냄새 좋다~ 누구부터 만날까?']), 4000);
 }
 /* =========================================================
@@ -5070,6 +5137,7 @@ function openSettings() {
     <button class="set-row" id="setSoundTest"><span>🎵 소리 들어 보기</span><b>열기 ›</b></button>
     <button class="set-row" id="setHaptic"><span>📳 진동</span><b>${S.haptic !== false ? '켜짐' : '꺼짐'}</b></button>
     <button class="set-row" id="setGfx"><span>✨ 새 그래픽 (말랑 베어·광장)</span><b>${S.gfxOld ? '꺼짐' : '켜짐'}</b></button>
+    <button class="set-row" id="setHero"><span>🧒 마을 주인공</span><b>${S.hero && S.hero !== 'none' ? HEROES[S.hero] : '펫만'}</b></button>
     <button class="set-row" id="setAlbum"><span>📷 사진 앨범</span><b>${loadPhotos().length} / ${PHOTO_MAX}장 ›</b></button>
     <div class="set-row"><span>⏱️ 오늘 논 시간</span><b>${Math.floor(playSec() / 60)}분</b></div>
     <button class="set-row" id="setParent"><span>🔒 보호자 메뉴</span><b>열기 ›</b></button>
@@ -5079,6 +5147,7 @@ function openSettings() {
     for (const [id, key] of [['#setMusicVol', 'musicVol'], ['#setSfxVol', 'sfxVol']]) body.querySelector(id).addEventListener('click', () => { S[key] = ((Number.isInteger(S[key]) ? S[key] : 1) + 1) % 3; persist(); sfx('correct'); openSettings(); });
     body.querySelector('#setSoundTest').addEventListener('click', openSoundTest);
     body.querySelector('#setHaptic').addEventListener('click', () => { S.haptic = S.haptic === false; persist(); sfx('pop'); openSettings(); });
+    body.querySelector('#setHero').addEventListener('click', () => { if (!World.canHero()) return toast('새 그래픽을 켜야 주인공이 보여요'); openHeroPick(); });
     body.querySelector('#setGfx').addEventListener('click', () => { S.gfxOld = !S.gfxOld; persist(); toast(S.gfxOld ? '예전 그래픽으로 바꿀게요' : '새 그래픽으로 바꿀게요'); setTimeout(() => location.reload(), 700); });
     body.querySelector('#setAlbum').addEventListener('click', () => openAlbum());
     body.querySelector('#setParent').addEventListener('click', () => { closeSheet(); parentGate(openParent); });

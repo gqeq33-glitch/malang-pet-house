@@ -322,3 +322,12 @@ test('저장 실패: 한 번만 알리고, 다시 저장되면 회복을 알린�
 test('웹판만 저장 보관(storage.persist)을 요청하고, 앱판(Capacitor)은 건너뛴다', () => {
   assert.match(html, /!window\.Capacitor\?\.isNativePlatform\?\.\(\) && navigator\.storage && navigator\.storage\.persist\) navigator\.storage\.persisted\(\)\.then\(on => on \|\| navigator\.storage\.persist\(\)\)\.catch/);
 });
+
+// 마을 주인공(사람): 저장 칸 hero
+test('주인공 저장: 정해진 값만 받고, 이상한 값은 빼며, 예전 저장(칸 없음)도 그대로 통과', () => {
+  for (const h of ['none', 'female-b', 'female-c', 'male-a', 'male-e']) assert.equal(strict(save({ hero: h })).data.hero, h);
+  assert.equal(strict(save()).err, undefined); assert.equal(strict(save()).data.hero, undefined);
+  for (const h of ['zombie', 'soldier', '<img onerror=x>', 3, null, {}]) assert.ok(strict(save({ hero: h })).err, String(h));
+  const f = fix(save({ hero: 'zombie' })); assert.equal(f.err, undefined); assert.equal(f.data.hero, undefined);
+  assert.equal(strict(JSON.parse(JSON.stringify(strict(save({ hero: 'male-a' })).data))).data.hero, 'male-a');   // 백업 왕복
+});

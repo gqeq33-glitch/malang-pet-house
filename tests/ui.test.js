@@ -263,7 +263,7 @@ test('첫 모험: 대사·화면·연결이 모두 있다', () => {
   assert.ok(html.includes('advSetup(root);') && html.includes('movePals(dt); advTick(dt);'));
   assert.ok(html.includes("firstShard: ['⭐', '첫 모험'"), '배지');
   assert.ok(html.includes("const ENG_EXTRA = [['key', '열쇠', '🔑']];"), '복습 단어 key');
-  assert.ok(/const TOP = \[[^\]]*'adv'\]/.test(html), '저장 허용 목록');
+  assert.ok(/const TOP = \[[^\]]*'adv'[,\]]/.test(html), '저장 허용 목록');
   assert.ok(html.includes("'.mini, .race-ui, .gate-wrap, .rest, .adv-ov'"), '안내 화면이 뜨면 달리기를 멈춘다');
 });
 test('첫 모험: 광장 GLB에 모험 소품 노드가 있다', () => {
@@ -286,4 +286,28 @@ test('곰 GLB 애니메이션: AnimationMixer로 재생하고 상태별 동작�
   const map = h.match(/const CLIP_OF_TRICK = (\{[^}]+\})/)[1];
   const used = new Set([...map.matchAll(/'(\w+)'/g)].map(m => m[1]).concat(['jump', 'walk', 'run', 'sleep', 'happy', 'idle']));
   for (const u of used) assert.ok(have.has(u), u + ' 동작이 GLB에 없음');
+});
+
+// 마을 주인공(사람, Kenney Mini Characters CC0)
+test('주인공: 모델·라이선스·캐시 목록이 있고, 쓰는 동작이 모델에 모두 있다', () => {
+  const fs2 = require('node:fs'), p2 = require('node:path'), www = p2.join(__dirname, '..', 'www');
+  const h = fs2.readFileSync(p2.join(www, 'index.html'), 'utf8'), sw = fs2.readFileSync(p2.join(www, 'sw.js'), 'utf8');
+  const ids = JSON.parse(h.match(/const HERO_IDS = (\[[^\]]+\])/)[1].replace(/'/g, '"'));
+  const names = Object.keys(eval('(' + h.match(/const HEROES = (\{[^}]+\})/)[1] + ')'));
+  assert.deepEqual(names.sort(), ids.filter(i => i !== 'none').sort(), '고르기 화면과 저장 검사 목록이 같아야 함');
+  assert.match(fs2.readFileSync(p2.join(www, 'models', 'people', 'LICENSE-Kenney-CC0.txt'), 'utf8'), /CC0/);
+  assert.ok(sw.includes('models/people/Textures/colormap.png'));
+  const used = ['idle', 'walk', 'sprint', 'jump', 'interact-right', 'emote-yes', 'emote-no'];
+  for (const id of names) {
+    for (const f of [`models/people/character-${id}.glb`, `models/people/hero-${id}.png`]) { assert.ok(fs2.existsSync(p2.join(www, f)), f); assert.ok(sw.includes(f), 'sw.js: ' + f); }
+    const glb = fs2.readFileSync(p2.join(www, 'models', 'people', `character-${id}.glb`));
+    const j = JSON.parse(glb.slice(20, 20 + glb.readUInt32LE(12)).toString());
+    const have = new Set(j.animations.map(a => a.name));
+    for (const u of used) assert.ok(have.has(u), `${id}: ${u}`);
+    assert.ok(j.images.every(im => im.uri === 'Textures/colormap.png'), id + ' 텍스처');
+  }
+  // 집 안은 펫 중심 그대로: 주인공은 마을에서만, 둘이 하기·탈것·경주 때는 숨긴다
+  assert.match(h, /const heroOn = \(\) => !!hero && ok && st\.area === 'village' && !duo && !rideKind && !race;/);
+  // 펫 이름은 고르기 화면 HTML에 escapeHTML을 거쳐 들어간다
+  assert.match(h, /\$\{escapeHTML\(josa\(p\.name, '이', '가'\)\)\} 뒤를 따라와요/);
 });
