@@ -310,4 +310,12 @@ test('주인공: 모델·라이선스·캐시 목록이 있고, 쓰는 동작이
   assert.match(h, /const heroOn = \(\) => !!hero && ok && st\.area === 'village' && !duo && !rideKind && !race;/);
   // 펫 이름은 고르기 화면 HTML에 escapeHTML을 거쳐 들어간다
   assert.match(h, /\$\{escapeHTML\(josa\(p\.name, '이', '가'\)\)\} 뒤를 따라와요/);
+  assert.match(h, /\$\{escapeHTML\(josa\(p\.name, '을', '를'\)\)\} 돌보고/);
+  // 집 안에서는 주인공이 펫을 따라오고, 아이는 예전처럼 펫을 움직인다
+  assert.match(h, /const heroHome = \(\) => !!hero && ok && st\.area === 'house' && !duo && !race;/);
+  // 쓰다듬기 = 하이파이브, 대화하면 펫이 손을 흔든다
+  assert.match(h, /const five = World\.highFive\(\);/);
+  assert.match(h, /World\.setTalking\(id, true\); World\.trick\('wave'\);/);
+  // 처음 시작 순서: 펫·이름 → 주인공 → 첫 장 안내 (주인공을 못 쓰는 기기는 예전 순서)
+  assert.match(h, /if \(World\.canHero\(\)\) setTimeout\(\(\) => openHeroPick\(firstChapter\), 500\);/);
 });

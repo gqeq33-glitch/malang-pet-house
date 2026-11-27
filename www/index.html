@@ -1759,6 +1759,10 @@ const World = (() => {
     a.reset(); a.enabled = true; a.setEffectiveWeight(1); if (prev) a.crossFadeFrom(prev, .2, false); a.play(); hero.cur = name;
   }
   const heroOn = () => !!hero && ok && st.area === 'village' && !duo && !rideKind && !race;
+  // 집 안: 아이는 예전처럼 펫을 돌보고 움직이며, 주인공은 펫이 지나간 길을 따라와 곁에 서 있다 (알일 때도 옆에서 지켜본다)
+  const heroHome = () => !!hero && ok && st.area === 'house' && !duo && !race;
+  const hf = { x: 0, z: 0, face: 0, walk: false, on: false };   // 집 안에서 따라오는 주인공 자리
+  let heroAct = 0;   // 하이파이브 동작이 남은 시간
   // 펫 상태 → 곰 GLB 애니메이션 이름
   const CLIP_OF_TRICK = { wave: 'wave', dance: 'dance', sad: 'sad', surprise: 'surprised', jump: 'jump', hop: 'jump', celebrate: 'happy', cheer: 'happy', clap: 'happy', spin: 'happy', transform: 'happy' };
   function petClip(walking, inAir, riding) {
@@ -3126,7 +3130,7 @@ const World = (() => {
       const p = c.parts, vis = st.area !== 'obby' && !duo;
       p.root.visible = vis; if (!vis) return;
       // 펫이 지나간 길을 그대로 따라오기 때문에 문을 지나 방을 옮겨도 벽을 뚫지 않는다
-      const back = trail[trail.length - 1 - 7 * (k + 1 + (heroOn() ? 1 : 0))] || [st.x - Math.sin(st.face) * 1.4, st.z - Math.cos(st.face) * 1.4];
+      const back = trail[trail.length - 1 - 7 * (k + 1 + (heroOn() || heroHome() ? 1 : 0))] || [st.x - Math.sin(st.face) * 1.4, st.z - Math.cos(st.face) * 1.4];
       const side = (k ? -1 : 1) * .6, tx = back[0] + side * Math.cos(st.face), tz = back[1] - side * Math.sin(st.face);
       if (Math.hypot(tx - c.x, tz - c.z) > 14) { c.x = tx; c.z = tz; }
       const ex = tx - c.x, ez = tz - c.z, d = Math.hypot(ex, ez);
@@ -3269,7 +3273,9 @@ const World = (() => {
     const t = st.t, heroWalk = (st.mode === 'walk' && st.path.length > 0) || st.driving || !!(race && race.t >= 0) || (st.area === 'obby' && st.obMove), cyc = t * (st.run ? 11.5 : 8);
     st.face = turn(st.face, st.faceGoal, dt * 9);
     const hOn = heroOn() && !pet.isEgg;
-    if (hero) hero.g.visible = hOn;
+    const hHome = !hOn && heroHome();
+    if (hero) hero.g.visible = hOn || hHome;
+    if (heroAct > 0) heroAct -= dt;
     if (hOn) {
       // 펫은 주인공이 지나간 길(trail)을 1.5m쯤 뒤에서 따라온다. 멀리 떨어지면(순간 이동) 바로 옆으로 온다
       const back = trail[trail.length - 5] || [st.x - Math.sin(st.face) * 1.1, st.z - Math.cos(st.face) * 1.1];
@@ -3341,10 +3347,26 @@ const World = (() => {
       for (const w of rideWheels) w.m.rotation.x += moved / (w.r * RIDE_SCALE);
     }
     if (hOn) {
-      hero.g.position.set(st.x, 0, st.z); hero.g.rotation.y = st.face;
-      heroPlay(talking ? 'interact-right' : HERO_TRICK[st.trick] || (heroWalk ? (st.run ? 'sprint' : 'walk') : 'idle'));
+      // 하이파이브 중에는 펫 쪽을 보고 손을 내민다
+      hero.g.position.set(st.x, 0, st.z); hero.g.rotation.y = heroAct > 0 ? Math.atan2(pf.x - st.x, pf.z - st.z) : st.face;
+      heroPlay(heroAct > 0 || talking ? 'interact-right' : HERO_TRICK[st.trick] || (heroWalk ? (st.run ? 'sprint' : 'walk') : 'idle'));
       hero.mixer.update(dt);
-    }
+    } else if (hHome) {
+      if (!hf.on) { [hf.x, hf.z] = houseMove(st.x, st.z, st.x - 1.5, st.z - .8); hf.face = 0; hf.on = true; hf.walk = false; }
+      // 펫이 걸으면 지나간 길을 따라오고, 멈추면 펫의 왼쪽 뒤(카메라 반대쪽)에 서서 화면을 가리지 않는다
+      const back = heroWalk ? trail[trail.length - 6] : houseMove(st.x, st.z, st.x - 1.5, st.z - .8);
+      let hd = 0;
+      if (back) {
+        const ex = back[0] - hf.x, ez = back[1] - hf.z; hd = Math.hypot(ex, ez);
+        if (hd > 9) { hf.x = back[0]; hf.z = back[1]; hf.walk = false; }   // 방을 순간 이동했을 때
+        else if (hd > .3) { const sp = Math.min(hd, (hd > 2.5 ? 5 : 2.4) * dt); hf.x += ex / hd * sp; hf.z += ez / hd * sp; hf.face = turn(hf.face, Math.atan2(ex, ez), dt * 8); hf.walk = true; }
+        else hf.walk = false;
+      } else hf.walk = false;
+      if (!hf.walk) hf.face = turn(hf.face, Math.atan2(st.x - hf.x, st.z - hf.z), dt * 4);   // 서 있을 때는 펫을 바라본다
+      hero.g.position.set(hf.x, 0, hf.z); hero.g.rotation.y = hf.face;
+      heroPlay(heroAct > 0 ? 'interact-right' : HERO_TRICK[st.trick] || (hf.walk ? (hd > 2.5 ? 'sprint' : 'walk') : 'idle'));
+      hero.mixer.update(dt);
+    } else hf.on = false;
     pet.root.position.set(hOn ? pf.x : st.x, y, hOn ? pf.z : st.z); pet.root.rotation.set(rx, ry, rz); pet.body.scale.set(sx, sy, sx); pet.body.rotation.x = pet.isEgg || (p.asleep && st.at === 'bed') ? 0 : LOOK_UP + (walking && st.run && !rideKind ? .22 : 0);
   }
 
@@ -3848,7 +3870,9 @@ const World = (() => {
     petAnim() { return pet && pet.mixer ? pet.curClip : null; },
     setHero(look) { setHero(look); },
     canHero() { return ok && !!T.GLTFLoader && !S.gfxOld; },
-    heroAnim() { return hero && hero.g.visible ? hero.cur : null; },   // 시험·진단: 마을에서 주인공이 하는 동작   // 시험·진단: 지금 재생 중인 곰 애니메이션
+    heroAnim() { return hero && hero.g.visible ? hero.cur : null; },
+    // 펫을 쓰다듬으면 주인공이 펫과 하이파이브한다 (주인공이 보일 때만). 하이파이브했으면 true
+    highFive() { if (!hero || !hero.g.visible) return false; heroAct = .9; return true; },   // 시험·진단: 마을에서 주인공이 하는 동작   // 시험·진단: 지금 재생 중인 곰 애니메이션
     quest: aqQuest,
     set onQuest(fn) { AQ.on = fn; },
     get st() { return st; }
@@ -3972,11 +3996,13 @@ function patPet() {
   sfx('tap');
   if (now - lastPat < 600) return;
   lastPat = now;
+  const five = World.highFive();   // 주인공이 있으면 펫이 폴짝 뛰어 주인공 손에 하이파이브
   mission('pat');
   change({ fun: 3 }); addXP(1);
   burst(['💗', '💕', '✨'], 3, -.15);
   setMood('love', 1100);
-  say(pick(['헤헤, 간지러워!', '더 쓰다듬어 줘~', '좋아좋아!', `${p.name} 행복해!`, '말랑말랑~']), 2500);
+  if (five) burst(['🙌'], 1, -.35);
+  say(five ? pick(['하이파이브! 짝!', '헤헤, 우리 최고!', '손바닥 짝~ 신난다!', `${p.name} 기분 최고!`]) : pick(['헤헤, 간지러워!', '더 쓰다듬어 줘~', '좋아좋아!', `${p.name} 행복해!`, '말랑말랑~']), 2500);
   render();
 }
 
@@ -4200,7 +4226,7 @@ function talkTo(id) {
   const back = document.activeElement instanceof HTMLElement && document.activeElement !== document.body ? document.activeElement : $('#world');
   World.walkToNpc(id, () => {
     if (talking) return;
-    talking = id; talkReturnFocus = back; World.setTalking(id, true);
+    talking = id; talkReturnFocus = back; World.setTalking(id, true); World.trick('wave');   // 펫도 친구에게 인사
     $('#talkFace').innerHTML = `<img src="${World.portrait(id)}" alt="${f.name}">`;
     $('#talkName').textContent = f.name; $('#talkJob').textContent = f.job;
     $('#talk').hidden = false; pushBack(); sfx('pop');
@@ -4823,16 +4849,20 @@ function waterBed(i) {
 }
 /* ---------- 마을 주인공(사람) 고르기 ---------- */
 const HEROES = { 'female-b': '하나', 'female-c': '소라', 'male-a': '준', 'male-e': '민' };
-function openHeroPick() {
+function openHeroPick(after) {
   const p = P();
   const cards = Object.entries(HEROES).map(([id, nm]) => `<button class="item${S.hero === id ? ' on' : ''}" data-hero="${id}"><span class="art"><img src="models/people/hero-${id}.png" alt="" width="96" height="96"></span><span class="nm">${nm}</span></button>`).join('')
     + `<button class="item${S.hero === 'none' ? ' on' : ''}" data-hero="none"><span class="art">${petSVG(p.sp, { mood: 'happy', stage: 'kid' })}</span><span class="nm">펫만</span></button>`;
-  openSheet('🧒 마을에서 함께 걸을 나', `<p class="msub">마을에서는 내가 걷고, ${escapeHTML(josa(p.name, '이', '가'))} 뒤를 따라와요. 설정에서 언제든 바꿀 수 있어요.</p><div class="grid">${cards}</div>`,
-    body => body.addEventListener('click', e => {
+  openSheet('🧒 나는 누구일까요?', `<p class="msub">집에서는 내가 ${escapeHTML(josa(p.name, '을', '를'))} 돌보고, 마을에서는 내가 걷고 ${escapeHTML(josa(p.name, '이', '가'))} 뒤를 따라와요. 설정에서 언제든 바꿀 수 있어요.</p><div class="grid">${cards}</div>`,
+    body => {
+      // 고르거나 닫으면(✕·뒤로 가기) 다음 순서(예: 첫 장 안내)를 이어 간다. 닫기만 하면 다음에 마을에 갈 때 다시 묻는다
+      if (after) { const sc = body.closest('.scrim'); let done = false; const mo = new MutationObserver(() => { if (!done && !sc.isConnected) { done = true; mo.disconnect(); after(); } }); mo.observe($('#app'), { childList: true }); }
+      body.addEventListener('click', e => {
       const b = e.target.closest('[data-hero]'); if (!b) return;
       S.hero = b.dataset.hero; persist(); World.setHero(S.hero); closeSheet();
-      toast(S.hero === 'none' ? '마을에서 펫이 혼자 걸어요' : `${josa(HEROES[S.hero], '과', '와')} 함께 마을을 걸어요`);
-    }));
+      toast(S.hero === 'none' ? '펫이 혼자 지내요' : `${josa(HEROES[S.hero], '과', '와')} ${josa(p.name, '이', '가')} 친구가 됐어요`);
+    });
+    });
 }
 function onEnterVillage() {
   mission('outside'); badge('village');
@@ -5137,7 +5167,7 @@ function openSettings() {
     <button class="set-row" id="setSoundTest"><span>🎵 소리 들어 보기</span><b>열기 ›</b></button>
     <button class="set-row" id="setHaptic"><span>📳 진동</span><b>${S.haptic !== false ? '켜짐' : '꺼짐'}</b></button>
     <button class="set-row" id="setGfx"><span>✨ 새 그래픽 (말랑 베어·광장)</span><b>${S.gfxOld ? '꺼짐' : '켜짐'}</b></button>
-    <button class="set-row" id="setHero"><span>🧒 마을 주인공</span><b>${S.hero && S.hero !== 'none' ? HEROES[S.hero] : '펫만'}</b></button>
+    <button class="set-row" id="setHero"><span>🧒 주인공(나)</span><b>${S.hero && S.hero !== 'none' ? HEROES[S.hero] : '펫만'}</b></button>
     <button class="set-row" id="setAlbum"><span>📷 사진 앨범</span><b>${loadPhotos().length} / ${PHOTO_MAX}장 ›</b></button>
     <div class="set-row"><span>⏱️ 오늘 논 시간</span><b>${Math.floor(playSec() / 60)}분</b></div>
     <button class="set-row" id="setParent"><span>🔒 보호자 메뉴</span><b>열기 ›</b></button>
@@ -9107,7 +9137,9 @@ $('#startBtn').addEventListener('click', () => {
   S.pets.push(newPet(chosen, name)); S.active = 0; S.lastTick = Date.now();
   S.tut = { step: 'egg', t0: Date.now() };
   persist(); sfx('hatch'); showHome();
-  setTimeout(() => chapterBanner(CHAPTERS[1], CH_SUB[1]), 700);
+  const firstChapter = () => setTimeout(() => chapterBanner(CHAPTERS[1], CH_SUB[1]), 400);
+  if (World.canHero()) setTimeout(() => openHeroPick(firstChapter), 500);   // 처음 시작: 펫 → 이름 → 나(주인공) 고르기
+  else setTimeout(() => chapterBanner(CHAPTERS[1], CH_SUB[1]), 700);
   say(idleLine(), 9000);
 });
 
