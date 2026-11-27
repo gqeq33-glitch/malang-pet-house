@@ -339,3 +339,10 @@ test('캐릭터 다듬기: 얼굴을 가리는 장식이 없고, 말풍선·주�
   assert.ok(html.includes('.item.hero-card .art{width:96px;height:96px}'));
   assert.equal((html.match(/class="item hero-card\$\{/g) || []).length, 2);
 });
+
+test('게임 스크립트 전체에 문법 오류가 없다 (따옴표 하나만 틀려도 첫 화면이 뜨지 않음)', () => {
+  const vm = require('node:vm');
+  const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
+  assert.ok(scripts.length >= 1);
+  for (const [i, code] of scripts.entries()) assert.doesNotThrow(() => new vm.Script(code, { filename: `index.html 스크립트 ${i + 1}` }));
+});

@@ -218,6 +218,11 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
 .talk-skip{flex:none;min-height:36px;padding:4px 10px;border-radius:999px;border:2px solid var(--line, #D9E2EC);background:#fff;color:var(--ink);font:inherit;font-size:13px;cursor:pointer}
 .talk-text{font-size:17px;line-height:1.6;margin:10px 0 12px;min-height:3.3em;cursor:pointer;text-wrap:pretty}
 .talk-choices{display:grid;gap:8px}
+.talk-choices.two{grid-template-columns:1fr 1fr}
+.talk-choices.two .talk-build,.talk-choices.two .talk-chips{grid-column:1/-1}
+.talk-build{font-family:var(--display);font-size:20px;line-height:1.3;padding:8px 12px;border-radius:14px;background:var(--soft);box-shadow:0 0 0 2px var(--ink) inset;min-height:44px}
+.talk-chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip-word{min-height:40px;padding:6px 12px;border:0;border-radius:999px;background:var(--butter);box-shadow:0 3px 0 #D9C9D1,0 0 0 2px var(--ink) inset;font-family:var(--display);font-size:17px;color:var(--ink);cursor:pointer}
 .talk-choices .candy{text-align:left;font-size:16px;padding:10px 14px}
 .form-chip{display:inline-block;margin-left:4px;font-size:13px;padding:1px 7px;border-radius:99px;background:var(--butter);box-shadow:0 0 0 1.5px var(--ink) inset;white-space:nowrap}
 .eyes{animation:blink 4.6s infinite;transform-box:fill-box;transform-origin:center}
@@ -4242,6 +4247,8 @@ let watered = [false, false, false], starsStarted = false;
 function friendAlert(id) {
   const f = fs(id);
   if (!f.met) return true;
+  if (id === 'tosil' && (bunQ() === 'none' || bunQ() === 'order')) return true;
+  if (id === 'somsom' && bunQ() === 'carry') return true;
   if (id === 'porong' && f.q === 'active' && watered.every(Boolean)) return true;
   if (id === 'banjjak' && f.q === 'active' && starsStarted && World.starsLeft() === 0) return true;
   if (id === 'neurit' && f.q === 'active' && shellsStarted && World.shellsLeft() === 0) return true;
@@ -4258,8 +4265,14 @@ $('#talkText').addEventListener('click', () => { clearInterval(typeTimer); $('#t
 $('#talkSkip').addEventListener('click', () => { sfx('tap'); closeTalk(); });   // 아이·보호자가 원하면 언제든 대화를 끝낸다 (하트·보상은 이미 받은 것 그대로)
 function showNode(node) {
   if (!node || !talking) return closeTalk();
-  typeText(node.text);
-  const box = $('#talkChoices'); box.innerHTML = '';
+  if (node.text !== fullText || !$('#talkText').textContent) typeText(node.text);   // 낱말을 누를 때마다 같은 글을 다시 치지 않는다
+  const box = $('#talkChoices'); box.innerHTML = ''; box.classList.toggle('two', !!node.two);
+  if (node.build !== undefined) { const d = document.createElement('div'); d.className = 'talk-build'; d.setAttribute('aria-live', 'polite'); d.textContent = node.build || '＿ ＿ ＿'; box.appendChild(d); }
+  if (node.chips) {
+    const w = document.createElement('div'); w.className = 'talk-chips'; w.setAttribute('role', 'group'); w.setAttribute('aria-label', '낱말 고르기');
+    for (const c of node.chips) { const b = document.createElement('button'); b.className = 'chip-word'; b.textContent = c.label; b.addEventListener('click', () => { sfx('tap'); showNode(c.fn()); }); w.appendChild(b); }
+    box.appendChild(w);
+  }
   for (const c of node.choices || [{ label: '👋 안녕!', fn: () => null }]) {
     const b = document.createElement('button'); b.className = 'candy'; b.textContent = c.label;
     b.addEventListener('click', () => { sfx('tap'); showNode(c.fn()); });
@@ -4353,6 +4366,67 @@ function bread() {
   World.eat(1.2); setMood('eat', 1200); sfx('eat'); render();
   return { text: `자, 갓 구운 꿀빵! ${josa(p.name, '아', '야')}, 따끈할 때 먹으렴~`, choices: [{ label: '냠냠! 고마워요 💛', fn: () => menu('tosil', false) }] };
 }
+/* BAKERY-START: 빵집 영어 주문 퀘스트 (토실에게 주문 → 솜솜에게 배달). 진행은 fs('tosil').q 하나에 저장한다:
+   'none' → 'order'(영어 주문 연습) → 'carry'(꿀빵 배달 중) → 'done'(선물 받음, 한 번만). 제한 시간·실패 벌칙·연속 기록 없음 */
+const BUN_MODEL = "I'd like a bun, please.";
+const BUN_TARGET = ["I'd", 'like', 'a', 'bun', 'please'];
+const BUN_WORDS = ["I'd", 'like', 'Can', 'I', 'have', 'a', 'bun', 'please'];
+const BUN_KO = { "I'd": '나는 ~할래요', like: '~하고 싶어요', Can: '~해도 돼요?', I: '나', have: '받다', a: '하나', bun: '동글빵', please: '주세요' };
+// 자연스러운 다른 주문도 정답. 대소문자·끝 문장부호·축약형(I'd = I would) 차이는 normEn이 맞춘다
+const BUN_OK = ["I'd like a bun, please.", "I'd like a bun.", 'I would like a bun, please.', 'Can I have a bun?', 'Can I have a bun, please?', 'Could I have a bun, please?', 'May I have a bun, please?', 'A bun, please.'];
+const normEn = t => String(t).toLowerCase().replace(/[’‘`´]/g, "'").replace(/\bi'd\b/g, 'i would').replace(/\bi'm\b/g, 'i am').replace(/\bid\b/g, 'i would')
+  .replace(/[^a-z' ]+/g, ' ').replace(/'/g, '').replace(/\s+/g, ' ').trim();
+const BUN_SET = new Set(BUN_OK.map(normEn));
+const bunOK = t => BUN_SET.has(normEn(t));
+const bunQ = () => { const q = fs('tosil').q; return q === 'order' || q === 'carry' || q === 'done' ? q : 'none'; };
+let bunBuild = [], bunHint = 0;
+function bakeryQuest() {
+  const s = fs('tosil'), q = bunQ();
+  if (q === 'none') return { text: '마침 잘 왔어! 광장의 솜솜이 꿀빵을 기다리는데, 나는 오븐 앞을 떠날 수가 없단다. 오늘은 영어 주문 놀이 날! 영어로 주문하면 꿀빵을 줄게. 솜솜에게 가져다줄래?', choices: [
+    { label: '좋아요! 🍯', fn: () => { s.q = 'order'; persist(); bunBuild = []; bunHint = 0; return bunOrder(); } },
+    { label: '다음에 할게요', fn: () => menu('tosil', false) }] };
+  if (q === 'order') { bunBuild = []; return bunOrder(); }
+  if (q === 'carry') return { text: '꿀빵은 아직 따끈해! 광장에 있는 솜솜에게 가져다주렴.', choices: [{ label: '다녀올게요!', fn: () => null }] };
+  return { text: `솜솜이 꿀빵 정말 맛있었대! 영어 주문도 척척, 최고야! "${BUN_MODEL}" = 꿀빵 하나 주세요.`, choices: [{ label: '🔊 다시 듣기', fn: () => { engSay(BUN_MODEL); return bakeryQuest(); } }, back('tosil')] };
+}
+function bunOrder(msg) {
+  const left = BUN_WORDS.filter(w => !bunBuild.includes(w));
+  const onTrack = bunBuild.every((w, i) => BUN_TARGET[i] === w), next = onTrack ? BUN_TARGET[bunBuild.length] : null;
+  const tip = bunHint >= 2 ? (next ? ` 💡 다음 낱말은 "${next}"!` : onTrack ? ' 💡 다 만들었어요! 주문해 봐요.' : ' 💡 "지우기"를 누르고 처음부터 해 봐요.') : bunHint === 1 ? ' 💡 낱말 옆에 뜻을 적었어요.' : '';
+  return {
+    text: (msg || '영어로 주문해 볼까? "꿀빵 하나 주세요"를 영어로! 낱말을 차례로 눌러 문장을 만들어요. 🔊 듣기를 누르면 들려줘요.') + tip,
+    build: bunBuild.join(' '),
+    chips: left.map(w => ({ label: bunHint >= 1 ? `${w} · ${BUN_KO[w]}` : w, fn: () => { bunBuild.push(w); return bunOrder(msg); } })),
+    two: true,
+    choices: [
+      { label: '🔊 듣기', fn: () => { engSay(BUN_MODEL); return bunOrder(msg); } },
+      { label: '↩ 지우기', fn: () => { bunBuild = []; return bunOrder(msg); } },
+      bunHint < 3 ? { label: `💡 힌트 ${bunHint + 1}/3`, fn: () => { bunHint++; return bunOrder(msg); } } : { label: '✨ 정답 넣기', fn: () => { bunBuild = BUN_TARGET.slice(); return bunOrder(msg); } },
+      { label: '✅ 주문하기', fn: bunCheck }
+    ]
+  };
+}
+function bunCheck() {
+  if (!bunBuild.length) return bunOrder('먼저 낱말을 눌러 문장을 만들어요!');
+  const said = bunBuild.join(' ');
+  // 틀리면 정답을 보여 주고 다시 (벌칙 없음)
+  if (!bunOK(said)) { sfx('bad'); bunBuild = []; return bunOrder(`아쉬워! 이렇게 말하면 돼요: "${BUN_MODEL}" (꿀빵 하나 주세요) 다시 해 볼까?`); }
+  fs('tosil').q = 'carry'; bunHint = 0; persist(); sfx('up'); engSay('Here you are!');
+  return { text: `"${said}" 완벽해! 토실: "Here you are!" (여기 있어요) 따끈한 꿀빵이야. 광장의 솜솜에게 가져다주렴!`, choices: [
+    { label: '🔊 Here you are! 듣기', fn: () => { engSay('Here you are!'); return { text: '"Here you are!"는 물건을 건네줄 때 쓰는 말이에요. (여기 있어요)', choices: [{ label: '다녀올게요! 🍯', fn: () => null }] }; } },
+    { label: '다녀올게요! 🍯', fn: () => null }] };
+}
+function bunDeliver() {
+  if (bunQ() !== 'carry') return menu('somsom', false);
+  const s = fs('tosil');
+  s.q = 'done'; s.qday = today(); S.coins += 25; addXP(10); mission('quest');   // 선물은 'done'이 된 이 한 번만
+  addFriend('tosil', 30); addFriend('somsom', 20); confetti(60); sfx('up'); render(); persist();
+  engSay('Thank you!');
+  return { text: '우와, 토실 아저씨 꿀빵이다! 영어로 주문해서 받아 왔다고? 대단해! "Thank you!" (고마워!) 선물로 25코인을 줄게!', choices: [
+    { label: "🔊 You're welcome! 배우기", fn: () => { engSay("You're welcome!"); return { text: '"You\'re welcome!" (천만에!) 고맙다는 말에 이렇게 대답해요.', choices: [back('somsom')] }; } },
+    back('somsom')] };
+}
+/* BAKERY-END */
 function porongQuest() {
   const s = fs('porong');
   if (s.q === 'none') return { text: '꽃밭 세 곳에 물을 줘야 하는데, 오늘은 손님이 많아서 바빠... 도와줄래?', choices: [
@@ -4408,8 +4482,8 @@ function careTip() {
   return { text: p[low] > 70 ? '지금처럼만 하면 최고야! 친구들과 이야기하고 싶을 때 들러 줘~' : tips[low], choices: [{ label: '알려 줘서 고마워!', fn: () => menu('somsom', false) }] };
 }
 const SPECIAL = {
-  somsom: () => [{ label: '💖 나 어때?', fn: compliment }, { label: '🫧 돌보기 꿀팁', fn: careTip }],
-  tosil: () => [{ label: '🍯 꿀빵 주세요', fn: bread }],
+  somsom: () => [...(bunQ() === 'carry' ? [{ label: '🍯 꿀빵 배달 왔어요!', fn: bunDeliver }] : []), { label: '💖 나 어때?', fn: compliment }, { label: '🫧 돌보기 꿀팁', fn: careTip }],
+  tosil: () => [{ label: { none: '📦 도와줄 일 있어요?', order: '🗣️ 영어로 주문할래요', carry: '🍯 꿀빵 배달 중이에요', done: '🍯 영어 주문 다시 듣기' }[bunQ()], fn: bakeryQuest }, { label: '🍯 꿀빵 주세요', fn: bread }],
   kokkal: () => [{ label: '🤔 수수께끼 내 주세요', fn: riddle }],
   porong: () => [{ label: fs('porong').q === 'active' ? '💧 꽃밭에 물 다 줬어요' : '🌸 도와줄 일 있어요?', fn: porongQuest }],
   banjjak: () => [{ label: fs('banjjak').q === 'active' ? '⭐ 별 조각 가져왔어!' : '🌠 같이 모험하자!', fn: starQuest }]
@@ -6153,7 +6227,7 @@ const STORY_DONE = {
   outside: () => World.area() === 'village' || !!(S.badges && S.badges.village),
   meet: () => metCount() >= 3,
   bread: () => !!fs('tosil').gday,
-  quest: () => ['porong', 'banjjak', 'neurit'].some(k => fs(k).q === 'done'),
+  quest: () => ['porong', 'banjjak', 'neurit', 'tosil'].some(k => fs(k).q === 'done'),
   decor: () => Object.keys(decorState().placed).length > 0,
   plant: () => !!S.farm && (S.farm.plots.some(pl => pl && pl.wet) || S.farm.harvested > 0),
   harvest: () => !!(S.farm && S.farm.harvested),
@@ -6511,6 +6585,7 @@ function openStand() {
 function goStand() { World.area() === 'village' ? World.goVillage('garden', true, openStand) : openStand(); }
 
 const NEWS = [
+  { v: '4.7', date: '11월 27일', items: ['🍯 빵집 영어 주문! 토실 아저씨에게 "I’d like a bun, please."로 꿀빵을 주문해서 광장의 솜솜에게 배달해요 (힌트·듣기 있음)', '💞 마을 친구와 친해지면 새 친구 → 친구 → 단짝! 단계마다 스티커와 가구 선물, 새 인사말', '⏭️ 친구와 이야기할 때 "건너뛰기"로 바로 끝낼 수 있어요', '🐲 꼬미의 가방끈이 얼굴을 가리지 않게, 말풍선은 머리 위로'] },
   { v: '4.6', date: '11월 27일', items: ['🧒 사람 주인공이 생겼어요! 처음 시작할 때 하나·소라·준·민 중에서 "나"를 골라요 (설정 › 주인공에서 언제든 바꿔요)', '🏡 집에서는 주인공이 펫 곁을 따라다니고, 쓰다듬으면 펫과 하이파이브! 마을에서는 내가 걷고 펫이 뒤를 따라와요', '👋 마을 친구와 이야기하면 펫도 손을 흔들어 인사해요', '💾 기록이 저장되지 않으면 바로 알려 드려요'] },
   { v: '4.5', date: '11월 11일', items: ['⭐ 첫 모험 「첫 번째 별빛 조각」! 마을 광장에서 솜솜의 빨간 열쇠를 찾아 주세요', '🔑 가까이 가면 큰 노란 버튼이 나와요. 어려우면 힌트 3단계', '🌟 별빛 상자를 열면 하늘의 말랑별이 밝아지고 광장에 빛이 돌아와요', '📚 모험에서 만난 단어 red·key가 복습에 들어가요'] },
   { v: '4.4', date: '11월 10일', items: ['🔑 보호자 PIN을 만들면 복구 코드를 드려요. PIN을 잊으면 복구 코드로만 지울 수 있어요', '📄 보호자 메뉴에서 개인정보처리방침을 볼 수 있어요', '🛡️ 이름 칸에는 전화번호·이메일을 쓸 수 없어요'] },

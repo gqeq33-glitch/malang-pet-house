@@ -378,3 +378,60 @@ test('대화 건너뛰기 버튼이 있고 대화창을 닫는다', () => {
   assert.ok(html.includes('id="talkSkip" type="button" aria-label="대화 건너뛰기"'));
   assert.match(html, /\$\('#talkSkip'\)\.addEventListener\('click', \(\) => \{ sfx\('tap'\); closeTalk\(\); \}\);/);
 });
+
+// ---------- 빵집 영어 주문 퀘스트 (fs('tosil').q: none → order → carry → done) ----------
+function bakeryBox() {
+  const box = { S: { coins: 0, friends: {} }, said: [], log: [] };
+  vm.createContext(box);
+  vm.runInContext(`const persist = () => log.push('save'), sfx = () => {}, engSay = t => said.push(t), confetti = () => {}, render = () => {}, addXP = () => {}, mission = () => {};
+    const today = () => 'Fri Nov 27 2026', menu = id => ({ text: 'menu:' + id }), back = id => ({ label: 'back', fn: () => menu(id) });
+    const addFriend = (id, n) => { fs(id).pts += n; };
+    ${html.slice(html.indexOf('function fs(id) {'), html.indexOf('const heartsOf = '))}
+    ${html.slice(html.indexOf('/* BAKERY-START'), html.indexOf('/* BAKERY-END */'))}
+    this.bakeryQuest = bakeryQuest; this.bunCheck = bunCheck; this.bunDeliver = bunDeliver; this.bunOK = bunOK; this.normEn = normEn; this.bunQ = bunQ; this.fs = fs;`, box);
+  return box;
+}
+const tap = (node, label) => { const all = [...(node.chips || []), ...(node.choices || [])]; const c = all.find(x => x.label === label) || all.find(x => x.label.startsWith(label + ' ·')) || all.find(x => x.label.startsWith(label)); assert.ok(c, '버튼 없음: ' + label); return c.fn(); };
+test('빵집: 허용 답 목록과 정규화(대소문자·문장부호·축약형)', () => {
+  const b = bakeryBox();
+  for (const t of ["I'd like a bun, please.", "i'd like a bun please", 'I would like a bun, please!', 'Can I have a bun?', 'can i have a bun please', 'CAN I HAVE A BUN, PLEASE', 'A bun, please.', "I’d like a bun.", 'Id like a bun please', 'May I have a bun, please?'])
+    assert.ok(b.bunOK(t), t);
+  for (const t of ['I like a bun', 'bun', 'Can I have a cat?', "I'd like two buns, please.", 'please bun a like', '']) assert.ok(!b.bunOK(t), t);
+});
+const strictT = d => saveGuard(d, Object.assign({}, cat, { FRIENDS: table('somsom', 'tosil') }), { now: 5000 });
+test('빵집: 부탁 → 주문(틀리면 정답 보여 주고 다시) → 배달 → 선물 한 번만, 다시 불러와도 진행이 맞다', () => {
+  const b = bakeryBox();
+  assert.equal(b.bunQ(), 'none');
+  let n = b.bakeryQuest(); assert.match(n.text, /솜솜/);
+  n = tap(n, '좋아요!'); assert.equal(b.fs('tosil').q, 'order'); assert.ok(n.chips.length >= 5);
+  assert.ok(n.choices.some(c => c.label === '🔊 듣기'));
+  tap(n, '🔊 듣기'); assert.equal(b.said.at(-1), "I'd like a bun, please.");
+  // 틀린 순서 → 정답을 보여 주고 다시, 진행은 그대로
+  n = tap(n, 'bun'); n = tap(n, "I'd"); assert.equal(n.build, "bun I'd");
+  n = tap(n, '✅ 주문하기'); assert.match(n.text, /I'd like a bun, please\./); assert.equal(n.build, ''); assert.equal(b.fs('tosil').q, 'order');
+  // 다른 자연스러운 표현으로 정답
+  for (const w of ['Can', 'I', 'have', 'a', 'bun']) n = tap(n, w);
+  n = tap(n, '✅ 주문하기'); assert.equal(b.fs('tosil').q, 'carry'); assert.match(n.text, /Here you are!/);
+  // 저장 → 검사 → 다시 불러오기
+  const saved = strictT(JSON.parse(JSON.stringify(save({ friends: b.S.friends }))));
+  assert.equal(saved.err, undefined); assert.equal(saved.data.friends.tosil.q, 'carry');
+  const b2 = bakeryBox(); b2.S.friends = JSON.parse(JSON.stringify(saved.data.friends));
+  assert.equal(b2.bunQ(), 'carry'); assert.match(b2.bakeryQuest().text, /솜솜에게 가져다주렴/);
+  const c0 = b2.S.coins; n = b2.bunDeliver(); assert.equal(b2.S.coins, c0 + 25); assert.equal(b2.fs('tosil').q, 'done');
+  b2.bunDeliver(); b2.bunDeliver(); assert.equal(b2.S.coins, c0 + 25, '선물은 한 번만');
+  const again = strictT(JSON.parse(JSON.stringify(save({ friends: b2.S.friends }))));
+  const b3 = bakeryBox(); b3.S.friends = JSON.parse(JSON.stringify(again.data.friends)); assert.equal(b3.bunQ(), 'done');
+  assert.equal(b3.bunDeliver().text, 'menu:somsom');
+});
+test('빵집: 영어를 몰라도 힌트 3단계로 끝까지, 이상한 저장값은 처음 상태로 본다', () => {
+  const b = bakeryBox();
+  let n = tap(b.bakeryQuest(), '좋아요!');
+  n = tap(n, '💡 힌트 1/3'); assert.ok(n.chips.every(c => c.label.includes(' · ')), '낱말 뜻');
+  n = tap(n, '💡 힌트 2/3'); assert.match(n.text, /다음 낱말은 "I'd"/);
+  n = tap(n, '💡 힌트 3/3'); n = tap(n, '✨ 정답 넣기'); assert.equal(n.build, "I'd like a bun please");
+  n = tap(n, '✅ 주문하기'); assert.equal(b.fs('tosil').q, 'carry');
+  const c = bakeryBox(); c.S.friends.tosil = { pts: 0, met: true, q: 'evil' }; assert.equal(c.bunQ(), 'none');
+  // 제한 시간·실패 벌칙·연속 기록 코드가 없다
+  const code = html.slice(html.indexOf('/* BAKERY-START'), html.indexOf('/* BAKERY-END */'));
+  assert.ok(!/setTimeout|setInterval|coins\s*-=|streak|연속/.test(code.replace(/연속 기록 없음/, '')));
+});
