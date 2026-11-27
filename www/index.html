@@ -255,6 +255,7 @@ button:focus-visible,input:focus-visible{outline:3px solid #4BB8A0;outline-offse
 .item .art{width:72px;height:60px}
 .item .art svg{width:100%;height:100%}
 .item .art img{width:100%;height:100%;object-fit:contain}
+.item.hero-card .art{width:96px;height:96px}
 .item .nm{font-family:var(--display);font-size:15px}
 .item .pr{font-size:13px;display:flex;align-items:center;gap:4px;color:var(--muted)}
 .item .eff{font-size:13px;color:var(--muted)}
@@ -737,7 +738,7 @@ const SPECIES = {
           + ol('<path d="M146 164 Q176 170 178 146 Q186 154 184 164 Q178 186 144 178Z"/>', '#80DDBB')
           + ol(star(180, 140, 10, 4.5), '#FFD95A', 5),
         body: ol('<ellipse cx="100" cy="128" rx="62" ry="55"/>', '#80DDBB') + '<ellipse cx="100" cy="158" rx="36" ry="22" fill="#F2FFF9"/><g fill="#5FC7A2"><circle cx="66" cy="94" r="5"/><circle cx="134" cy="94" r="5"/><circle cx="76" cy="84" r="3"/><circle cx="124" cy="84" r="3"/></g>',
-        front: ol(star(100, 72, 15, 6.5), '#FFD95A', 5) + '<path d="M70 106 L146 160" stroke="#8A5530" stroke-width="5" stroke-linecap="round"/>' + ol('<rect x="134" y="150" width="28" height="24" rx="6"/>', '#C98F5A', 4) + ol('<ellipse cx="80" cy="181" rx="12" ry="7"/><ellipse cx="120" cy="181" rx="12" ry="7"/>', '#80DDBB', 6)
+        front: ol(star(100, 72, 15, 6.5), '#FFD95A', 5) + '<path d="M42 148 Q92 178 140 160" fill="none" stroke="#8A5530" stroke-width="5" stroke-linecap="round"/>' + ol('<rect x="134" y="150" width="28" height="24" rx="6"/>', '#C98F5A', 4) + ol('<ellipse cx="80" cy="181" rx="12" ry="7"/><ellipse cx="120" cy="181" rx="12" ry="7"/>', '#80DDBB', 6)
       };
     }
   },
@@ -762,7 +763,7 @@ const SPECIES = {
 Object.assign(SPECIES, {
   fox: {
     name: '노을이', kind: '노을 여우', color: '#FF9E5E', bg: '#FFF0E2', fav: 'cake',
-    hatTop: 66, eye: 124, mouth: 141,
+    hatTop: 66, eye: 124, mouth: 141, shine: [6, 18],
     desc: '활발하고 장난기 많은 주황 여우예요. 헤드폰으로 영어를 듣고 따라 말하는 걸 좋아해요.',
     draw() {
       const f = '#FF9E5E';
@@ -776,7 +777,7 @@ Object.assign(SPECIES, {
   },
   turtle: {
     name: '느긋이', kind: '풀잎 거북', color: '#9BD77E', bg: '#EEF9E6', fav: 'carrot',
-    hatTop: 70, eye: 126, mouth: 143,
+    hatTop: 70, eye: 126, mouth: 143, shine: [12, 26],
     desc: '등에 풀잎 무늬를 지고 다니는 거북이에요. 느려 보여도 끝까지 해내요.',
     draw() {
       return {
@@ -925,11 +926,13 @@ function petSVG(spId, o = {}) {
   const face = eyesSVG(mood, ey, stage === 'baby')
     + `<g fill="#FF9DB5" opacity=".75"><ellipse cx="60" cy="${ey + 15}" rx="10" ry="6"/><ellipse cx="140" cy="${ey + 15}" rx="10" ry="6"/></g>`
     + mouthSVG(mood, sp.mouth);
+  // 12종의 2D 초상에 같은 부드러운 봉제 인형 광택을 더한다.
+  const plushShine = (sp.shine ? `<g transform="translate(${sp.shine[0]} ${sp.shine[1]})">` : '<g>') + '<path d="M59 112 Q64 94 82 87" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".68"/><circle cx="145" cy="91" r="2.5" fill="#fff" opacity=".78"/></g>';   // 헤드폰·등껍질 같은 장식과 겹치는 종은 shine 값만큼 옮긴다
   const dirt = o.dirt ? `<g fill="#B08968" opacity="${o.dirt}"><ellipse cx="68" cy="162" rx="8" ry="5.5"/><ellipse cx="136" cy="150" rx="6" ry="4.5"/><ellipse cx="112" cy="174" rx="5" ry="3.5"/><ellipse cx="82" cy="102" rx="5" ry="3.5"/><circle cx="128" cy="106" r="3"/></g>` : '';
   let hat = '';
   if (o.hat && HATS[o.hat]) hat = HATS[o.hat].eyes ? HATS[o.hat].svg(ey) : `<g transform="translate(100 ${sp.hatTop})">${HATS[o.hat].svg()}</g>`;
   const spark = stage === 'adult' ? `<g class="spark" fill="#FFD95A" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round">${star(166, 64, 9, 3.6)}${star(34, 92, 7, 2.8)}</g>` : '';
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"${o.sil ? ' class="sil"' : ''}><ellipse cx="100" cy="189" rx="56" ry="8" fill="#000" opacity=".08"/>${parts.back}${parts.body}${dirt}${face}${parts.front}${hat}${spark}</svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"${o.sil ? ' class="sil"' : ''}><ellipse cx="100" cy="189" rx="56" ry="8" fill="#000" opacity=".08"/>${parts.back}${parts.body}${plushShine}${dirt}${face}${parts.front}${hat}${spark}</svg>`;
 }
 
 function eggSVG(spId, taps) {
@@ -1993,6 +1996,8 @@ const World = (() => {
     const c = nb ? Object.assign({}, PET3.bear, { cy: 1.0, R: .55, hat: 1.6, twoBody: false }) : PET3[spId], R = c.R, cy = c.cy;
     const root = new T.Group(), body = new T.Group(); root.add(body);
     const pt = { root, body, isEgg: false };
+    // 말풍선 높이: 머리 꼭대기(모자 자리) + 귀·왕관 여유 (토끼 귀는 더 길고, 모자를 쓰면 조금 더 위)
+    pt.top = c.hat + .15 + .38 + (spId === 'bunny' && !nb ? .22 : 0) + (hatId ? .2 : 0);
     body.position.y = .15;      // 다리가 보이도록 몸을 올린다
     const cloth = TOP3[top];
     const add = (color, x, y, z, sx, sy, sz, parent = body, ol = 1.07, geo = SPH) => mesh(geo, color, x, y, z, sx, sy, sz, parent, { outline: ol ? 1 + (ol - 1) * .6 : 0, ink: petInk, mat: toonSoft(color) });
@@ -2002,6 +2007,10 @@ const World = (() => {
 
     // 몸 (머리와 몸이 하나인 동글동글 2등신)
     add(bc, 0, cy, 0, R * (c.headW || (c.twoBody ? 1.1 : 1)), c.headH ? R * c.headH : R * (spId === 'penguin' ? 1.1 : .93), R * .96);
+    // 2D 초상과 같은 하이라이트를 넣어 3D 펫도 말랑한 인형 재질로 보이게 한다.
+    // 다람쥐는 도토리 모자가 이마를 덮으므로 모자 아래 볼 위쪽에 둔다
+    const [hlx, hly] = spId === 'squirrel' ? [-.32, .06] : [-.22, .29];
+    mesh(SPH, '', hlx, cy + hly, zAt(hlx, cy + hly) + .006, .055, .105, .014, body, { mat: new T.MeshBasicMaterial({ color: '#FFFFFF', transparent: true, opacity: .48, depthWrite: false }), cast: false });
     if (c.twoBody && spId !== 'turtle') add(bc, 0, c.longBody ? .46 : .42, -.02, c.longBody ? .33 : .35, c.longBody ? .44 : .41, .32);      // 2등신: 머리 아래 작은 몸
     const feet = (color = bc) => {
       const fx = .19, hip = .3, legCol = cloth && cloth.pants ? cloth.c : bc;
@@ -3354,7 +3363,9 @@ const World = (() => {
     } else if (hHome) {
       if (!hf.on) { [hf.x, hf.z] = houseMove(st.x, st.z, st.x - 1.5, st.z - .8); hf.face = 0; hf.on = true; hf.walk = false; }
       // 펫이 걸으면 지나간 길을 따라오고, 멈추면 펫의 왼쪽 뒤(카메라 반대쪽)에 서서 화면을 가리지 않는다
-      const back = heroWalk ? trail[trail.length - 6] : houseMove(st.x, st.z, st.x - 1.5, st.z - .8);
+      let back = heroWalk ? trail[trail.length - 6] : houseMove(st.x, st.z, st.x - 1.5, st.z - .8);
+      // 펫이 안쪽(카메라 반대쪽)으로 걸어가면 지나간 길이 카메라와 펫 사이가 되므로, 펫 바로 앞을 막지 않게 옆으로 비켜 따라온다
+      if (heroWalk && back && back[1] > st.z - .2 && Math.abs(back[0] - st.x) < 1.3) back = houseMove(st.x, st.z, st.x + (hf.x < st.x ? -1.4 : 1.4), Math.min(back[1], st.z + .3));
       let hd = 0;
       if (back) {
         const ex = back[0] - hf.x, ez = back[1] - hf.z; hd = Math.hypot(ex, ez);
@@ -3456,7 +3467,7 @@ const World = (() => {
 
   function placeBubble() {
     if (!pet) return;
-    const s = screen(pet.isEgg ? 1.5 : 1.75 + (pet.rainbow ? .3 : 0)), w = room.clientWidth, bw = bubble.offsetWidth;
+    const s = screen(pet.isEgg ? 1.5 : (pet.top || 1.75) + (pet.rainbow ? .3 : 0)), w = room.clientWidth, bw = bubble.offsetWidth;
     bubble.style.left = clamp(s.x, bw / 2 + 6, w - bw / 2 - 6) + 'px';
     bubble.style.top = clamp(s.y - bubble.offsetHeight - 14, 44, room.clientHeight - bubble.offsetHeight - 10) + 'px';
   }
@@ -4851,8 +4862,8 @@ function waterBed(i) {
 const HEROES = { 'female-b': '하나', 'female-c': '소라', 'male-a': '준', 'male-e': '민' };
 function openHeroPick(after) {
   const p = P();
-  const cards = Object.entries(HEROES).map(([id, nm]) => `<button class="item${S.hero === id ? ' on' : ''}" data-hero="${id}"><span class="art"><img src="models/people/hero-${id}.png" alt="" width="96" height="96"></span><span class="nm">${nm}</span></button>`).join('')
-    + `<button class="item${S.hero === 'none' ? ' on' : ''}" data-hero="none"><span class="art">${petSVG(p.sp, { mood: 'happy', stage: 'kid' })}</span><span class="nm">펫만</span></button>`;
+  const cards = Object.entries(HEROES).map(([id, nm]) => `<button class="item hero-card${S.hero === id ? ' on' : ''}" data-hero="${id}"><span class="art"><img src="models/people/hero-${id}.png" alt="" width="96" height="96"></span><span class="nm">${nm}</span></button>`).join('')
+    + `<button class="item hero-card${S.hero === 'none' ? ' on' : ''}" data-hero="none"><span class="art">${petSVG(p.sp, { mood: 'happy', stage: 'kid' })}</span><span class="nm">펫만</span></button>`;
   openSheet('🧒 나는 누구일까요?', `<p class="msub">집에서는 내가 ${escapeHTML(josa(p.name, '을', '를'))} 돌보고, 마을에서는 내가 걷고 ${escapeHTML(josa(p.name, '이', '가'))} 뒤를 따라와요. 설정에서 언제든 바꿀 수 있어요.</p><div class="grid">${cards}</div>`,
     body => {
       // 고르거나 닫으면(✕·뒤로 가기) 다음 순서(예: 첫 장 안내)를 이어 간다. 닫기만 하면 다음에 마을에 갈 때 다시 묻는다

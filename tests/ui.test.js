@@ -319,3 +319,23 @@ test('주인공: 모델·라이선스·캐시 목록이 있고, 쓰는 동작이
   // 처음 시작 순서: 펫·이름 → 주인공 → 첫 장 안내 (주인공을 못 쓰는 기기는 예전 순서)
   assert.match(h, /if \(World\.canHero\(\)\) setTimeout\(\(\) => openHeroPick\(firstChapter\), 500\);/);
 });
+
+test('캐릭터 다듬기: 얼굴을 가리는 장식이 없고, 말풍선·주인공이 펫을 덮지 않는다', () => {
+  // 용 가방끈은 눈(124) 위를 지나지 않고 볼 아래 배로 둘러 맨다
+  assert.ok(!html.includes('M70 106 L146 160'), '옛 가방끈(눈을 가로지름)이 남아 있다');
+  assert.ok(html.includes('<path d="M42 148 Q92 178 140 160" fill="none" stroke="#8A5530"'));
+  // 2D 광택은 12종 공통, 장식과 겹치는 종만 shine 값으로 옮긴다
+  assert.match(html, /const plushShine = \(sp\.shine \?/);
+  assert.match(html, /\$\{parts\.body\}\$\{plushShine\}\$\{dirt\}\$\{face\}/);
+  for (const m of html.matchAll(/shine: \[(-?\d+), (-?\d+)\]/g)) assert.ok(Math.abs(+m[1]) <= 20 && Math.abs(+m[2]) <= 30, 'shine 이동이 너무 크다');
+  // 3D 하이라이트: 다람쥐는 도토리 모자 아래
+  assert.match(html, /const \[hlx, hly\] = spId === 'squirrel' \? \[-\.32, \.06\] : \[-\.22, \.29\];/);
+  // 말풍선은 종마다 머리 꼭대기(귀·모자 포함) 위에 뜬다
+  assert.match(html, /pt\.top = c\.hat \+ \.15 \+ \.38/);
+  assert.match(html, /screen\(pet\.isEgg \? 1\.5 : \(pet\.top \|\| 1\.75\)/);
+  // 집 안 주인공은 펫이 안쪽으로 걸어갈 때 카메라와 펫 사이를 막지 않게 옆으로 비킨다
+  assert.match(html, /if \(heroWalk && back && back\[1\] > st\.z - \.2 && Math\.abs\(back\[0\] - st\.x\) < 1\.3\) back = houseMove\(/);
+  // 주인공 고르기 카드는 그림을 크게
+  assert.ok(html.includes('.item.hero-card .art{width:96px;height:96px}'));
+  assert.equal((html.match(/class="item hero-card\$\{/g) || []).length, 2);
+});
